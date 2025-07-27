@@ -3,8 +3,11 @@ Build/Debug/
 Build/Release/
 
 # Exclude all library files in WestEngine/Core/Libs and any of its subdirectories
-WestEngine/Core/Libs/**/*.so
-WestEngine/Core/Libs/**/*.a
-WestEngine/Core/Libs/**/*.dll
-WestEngine/Core/Libs/**/*.lib
-WestEngine/Core/Libs/**/*.dylib
+WestEngine/Core/Libs/
+UserInterface/WestEngine/
+
+# Exclude all build paths of Interface module
+UserInterface/build/
+
+# Exclue cache
+WestEngine/.cache
