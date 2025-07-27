@@ -1,4 +1,0 @@
-/home/tobias/Documents/Privat/Engine/UserInterface/build/CMakeFiles/WestInterface.dir
-/home/tobias/Documents/Privat/Engine/UserInterface/build/CMakeFiles/WestInterfaceStatic.dir
-/home/tobias/Documents/Privat/Engine/UserInterface/build/CMakeFiles/edit_cache.dir
-/home/tobias/Documents/Privat/Engine/UserInterface/build/CMakeFiles/rebuild_cache.dir
