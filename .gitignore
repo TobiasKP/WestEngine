@@ -10,4 +10,5 @@ UserInterface/WestEngine/
 UserInterface/build/
 
 # Exclue cache
-WestEngine/.cache
+WestEngine/.cache/
+.cache/
