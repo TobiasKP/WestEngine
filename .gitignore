@@ -1,0 +1,10 @@
+# Exclude only the Build/Debug and Build/Relese folders (not the entire Build/ folder)
+Build/Debug/
+Build/Release/
+
+# Exclude all library files in WestEngine/Core/Libs and any of its subdirectories
+WestEngine/Core/Libs/**/*.so
+WestEngine/Core/Libs/**/*.a
+WestEngine/Core/Libs/**/*.dll
+WestEngine/Core/Libs/**/*.lib
+WestEngine/Core/Libs/**/*.dylib
