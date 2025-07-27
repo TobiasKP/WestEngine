@@ -1,0 +1,76 @@
+#pragma once
+
+#if defined(_WIN32) || defined(_WIN64)
+#ifdef WEST_INTERFACE_EXPORTS
+#define WEST_INTERFACE __declspec(dllexport)
+#else
+#define WEST_INTERFACE __declspec(dllimport)
+#endif
+#else
+#define WEST_INTERFACE __attribute__((visibility("default")))
+#endif
+
+#include "FacadeStructs.h"
+#include "WestInterface/Elements/ContainerElement.cpp"
+#include "WestInterface/InterfaceBuilder.h"
+#include "WestInterface/Observer/EventObserver.h"
+#include "WestInterface/Observer/ValueObserver.h"
+#include "WestInterface/RenderManagment/DrawData.h"
+#include "WestInterface/RenderManagment/UIRenderManager.h"
+
+#include <array>
+#include <atomic>
+#include <cstdint>
+#include <string>
+
+class WEST_INTERFACE WestInterfaceFacade {
+public:
+  WestInterfaceFacade();
+  ~WestInterfaceFacade();
+
+  // Managing Interfaces
+  std::uint8_t createNewInterface(std::uint16_t xScreenPosition,
+                                  std::uint16_t yScreenPosition, float scale,
+                                  std::uint8_t gridLayout,
+                                  std::vector<ElementProxy *> elements);
+  bool destroyInterface(std::uint8_t interfaceId);
+
+  // Adding Elements or removing
+  void addElement(std::uint8_t interfaceId, ElementProxy *element);
+  bool removeElement(std::uint8_t interfaceId, std::uint32_t elementId);
+
+  // RenderLoop
+  void updateRenderData();
+  const RenderData getRenderData();
+
+  // Events
+  bool notify(std::uint8_t event, std::uint16_t mouseX, std::uint16_t mouseY);
+  bool notify(std::uint8_t event, std::string value);
+
+  // Changes to Interface
+  bool resize(std::uint8_t interfaceId, std::uint16_t width,
+              std::uint16_t height);
+  bool reposition(std::uint8_t interfaceId, std::uint16_t xScreenPosition,
+                  std::uint16_t yScreenPosition);
+
+  // Get Resources
+  const char *getResource(std::string resource);
+
+  friend class UIRenderManager;
+
+protected:
+  std::atomic_bool filled;
+  std::size_t count;
+
+private:
+  std::array<ContainerElement *, 32> _interfaces;
+
+  static constexpr RenderData _instance{};
+
+  ValueObserver _valueObserver;
+  EventObserver _eventObserver;
+  InterfaceBuilder _builder;
+  UIRenderManager _renderManager;
+
+  ContainerElement *findInterfaceById(std::uint8_t id);
+};

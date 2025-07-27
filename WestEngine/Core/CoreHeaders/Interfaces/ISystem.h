@@ -1,0 +1,37 @@
+#pragma once
+
+#define GLM_ENABLE_EXPERIMENTAL
+
+#include <../../../Libs/GLM/gtc/epsilon.hpp>
+#include <../../../Libs/GLM/gtx/norm.hpp>
+#include <vector>
+
+#include "../Entity/Entity.h"
+
+class ISystem {
+public:
+  ISystem() : _name(nullptr) {};
+  virtual ~ISystem() {};
+
+  // Getter
+  inline const char *getName() { return _name; }
+  inline const std::vector<Entity *> getEntities() { return _entities; }
+
+  // Setter
+  inline void setName(const char *name) { _name = name; }
+
+  // Functions
+  inline void addEntity(Entity *e) {
+    std::lock_guard<std::mutex> lock(_mutex);
+    _entities.emplace_back(e);
+  }
+  virtual void update() = 0;
+  virtual void updateDebuggingInfo() = 0;
+
+protected:
+  std::mutex _mutex;
+
+private:
+  const char *_name;
+  std::vector<Entity *> _entities;
+};
