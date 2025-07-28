@@ -28,7 +28,7 @@ void EntityBuilder::createEntities() {
     lua_pop(L, 1);
 
 #ifdef DEBUG
-    WestLogger::getLoggerInstance().writeInfo("Adding new Entity to Scene");
+    WestLogger::getLoggerInstance().writeInfo("Adding new Entity to Scene\n");
 #endif
     Scene::getSceneInstance().addEntity(e);
   }
@@ -79,13 +79,8 @@ void EntityBuilder::modelInfo(Entity *e) {
   char meshPath[256] = {0};
   char texPath[256] = {0};
 
-#ifdef DEBUG
-  strcpy(meshPath, "Debug/assets/Models/");
-  strcpy(texPath, "Debug/assets/Textures/");
-#else
-  strcpy(meshPath, "assets/Models/");
-  strcpy(texPath, "assets/Textures/");
-#endif
+  strcpy(meshPath, "/assets/Models/");
+  strcpy(texPath, "/assets/Textures/");
 
   lua_pushnil(L);
   while (lua_next(L, -2) != 0) {
@@ -104,6 +99,12 @@ void EntityBuilder::modelInfo(Entity *e) {
     lua_pop(L, 1);
   }
 
+#ifdef DEBUG
+  WestLogger::getLoggerInstance().writeInfo("Loading Model\n");
+  WestLogger::getLoggerInstance().writeInfo(meshPath);
+  WestLogger::getLoggerInstance().writeInfo("\n");
+#endif
+
   Model *m = loadModel(strdup(meshPath));
   if (strlen(texPath) > 0) {
     Texture *t = loadTexture(strdup(texPath));
@@ -117,32 +118,37 @@ void EntityBuilder::shaderInfo(Entity *e) {
   char vertexPath[256] = {0};
   char fragmentPath[256] = {0};
 
-#ifdef DEBUG
-  std::strncpy(vertexPath, "Debug/shader/", sizeof(vertexPath));
-  std::strncpy(fragmentPath,  "Debug/shader/", sizeof(fragmentPath));
-#else
-  std::strncpy(vertexPath, "shader/", sizeof(vertexPath));
-  std::strncpy(fragmentPath,"shader/", sizeof(fragmentPath));
-#endif
+  std::strncpy(vertexPath, "/shader/", sizeof(vertexPath));
+  std::strncpy(fragmentPath, "/shader/", sizeof(fragmentPath));
 
   std::int32_t group;
   lua_pushnil(L);
   while (lua_next(L, -2) != 0) {
     if (lua_isnumber(L, -1)) {
-      group = lua_tonumber(L, -1); 
+      group = lua_tonumber(L, -1);
       lua_pop(L, 1);
       continue;
     }
     const char *key = lua_tostring(L, -2);
     if (strcmp(key, "v") == 0) {
       const char *vertex = lua_tostring(L, -1);
-      std::strncat(vertexPath,vertex, sizeof(vertexPath) - strlen(vertexPath) - 1);
+      std::strncat(vertexPath, vertex,
+                   sizeof(vertexPath) - strlen(vertexPath) - 1);
     } else if (strcmp(key, "f") == 0) {
       const char *frag = lua_tostring(L, -1);
-      std::strncat(fragmentPath, frag, sizeof(fragmentPath) - strlen(fragmentPath) - 1);
+      std::strncat(fragmentPath, frag,
+                   sizeof(fragmentPath) - strlen(fragmentPath) - 1);
     }
     lua_pop(L, 1);
   }
+
+#ifdef DEBUG
+  WestLogger::getLoggerInstance().writeInfo("Loading Shader\n");
+  WestLogger::getLoggerInstance().writeInfo(vertexPath);
+  WestLogger::getLoggerInstance().writeInfo("\n");
+  WestLogger::getLoggerInstance().writeInfo(fragmentPath);
+  WestLogger::getLoggerInstance().writeInfo("\n");
+#endif
 
   Shader *s = loadShader(strdup(vertexPath), strdup(fragmentPath), group);
   e->addComponent(BitMasks::Components::SHADER, s);
