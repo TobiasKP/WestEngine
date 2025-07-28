@@ -2,7 +2,7 @@ local entitiyList = { "Bunny" }
 
 local Entities = {}
 
-local utils = require("../Utils")
+local utils = require("Utils")
 
 IntroScene = {}
 

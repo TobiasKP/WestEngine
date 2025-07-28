@@ -1,8 +1,6 @@
 Utils = {}
 
-_DEBUG = true
-
-local yaml = require("../yaml")
+local yaml = require("yaml")
 
 local function interpreteData(data)
   local Entity = {
@@ -42,11 +40,9 @@ function LoadEntity(entity)
   assert(entity ~= nil)
 
   local file = nil
-  if _DEBUG then
-    file = io.open("Debug/lua/Entities/" .. entity .. ".yaml")
-  else
-    file = io.open("lua/Entities/" .. entity .. ".yaml")
-  end
+
+  file = io.open("lua/Entities/" .. entity .. ".yaml")
+
 
   if file == nil then
     print("Error opening file")
@@ -65,6 +61,5 @@ function LoadEntity(entity)
 end
 
 Utils.LoadEntity = LoadEntity
-Utils.DEBUG = _DEBUG
 
 return Utils
