@@ -9,7 +9,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-ShaderManager::ShaderManager() : IManager(nullptr) {
+#ifdef _WIN32
+<include> direct.h
+#define getcwd _getcwd
+#define PATH_MAX MAX_PATH
+#else
+#include <limits.h>
+#include <unistd.h>
+#endif
+
+ShaderManager::ShaderManager()
+    : IManager(nullptr) {
   setName(CoreConstants::SHADER_MANAGER);
 }
 
@@ -44,7 +54,7 @@ std::int32_t ShaderManager::init() {
   _scene->getCamera()->setCameraUniforms(
       UniformUtils::createUniformBufferObject(UniformConstants::CAMERA_UNIFORMS,
                                               sizeof(glm::mat4) * 2, 1));
-  //initInterfaceShader();
+  // initInterfaceShader();
 
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
@@ -192,7 +202,7 @@ GLuint ShaderManager::createShader(const char *shaderFile,
   }
 
 #ifdef DEBUG
-  getString()->format("%s ### Created Shader: %d from File: %s.\n", getName(),
+  getString()->format("%s ### Created Shader: %d for File: %s.\n", getName(),
                       shaderId, shaderFile);
   logDebug(getString()->getBuffer());
 #endif
@@ -246,16 +256,23 @@ void ShaderManager::link(GLuint programId, GLuint vertexId, GLuint fragmentId) {
 }
 
 GLchar *ShaderManager::readShaderSource(const char *shaderFile) {
+
+  char cwd[PATH_MAX];
+  char filePath[PATH_MAX];
+  if (getcwd(cwd, sizeof(cwd)) == NULL)
+    return nullptr;
+
   std::int32_t fd;
-  if (open(shaderFile, O_RDONLY) == -1) {
-    getString()->format("Error opening shader File. Path: %s\n", shaderFile);
+  snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", shaderFile);
+  if ((fd = open(filePath, O_RDONLY)) == -1) {
+    getString()->format("Error opening shader File. Path: %s\n", filePath);
     logFailure(getString()->getBuffer());
     return nullptr;
   }
 
   FILE *file = fdopen(fd, "rb");
   if (file == NULL) {
-    getString()->format("Error opening File. Path: %s\n", shaderFile);
+    getString()->format("Error opening File. Path: %s\n", filePath);
     logFailure(getString()->getBuffer());
     return nullptr;
   }
