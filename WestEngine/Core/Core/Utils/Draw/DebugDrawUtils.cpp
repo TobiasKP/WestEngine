@@ -34,12 +34,8 @@ Entity *DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction,
     return nullptr;
 
   Shader *s = new Shader();
-  snprintf(filePath, sizeof(filePath), "%s%s", cwd,
-           CoreConstants::DEBUG_V_SHADER);
-  s->vertexShaderFile = filePath;
-  snprintf(filePath, sizeof(filePath), "%s%s", cwd,
-           CoreConstants::DEBUG_F_SHADER);
-  s->fragShaderFile = filePath;
+  s->vertexShaderFile = (char *) CoreConstants::DEBUG_V_SHADER;
+  s->fragShaderFile = (char *) CoreConstants::DEBUG_F_SHADER;
   s->shadergroup = CoreConstants::DEBUG_SHADERGROUP;
 
   Entity *e = new Entity(Config::EngineInternals.INTERNAL_ENTITY_ID++);

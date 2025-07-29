@@ -5,15 +5,25 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <algorithm>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <algorithm>
 
-Model *ObjectLoader::loadModel(float *vertices, size_t verticesLength,
-                               std::int32_t *indices, size_t indicesLength,
-                               float *texture, size_t textureLength,
-                               float *normals, size_t normalsLength) {
+#ifdef _WIN32
+<include> direct.h
+#define getcwd _getcwd
+#define PATH_MAX MAX_PATH
+#else
+#include <limits.h>
+#include <unistd.h>
+#endif
+
+    Model *
+    ObjectLoader::loadModel(float *vertices, size_t verticesLength,
+                            std::int32_t *indices, size_t indicesLength,
+                            float *texture, size_t textureLength,
+                            float *normals, size_t normalsLength) {
   assert(vertices != nullptr && verticesLength > 0 && indices != nullptr &&
          indicesLength > 0 && _logger != nullptr);
 
@@ -34,20 +44,29 @@ Model *ObjectLoader::loadModel(float *vertices, size_t verticesLength,
   Model *m = new Model();
   m->id = id;
   m->vertexCount = indicesLength / sizeof(std::int32_t);
-  return m; 
+  return m;
 }
 
 Model *ObjectLoader::loadModel(const char *path) {
+
+  char cwd[PATH_MAX];
+  char filePath[PATH_MAX];
+  if (getcwd(cwd, sizeof(cwd)) == NULL)
+    return nullptr;
+
   std::int32_t fd;
   FILE *file;
-  if (open( path, O_RDONLY) == -1) {
-    _logger->writeError("---Error opening File!");
+  snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", path);
+  if ((fd = open(filePath, O_RDONLY)) == -1) {
+    _logger->writeError("---Error opening File!\n Path: ");
+    _logger->writeError(filePath);
+    _logger->writeError("\n");
     // TODO return drawdebug Cube
     return nullptr;
   }
 
   if ((file = fdopen(fd, "r")) == NULL) {
-    _logger->writeError("---Error opening File!");
+    _logger->writeError("---Error opening File!\n");
     return nullptr;
   }
 
@@ -83,28 +102,28 @@ Model *ObjectLoader::loadOBJModel(FILE *file) {
       normals.push_back(nz);
     } else if (strncmp(line, "f ", 2) == 0) {
       std::int32_t vertexIndex[3], textureIndex[3] = {0}, normalIndex[3] = {0};
-      int matches = sscanf(
-          line + 2, "%d/%d/%d %d/%d/%d %d/%d/%d", &vertexIndex[0],
-          &textureIndex[0], &normalIndex[0], &vertexIndex[1], &textureIndex[1],
-          &normalIndex[1], &vertexIndex[2], &textureIndex[2], &normalIndex[2]);
+      int matches = sscanf(line + 2, "%d/%d/%d %d/%d/%d %d/%d/%d",
+                           &vertexIndex[0], &textureIndex[0], &normalIndex[0],
+                           &vertexIndex[1], &textureIndex[1], &normalIndex[1],
+                           &vertexIndex[2], &textureIndex[2], &normalIndex[2]);
 
       if (matches != 9) {
         matches = sscanf(line + 2, "%d/%d %d/%d %d/%d", &vertexIndex[0],
-                           &textureIndex[0], &vertexIndex[1], &textureIndex[1],
-                           &vertexIndex[2], &textureIndex[2]);
+                         &textureIndex[0], &vertexIndex[1], &textureIndex[1],
+                         &vertexIndex[2], &textureIndex[2]);
       }
 
       if (matches != 6) {
-        matches = sscanf(line + 2, "%d %d %d", &vertexIndex[0],
-                           &vertexIndex[1], &vertexIndex[2]);
+        matches = sscanf(line + 2, "%d %d %d", &vertexIndex[0], &vertexIndex[1],
+                         &vertexIndex[2]);
       }
 
-      if (matches >= 3) { 
+      if (matches >= 3) {
         indices.push_back(vertexIndex[0] - 1);
         indices.push_back(vertexIndex[1] - 1);
         indices.push_back(vertexIndex[2] - 1);
 
-        if (matches >= 6) { 
+        if (matches >= 6) {
           for (int i = 0; i < 3; i++) {
             int texIndex = textureIndex[i] - 1;
             if (texIndex >= 0 && texIndex < textures.size() / 2) {
@@ -114,7 +133,7 @@ Model *ObjectLoader::loadOBJModel(FILE *file) {
           }
         }
 
-        if (matches == 9) { 
+        if (matches == 9) {
           for (int i = 0; i < 3; i++) {
             int normIndex = normalIndex[i] - 1;
             if (normIndex >= 0 && normIndex < normals.size() / 3) {
