@@ -3,19 +3,19 @@
 #include <lua.hpp>
 
 #ifdef _WIN32
-  <include> direct.h
-  #define getcwd _getcwd
-  #define PATH_MAX MAX_PATH
+<include> direct.h
+#define getcwd _getcwd
+#define PATH_MAX MAX_PATH
 #else
-  #include <unistd.h>
-  #include <limits.h>
+#include <limits.h>
+#include <unistd.h>
 #endif
 
 #include "../CoreHeaders/Entity/Camera.h"
 #include "../CoreHeaders/Utils/TimeUtils.h"
 
-
-SceneManager::SceneManager() : IManager(nullptr) {
+SceneManager::SceneManager()
+    : IManager(nullptr) {
   setName(CoreConstants::SCENE_MANAGER);
 }
 
@@ -33,13 +33,15 @@ std::int32_t SceneManager::startup() {
   L = luaL_newstate();
   luaL_openlibs(L);
   _builder = new EntityBuilder(L, _loader);
+#ifdef DEBUG
+  logDebug(std::format("{} ### instantiated lus state", getName()));
+#endif
   return 0;
 }
 
 void SceneManager::shutdown() {
 #ifdef DEBUG
-  getString()->format("%s ### Shutting down %s...\n", getName(), getName());
-  logDebug(getString()->getBuffer());
+  logDebug(std::format("{} ### Shutting down {}...\n", getName(), getName()));
 #endif
   lua_close(L);
   deleteScene();
@@ -52,14 +54,13 @@ std::int32_t SceneManager::init() {
 
   _scene->init();
 
-
   char cwd[PATH_MAX];
   char filePath[PATH_MAX];
   if (getcwd(cwd, sizeof(cwd)) == NULL)
     return 1;
 
   snprintf(filePath, sizeof(filePath), "%s%s", cwd,
-           CoreConstants::LUA_INIT_FILE);
+           CoreConstants::LUA_INIT_FILE.c_str());
   luaL_dofile(L, filePath);
   lua_getglobal(L, "Init");
   lua_call(L, 0, 0);
@@ -77,13 +78,11 @@ std::int32_t SceneManager::init() {
   // This block belongs together for loading all entitys of a given scene
 
 #ifdef DEBUG
-  getString()->format("%s ### Scene Initialized\n", getName());
-  logDebug(getString()->getBuffer());
+  logDebug(std::format("{} ### Scene Initialized\n", getName()));
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
-  getString()->format("%s ### %s init time: %f ms.\n", getName(), getName(),
-                      res);
-  logDebug(getString()->getBuffer());
+  logDebug(
+      std::format("{} ### %s init time: {} ms.\n", getName(), getName(), res));
 #endif
 
   return 0;
@@ -98,9 +97,8 @@ void SceneManager::update() {
 
 void SceneManager::removeEntityFromScene(Entity *entity) {
 #ifdef DEBUG
-  getString()->format("%s ### Removing Entitiy from Scene: %d\n", getName(),
-                      entity->getId());
-  logDebug(getString()->getBuffer());
+  logDebug(std::format("{} ### Removing Entitiy from Scene: {}\n", getName(),
+                       entity->getId()));
 #endif
   _scene->removeEntity(entity);
   if (!entity->isDebugEntity())
@@ -111,12 +109,10 @@ void SceneManager::removeEntityFromScene(Entity *entity) {
 void SceneManager::deleteScene() {
   _loader->cleanup();
 #ifdef DEBUG
-  getString()->format("%s ### Cleaned up GPU memory\n", getName());
-  logDebug(getString()->getBuffer());
+  logDebug(std::format("{} ### Cleaned up GPU memory\n", getName()));
 #endif
   _scene->deleteScene();
 #ifdef DEBUG
-  getString()->format("%s ### Deleted Scene\n", getName());
-  logDebug(getString()->getBuffer());
+  logDebug(std::format("{} ### Deleted Scene\n", getName()));
 #endif
 }

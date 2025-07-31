@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <mutex>
+#include <string>
 
 #include "../../../Constants/CoreConstants.h"
 
@@ -12,8 +13,8 @@ public:
   WestLogger(WestLogger const &) = delete;
   void operator=(WestLogger const &) = delete;
 
-  void writeInfo(const char *message);
-  void writeError(const char *message);
+  void writeInfo(const std::string message);
+  void writeError(const std::string message);
   void closeFileStreams();
 
 private:

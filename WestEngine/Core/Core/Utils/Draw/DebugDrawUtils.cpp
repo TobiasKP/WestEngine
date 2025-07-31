@@ -1,16 +1,16 @@
 #include "../../../CoreHeaders/Utils/Draw/DebugDrawUtils.h"
 
 #ifdef _WIN32
-  <include> direct.h
-  #define getcwd _getcwd
-  #define PATH_MAX MAX_PATH
+<include> direct.h
+#define getcwd _getcwd
+#define PATH_MAX MAX_PATH
 #else
-  #include <unistd.h>
-  #include <limits.h>
+#include <limits.h>
+#include <unistd.h>
 #endif
 
-#include "../../../Constants/CoreConstants.h"
 #include "../../../Config/Config.h"
+#include "../../../Constants/CoreConstants.h"
 #include "../../../CoreHeaders/Entity/Entity.h"
 
 DebugDrawUtils::DebugDrawUtils(WestLogger *logger) {
@@ -30,12 +30,12 @@ Entity *DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction,
 
   char cwd[PATH_MAX];
   char filePath[PATH_MAX];
-  if (getcwd(cwd, sizeof(cwd)) == NULL) 
+  if (getcwd(cwd, sizeof(cwd)) == NULL)
     return nullptr;
 
   Shader *s = new Shader();
-  s->vertexShaderFile = (char *) CoreConstants::DEBUG_V_SHADER;
-  s->fragShaderFile = (char *) CoreConstants::DEBUG_F_SHADER;
+  s->vertexShaderFile = CoreConstants::DEBUG_V_SHADER;
+  s->fragShaderFile = CoreConstants::DEBUG_F_SHADER;
   s->shadergroup = CoreConstants::DEBUG_SHADERGROUP;
 
   Entity *e = new Entity(Config::EngineInternals.INTERNAL_ENTITY_ID++);

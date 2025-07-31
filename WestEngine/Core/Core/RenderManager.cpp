@@ -1,11 +1,11 @@
 #include "../CoreHeaders/RenderManager.h"
 
+#include "../Config/Config.h"
 #include "../CoreHeaders/InterfaceManager.h"
 #include "../CoreHeaders/Utils/DataUtils/ObjectLoader.h"
 #include "../CoreHeaders/Utils/DataUtils/UniformUtils.h"
 #include "../CoreHeaders/Utils/Math/PositionCalculation.h"
 #include "../CoreHeaders/Utils/TimeUtils.h"
-#include "../Config/Config.h"
 
 GLuint RenderManager::_usedShaderProgram = 0;
 
@@ -23,8 +23,7 @@ std::int32_t RenderManager::startup() { return 0; }
 
 void RenderManager::shutdown() {
 #ifdef DEBUG
-  getString()->format("%s ### Shutting down %s...\n", getName(), getName());
-  logDebug(getString()->getBuffer());
+  logDebug(std::format("{} ### Shutting down {}...\n", getName(), getName()));
 #endif
 }
 
@@ -34,14 +33,13 @@ std::int32_t RenderManager::init() {
 #endif
 
   _scene = &Scene::getSceneInstance();
-  //initInterfaceBuffer();
+  // initInterfaceBuffer();
 
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
-  getString()->format("%s ### RenderManager init time: %f ms.\n", getName(),
-                      res);
-  logDebug(getString()->getBuffer());
+  logDebug(
+      std::format("{} ### RenderManager init time: {} ms.\n", getName(), res));
 #endif
 
   return 0;
@@ -49,7 +47,7 @@ std::int32_t RenderManager::init() {
 
 void RenderManager::update() {
   clearColor();
-  //renderUserInterfaces();
+  // renderUserInterfaces();
   renderGameEntities();
 }
 
@@ -93,9 +91,8 @@ void RenderManager::renderGameEntities() {
     Shader *s = (Shader *)entity->getComponent(BitMasks::Components::SHADER);
     if (!s->initialized) {
 #ifdef DEBUG
-      getString()->format("!!! Entity shader not initialized! Entity: %d\n",
-                          entity->getId());
-      logDebug(getString()->getBuffer());
+      logDebug(std::format("!!! Entity shader not initialized! Entity: {}\n",
+                           entity->getId()));
 #endif
       glUseProgram(0);
       _usedShaderProgram = 0;
@@ -132,12 +129,12 @@ void RenderManager::renderGameEntities() {
 }
 
 void RenderManager::renderUserInterfaces() {
-  //glUseProgram(Global::UserInterface::SHADER_PROGRAM);
+  // glUseProgram(Global::UserInterface::SHADER_PROGRAM);
   //_usedShaderProgram = Global::UserInterface::SHADER_PROGRAM;
   glBindVertexArray(_quadVAO);
   UniformUtils::setUniform(_texture, 0);
-  //UniformUtils::setUniform(Global::UserInterface::ORTHO_UNIFORM,
-  //                         Global::UserInterface::ORTHO_MATRIX);
+  // UniformUtils::setUniform(Global::UserInterface::ORTHO_UNIFORM,
+  //                          Global::UserInterface::ORTHO_MATRIX);
   std::vector<glm::vec2> positionsOfElements;
   std::uint16_t totalCount;
   /*for (IUserInterface *interface : InterfaceManager::getInterfaces()) {

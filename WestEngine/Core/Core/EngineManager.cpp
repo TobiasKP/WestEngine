@@ -3,15 +3,14 @@
 #include "../Config/Config.h"
 #include "../Constants/CoreConstants.h"
 
-#include "../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
-#include "../CoreHeaders/Utils/TimeUtils.h"
-
 #include "../CoreHeaders/InputManager.h"
 #include "../CoreHeaders/InterfaceManager.h"
 #include "../CoreHeaders/RenderManager.h"
 #include "../CoreHeaders/SceneManager.h"
 #include "../CoreHeaders/ShaderManager.h"
 #include "../CoreHeaders/SystemManager.h"
+#include "../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
+#include "../CoreHeaders/Utils/TimeUtils.h"
 
 EngineManager::EngineManager() : IManager(nullptr) {
   setName(CoreConstants::ENGINE_MANAGER);
@@ -44,16 +43,13 @@ std::int32_t EngineManager::startup() {
 #endif
 
   std::int32_t success = iterateQ(CYCLE::STARTUP);
-
-  getString()->format("%s ### Startup complete\n", getName());
-  logDebug(getString()->getBuffer());
+  logDebug(std::format("{} ### Startup complete\n", getName()));
 
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
-  double res = TimeUtils::getDuration(start, end);
-  getString()->format("%s ### All Managers started! startup time: %f ms.\n",
-                      getName(), res);
-  logDebug(getString()->getBuffer());
+  double res = TimeUtils::getDuration(start, end); 
+  logDebug(std::format("{} ### All Managers started! startup time: {} ms.\n",
+                      getName(), res));
 #endif
 
   return success;
@@ -61,8 +57,7 @@ std::int32_t EngineManager::startup() {
 
 void EngineManager::shutdown() {
 #ifdef DEBUG
-  getString()->format("%s ### Shutting down %s...\n", getName(), getName());
-  logDebug(getString()->getBuffer());
+  logDebug(std::format("{} ### Shutting down {}...\n", getName(), getName()));
 #endif
   assert(_engineQ != nullptr && _engineQ->getSize() > 0);
   while (!_engineQ->isEmpty()) {
@@ -82,8 +77,7 @@ void EngineManager::update() {
   double delta = 0;
 
 #ifdef DEBUG
-  getString()->format("%s ### STARTING MAIN GAME LOOP.\n", getName());
-  logDebug(getString()->getBuffer());
+  logDebug(std::format("{} ### STARTING MAIN GAME LOOP.\n", getName()));
 #endif
 
   while (!_exitEngine) {
@@ -112,8 +106,8 @@ void EngineManager::update() {
 
       if (frameCounter >= _NANOSECOND) {
         setFps(frames);
-        getString()->format("%s : %d", CoreConstants::TITLE, getFps());
-        _windowManager->setWindowTitle(getString()->getBuffer());
+        _windowManager->setWindowTitle(
+            std::format("{} : {}", CoreConstants::TITLE, getFps()));
 
         frames = 0;
         frameCounter = 0;
@@ -137,9 +131,8 @@ std::int32_t EngineManager::init() {
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
-  getString()->format("%s ### All Managers initialized! init time: %f ms.\n",
-                      getName(), res);
-  logDebug(getString()->getBuffer());
+  logDebug(std::format("{} ### All Managers initialized! init time: {} ms.\n",
+                       getName(), res));
 #endif
   return success;
 }
@@ -165,9 +158,9 @@ std::int32_t EngineManager::iterateQ(CYCLE code) {
 
     if (success != 0) {
 #ifdef DEBUG
-      getString()->format("%s ### Failure in %s for cycle: %i \n", getName(),
-                          item->getName(), code);
-      logFailure(getString()->getBuffer());
+      int enumCode = code;
+      logFailure(std::format("{} ### Failure in {} for cycle: {}\n", getName(),
+                             item->getName(), enumCode));
 #endif
       break;
     }
@@ -178,9 +171,8 @@ std::int32_t EngineManager::iterateQ(CYCLE code) {
     if (code == CYCLE::UPDATE) {
       double end = TimeUtils::getCurrentTimeAsTime();
       double res = TimeUtils::getDuration(start, end);
-      getString()->format("%s ### Queue time: %f ms. for: %s \n", getName(),
-                          res, item->getName());
-      logDebug(getString()->getBuffer());
+      logDebug(std::format("{} ### Queue time: {} ms. for: {} \n", getName(),
+                           res, item->getName()));
     }
 #endif
   }
@@ -199,17 +191,16 @@ std::int32_t EngineManager::executeCycle(CYCLE code, IManager *item) {
     item->update();
     return 0;
   default:
-    getString()->format("%s ### unknown territory ... code: %d\n", getName(),
-                        code);
-    logFailure(getString()->getBuffer());
+    logFailure(std::format("{} ### unknown territory ... code: {}\n", getName(),
+                           (int)code));
     return 1;
   }
 }
 
 bool EngineManager::isPauseCycle(CYCLE code, IManager *item) {
   bool pauseExecute = code == CYCLE::PAUSE;
-  bool isManager = strcmp(item->getName(), CoreConstants::INPUT_MANAGER) == 0 ||
-                   strcmp(item->getName(), CoreConstants::WINDOW_MANAGER) == 0;
+  bool isManager = CoreConstants::INPUT_MANAGER.compare(item->getName()) == 0 ||
+                   CoreConstants::WINDOW_MANAGER.compare(item->getName()) == 0;
 
   return pauseExecute && !isManager;
 }

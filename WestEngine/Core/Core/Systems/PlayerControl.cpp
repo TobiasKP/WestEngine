@@ -1,13 +1,15 @@
 #include "../../CoreHeaders/Systems/PlayerControl.h"
 
-#include "../../Constants/Systems.h"
+#include <format>
+
 #include "../../Config/Config.h"
+#include "../../Constants/Systems.h"
 
 PlayerControl::PlayerControl(WestLogger *logger)
     : ISystem(), _logger(logger), _cameraPending(false) {
   setName(Systems::PLAYER_CONTROL);
-  _string = new WestString();
 #ifdef DEBUG
+  _logger->writeInfo(std::format("{} *** Initialized debug information", getName()));
   _debugDrawUtils = new DebugDrawUtils(_logger);
   _debugEntity = nullptr;
   _drawn = false, _camLog = true, _posLog = true;
@@ -17,7 +19,7 @@ PlayerControl::PlayerControl(WestLogger *logger)
 PlayerControl::~PlayerControl() {}
 
 void PlayerControl::update() {
-  assert(_logger != nullptr && _string != nullptr);
+  assert(_logger != nullptr);
   if (_cameraPending.exchange(false)) {
     glm::vec3 localCam;
     {
@@ -27,9 +29,9 @@ void PlayerControl::update() {
 
 #ifdef DEBUG
     if (_camLog) {
-      _string->format("%s *** updating Camera position (%f, %f, %f)\n",
-                      getName(), localCam.x, localCam.y, localCam.z);
-      _logger->writeInfo(_string->getBuffer());
+      _logger->writeInfo(
+          std::format("{} *** updating Camera position ({}, {}, {})\n",
+                      getName(), localCam.x, localCam.y, localCam.z));
       _camLog = false;
     }
 #endif
@@ -52,9 +54,8 @@ void PlayerControl::update() {
   if (pending || !destinationReached(posComp)) {
     glm::vec3 localDest;
 #ifdef DEBUG
-    if (_debugEntity != nullptr && !_debugEntity->isDestroyed() && pending) {
-      _string->format("%s *** Destroying destination Debug Line\n", getName());
-      _logger->writeInfo(_string->getBuffer());
+    if (_debugEntity != nullptr && !_debugEntity->isDestroyed() && pending) { 
+      _logger->writeInfo(std::format("{} *** Destroying destination Debug Line\n", getName()));
       _debugEntity->destroy();
       _drawn = false;
     }
@@ -65,13 +66,12 @@ void PlayerControl::update() {
     }
 #ifdef DEBUG
     if (_posLog) {
-      glm::vec3 currentPos = posComp->position;
-      _string->format("%s *** Moving entity at position: (%f, %f, %f) - to "
-                      "position: (%f, %f, %f)\n",
+      glm::vec3 currentPos = posComp->position; 
+      _logger->writeInfo(std::format("{} *** Moving entity at position: ({}, {}, {}) - to "
+                      "position: ({}, {}, {})\n",
                       getName(), currentPos.x, currentPos.y, currentPos.z,
                       _moveToDestination.x, _moveToDestination.y,
-                      _moveToDestination.z);
-      _logger->writeInfo(_string->getBuffer());
+                      _moveToDestination.z));
       _posLog = false;
     }
 #endif
@@ -95,7 +95,8 @@ void PlayerControl::updatePosition(glm::vec3 local, Position *posComp) {
   assert(posComp != nullptr);
   glm::vec3 direction = local - posComp->position;
 
-  if (glm::length2(direction) <= Config::GeneralConfig.SPEED * Config::GeneralConfig.SPEED) {
+  if (glm::length2(direction) <=
+      Config::GeneralConfig.SPEED * Config::GeneralConfig.SPEED) {
     posComp->position = local;
     return;
   }
@@ -108,9 +109,8 @@ bool PlayerControl::destinationReached(Position *posComp) {
   bool reached = glm::all(glm::epsilonEqual(
       posComp->position, _moveToDestination, Config::GeneralConfig.EPSILON));
 #ifdef DEBUG
-  if (_debugEntity != nullptr && !_debugEntity->isDestroyed() && reached) {
-    _string->format("%s *** Destroying destination Debug Line\n", getName());
-    _logger->writeInfo(_string->getBuffer());
+  if (_debugEntity != nullptr && !_debugEntity->isDestroyed() && reached) { 
+    _logger->writeInfo(std::format("{} *** Destroying destination Debug Line\n", getName()));
     _debugEntity->destroy();
     _drawn = false;
   }
@@ -147,14 +147,14 @@ void PlayerControl::updateDebuggingInfo() {
       BitMasks::Components::POSITION);
   assert(posComp != nullptr);
   glm::vec3 direction = _moveToDestination - posComp->position;
-  if (glm::length2(direction) <= Config::GeneralConfig.SPEED * Config::GeneralConfig.SPEED) {
+  if (glm::length2(direction) <=
+      Config::GeneralConfig.SPEED * Config::GeneralConfig.SPEED) {
     return;
   }
-
-  _string->format("%s *** Drawing destination Debug Line from: %f, %f, %f\n",
+ 
+  _logger->writeInfo(std::format("{} *** Drawing destination Debug Line from: {}, {}, {}\n",
                   getName(), posComp->position.x, posComp->position.y,
-                  posComp->position.z);
-  _logger->writeInfo(_string->getBuffer());
+                  posComp->position.z));
 
   glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0f);
   _debugEntity = _debugDrawUtils->addLine(posComp->position, direction, color);

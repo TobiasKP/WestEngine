@@ -10,15 +10,15 @@
 
 class ISystem {
 public:
-  ISystem() : _name(nullptr) {};
+  ISystem() : _name(CoreConstants::UNDEFINED_STRING) {};
   virtual ~ISystem() {};
 
   // Getter
-  inline const char *getName() { return _name; }
+  inline std::string getName() { return _name; }
   inline const std::vector<Entity *> getEntities() { return _entities; }
 
   // Setter
-  inline void setName(const char *name) { _name = name; }
+  inline void setName(const std::string name) { _name = name; }
 
   // Functions
   inline void addEntity(Entity *e) {
@@ -32,6 +32,6 @@ protected:
   std::mutex _mutex;
 
 private:
-  const char *_name;
+  std::string _name = CoreConstants::UNDEFINED_STRING;
   std::vector<Entity *> _entities;
 };

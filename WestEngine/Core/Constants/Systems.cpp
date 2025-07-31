@@ -2,7 +2,7 @@
 
 namespace Systems {
 
-const char *SYSTEMS = "systems";
-const char *PLAYER_CONTROL = "PlayerControl";
+const std::string SYSTEMS = "systems";
+const std::string PLAYER_CONTROL = "PlayerControl";
 
 } // namespace Systems

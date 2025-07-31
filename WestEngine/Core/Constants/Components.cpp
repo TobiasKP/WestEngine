@@ -1,8 +1,8 @@
 #include "Components.h"
 
 namespace Components {
-const char* COMPONENTS = "components";
-const char* MODEL = "model";
-const char* SHADER = "shader";
-const char* POSITION = "Position";
+const std::string COMPONENTS = "components";
+const std::string MODEL = "model";
+const std::string SHADER = "shader";
+const std::string POSITION = "Position";
 }

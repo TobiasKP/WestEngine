@@ -25,7 +25,7 @@ public:
   // Functions
   void setKey(std::int32_t key, const char *command);
   std::int32_t findByOperation(const char *command);
-  const char *findByKey(std::int32_t key);
+  const std::string findByKey(std::int32_t key);
 
 private:
   std::map<std::int32_t, const char *> _inputMap;

@@ -31,7 +31,7 @@ void WestLogger::closeFileStreams() {
   _errorFile.close();
 }
 
-void WestLogger::writeInfo(const char *message) {
+void WestLogger::writeInfo(const std::string message) {
   std::lock_guard<std::mutex> lock(_mutex);
   if (_logFile.is_open()) {
     _logFile << message;
@@ -39,7 +39,7 @@ void WestLogger::writeInfo(const char *message) {
   }
 }
 
-void WestLogger::writeError(const char *message) {
+void WestLogger::writeError(const std::string message) {
   std::lock_guard<std::mutex> lock(_mutex);
   if (_errorFile.is_open()) {
     _errorFile << message;

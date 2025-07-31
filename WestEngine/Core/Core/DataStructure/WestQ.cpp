@@ -1,10 +1,9 @@
 #include "../../CoreHeaders/DataStructure/WestQ.h"
 
-#include "../../CoreHeaders/Utils/WestString.h"
+#include <format>
 
 WestQ::WestQ() {
   _logger = nullptr;
-  _string = nullptr;
   _size = 0;
   _capacity = 0;
   _array = new IManager *[_capacity];
@@ -15,14 +14,12 @@ WestQ::WestQ() {
 WestQ::WestQ(std::uint8_t maxCapacity, WestLogger *logger) {
   assert(logger && maxCapacity > 0);
   _logger = logger;
-  _string = new WestString();
   _capacity = maxCapacity;
   _front = _size = 0;
   _array = new IManager *[_capacity];
   _rear = _capacity - 1;
-#ifdef DEBUG
-  _string->format("Initialized Manager Queue with capacity: %d\n",_capacity);
-  _logger->writeInfo(_string->getBuffer());
+#ifdef DEBUG 
+  _logger->writeInfo(std::format("Initialized Manager Queue with capacity: {}\n",_capacity));
 #endif
 }
 
@@ -36,9 +33,8 @@ WestQ::~WestQ() {
 
 void WestQ::enqueue(IManager *item) {
   assert(item);
-  if (isFull()) {
-    _string->format("West Queue is full! stopped trying to add: %s", item->getName());
-    _logger->writeError(_string->getBuffer());
+  if (isFull()) { 
+    _logger->writeError(std::format("West Queue is full! stopped trying to add: {}", item->getName()));
     return;
   }
 

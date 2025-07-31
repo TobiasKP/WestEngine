@@ -23,7 +23,7 @@ public:
 
   // Getter
   std::vector<Entity *> getEntities();
-  inline char *getSceneName() { return _sceneName; }
+  inline std::string getSceneName() { return _sceneName; }
   inline Camera *getCamera() { return _camera; }
 
 private:
@@ -33,7 +33,7 @@ private:
   static Camera *_camera;
   std::vector<Entity *> _entities;
   std::vector<Entity *> _debugEntities;
-  char *_sceneName;
+  std::string _sceneName = CoreConstants::UNDEFINED_STRING;
 
   Scene();
   ~Scene();

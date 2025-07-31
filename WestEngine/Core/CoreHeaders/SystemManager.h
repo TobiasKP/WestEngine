@@ -22,7 +22,7 @@ public:
   void update() override;
   std::int32_t init() override;
 
-  static ISystem* getSystemByName(const char* name);
+  static ISystem* getSystemByName(const std::string name);
 
 private:
   Scene *_scene;
