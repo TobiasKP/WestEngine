@@ -1,15 +1,15 @@
 
 @echo off
 :: Define source and target directories
-set "SOURCE_SCRIPTS=%~dp0Core\Game\Scripts"
+set "SOURCE_SCRIPTS=%~dp0WestEngine\Core\Game\Scripts"
 set "TARGET_SCRIPTS=%~dp0Debug\lua"
 set "TARGETR_SCRIPTS=%~dp0Release\lua"
 
-set "SOURCE_ASSETS=%~dp0Core\Game\Assets"
+set "SOURCE_ASSETS=%~dp0WestEngine\Core\Game\Assets"
 set "TARGET_ASSETS=%~dp0Debug\assets"
 set "TARGETR_ASSETS=%~dp0Release\assets"
 
-set "SOURCE_SHADERS=%~dp0Core\Shader"
+set "SOURCE_SHADERS=%~dp0WestEngine\Core\Shader"
 set "TARGET_SHADERS=%~dp0Debug\shader"
 set "TARGETR_SHADERS=%~dp0Release\shader"
 
