@@ -2,15 +2,16 @@
 
 #include <cassert>
 #include <cstdint>
+#include <string>
+#include <format>
 #include <iostream>
 
 #include "../Utils/Logging/WestLogger.h"
-#include "../Utils/WestString.h"
 
 class IManager {
 
 public:
-  IManager(WestLogger *logger) : _logger(logger), _string(new WestString()) {};
+  IManager(WestLogger *logger) : _logger(logger) {};
   virtual ~IManager() {};
 
   virtual std::int32_t startup() = 0;
@@ -18,19 +19,17 @@ public:
   virtual void update() = 0;
   virtual std::int32_t init() = 0;
 
-  inline void setName(const char *name) { this->_name = name; }
+  inline void setName(std::string name) { this->_name = name; }
 
-  inline const char *getName() { return this->_name; }
-  inline WestString *getString() { return this->_string; }
+  inline const std::string getName() { return this->_name; }
   inline WestLogger *getLogger() { return this->_logger; }
 
 protected:
-  inline void logFailure(const char *message) { _logger->writeError(message); }
-  inline void logDebug(const char *message) { _logger->writeInfo(message); };
+  inline void logFailure(const std::string message) { _logger->writeError(message); }
+  inline void logDebug(const std::string message) { _logger->writeInfo(message); };
 
 private:
   WestLogger *_logger = nullptr;
-  const char *_name = nullptr;
-  WestString *_string = nullptr;
+  std::string _name = CoreConstants::UNDEFINED_STRING;
 };
 

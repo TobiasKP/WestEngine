@@ -17,19 +17,19 @@ void KeyboardCallbacks::keyboardCallback(GLFWwindow *window, int key,
 
   assert(_iManager != nullptr && _wManager != nullptr && _iObserver != nullptr);
 
-  const char *command = _iManager->findByKey(key);
-  if (command == nullptr) {
+  const std::string command = _iManager->findByKey(key);
+  if (command.compare(CoreConstants::UNDEFINED_STRING)) {
     return;
-  } else if (strcmp(command, "Pause") == 0 && action == GLFW_PRESS) {
+  } else if (command.compare("Pause") == 0 && action == GLFW_PRESS) {
     Config::EngineInternals.PAUSE = !Config::EngineInternals.PAUSE;
-  } else if (strcmp(command, "OpenMenu") == 0 && action == GLFW_PRESS &&
+  } else if (command.compare("OpenMenu") == 0 && action == GLFW_PRESS &&
              !Config::EngineInternals.PAUSE) {
     _iObserver->setGeneralFlag(BitMasks::General::MENU);
   }
 }
 
 void KeyboardCallbacks::executeBoundOperation(std::int32_t key,
-                                              const char *boundOperation) {
+                                              const std::string boundOperation) {
   assert(_iManager != nullptr && _wManager != nullptr && _iObserver != nullptr);
   if (!_wManager->isKeyPressed(key) || Config::EngineInternals.PAUSE) {
     return;
@@ -37,16 +37,16 @@ void KeyboardCallbacks::executeBoundOperation(std::int32_t key,
 
   std::int32_t x = 0, y = 0;
   bool updateCam = false;
-  if (strcmp(boundOperation, "CameraUp") == 0) {
+  if (boundOperation.compare("CameraUp") == 0) {
     y = 1;
     updateCam = true;
-  } else if (strcmp(boundOperation, "CameraDown") == 0) {
+  } else if (boundOperation.compare("CameraDown") == 0) {
     y = -1;
     updateCam = true;
-  } else if (strcmp(boundOperation, "CameraLeft") == 0) {
+  } else if (boundOperation.compare("CameraLeft") == 0) {
     x = -1;
     updateCam = true;
-  } else if (strcmp(boundOperation, "CameraRight") == 0) {
+  } else if (boundOperation.compare("CameraRight") == 0) {
     x = 1;
     updateCam = true;
   }

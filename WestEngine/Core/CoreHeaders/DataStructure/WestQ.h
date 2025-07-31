@@ -5,7 +5,6 @@
 
 #include "../Interfaces/IManager.h"
 #include "../Utils/Logging/WestLogger.h"
-#include "../Utils/WestString.h"
 
 class WestQ {
 
@@ -30,5 +29,4 @@ private:
   std::int32_t _front, _rear,  _size;
   std::uint8_t _capacity;
   IManager **_array;
-  WestString *_string;
 };

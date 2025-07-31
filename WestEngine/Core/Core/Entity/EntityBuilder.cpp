@@ -4,6 +4,9 @@
 #include "../../Constants/Systems.h"
 #include "../../CoreHeaders/Entity/Scene.h"
 
+#include <stdio.h>
+#include <string.h>
+
 #include <iostream>
 
 void EntityBuilder::createEntities() {
@@ -35,18 +38,18 @@ void EntityBuilder::createEntities() {
 }
 
 void EntityBuilder::createProperties(Entity *e) {
-  std::map<const char *, std::int32_t, CStrCmp> infos;
-  char *name;
+  std::map<std::string, std::int32_t> infos;
+  std::string name = CoreConstants::UNDEFINED_STRING;
   const char *key = lua_tostring(L, -2);
 
   lua_pushnil(L);
-  if (strcmp(key, Components::COMPONENTS) == 0) {
+  if (Components::COMPONENTS.compare(key) == 0) {
     while (lua_next(L, -2) != 0) {
       parseInfos(infos, name);
       _cFac->createComponent(infos, name, e);
       lua_pop(L, 1);
     }
-  } else if (strcmp(key, Systems::SYSTEMS) == 0) {
+  } else if (Systems::SYSTEMS.compare(key) == 0) {
     while (lua_next(L, -2) != 0) {
       parseInfos(infos, name);
       _sFac->createSystem(infos, name, e);
@@ -55,8 +58,8 @@ void EntityBuilder::createProperties(Entity *e) {
   }
 }
 
-void EntityBuilder::parseInfos(
-    std::map<const char *, std::int32_t, CStrCmp> &infos, char *&name) {
+void EntityBuilder::parseInfos(std::map<std::string, std::int32_t> &infos,
+                               std::string &name) {
   lua_pushnil(L);
   while (lua_next(L, -2) != 0) {
     const char *key = lua_tostring(L, -2);
@@ -118,8 +121,8 @@ void EntityBuilder::shaderInfo(Entity *e) {
   char vertexPath[256] = {0};
   char fragmentPath[256] = {0};
 
-  std::strncpy(vertexPath, "/shader/", sizeof(vertexPath));
-  std::strncpy(fragmentPath, "/shader/", sizeof(fragmentPath));
+  strncpy(vertexPath, "/shader/", sizeof(vertexPath));
+  strncpy(fragmentPath, "/shader/", sizeof(fragmentPath));
 
   std::int32_t group;
   lua_pushnil(L);
@@ -132,12 +135,11 @@ void EntityBuilder::shaderInfo(Entity *e) {
     const char *key = lua_tostring(L, -2);
     if (strcmp(key, "v") == 0) {
       const char *vertex = lua_tostring(L, -1);
-      std::strncat(vertexPath, vertex,
-                   sizeof(vertexPath) - strlen(vertexPath) - 1);
+      strncat(vertexPath, vertex, sizeof(vertexPath) - strlen(vertexPath) - 1);
     } else if (strcmp(key, "f") == 0) {
       const char *frag = lua_tostring(L, -1);
-      std::strncat(fragmentPath, frag,
-                   sizeof(fragmentPath) - strlen(fragmentPath) - 1);
+      strncat(fragmentPath, frag,
+              sizeof(fragmentPath) - strlen(fragmentPath) - 1);
     }
     lua_pop(L, 1);
   }

@@ -33,8 +33,7 @@ std::int32_t ShaderManager::startup() { return 0; }
 
 void ShaderManager::shutdown() {
 #ifdef DEBUG
-  getString()->format("%s ### Shutting down %s...\n", getName(), getName());
-  logDebug(getString()->getBuffer());
+  logDebug(std::format("{} ### Shutting down {}...\n", getName(), getName()));
 #endif
 
   glUseProgram(0);
@@ -59,9 +58,8 @@ std::int32_t ShaderManager::init() {
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
-  getString()->format("%s ### ShaderManager init time: %f ms.\n", getName(),
-                      res);
-  logDebug(getString()->getBuffer());
+  logDebug(
+      std::format("{} ### ShaderManager init time: {} ms.\n", getName(), res));
 #endif
 
   return 0;
@@ -74,19 +72,17 @@ void ShaderManager::update() {
       continue;
 
 #ifdef DEBUG
-    getString()->format("%s ### Initializing shader for Entity: %d.\n",
-                        getName(), entity->getId());
-    logDebug(getString()->getBuffer());
+    logDebug(std::format("{} ### Initializing shader for Entity: {}.\n",
+                         getName(), entity->getId()));
 #endif
 
     GLuint programId = -1;
     if (_programList.find(s->shadergroup) != _programList.end()) {
 #ifdef DEBUG
-      getString()->format("%s ### Shader already created setting programId: %d "
-                          "for group: %d.\n",
-                          getName(), _programList[s->shadergroup],
-                          s->shadergroup);
-      logDebug(getString()->getBuffer());
+      logDebug(
+          std::format("{} ### Shader already created setting programId: {} "
+                      "for group: {}.\n",
+                      getName(), _programList[s->shadergroup], s->shadergroup));
 #endif
       programId = _programList[s->shadergroup];
     } else {
@@ -94,9 +90,8 @@ void ShaderManager::update() {
     }
 
     if (programId == -1) {
-      getString()->format("%s ### Could not create Shader for entity: %d.\n",
-                          getName(), entity->getId());
-      logFailure(getString()->getBuffer());
+      logFailure(std::format("{} ### Could not create Shader for entity: {}.\n",
+                             getName(), entity->getId()));
     }
 
     s->programId = programId;
@@ -116,14 +111,12 @@ void ShaderManager::initInterfaceShader() {
   link(programId, vertId, fragId);
 
   if (programId == -1) {
-    getString()->format("%s ### Failed to create interface shader program.\n",
-                        getName());
-    logFailure(getString()->getBuffer());
+    logFailure(std::format(
+        "{} ### Failed to create interface shader program.\n", getName()));
   }
 #ifdef DEBUG
-  getString()->format("%s ### Created Shader for Interfaces. ProgramID: %d.\n",
-                      getName(), programId);
-  logDebug(getString()->getBuffer());
+  logDebug(std::format("{} ### Created Shader for Interfaces. ProgramID: {}.\n",
+                       getName(), programId));
 #endif
 
   _programList[CoreConstants::TEXT_SHADERGROUP] = programId;
@@ -138,18 +131,16 @@ void ShaderManager::initInterfaceShader() {
 
 GLuint ShaderManager::initShader(Shader *s, Entity *entity) {
 #ifdef DEBUG
-  getString()->format("%s ### Creating new Shader for group: %d.\n", getName(),
-                      s->shadergroup);
-  logDebug(getString()->getBuffer());
+  logDebug(std::format("{} ### Creating new Shader for group: {}.\n", getName(),
+                       s->shadergroup));
 #endif
   GLuint programId = glCreateProgram();
   if (programId == 0)
     return -1;
 
 #ifdef DEBUG
-  getString()->format("%s ### Created Shader for group: %d. ProgramID: %d.\n",
-                      getName(), s->shadergroup, programId);
-  logDebug(getString()->getBuffer());
+  logDebug(std::format("{} ### Created Shader for group: {}. ProgramID: {}.\n",
+                       getName(), s->shadergroup, programId));
 #endif
 
   GLuint vertId = createVertexShader(s->vertexShaderFile, programId);
@@ -161,11 +152,10 @@ GLuint ShaderManager::initShader(Shader *s, Entity *entity) {
   if (uniformBlockIndex != GL_INVALID_INDEX)
     glUniformBlockBinding(programId, uniformBlockIndex, 1);
   else {
-    getString()->format(
-        "%s ### Uniform Block not found for Enitity: %d. Check if the "
-        "Entity uses a Shader with Camera uniforms\n",
-        getName(), entity->getId());
-    logDebug(getString()->getBuffer());
+    logDebug(
+        std::format("{} ### Uniform Block not found for Enitity: {}. Check if "
+                    "the Entity uses a Shader with Camera uniforms\n",
+                    getName(), entity->getId()));
   }
   return programId;
 }
@@ -192,19 +182,17 @@ void ShaderManager::addUniforms(GLuint programId, Entity *entity,
   }
 }
 
-GLuint ShaderManager::createShader(const char *shaderFile,
+GLuint ShaderManager::createShader(const std::string shaderFile,
                                    std::int32_t shaderType, GLuint programId) {
   GLuint shaderId = glCreateShader(shaderType);
-  if (shaderId == 0) {
-    getString()->format("Error creating shader. Type: %d.\n", shaderType);
-    logFailure(getString()->getBuffer());
+  if (shaderId == 0) { 
+    logFailure(std::format("Error creating shader. Type: {}.\n", shaderType));
     return -1;
   }
 
-#ifdef DEBUG
-  getString()->format("%s ### Created Shader: %d for File: %s.\n", getName(),
-                      shaderId, shaderFile);
-  logDebug(getString()->getBuffer());
+#ifdef DEBUG 
+  logDebug(std::format("{} ### Created Shader: {} for File: {}.\n", getName(),
+                      shaderId, shaderFile));
 #endif
 
   const GLchar *source = readShaderSource(shaderFile);
@@ -219,10 +207,9 @@ GLuint ShaderManager::createShader(const char *shaderFile,
 
   glGetShaderiv(shaderId, GL_COMPILE_STATUS, &status);
   if (status == 0) {
-    glGetShaderInfoLog(shaderId, 2048, &size, errorLog);
-    getString()->format("Error compiling shader. Type: %d, Info: %s\n",
-                        shaderType, errorLog);
-    logFailure(getString()->getBuffer());
+    glGetShaderInfoLog(shaderId, 2048, &size, errorLog); 
+    logFailure(std::format("Error compiling shader. Type: {}, Info: {}\n",
+                        shaderType, errorLog));
     return 0;
   }
 
@@ -236,9 +223,8 @@ void ShaderManager::link(GLuint programId, GLuint vertexId, GLuint fragmentId) {
   GLchar errorLog[1024] = {};
   glGetProgramiv(programId, GL_LINK_STATUS, &status);
   if (status == 0) {
-    glGetProgramInfoLog(programId, 1024, &size, errorLog);
-    getString()->format("Error linking program. Info: %s\n", errorLog);
-    logFailure(getString()->getBuffer());
+    glGetProgramInfoLog(programId, 1024, &size, errorLog); 
+    logFailure(std::format("Error linking program. Info: {}\n", errorLog));
   }
 
   if (vertexId != 0)
@@ -249,13 +235,12 @@ void ShaderManager::link(GLuint programId, GLuint vertexId, GLuint fragmentId) {
 
   glValidateProgram(programId);
   glGetProgramiv(programId, GL_VALIDATE_STATUS, &status);
-  if (status == 0) {
-    getString()->format("Error validating program. Info: %s\n", errorLog);
-    logFailure(getString()->getBuffer());
+  if (status == 0) { 
+    logFailure(std::format("Error validating program. Info: {}\n", errorLog));
   }
 }
 
-GLchar *ShaderManager::readShaderSource(const char *shaderFile) {
+GLchar *ShaderManager::readShaderSource(const std::string shaderFile) {
 
   char cwd[PATH_MAX];
   char filePath[PATH_MAX];
@@ -263,17 +248,15 @@ GLchar *ShaderManager::readShaderSource(const char *shaderFile) {
     return nullptr;
 
   std::int32_t fd;
-  snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", shaderFile);
-  if ((fd = open(filePath, O_RDONLY)) == -1) {
-    getString()->format("Error opening shader File. Path: %s\n", filePath);
-    logFailure(getString()->getBuffer());
+  snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", shaderFile.c_str());
+  if ((fd = open(filePath, O_RDONLY)) == -1) { 
+    logFailure(std::format("Error opening shader File. Path: {}\n", filePath));
     return nullptr;
   }
 
   FILE *file = fdopen(fd, "rb");
-  if (file == NULL) {
-    getString()->format("Error opening File. Path: %s\n", filePath);
-    logFailure(getString()->getBuffer());
+  if (file == NULL) { 
+    logFailure(std::format("Error opening File. Path: {}\n", filePath));
     return nullptr;
   }
 

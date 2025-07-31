@@ -16,7 +16,7 @@ public:
   // Getter
   inline GLint getWidth() { return _width; }
   inline GLint getHeight() { return _height; }
-  inline const char *getTitle() { return _title; }
+  inline std::string etTitle() { return _title; }
   inline GLFWwindow *getWindow() { return _window; }
 
   // Overrides
@@ -28,7 +28,7 @@ public:
   // Functions
   inline bool windowShouldClose() { return glfwWindowShouldClose(_window); }
   void resizeWindow(GLint width, GLint height);
-  void setWindowTitle(const char *title);
+  void setWindowTitle(std::string title);
   void setClearColor(float r, float g, float b, float a) {
     glClearColor(r, g, b, a);
   }
@@ -39,6 +39,6 @@ public:
 
 private:
   GLint _width, _height;
-  const char *_title;
+  std::string _title = CoreConstants::UNDEFINED_STRING;
   GLFWwindow *_window = nullptr;
 };

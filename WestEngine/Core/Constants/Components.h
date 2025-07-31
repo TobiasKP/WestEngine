@@ -1,6 +1,8 @@
+#include <string>
+
 namespace Components {
-extern const char* COMPONENTS;
-extern const char* SHADER;
-extern const char* MODEL;
-extern const char* POSITION;
+extern const std::string COMPONENTS;
+extern const std::string SHADER;
+extern const std::string MODEL;
+extern const std::string POSITION;
 };

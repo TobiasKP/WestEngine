@@ -40,3 +40,5 @@ private:
   std::int32_t executeCycle(CYCLE code, IManager *item);
   bool isPauseCycle(CYCLE code, IManager *item);
 };
+
+

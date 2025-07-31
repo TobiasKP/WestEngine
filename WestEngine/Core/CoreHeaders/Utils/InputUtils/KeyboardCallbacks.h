@@ -8,7 +8,7 @@ public:
   static void keyboardCallback(GLFWwindow *window, int key, int scancode,
                                int action, int mods);
   static void executeBoundOperation(std::int32_t key,
-                                    const char *boundOperation);
+                                    const std::string boundOperation);
   static void shutdown();
 
   // Setter

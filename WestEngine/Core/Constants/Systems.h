@@ -1,6 +1,8 @@
+#include <string>
+
 namespace Systems {
 
-extern const char *SYSTEMS;
-extern const char *PLAYER_CONTROL;
+extern const std::string SYSTEMS;
+extern const std::string PLAYER_CONTROL;
 
 } // namespace Systems

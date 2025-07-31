@@ -19,15 +19,18 @@ SystemManager::SystemManager(WestLogger *logger) : IManager(logger) {
 SystemManager::~SystemManager() {}
 
 std::int32_t SystemManager::startup() {
+  std::cout << "init controls " << std::endl;
   _systems = {new PlayerControl(getLogger())};
 
+#ifdef DEBUG
+  logDebug(std::format("{} ### Instantiated critical game systems", getName()));
+#endif
   return 0;
 }
 
 void SystemManager::shutdown() {
 #ifdef DEBUG
-  getString()->format("%s ### Shutting down %s...\n", getName(), getName());
-  logDebug(getString()->getBuffer());
+  logDebug(std::format("{} ### Shutting down {}...\n", getName(), getName()));
 #endif
 }
 
@@ -41,9 +44,8 @@ std::int32_t SystemManager::init() {
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
-  getString()->format("%s ### EntitySystemManager init time: %f ms.\n",
-                      getName(), res);
-  logDebug(getString()->getBuffer());
+  logDebug(std::format("{} ### EntitySystemManager init time: {} ms.\n",
+                       getName(), res));
 #endif
 
   return 0;
@@ -54,15 +56,16 @@ void SystemManager::update() {
   _loggingFrequence++;
   double start = TimeUtils::getCurrentTimeAsTime();
   for (ISystem *system : _systems) {
-    //TODO fix flickering artifact when updating debugging info in playercontrol
+    // TODO fix flickering artifact when updating debugging info in
+    // playercontrol
     system->updateDebuggingInfo();
   }
 #endif
 
   std::vector<std::future<void>> futures;
   for (ISystem *system : _systems) {
-    futures.emplace_back(
-       Config::EngineInternals.THREADPOOL->enqueue([system, logger = getLogger()] {
+    futures.emplace_back(Config::EngineInternals.THREADPOOL->enqueue(
+        [system, logger = getLogger()] {
           if (system == nullptr) {
             logger->writeError(
                 "System invalid null ptr check entity file or debug\n");
@@ -80,25 +83,24 @@ void SystemManager::update() {
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
   _avgTime = ((_avgTime * (_loggingFrequence - 1)) + res) / _loggingFrequence;
-  if (_loggingFrequence == 50) {
-    getString()->format(
-        "%s ### EntitySystemManager run %d cycles for all "
-        "entities: (number of entites) %d - average time per cycle: %f ms.\n",
-        getName(), _loggingFrequence, count, _avgTime);
-    logDebug(getString()->getBuffer());
+  if (_loggingFrequence == 75) {
+    logDebug(std::format(
+        "{} ### EntitySystemManager run {} cycles for all "
+        "entities: (number of entites) {} - average time per cycle: {} ms.\n",
+        getName(), _loggingFrequence, count, _avgTime));
     _loggingFrequence = 0;
     _avgTime = 0;
   }
 #endif
 }
 
-//TODO Change to IndexBased or BitBased lookup
-ISystem *SystemManager::getSystemByName(const char *name) {
+// TODO Change to IndexBased or BitBased lookup
+ISystem *SystemManager::getSystemByName(const std::string name) {
   auto it =
       std::find_if(_systems.begin(), _systems.end(), [name](ISystem *obj) {
         if (obj == nullptr)
           return false;
-        return strcmp(name, obj->getName()) == 0;
+        return name.compare(obj->getName().c_str()) == 0;
       });
 
   if (it != _systems.end()) {

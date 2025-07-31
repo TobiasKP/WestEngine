@@ -4,25 +4,24 @@
 #include "../CoreHeaders/Utils/InputUtils/MouseCallbacks.h"
 #include "../CoreHeaders/Utils/TimeUtils.h"
 
-#include <errno.h>
+#include <cstring>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #ifdef _WIN32
-  <include> direct.h
-  #define getcwd _getcwd
-  #define PATH_MAX MAX_PATH
+<include> direct.h
+#define getcwd _getcwd
+#define PATH_MAX MAX_PATH
 #else
-  #include <unistd.h>
-  #include <limits.h>
+#include <limits.h>
+#include <unistd.h>
 #endif
-
-
 
 #define SH_DENYNO 0x40
 
-InputManager::InputManager() : IManager(nullptr) {
+InputManager::InputManager()
+    : IManager(nullptr) {
   setName(CoreConstants::INPUT_MANAGER);
 }
 
@@ -40,40 +39,37 @@ std::int32_t InputManager::startup() {
     return 1;
 
 #ifdef DEBUG
-  snprintf(filePath, sizeof(filePath), "%s\n", cwd); 
+  snprintf(filePath, sizeof(filePath), "%s\n", cwd);
   logDebug(filePath);
 #endif
 
   std::int32_t fd;
   snprintf(filePath, sizeof(filePath), "%s%s", cwd,
-           CoreConstants::INPUT_CONFIG_FILE_NAME);
+           CoreConstants::INPUT_CONFIG_FILE_NAME.c_str());
   if ((fd = open(filePath, O_RDONLY)) == -1) {
-    getString()->format("%s ### Error opening Input Config file: &s\n %s\n",
-                        getName(), filePath,strerror(errno));
-    logFailure(getString()->getBuffer());
+    logFailure(std::format("{} ### Error opening Input Config file: {}\n {}\n",
+                           getName(), filePath, std::strerror(errno)));
     return 1;
   }
 
   if ((_inputConfig = fdopen(fd, "r")) == NULL) {
-    getString()->format("%s ### Error opening Input Config filestream\n",
-                        getName());
-    logFailure(getString()->getBuffer());
+    logFailure(std::format("{} ### Error opening Input Config filestream\n",
+                           getName()));
     return 1;
   }
 
   snprintf(filePath, sizeof(filePath), "%s%s", cwd,
-           CoreConstants::AVAILABLE_INPUTS_FILE_NAME);
+           CoreConstants::AVAILABLE_INPUTS_FILE_NAME.c_str());
   if ((fd = open(filePath, O_RDONLY)) == -1) {
-    getString()->format("%s ### Error opening avialable Inputs file: %s\n %s\n",
-                        getName(), filePath,strerror(errno));
-    logFailure(getString()->getBuffer());
+    logFailure(
+        std::format("{} ### Error opening avialable Inputs file: {}\n {}\n",
+                    getName(), filePath, std::strerror(errno)));
     return 1;
   }
 
   if ((_availableCommands = fdopen(fd, "r")) == NULL) {
-    getString()->format("%s ### Error opening avialable Inputs filestream\n",
-                        getName());
-    logFailure(getString()->getBuffer());
+    logFailure(std::format("{} ### Error opening avialable Inputs filestream\n",
+                           getName()));
     return 1;
   }
 
@@ -81,17 +77,15 @@ std::int32_t InputManager::startup() {
   KeyboardCallbacks::setInputManager(this);
 
 #ifdef DEBUG
-  getString()->format("%s ### Loaded files for Input Configuration %s...\n",
-                      getName(), CoreConstants::INPUT_CONFIG_FILE_NAME);
-  logDebug(getString()->getBuffer());
+  logDebug(std::format("{} ### Loaded files for Input Configuration {}...\n",
+                       getName(), CoreConstants::INPUT_CONFIG_FILE_NAME));
 #endif
   return 0;
 }
 
 void InputManager::shutdown() {
 #ifdef DEBUG
-  getString()->format("%s ### Shutting down %s...\n", getName(), getName());
-  logDebug(getString()->getBuffer());
+  logDebug(std::format("{} ### Shutting down {}...\n", getName(), getName()));
 #endif
   delete _inputConfig;
   delete _availableCommands;
@@ -122,9 +116,8 @@ std::int32_t InputManager::init() {
     inbuf[strcspn(inbuf, "\n")] = 0;
     char *equalSign = strchr(inbuf, '=');
 #ifdef DEBUG
-    getString()->format("%s ### Reading input from cfg: %s\n", getName(),
-                        inbuf);
-    logDebug(getString()->getBuffer());
+    logDebug(
+        std::format("{} ### Reading input from cfg: {}\n", getName(), inbuf));
 #endif
     if (equalSign) {
       *equalSign = '\0';
@@ -146,9 +139,8 @@ std::int32_t InputManager::init() {
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
-  getString()->format("%s ### InputManager init time: %f ms.\n", getName(),
-                      res);
-  logDebug(getString()->getBuffer());
+  logDebug(
+      std::format("{} ### InputManager init time: {} ms.\n", getName(), res));
 #endif
 
   return success;
@@ -168,7 +160,8 @@ void InputManager::setKey(std::int32_t key, const char *command) {
 
 std::int32_t InputManager::findByOperation(const char *command) {
 #ifdef DEBUG
-  getString()->format("%s ### Searching for command %s.\n", getName(), command);
+  logDebug(
+      std::format("{} ### Searching for command {}.\n", getName(), command));
 #endif
   for (const auto &entry : _inputMap) {
     if (strcmp(entry.second, command) == 0)
@@ -177,15 +170,15 @@ std::int32_t InputManager::findByOperation(const char *command) {
   return -1;
 }
 
-const char *InputManager::findByKey(std::int32_t key) {
+const std::string InputManager::findByKey(std::int32_t key) {
 #ifdef DEBUG
-  getString()->format("%s ### Searching for Key %d.\n", getName(), key);
+  logDebug(std::format("{} ### Searching for Key {}.\n", getName(), key));
 #endif
   for (const auto &entry : _inputMap) {
     if (entry.first == key)
       return entry.second;
   }
-  return nullptr;
+  return CoreConstants::UNDEFINED_STRING;
 }
 
 std::int32_t InputManager::checkInputConfigLineForErrors(
@@ -202,8 +195,7 @@ std::int32_t InputManager::checkInputConfigLineForErrors(
   }
 
   if (!found) {
-    getString()->format("Command not supported: %s", value);
-    logFailure(getString()->getBuffer());
+    logFailure(std::format("Command not supported: {}", value));
     return 1;
   }
 

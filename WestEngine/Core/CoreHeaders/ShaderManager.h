@@ -27,16 +27,16 @@ private:
 
   void initInterfaceShader();
   GLuint initShader(Shader *s, Entity *entity);
-  GLuint createShader(const char *shaderFile, std::int32_t shaderTyp,
+  GLuint createShader(const std::string shaderFile, std::int32_t shaderTyp,
                       GLuint programId);
-  GLchar *readShaderSource(const char *shaderFile);
+  GLchar *readShaderSource(const std::string shaderFile);
   void link(GLuint programId, GLuint vertexId, GLuint fragmentId);
 
   // Functions
-  GLuint createVertexShader(const char *file, GLuint programId) {
+  GLuint createVertexShader(const std::string file, GLuint programId) {
     return createShader(file, GL_VERTEX_SHADER, programId);
   }
-  GLuint createFragmentShader(const char *file, GLuint programId) {
+  GLuint createFragmentShader(const std::string file, GLuint programId) {
     return createShader(file, GL_FRAGMENT_SHADER, programId);
   }
   void addUniforms(GLuint programId, Entity *entity, std::int32_t shadergroup);

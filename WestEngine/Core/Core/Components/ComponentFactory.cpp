@@ -4,9 +4,9 @@
 #include "../../CoreHeaders/Components/Umbrella.h"
 
 void ComponentFactory::createComponent(
-    std::map<const char *, std::int32_t, CStrCmp> infos, const char *name,
+    std::map<std::string, std::int32_t> infos, std::string name,
     Entity *e) {
-  if (strcmp(name, Components::POSITION) == 0) {
+  if (Components::POSITION.compare(name) == 0) {
     // TODO: Add rotation and scale
     Position *p = new Position();
     glm::vec3 pos = glm::vec3();

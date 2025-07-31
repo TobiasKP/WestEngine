@@ -7,7 +7,6 @@
 
 #include "../Utils/Draw/DebugDrawUtils.h"
 #include "../Utils/Logging/WestLogger.h"
-#include "../Utils/WestString.h"
 
 class PlayerControl : public ISystem {
 public:
@@ -22,8 +21,7 @@ public:
   bool destinationReached(Position *posComp);
 
 private:
-  WestLogger *_logger;
-  WestString *_string; 
+  WestLogger *_logger; 
   std::mutex _CameraMutex, _MovementMutex;
 
   glm::vec3 _moveToDestination = glm::vec3(0.0f);

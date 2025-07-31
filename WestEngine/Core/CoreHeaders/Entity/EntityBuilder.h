@@ -5,10 +5,9 @@
 
 #include "../../CoreHeaders/Entity/Entity.h"
 
-#include "../Utils/DataUtils/ObjectLoader.h"
-#include "../Systems/SystemFactory.h"
 #include "../Components/ComponentFactory.h"
-#include "../Utils/WestString.h"
+#include "../Systems/SystemFactory.h"
+#include "../Utils/DataUtils/ObjectLoader.h"
 
 class EntityBuilder {
 public:
@@ -31,8 +30,7 @@ private:
   void modelInfo(Entity *e);
   void createProperties(Entity *e);
   void shaderInfo(Entity *e);
-  void parseInfos(std::map<const char *, std::int32_t, CStrCmp> &infos,
-                  char *&name);
+  void parseInfos(std::map<std::string, std::int32_t> &infos, std::string &name);
   Model *loadModel(float *vertices, size_t verticeLength, std::int32_t *indices,
                    size_t indiceLength, float *textureCoords,
                    size_t textureCoordLength);
