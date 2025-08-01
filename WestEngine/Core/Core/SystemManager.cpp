@@ -18,12 +18,11 @@ SystemManager::SystemManager(WestLogger *logger) : IManager(logger) {
 
 SystemManager::~SystemManager() {}
 
-std::int32_t SystemManager::startup() {
-  std::cout << "init controls " << std::endl;
+std::int32_t SystemManager::startup() { 
   _systems = {new PlayerControl(getLogger())};
 
 #ifdef DEBUG
-  logDebug(std::format("{} ### Instantiated critical game systems", getName()));
+  logDebug(std::format("{} ### Instantiated critical game systems\n", getName()));
 #endif
   return 0;
 }

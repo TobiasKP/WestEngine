@@ -4,6 +4,7 @@
 
 #include "DataStructure/WestQ.h"
 #include "WindowManager.h"
+#include "../../Config/Config.h"
 
 class EngineManager : public IManager {
 
@@ -33,7 +34,7 @@ private:
   WestQ *_engineQ;
   WindowManager *_windowManager;
   const long _NANOSECOND = 1000000000;
-  const float _FRAMERATE = 30.0f;
+  const float _FRAMERATE = Config::GeneralConfig.FPS;
   const float _FRAMETIME = 1.0f / _FRAMERATE;
 
   std::int32_t iterateQ(CYCLE code);

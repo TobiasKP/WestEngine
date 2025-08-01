@@ -2,6 +2,7 @@
 
 #include <../../../Libs/GLM/ext/matrix_clip_space.hpp>
 #include <../../../Libs/GLM/glm.hpp>
+#include <GLFW/glfw3.h>
 
 #include "../Config/Config.h"
 #include "../Constants/CoreConstants.h"
@@ -37,6 +38,23 @@ std::int32_t WindowManager::startup() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+  glfwWindowHint(GLFW_MAXIMIZED, GL_FALSE);
+
+  std::int32_t monitorPosX, monitorPosY;
+  GLFWmonitor *primary = glfwGetPrimaryMonitor();
+  const GLFWvidmode *mode = glfwGetVideoMode(primary);
+  glfwGetMonitorPos(primary, &monitorPosX, &monitorPosY);
+  if (glfwGetError(NULL) != GLFW_NO_ERROR) {
+    logFailure(std::format(
+        "{} ### Error setting glfw specific informations, stopping startup.\n",
+        getName()));
+    glfwTerminate();
+    return 1;
+  }
+
+  logDebug(std::format(
+      "{} ### primary monitor resolution: {} x {}, setting to {} x {}\n",
+      getName(), mode->width, mode->height, _width, _height));
 
   _window = glfwCreateWindow(_width, _height, _title.c_str(), NULL, NULL);
 
@@ -47,11 +65,22 @@ std::int32_t WindowManager::startup() {
   }
 
   std::int32_t bufferWidth, bufferHeight;
+  std::int32_t windowPosX = monitorPosX + (mode->width - _width) / 2,
+               windowPosY = monitorPosY + (mode->height - _height) / 2;
+  glfwShowWindow(_window);
+  glfwSetWindowSize(_window, _width, _height);
+  glfwSetWindowPos(_window, windowPosX, windowPosY);
   glfwGetFramebufferSize(_window, &bufferWidth, &bufferHeight);
   glfwMakeContextCurrent(_window);
 
   if (glewInit() != GLEW_OK) {
     logFailure("GLEW init failed\n");
+    glfwTerminate();
+    return 1;
+  } else if (glfwGetError(NULL) != GLFW_NO_ERROR) {
+    logFailure(std::format("{} ### Error setting window specific informations, "
+                           "stopping startup.\n",
+                           getName()));
     glfwTerminate();
     return 1;
   }
@@ -60,10 +89,13 @@ std::int32_t WindowManager::startup() {
 
   glClearColor(1.0f, 1.0f, 0.0f, 0.5f);
 #ifdef DEBUG
-  logDebug(std::format("{} ### Instantiating GL message callback", getName()));
+  logDebug(std::format("{} ### Instantiating GL debug callback\n", getName()));
   glEnable(GL_DEBUG_OUTPUT);
-  glDebugMessageCallback(this->MessageCallback, this);
+  glDebugMessageCallback(this->messageCallback, this);
+  logDebug(std::format("{} ### Instantiating GL error callback\n", getName()));
 #endif
+  glfwSetErrorCallback(errorCallback);
+
   return 0;
 }
 
@@ -105,14 +137,16 @@ void WindowManager::update() {
   glfwPollEvents();
 }
 
-void WindowManager::MessageCallback(GLenum source, GLenum type, GLuint id,
+void WindowManager::errorCallback(std::int32_t error, const char *message) {
+  WestLogger::getLoggerInstance().writeError(
+      std::format("$$$ {} thrown: {}", error, message));
+}
+
+void WindowManager::messageCallback(GLenum source, GLenum type, GLuint id,
                                     GLenum severity, GLsizei length,
-                                    const GLchar *message,
-                                    const void *userParam) {
-  WindowManager *instance =
-      static_cast<WindowManager *>(const_cast<void *>(userParam));
-  instance->logFailure(std::format(
-      "GL CALLBACK: {} type = 0x{}, severity = 0x{}, message = {}\n",
+                                    const GLchar *message, const void *me) {
+  WestLogger::getLoggerInstance().writeInfo(std::format(
+      "$$$ GL CALLBACK: {} type = 0x{}, severity = 0x{}, message = {}\n",
       (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity,
       message));
 }

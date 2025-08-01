@@ -8,8 +8,8 @@
 namespace Config {
 
 struct General {
-  GLint WIDTH = 1920, HEIGHT = 1080;
-  float SPEED = 0.05f, EPSILON = 1e-6f;
+  GLint WIDTH = 800, HEIGHT = 600;
+  float SPEED = 0.05f, EPSILON = 1e-6f, FPS = 30.0f; 
 };
 
 struct UserInterface {

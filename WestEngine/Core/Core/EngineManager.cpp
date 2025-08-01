@@ -66,8 +66,7 @@ void EngineManager::shutdown() {
     item->shutdown();
   }
   KeyboardCallbacks::shutdown();
-  _engineQ->~WestQ();
-  delete _engineQ;
+  _engineQ->~WestQ(); 
 }
 
 void EngineManager::update() {
