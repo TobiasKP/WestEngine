@@ -33,9 +33,10 @@ public:
     glClearColor(r, g, b, a);
   }
   bool isKeyPressed(std::int32_t keyCode);
-  static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id,
+  static void GLAPIENTRY messageCallback(GLenum source, GLenum type, GLuint id,
                                   GLenum severity, GLsizei length,
-                                  const GLchar *message, const void *iserParam);
+                                  const GLchar *message, const void *me);
+  static void errorCallback(std::int32_t error, const char* message); 
 
 private:
   GLint _width, _height;

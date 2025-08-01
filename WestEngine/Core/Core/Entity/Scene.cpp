@@ -15,7 +15,7 @@ Scene &Scene::getSceneInstance() {
 
 Scene::Scene() {}
 
-Scene::~Scene() { deleteScene(); }
+Scene::~Scene() { }
 
 void Scene::deleteScene() {
   delete _camera;

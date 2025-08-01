@@ -34,7 +34,7 @@ std::int32_t SceneManager::startup() {
   luaL_openlibs(L);
   _builder = new EntityBuilder(L, _loader);
 #ifdef DEBUG
-  logDebug(std::format("{} ### instantiated lus state", getName()));
+  logDebug(std::format("{} ### instantiated lus state\n", getName()));
 #endif
   return 0;
 }

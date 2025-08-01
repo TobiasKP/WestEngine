@@ -40,7 +40,7 @@ std::int32_t InputManager::startup() {
 
 #ifdef DEBUG
   snprintf(filePath, sizeof(filePath), "%s\n", cwd);
-  logDebug(filePath);
+  logDebug(std::format("{} ### Current working dir: {}", getName(), filePath));
 #endif
 
   std::int32_t fd;
@@ -87,8 +87,7 @@ void InputManager::shutdown() {
 #ifdef DEBUG
   logDebug(std::format("{} ### Shutting down {}...\n", getName(), getName()));
 #endif
-  delete _inputConfig;
-  delete _availableCommands;
+
   delete _observer;
 }
 

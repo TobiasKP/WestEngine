@@ -18,23 +18,24 @@ WestQ::WestQ(std::uint8_t maxCapacity, WestLogger *logger) {
   _front = _size = 0;
   _array = new IManager *[_capacity];
   _rear = _capacity - 1;
-#ifdef DEBUG 
-  _logger->writeInfo(std::format("Initialized Manager Queue with capacity: {}\n",_capacity));
+#ifdef DEBUG
+  _logger->writeInfo(
+      std::format("Initialized Manager Queue with capacity: {}\n", _capacity));
 #endif
 }
 
 WestQ::~WestQ() {
-  for (int i = 0; i < _capacity; i++) {
-    assert(_array[i] != nullptr);
-    delete _array[i];
-  }
+#ifdef DEBUG 
+    _logger->writeInfo(std::format("Deleting Manager Queue."));
+#endif
   delete _array;
 }
 
 void WestQ::enqueue(IManager *item) {
   assert(item);
-  if (isFull()) { 
-    _logger->writeError(std::format("West Queue is full! stopped trying to add: {}", item->getName()));
+  if (isFull()) {
+    _logger->writeError(std::format(
+        "West Queue is full! stopped trying to add: {}", item->getName()));
     return;
   }
 

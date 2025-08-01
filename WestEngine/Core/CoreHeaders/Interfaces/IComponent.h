@@ -6,7 +6,7 @@
 #include "../../Constants/BitMasks.h"
 
 struct IComponent {
- const std::uint16_t _guid = NULL;
+ const std::uint16_t _guid = 0;
 
   // Overload
   bool operator<(const IComponent &other) const { return _guid < other._guid; } 
