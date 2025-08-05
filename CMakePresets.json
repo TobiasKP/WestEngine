@@ -1,0 +1,64 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "linux-release",
+      "generator": "Unix Makefiles",
+      "description": "Linux Release Build with all Modules",
+      "binaryDir": "${sourceDir}/build/linux-release",
+      "hidden": false,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_CORE": "ON",
+        "BUILD_UI": "ON"
+      }
+    },
+    { 
+      "name": "linux-debug-core",
+      "generator": "Unix Makefiles",
+      "description": "Linux Debug Build Core only",
+      "binaryDir": "${sourceDir}/build/linux-debug-core",
+      "hidden": false,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_CORE": "ON",
+        "BUILD_UI": "OFF"
+      }
+    },
+    {
+      "name": "linux-debug-ui",
+      "generator": "Unix Makefiles",
+      "description": "Linux Debug Build UserInterface only",
+      "binaryDir": "${sourceDir}/build/linux-debug-ui",
+      "hidden": false,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_CORE": "OFF",
+        "BUILD_UI": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "linux-debug-core",
+      "configurePreset": "linux-debug-core",
+      "cleanFirst": true,
+      "environment": {
+        "VERBOSE": "1"
+      }
+    },
+    {
+      "name": "linux-debug-ui",
+      "configurePreset": "linux-debug-ui",
+      "cleanFirst": true,
+      "environment": {
+        "VERBOSE": "1"
+      }
+    },
+    {
+      "name": "linux-release",
+      "configurePreset": "linux-release",
+      "cleanFirst": true
+    }
+  ]
+}

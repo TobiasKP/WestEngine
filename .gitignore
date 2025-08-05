@@ -1,6 +1,5 @@
-# Exclude only the Build/Debug and Build/Relese folders (not the entire Build/ folder)
-Build/Debug/
-Build/Release/
+# Exclude the Build folder
+build/
 
 # Exclude all library files in WestEngine/Core/Libs and any of its subdirectories
 WestEngine/Core/Libs/
@@ -11,3 +10,6 @@ UserInterface/build/
 
 # Exclue cache
 **/.cache/
+
+compile_commands.json
+.luarc.json
