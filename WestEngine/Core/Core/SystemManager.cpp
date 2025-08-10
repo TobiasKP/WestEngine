@@ -52,11 +52,9 @@ std::int32_t SystemManager::init() {
 
 void SystemManager::update() {
 #ifdef DEBUG
-  _loggingFrequence++;
+  std::uint8_t cycle = WestLogger::getCycleLength();
   double start = TimeUtils::getCurrentTimeAsTime();
-  for (ISystem *system : _systems) {
-    // TODO fix flickering artifact when updating debugging info in
-    // playercontrol
+  for (ISystem *system : _systems) {   
     system->updateDebuggingInfo();
   }
 #endif
@@ -81,14 +79,13 @@ void SystemManager::update() {
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
-  _avgTime = ((_avgTime * (_loggingFrequence - 1)) + res) / _loggingFrequence;
-  if (_loggingFrequence == 75) {
-    logDebug(std::format(
+  _avgTime += res; 
+  if (cycle == 0) {
+    logCycle(std::format(
         "{} ### EntitySystemManager run {} cycles for all "
         "entities: (number of entites) {} - average time per cycle: {} ms.\n",
-        getName(), _loggingFrequence, count, _avgTime));
-    _loggingFrequence = 0;
-    _avgTime = 0;
+        getName(), cycle, count, _avgTime / cycle));
+     _avgTime = 0;
   }
 #endif
 }

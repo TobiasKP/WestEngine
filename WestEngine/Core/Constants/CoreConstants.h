@@ -8,6 +8,8 @@ extern const std::string UNDEFINED_STRING;
 
 extern const std::string INFO_FILE_NAME;
 extern const std::string ERROR_FILE_NAME;
+extern const std::string CYCLE_FILE_NAME;
+
 extern const std::string INPUT_CONFIG_FILE_NAME;
 extern const std::string AVAILABLE_INPUTS_FILE_NAME;
 extern const std::string DEBUG_V_SHADER;
