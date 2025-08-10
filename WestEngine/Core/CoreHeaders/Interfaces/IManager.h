@@ -27,6 +27,7 @@ public:
 protected:
   inline void logFailure(const std::string message) { _logger->writeError(message); }
   inline void logDebug(const std::string message) { _logger->writeInfo(message); };
+  inline void logCycle(const std::string message) { _logger->writeCycleLog(message); }
 
 private:
   WestLogger *_logger = nullptr;

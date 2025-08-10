@@ -170,7 +170,7 @@ std::int32_t EngineManager::iterateQ(CYCLE code) {
     if (code == CYCLE::UPDATE) {
       double end = TimeUtils::getCurrentTimeAsTime();
       double res = TimeUtils::getDuration(start, end);
-      logDebug(std::format("{} ### Queue time: {} ms. for: {} \n", getName(),
+      logCycle(std::format("{} ### Queue time: {} ms. for: {} \n", getName(),
                            res, item->getName()));
     }
 #endif
