@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-#include "../../../Libs/GLM/gtc/type_ptr.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 #include "../../../CoreHeaders/Utils/Logging/WestLogger.h"
 

@@ -1,6 +1,6 @@
 #include "CoreConstants.h"
 
-#include <../../../Libs/GLM/gtc/matrix_transform.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace CoreConstants {
 const std::string TITLE = "Test Title";

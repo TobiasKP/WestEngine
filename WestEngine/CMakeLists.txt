@@ -1,18 +1,25 @@
 message(STATUS "Building Core Module")
 
-project(WestCore VERSION 1.0)
+project(WestCore VERSION 0.1.0)
+
+# ─────────────────────────────────────────────────────────────
+# Packages
+# ─────────────────────────────────────────────────────────────
+find_package(GLEW REQUIRED)
+find_package(glfw3 CONFIG REQUIRED)
+find_package(Lua REQUIRED)
+find_package(glm CONFIG REQUIRED)
+find_package(assimp CONFIG REQUIRED)
+find_package(Stb REQUIRED)
 
 # ─────────────────────────────────────────────────────────────
 # Includes (shared across platforms)
 # ─────────────────────────────────────────────────────────────
 message(STATUS "Including headers ...")
 include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/CoreHeaders
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Libs/GLEW/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Libs/GLFW/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Libs/LUA/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Libs/STB
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Libs/GLM
+    ${LUA_INCLUDE_DIR}
+    ${Stb_INCLUDE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/Core/CoreHeaders   
     ${CMAKE_CURRENT_SOURCE_DIR}/Core/Libs/WEST_INTERFACE
 )
 
@@ -20,26 +27,17 @@ include_directories(
 # Platform-specific configuration
 # ─────────────────────────────────────────────────────────────
 if (WIN32)
-    set(PLATFORM "windows")
-    set(GLEW_LIB glew32s)
-    set(GLFW_LIB glfw3)
-    set(LUA_LIB lua54)
+    set(PLATFORM "windows")   
     #set(WEST_INTERFACE_LIB WestInterface)
     set(OPENGL_LIB opengl32)
     add_definitions(-DGLEW_STATIC -DLUA_STATIC)
     target_link_options(${PROJECT_NAME} PRIVATE "-mwindows")
 elseif(APPLE)
-    set(PLATFORM "mac")
-    set(GLEW_LIB GLEW)
-    set(GLFW_LIB glfw)
-    set(LUA_LIB lua)
+    set(PLATFORM "mac")   
     #set(WEST_INTERFACE_LIB WestInterface)
     set(OPENGL_LIB "-framework OpenGL -framework Cocoa -framework IOKit")
 elseif(UNIX)
-    set(PLATFORM "linux")
-    set(GLEW_LIB GLEW)
-    set(GLFW_LIB glfw)
-    set(LUA_LIB lua)
+    set(PLATFORM "linux")   
     #set(WEST_INTERFACE_LIB WestInterface)
     set(OPENGL_LIB GL)
 endif()
@@ -48,23 +46,22 @@ endif()
 # Link Directories and Targets
 # ─────────────────────────────────────────────────────────────
 message(STATUS "Linking libraries for platform: ${PLATFORM}")
-link_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Libs/GLEW/${PLATFORM}/lib
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Libs/GLFW/${PLATFORM}/lib
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Libs/LUA/${PLATFORM}/lib
-  #  ${CMAKE_SOURCE_DIR}/Core/Libs/WEST_INTERFACE/${PLATFORM}/lib
+link_directories(   
+    #${CMAKE_SOURCE_DIR}/Core/Libs/WEST_INTERFACE/${PLATFORM}/lib
 )
 
 file(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/Core/*.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
-target_link_libraries(${PROJECT_NAME}
-    ${GLEW_LIB}
-    ${GLFW_LIB}
-    ${LUA_LIB}
-    #${WEST_INTERFACE_LIB}
+target_link_libraries(${PROJECT_NAME} 
+    GLEW::GLEW
+    glfw
+    ${LUA_LIBRARIES}
+    glm::glm
+    assimp::assimp 
     ${OPENGL_LIB}
+    #${WEST_INTERFACE_LIB}
     m dl pthread  # UNIX common libs
 )
 
@@ -92,8 +89,6 @@ set(RESOURCE_BASE "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
 set(ENGINE_DIR "${RESOURCE_BASE}/engine")
 
 file(GLOB CONFIG_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Core/Game/Config/*")
-file(GLOB STB_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Core/Libs/STB/*")
-file(GLOB GLM_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Core/Libs/GLM/*")
 
 # General file copy post-build
 foreach(FOLDER lua assets shader engine config libs libs/STB libs/GLM)
@@ -104,14 +99,10 @@ foreach(FOLDER lua assets shader engine config libs libs/STB libs/GLM)
 endforeach()
 
 # ─────────────────────────────────────────────────────────────
-# Post-build file copying 
+# Post-build file copying of custom modules
 # ─────────────────────────────────────────────────────────────
 if (WIN32)
-    foreach(DLL_NAME
-        glew32.dll
-        glfw3.dll
-        lua54.dll
-        assimp.dll
+    foreach(DLL_NAME 
         #WestInterface.dll
     )
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -122,11 +113,7 @@ if (WIN32)
         )
     endforeach()
 elseif(UNIX)
-    foreach(SO_NAME
-        libGLEW.so.2.2.0
-        libglfw.so.3.3
-        liblua.so
-        libassimp.so
+    foreach(SO_NAME     
         #WestInterface.so
     )
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -160,14 +147,6 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CONFIG_FILES} "${RESOURCE_BASE}/config"
-)
-
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${STB_FILES} "${RESOURCE_BASE}/libs/STB"
-)
-
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GLM_FILES} "${RESOURCE_BASE}/libs/GLM"
 )
 
 message(STATUS "Configuration complete. Ready to build.")

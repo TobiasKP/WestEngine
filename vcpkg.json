@@ -1,0 +1,12 @@
+{
+  "name": "west-engine",
+  "version-string": "0.1.0",
+  "dependencies": [
+    "glew",
+    "glfw3",
+    "lua",
+    "glm",
+    "assimp",
+    "stb"
+  ]
+}

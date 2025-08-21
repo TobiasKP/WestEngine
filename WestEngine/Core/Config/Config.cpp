@@ -1,7 +1,6 @@
 #include "Config.h"
 
-#include <../../../Libs/GLM/ext/matrix_clip_space.hpp>
-#include <../../../Libs/GLM/glm.hpp>
+#include <glm/ext/matrix_clip_space.hpp>
 #include <GL/glew.h>
 /*
 namespace Global {

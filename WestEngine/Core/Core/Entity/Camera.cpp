@@ -1,7 +1,7 @@
 #include "../../CoreHeaders/Entity/Camera.h"
 
-#include <../../../Libs/GLM/gtc/matrix_transform.hpp>
-#include "../../../Libs/GLM/gtc/type_ptr.hpp"
+#include <glm/gtc/matrix_transform.hpp>
+#include "glm/gtc/type_ptr.hpp"
 
 #include "../Config/Config.h"
 

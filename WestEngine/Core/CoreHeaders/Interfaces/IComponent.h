@@ -1,6 +1,6 @@
 #pragma once
 
-#include <../../../Libs/GLM/glm.hpp>
+#include <glm/glm.hpp>
 #include <cassert>
 
 #include "../../Constants/BitMasks.h"
