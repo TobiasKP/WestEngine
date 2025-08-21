@@ -2,8 +2,8 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 
-#include <../../../Libs/GLM/gtc/epsilon.hpp>
-#include <../../../Libs/GLM/gtx/norm.hpp>
+#include <glm/gtc/epsilon.hpp>
+#include <glm/gtx/norm.hpp>
 #include <vector>
 
 #include "../Entity/Entity.h"

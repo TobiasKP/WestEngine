@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <../../../Libs/GLM/glm.hpp>
+#include <glm/glm.hpp>
 
 class UniformUtils {
 public:

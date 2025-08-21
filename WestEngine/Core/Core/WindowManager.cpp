@@ -1,7 +1,7 @@
 #include "../CoreHeaders/WindowManager.h"
 
-#include <../../../Libs/GLM/ext/matrix_clip_space.hpp>
-#include <../../../Libs/GLM/glm.hpp>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
 
 #include "../Config/Config.h"

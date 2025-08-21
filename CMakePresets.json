@@ -1,8 +1,16 @@
 {
-  "version": 3,
+  "version": 6,
+  "cmakeMinimumRequired": { "major": 3, "minor": 21, "patch": 0 },
+
   "configurePresets": [
     {
+      "name": "base",
+      "hidden": true,
+      "toolchainFile": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+    }, 
+    {
       "name": "linux-release",
+      "inherits": "base",
       "generator": "Unix Makefiles",
       "description": "Linux Release Build with all Modules",
       "binaryDir": "${sourceDir}/build/linux-release",
@@ -11,10 +19,16 @@
         "CMAKE_BUILD_TYPE": "Release",
         "BUILD_CORE": "ON",
         "BUILD_UI": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
       }
     },
-    { 
+    {
       "name": "linux-debug-core",
+      "inherits": "base",
       "generator": "Unix Makefiles",
       "description": "Linux Debug Build Core only",
       "binaryDir": "${sourceDir}/build/linux-debug-core",
@@ -23,10 +37,16 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "BUILD_CORE": "ON",
         "BUILD_UI": "OFF"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
       }
     },
     {
       "name": "linux-debug-ui",
+      "inherits": "base",
       "generator": "Unix Makefiles",
       "description": "Linux Debug Build UserInterface only",
       "binaryDir": "${sourceDir}/build/linux-debug-ui",
@@ -35,30 +55,167 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "BUILD_CORE": "OFF",
         "BUILD_UI": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    }, 
+    {
+      "name": "macos-base",
+      "inherits": "base",
+      "hidden": true,
+      "generator": "Unix Makefiles",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      }
+    },
+    {
+      "name": "macos-release",
+      "inherits": "macos-base",
+      "description": "macOS Release Build with all Modules",
+      "binaryDir": "${sourceDir}/build/macos-release",
+      "hidden": false,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_CORE": "ON",
+        "BUILD_UI": "ON"
+      }
+    },
+    {
+      "name": "macos-debug-core",
+      "inherits": "macos-base",
+      "description": "macOS Debug Build Core only",
+      "binaryDir": "${sourceDir}/build/macos-debug-core",
+      "hidden": false,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_CORE": "ON",
+        "BUILD_UI": "OFF"
+      }
+    },
+    {
+      "name": "macos-debug-ui",
+      "inherits": "macos-base",
+      "description": "macOS Debug Build UserInterface only",
+      "binaryDir": "${sourceDir}/build/macos-debug-ui",
+      "hidden": false,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_CORE": "OFF",
+        "BUILD_UI": "ON"
+      }
+    }, 
+    {
+      "name": "windows-base",
+      "inherits": "base",
+      "hidden": true,
+      "generator": "Visual Studio 17 2022",
+      "architecture": {
+        "value": "x64",
+        "strategy": "set"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "windows-release",
+      "inherits": "windows-base",
+      "description": "Windows Release Build with all Modules",
+      "binaryDir": "${sourceDir}/build/windows-release",
+      "hidden": false,
+      "cacheVariables": {
+        "BUILD_CORE": "ON",
+        "BUILD_UI": "ON"
+      }
+    },
+    {
+      "name": "windows-debug-core",
+      "inherits": "windows-base",
+      "description": "Windows Debug Build Core only",
+      "binaryDir": "${sourceDir}/build/windows-debug-core",
+      "hidden": false,
+      "cacheVariables": {
+        "BUILD_CORE": "ON",
+        "BUILD_UI": "OFF"
+      }
+    },
+    {
+      "name": "windows-debug-ui",
+      "inherits": "windows-base",
+      "description": "Windows Debug Build UserInterface only",
+      "binaryDir": "${sourceDir}/build/windows-debug-ui",
+      "hidden": false,
+      "cacheVariables": {
+        "BUILD_CORE": "OFF",
+        "BUILD_UI": "ON"
       }
     }
   ],
+
   "buildPresets": [
     {
       "name": "linux-debug-core",
       "configurePreset": "linux-debug-core",
       "cleanFirst": true,
-      "environment": {
-        "VERBOSE": "1"
-      }
+      "environment": { "VERBOSE": "1" }
     },
     {
       "name": "linux-debug-ui",
       "configurePreset": "linux-debug-ui",
       "cleanFirst": true,
-      "environment": {
-        "VERBOSE": "1"
-      }
+      "environment": { "VERBOSE": "1" }
     },
     {
       "name": "linux-release",
       "configurePreset": "linux-release",
       "cleanFirst": true
+    },
+
+   
+    {
+      "name": "macos-debug-core",
+      "configurePreset": "macos-debug-core",
+      "cleanFirst": true,
+      "environment": { "VERBOSE": "1" }
+    },
+    {
+      "name": "macos-debug-ui",
+      "configurePreset": "macos-debug-ui",
+      "cleanFirst": true,
+      "environment": { "VERBOSE": "1" }
+    },
+    {
+      "name": "macos-release",
+      "configurePreset": "macos-release",
+      "cleanFirst": true
+    },
+
+  
+    {
+      "name": "windows-debug-core",
+      "configurePreset": "windows-debug-core",
+      "configuration": "Debug",
+      "cleanFirst": true
+    },
+    {
+      "name": "windows-debug-ui",
+      "configurePreset": "windows-debug-ui",
+      "configuration": "Debug",
+      "cleanFirst": true
+    },
+    {
+      "name": "windows-release",
+      "configurePreset": "windows-release",
+      "configuration": "Release",
+      "cleanFirst": true
     }
   ]
 }
+
