@@ -11,11 +11,13 @@
 #endif
 
 struct WEST_INTERFACE ComponentData {
-  float xStart;
-  float yStart;
+  // Bottom Left corner & scale
+  float xLL;
+  float yLL;
   float scale;
   //float uvTopLeft;
   //float uvBottomRight;
+  // Color of component:
   float colorR;
   float colorG;
   float colorB;

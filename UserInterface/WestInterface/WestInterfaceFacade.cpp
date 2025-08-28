@@ -27,11 +27,12 @@ ContainerElement *WestInterfaceFacade::findInterfaceById(std::uint8_t id) {
 
 std::uint8_t WestInterfaceFacade::createNewInterface(
     std::uint16_t xScreenPosition, std::uint16_t yScreenPosition, float scale,
-    std::uint8_t gridLayout, std::vector<ElementProxy *> elements) {
+    std::uint8_t gridCells, std::vector<ElementProxy *> elements) {
 
   _builder.createNewInterface(xScreenPosition, yScreenPosition, scale,
-                              gridLayout);
+                              gridCells);
   for (auto *element : elements) {
+    // Todo log debug
     _builder.addElement(element);
   }
   ContainerElement *interface = _builder.build();
@@ -52,10 +53,12 @@ bool WestInterfaceFacade::destroyInterface(std::uint8_t interfaceId) {
   if (location == -1)
     return false;
 
+  // TODO Log debug
   ContainerElement *e = _interfaces.at(count);
   _interfaces.at(count) = nullptr;
   _interfaces.at(location) = e;
   count--;
+  e->~ContainerElement();
   return true;
 }
 
@@ -64,9 +67,13 @@ void WestInterfaceFacade::addElement(std::uint8_t interfaceId,
   ContainerElement *interface = findInterfaceById(interfaceId);
   if (interface == nullptr)
     return;
+  else {
+    // TODO Debug log
+  }
 
   IElement *e = _builder.transform(element);
-  interface->addChild(e);
+  // TODO Debug log
+  interface->addChild(e, element->column, element->row);
 };
 
 bool WestInterfaceFacade::removeElement(std::uint8_t interfaceId,

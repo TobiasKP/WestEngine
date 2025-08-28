@@ -23,8 +23,8 @@ struct WEST_INTERFACE ElementProxy {
   ElementType type;
   std::uint32_t elementId;
 
-  //std::uint8_t eventId;
-  //std::function<void()> eventHandler;
+  // std::uint8_t eventId;
+  // std::function<void()> eventHandler;
 
   float colorR;
   float colorG;
@@ -34,6 +34,10 @@ struct WEST_INTERFACE ElementProxy {
   float xPosition;
   float yPosition;
   float scale;
+
+  std::uint8_t row;
+  std::uint8_t column;
+
   /*
     std::string value;
 
@@ -41,8 +45,6 @@ struct WEST_INTERFACE ElementProxy {
     std::uint32_t textureId;
 
     std::uint32_t iconId;
-    std::uint8_t row;
-    std::uint8_t column;
     std::uint8_t padding;*/
 };
 
