@@ -1,26 +1,26 @@
 # Installation Process
 
-1: [Section Link](#requirements)
-2: [Section Link](#installation)
+1: [Section Link](#requirements) <br />
+2: [Section Link](#installation) <br />
 
 ## Requirements
 
 Requirements for the project to build and run correctly:
 
-OS: MacOS, Windows, Linux
-OpenGL suitable graphics driver: [OpenGL introduction](www.khronos.org/opengl/wiki/Getting_Started)
-C++ 20 (or later) & compiler (e.g. gcc): [C++ introduction](https://cplusplus.com/doc/tutorial/introduction)
-CMake: [Cmake](https://cmake.org)
+OS: MacOS, Windows, Linux <br />
+OpenGL suitable graphics driver: [OpenGL introduction](www.khronos.org/opengl/wiki/Getting_Started) <br />
+C++ 20 (or later) & compiler (e.g. gcc): [C++ introduction](https://cplusplus.com/doc/tutorial/introduction) <br />
+CMake: [Cmake](https://cmake.org) <br />
 
 ## Installation
 
-Clone the repository with all submodules. VCPKG is used as a package manager: [VCPGK](https://learn.microsoft.com/en-us/vcpkg), and is required for all further dependencies to be loaded.
+Clone the repository with all submodules. [VCPGK](https://learn.microsoft.com/en-us/vcpkg) is used as a package manager and is required for all further dependencies to be loaded.
 
-***git clone --recurse-submodules 'https://github.com/TobiasKP/WestEngine.git'***
+*git clone --recurse-submodules `https://github.com/TobiasKP/WestEngine.git`*
 
 if already cloned without recourse option specified:
 
-***git submodule update --init --recursive***
+*git submodule update --init --recursive*
 
 For building the project CMakePresets are given and listed in the CMakePresets.json. Following the two major options for first time building the project.
 
@@ -28,16 +28,16 @@ For building the project CMakePresets are given and listed in the CMakePresets.j
 |:-----------------------|:----------------------------------:|:------------------------------:|--------------------------------:|
 | Full Build Cycle       | windows-release                    | linux-release                  | macos-release                   |
 | Full Debug Cycle       | **not specified yet**              | **not specified yet**          | **not specified yet**           |
-| Module                 | windows-debug-*module name*        | linux-debug-*module name*      | macos-debug-*module name*       |
+| Module                 | windows-debug-*`<module name>`*    | linux-debug-*`<module name>`*  | macos-debug-*`<module name>`*   |
 
 
 Examples:
 
-setting the full project preset on a linux system: *cmake --preset linux-release*
-setting the core module preset on a windows system: *cmake --preset windows-debug-core*
+setting the full project preset on a linux system: *cmake --preset linux-release* <br />
+setting the core module preset on a windows system: *cmake --preset windows-debug-core* <br />
 
-afterwards the project can be build with the specified presets:
-*cmake --build --preset your **preferred preset***
+afterwards the project can be build with the specified presets: <br />
+*cmake --build --preset your *`<preferred preset>`*
 
 The executable *WestCore* will be located in: ${CMAKE_SOURCE_DIR}/build/<used preset>/WestEngine/
 
