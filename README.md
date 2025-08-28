@@ -27,7 +27,7 @@ For building the project CMakePresets are given and listed in the CMakePresets.j
 | Mode                   | Windows                            | Linux                          | MacOS                           |
 |:-----------------------|:----------------------------------:|:------------------------------:|--------------------------------:|
 | Full Build Cycle       | windows-release                    | linux-release                  | macos-release                   |
-| Full Debug Cycle       | **not specified yet**              | **not specified yet**          | **not specified yet**           |
+| Full Debug Cycle       | windows-debug                      | linux-debug                    | macos-debug                     |
 | Module                 | windows-debug-*`<module name>`*    | linux-debug-*`<module name>`*  | macos-debug-*`<module name>`*   |
 
 
