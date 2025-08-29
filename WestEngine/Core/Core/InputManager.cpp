@@ -2,8 +2,8 @@
 
 #include "../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
 #include "../CoreHeaders/Utils/InputUtils/MouseCallbacks.h"
-#include "../CoreHeaders/Utils/TimeUtils.h"
 
+#include <TimeUtils.hpp>
 #include <cstring>
 #include <fcntl.h>
 #include <stdio.h>

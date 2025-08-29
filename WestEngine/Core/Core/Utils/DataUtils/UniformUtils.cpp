@@ -4,7 +4,7 @@
 
 #include "glm/gtc/type_ptr.hpp"
 
-#include "../../../CoreHeaders/Utils/Logging/WestLogger.h"
+#include <WestLogger.h>
 
 GLuint UniformUtils::createUniform(const char *name, GLuint programId) {
   GLint location = glGetUniformLocation(programId, name);

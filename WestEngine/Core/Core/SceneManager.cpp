@@ -1,5 +1,6 @@
 #include "../CoreHeaders/SceneManager.h"
 
+#include <TimeUtils.hpp>
 #include <lua.hpp>
 
 #ifdef _WIN32
@@ -12,7 +13,6 @@
 #endif
 
 #include "../CoreHeaders/Entity/Camera.h"
-#include "../CoreHeaders/Utils/TimeUtils.h"
 
 SceneManager::SceneManager()
     : IManager(nullptr) {

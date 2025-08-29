@@ -1,12 +1,11 @@
 #pragma once
 
+#include <WestLogger.h>
 #include <atomic>
 #include <mutex>
 
 #include "../Interfaces/ISystem.h"
-
 #include "../Utils/Draw/DebugDrawUtils.h"
-#include "../Utils/Logging/WestLogger.h"
 
 class PlayerControl : public ISystem {
 public:
@@ -15,13 +14,13 @@ public:
   ~PlayerControl() override;
 
   void update() override;
-  void updateDebuggingInfo() override; 
+  void updateDebuggingInfo() override;
   void setCameraMovement(glm::vec3 move);
   void setDestinationPosition(glm::vec3 dest);
   bool destinationReached(Position *posComp);
 
 private:
-  WestLogger *_logger; 
+  WestLogger *_logger;
   std::mutex _CameraMutex, _MovementMutex;
 
   glm::vec3 _moveToDestination = glm::vec3(0.0f);

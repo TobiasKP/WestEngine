@@ -2,9 +2,10 @@
 
 #include <cstdint>
 #include <cassert>
+#include <WestLogger.h>
 
 #include "../Interfaces/IManager.h"
-#include "../Utils/Logging/WestLogger.h"
+
 
 class WestQ {
 

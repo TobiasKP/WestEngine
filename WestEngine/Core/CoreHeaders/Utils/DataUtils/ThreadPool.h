@@ -6,7 +6,7 @@
 #include <functional>
 #include <future>
 
-#include "../Logging/WestLogger.h"
+#include <WestLogger.h>
 
 class ThreadPool {
 

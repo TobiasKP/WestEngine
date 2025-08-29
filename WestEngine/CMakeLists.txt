@@ -12,6 +12,23 @@ find_package(glm CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(Stb REQUIRED)
 
+
+# ─────────────────────────────────────────────────────────────
+# Custom static libraries 
+# ─────────────────────────────────────────────────────────────
+set(MODULES_DIR "${CMAKE_SOURCE_DIR}/Libs")
+set(WESTUTILS_ARCHIVE
+  "${MODULES_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}WestUtils${CMAKE_STATIC_LIBRARY_SUFFIX}"
+)
+
+add_library(WestUtilities STATIC IMPORTED GLOBAL)
+set_target_properties(WestUtilities PROPERTIES
+  IMPORTED_LOCATION
+    "${WESTUTILS_ARCHIVE}"
+  INTERFACE_INCLUDE_DIRECTORIES
+    "${CMAKE_SOURCE_DIR}/WestUtils/Include"
+)
+
 # ─────────────────────────────────────────────────────────────
 # Includes (shared across platforms)
 # ─────────────────────────────────────────────────────────────
@@ -30,8 +47,7 @@ if (WIN32)
     set(PLATFORM "windows")   
     #set(WEST_INTERFACE_LIB WestInterface)
     set(OPENGL_LIB opengl32)
-    add_definitions(-DGLEW_STATIC -DLUA_STATIC)
-    target_link_options(${PROJECT_NAME} PRIVATE "-mwindows")
+    add_definitions(-DGLEW_STATIC -DLUA_STATIC) 
 elseif(APPLE)
     set(PLATFORM "mac")   
     #set(WEST_INTERFACE_LIB WestInterface)
@@ -55,15 +71,27 @@ file(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/Core/*.cpp)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 target_link_libraries(${PROJECT_NAME} 
+    PRIVATE
+    WestUtilities 
     GLEW::GLEW
     glfw
     ${LUA_LIBRARIES}
     glm::glm
     assimp::assimp 
     ${OPENGL_LIB}
-    #${WEST_INTERFACE_LIB}
-    m dl pthread  # UNIX common libs
+    #${WEST_INTERFACE_LIB} 
 )
+
+if(UNIX AND NOT APPLE) 
+  target_link_libraries(${PROJECT_NAME} 
+    PRIVATE 
+    m dl pthread  # UNIX common libs
+  )
+endif()
+
+if(WIN32) 
+  target_link_options(${PROJECT_NAME} PRIVATE "-mwindows")
+endif()
 
 # ─────────────────────────────────────────────────────────────
 # Build Configuration

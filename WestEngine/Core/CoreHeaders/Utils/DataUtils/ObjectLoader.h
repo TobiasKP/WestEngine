@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "../../Components/Umbrella.h"
-#include "../Logging/WestLogger.h"
+#include <WestLogger.h>
 
 class ObjectLoader {
 public:

@@ -2,7 +2,7 @@
 
 #include "Constants/CoreConstants.h"
 #include "CoreHeaders/EngineManager.h"
-#include "CoreHeaders/Utils/Logging/WestLogger.h"
+#include <WestLogger.h>
 
 int main() {
   WestLogger &westLogger = WestLogger::getLoggerInstance();
@@ -23,7 +23,7 @@ int main() {
     engineManager->update();
   }
 
-  engineManager->shutdown(); 
+  engineManager->shutdown();
   westLogger.closeFileStreams();
 
   return 0;
