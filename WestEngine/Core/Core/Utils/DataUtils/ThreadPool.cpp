@@ -1,7 +1,7 @@
 #include "../../../CoreHeaders/Utils/DataUtils/ThreadPool.h"
 
 ThreadPool::ThreadPool(size_t numThreads) {
-  _logger->writeInfo("--- Creating worker threads for engine\n");
+  _logger->log(Level::Info, "--- Creating worker threads for engine\n");
 
   for (size_t i = 0; i < numThreads; ++i) {
     _threads.emplace_back([this] {

@@ -12,12 +12,12 @@ int main() {
   success = engineManager->startup();
   if (success != 0)
     return 1;
-  westLogger.writeInfo("Successfull startup\n");
+  westLogger.log(Level::Info, "Successfull startup\n");
 
   success = engineManager->init();
   if (success != 0)
     return 1;
-  westLogger.writeInfo("Successfull initialization\n");
+  westLogger.log(Level::Info, "Successfull initialization\n");
 
   while (!engineManager->shouldExit()) {
     engineManager->update();

@@ -4,6 +4,7 @@
 #include "../../Constants/Systems.h"
 #include "../../CoreHeaders/Entity/Scene.h"
 
+#include <format>
 #include <stdio.h>
 #include <string.h>
 
@@ -31,7 +32,8 @@ void EntityBuilder::createEntities() {
     lua_pop(L, 1);
 
 #ifdef DEBUG
-    WestLogger::getLoggerInstance().writeInfo("Adding new Entity to Scene\n");
+    WestLogger::getLoggerInstance().log(Level::Info,
+                                        "Adding new Entity to Scene\n");
 #endif
     Scene::getSceneInstance().addEntity(e);
   }
@@ -103,9 +105,8 @@ void EntityBuilder::modelInfo(Entity *e) {
   }
 
 #ifdef DEBUG
-  WestLogger::getLoggerInstance().writeInfo("Loading Model\n");
-  WestLogger::getLoggerInstance().writeInfo(meshPath);
-  WestLogger::getLoggerInstance().writeInfo("\n");
+  WestLogger::getLoggerInstance().log(
+      Level::Info, std::format("Loading Model: {}\n", meshPath));
 #endif
 
   Model *m = loadModel(strdup(meshPath));
@@ -145,11 +146,9 @@ void EntityBuilder::shaderInfo(Entity *e) {
   }
 
 #ifdef DEBUG
-  WestLogger::getLoggerInstance().writeInfo("Loading Shader\n");
-  WestLogger::getLoggerInstance().writeInfo(vertexPath);
-  WestLogger::getLoggerInstance().writeInfo("\n");
-  WestLogger::getLoggerInstance().writeInfo(fragmentPath);
-  WestLogger::getLoggerInstance().writeInfo("\n");
+  WestLogger::getLoggerInstance().log(
+      Level::Info,
+      std::format("Loading Shader:\n\t{}\n\t{}", vertexPath, fragmentPath));
 #endif
 
   Shader *s = loadShader(strdup(vertexPath), strdup(fragmentPath), group);

@@ -79,7 +79,7 @@ void ShaderManager::update() {
     GLuint programId = -1;
     if (_programList.find(s->shadergroup) != _programList.end()) {
 #ifdef DEBUG
-      logDebug(
+      logCycle(
           std::format("{} ### Shader already created setting programId: {} "
                       "for group: {}.\n",
                       getName(), _programList[s->shadergroup], s->shadergroup));

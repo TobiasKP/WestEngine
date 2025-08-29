@@ -4,7 +4,7 @@
 
 Chunk *PoolAllocator::allocateBlock(size_t chunkSize) {
 #ifdef DEBUG
-  _logger->writeInfo("---Allocating new chunks\n");
+  _logger->log(Level::Info, "---Allocating new chunks\n");
 #endif
   size_t blockSize = _numberOfChunks * chunkSize;
   Chunk *blockBegin = reinterpret_cast<Chunk *>(malloc(blockSize));
@@ -25,12 +25,11 @@ void *PoolAllocator::allocate(size_t size) {
   if (_allocationPointer == nullptr)
     _allocationPointer = allocateBlock(size);
 
-
   Chunk *freeChunk = _allocationPointer;
   _allocationPointer = _allocationPointer->next;
 
 #ifdef DEBUG
-  _logger->writeInfo("---Returning next free Chunk\n");
+  _logger->log(Level::Info, "---Returning next free Chunk\n");
 #endif
   return freeChunk;
 }

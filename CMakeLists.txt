@@ -16,7 +16,7 @@ if(BUILD_UTILS)
 endif()
 
 if(BUILD_UI)
-  add_subdirectory(UserInterface/)
+  add_subdirectory(WestInterface/)
 endif()
 
 if(BUILD_CORE)

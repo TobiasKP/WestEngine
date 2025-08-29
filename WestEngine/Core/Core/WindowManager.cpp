@@ -1,9 +1,9 @@
 #include "../CoreHeaders/WindowManager.h"
 
-#include <glm/ext/matrix_clip_space.hpp>
-#include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
 #include <TimeUtils.hpp>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/glm.hpp>
 
 #include "../Config/Config.h"
 #include "../Constants/CoreConstants.h"
@@ -138,17 +138,19 @@ void WindowManager::update() {
 }
 
 void WindowManager::errorCallback(std::int32_t error, const char *message) {
-  WestLogger::getLoggerInstance().writeError(
-      std::format("$$$ {} thrown: {}", error, message));
+  WestLogger::getLoggerInstance().log(
+      Level::Error, std::format("$$$ {} thrown: {}", error, message));
 }
 
 void WindowManager::messageCallback(GLenum source, GLenum type, GLuint id,
                                     GLenum severity, GLsizei length,
                                     const GLchar *message, const void *me) {
-  WestLogger::getLoggerInstance().writeInfo(std::format(
-      "$$$ GL CALLBACK: {} type = 0x{}, severity = 0x{}, message = {}\n",
-      (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity,
-      message));
+  WestLogger::getLoggerInstance().log(
+      Level::Info,
+      std::format(
+          "$$$ GL CALLBACK: {} type = 0x{}, severity = 0x{}, message = {}\n",
+          (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity,
+          message));
 }
 
 void WindowManager::resizeWindow(GLint width, GLint height) {

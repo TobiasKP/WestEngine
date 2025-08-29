@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <algorithm>
 #include <fcntl.h>
+#include <format>
 #include <stb_image.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,7 +38,7 @@
   unbind();
 
 #ifdef DEBUG
-  _logger->writeInfo("---Loaded Model, stored Data in vbo and vao\n");
+  _logger->log(Level::Info, "---Loaded Model, stored Data in vbo and vao\n");
 #endif
 
   Model *m = new Model();
@@ -57,15 +58,14 @@ Model *ObjectLoader::loadModel(const char *path) {
   FILE *file;
   snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", path);
   if ((fd = open(filePath, O_RDONLY)) == -1) {
-    _logger->writeError("---Error opening File!\n Path: ");
-    _logger->writeError(filePath);
-    _logger->writeError("\n");
+    _logger->log(Level::Error,
+                 std::format("---Error opening File!\n Path: {}\n", filePath));
     // TODO return drawdebug Cube
     return nullptr;
   }
 
   if ((file = fdopen(fd, "r")) == NULL) {
-    _logger->writeError("---Error opening File!\n");
+    _logger->log(Level::Error, "---Error opening File!\n");
     return nullptr;
   }
 
@@ -143,7 +143,7 @@ Model *ObjectLoader::loadOBJModel(FILE *file) {
           }
         }
       } else {
-        _logger->writeError("---Error parsing OBJ face data!");
+        _logger->log(Level::Error, "---Error parsing OBJ face data!");
         return nullptr;
       }
     }
@@ -168,7 +168,7 @@ GLuint ObjectLoader::loadTexture(const char *textureFile) {
   unsigned char *imgData =
       stbi_load(textureFile, &width, &height, &numComponents, 0);
   if (!imgData)
-    _logger->writeError("---No Imagedata loaded for texture.");
+    _logger->log(Level::Error, "---No Imagedata loaded for texture.");
 
   GLuint id;
   glGenTextures(1, &id);
@@ -251,7 +251,8 @@ void ObjectLoader::unloadModel(Model *model) {
   }
 
 #ifdef DEBUG
-  _logger->writeInfo("--- Deleted Vertex Array, Buffer and Textures from gl\n");
+  _logger->log(Level::Info,
+               "--- Deleted Vertex Array, Buffer and Textures from gl\n");
 #endif
 }
 

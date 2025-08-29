@@ -10,14 +10,27 @@
 #define WESTUTILS __attribute__((visibility("default")))
 #endif
 
+#include <atomic>
+#include <condition_variable>
 #include <cstdint>
 #include <fstream>
 #include <mutex>
+#include <queue>
 #include <string>
+#include <thread>
 
-const std::string INFO_FILE_NAME = "WestLog_";
-const std::string ERROR_FILE_NAME = "WestError_";
-const std::string CYCLE_FILE_NAME = "WestCyclingLog_";
+constexpr std::string INFO_FILE_NAME = "WestLog_";
+constexpr std::string ERROR_FILE_NAME = "WestError_";
+constexpr std::string CYCLE_FILE_NAME = "WestCyclingLog_";
+constexpr std::uint8_t CYCLE_LENGTH = 100;
+constexpr std::uint8_t BULK_SIZE = 50;
+
+enum class Level : uint8_t { Info, Error, Cycle };
+
+struct Message {
+  Level mode ;
+  std::string payload;
+};
 
 class WESTUTILS WestLogger {
 public:
@@ -26,23 +39,25 @@ public:
   WestLogger(WestLogger const &) = delete;
   void operator=(WestLogger const &) = delete;
 
-  void writeInfo(const std::string message);
-  void writeError(const std::string message);
-  void writeCycleLog(const std::string message);
+  void log(const Level level, const std::string message);
   void closeFileStreams();
 
-  static std::uint8_t getCycleLength();
+  std::uint8_t getCycleLength();
 
 private:
   WestLogger();
   ~WestLogger();
 
+  void workerThread();
+
   std::ofstream _logFile;
   std::ofstream _errorFile;
   std::ofstream _cycleFile;
-  std::uint8_t _cycleLength;
-  static WestLogger _loggerInstance;
-  static std::mutex _errorMutex;
-  static std::mutex _logMutex;
-  static std::mutex _cycleMutex;
+
+  std::atomic<size_t> _cycleLength{CYCLE_LENGTH};
+  std::atomic<bool> _stopWorker{false};
+  std::queue<Message> _q;
+  std::mutex _mutex;
+  std::condition_variable _cv;
+  std::thread _th;
 };
