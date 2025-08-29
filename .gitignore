@@ -4,6 +4,7 @@ build/
 # Exclude all library files in WestEngine/Core/Libs and any of its subdirectories
 WestEngine/Core/Libs/
 UserInterface/WestEngine/
+Libs/
 
 # Exclude all build paths of Interface module
 UserInterface/build/
