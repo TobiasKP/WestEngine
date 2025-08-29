@@ -2,6 +2,7 @@
 
 #include "../Config/Config.h"
 #include "../Constants/CoreConstants.h"
+#include <TimeUtils.hpp>
 
 #include "../CoreHeaders/InputManager.h"
 #include "../CoreHeaders/InterfaceManager.h"
@@ -10,7 +11,6 @@
 #include "../CoreHeaders/ShaderManager.h"
 #include "../CoreHeaders/SystemManager.h"
 #include "../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
-#include "../CoreHeaders/Utils/TimeUtils.h"
 
 EngineManager::EngineManager() : IManager(nullptr) {
   setName(CoreConstants::ENGINE_MANAGER);

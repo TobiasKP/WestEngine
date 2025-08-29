@@ -1,11 +1,12 @@
 #include "../CoreHeaders/RenderManager.h"
 
+#include <TimeUtils.hpp>
+
 #include "../Config/Config.h"
 #include "../CoreHeaders/InterfaceManager.h"
 #include "../CoreHeaders/Utils/DataUtils/ObjectLoader.h"
 #include "../CoreHeaders/Utils/DataUtils/UniformUtils.h"
 #include "../CoreHeaders/Utils/Math/PositionCalculation.h"
-#include "../CoreHeaders/Utils/TimeUtils.h"
 
 GLuint RenderManager::_usedShaderProgram = 0;
 

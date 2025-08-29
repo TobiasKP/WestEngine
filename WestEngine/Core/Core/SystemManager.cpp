@@ -2,9 +2,9 @@
 #include "../Config/Config.h"
 
 #include <algorithm>
+#include <TimeUtils.hpp>
 
 #include "../CoreHeaders/Systems/Umbrella.h"
-#include "../CoreHeaders/Utils/TimeUtils.h"
 
 std::array<ISystem *, 1> SystemManager::_systems = {};
 

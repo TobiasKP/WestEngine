@@ -6,11 +6,6 @@ namespace CoreConstants {
 const std::string TITLE = "Test Title";
 const std::string UNDEFINED_STRING = "";
 
-const std::string INFO_FILE_NAME = "WestLog_";
-const std::string ERROR_FILE_NAME = "WestError_";
-const std::string CYCLE_FILE_NAME = "WestCyclingLog_";
-
-
 const std::string INPUT_CONFIG_FILE_NAME = "/config/Game.ini";
 const std::string AVAILABLE_INPUTS_FILE_NAME = "/engine/AvailableInputCommands.cfg";
 const std::string LUA_INIT_FILE = "/lua/Main.lua";

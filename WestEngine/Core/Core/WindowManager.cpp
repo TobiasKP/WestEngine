@@ -3,12 +3,12 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
+#include <TimeUtils.hpp>
 
 #include "../Config/Config.h"
 #include "../Constants/CoreConstants.h"
 #include "../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
 #include "../CoreHeaders/Utils/InputUtils/MouseCallbacks.h"
-#include "../CoreHeaders/Utils/TimeUtils.h"
 
 WindowManager::WindowManager() : IManager(nullptr) {
   setName(CoreConstants::WINDOW_MANAGER);

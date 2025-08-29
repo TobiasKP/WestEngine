@@ -1,26 +1,31 @@
-#include "../../CoreHeaders/Utils/TimeUtils.h"
+#pragma once
 
 #include <chrono>
+#include <string>
 
 namespace TimeUtils {
-
-double getCurrentTimeAsTime() {
+static double getCurrentTimeAsTime() {
   auto long_time = std::chrono::high_resolution_clock::now();
   auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(
       long_time.time_since_epoch());
   return milliseconds.count();
 }
 
-double getDuration(double start, double end) { return (end - start); }
+static double getCurrentTimeAsHz() {
+  // TODO fill when used
+  return 0;
+}
 
-double getNanoseconds() {
+static double getDuration(double start, double end) { return (end - start); }
+
+static double getNanoseconds() {
   auto now = std::chrono::high_resolution_clock::now();
   auto nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(
       now.time_since_epoch());
   return nanoseconds.count();
 }
 
-std::string getCurrentTimeAsDate() {
+static std::string getCurrentTimeAsDate() {
   const std::chrono::time_point now{std::chrono::system_clock::now()};
   const std::chrono::year_month_day ymd{
       std::chrono::floor<std::chrono::days>(now)};
@@ -29,4 +34,4 @@ std::string getCurrentTimeAsDate() {
          std::to_string(static_cast<int>(ymd.year()));
 }
 
-} // namespace TimeUtils
+}; // namespace TimeUtils

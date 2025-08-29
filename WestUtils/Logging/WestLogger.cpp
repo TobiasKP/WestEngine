@@ -1,8 +1,8 @@
-#include "../../../CoreHeaders/Utils/Logging/WestLogger.h"
+#include "../Include/WestLogger.h"
 
 #include <iostream>
 
-#include "../../../CoreHeaders/Utils/TimeUtils.h"
+#include "../Include/TimeUtils.hpp"
 
 WestLogger WestLogger::_loggerInstance;
 std::mutex WestLogger::_errorMutex;
@@ -18,11 +18,11 @@ WestLogger &WestLogger::getLoggerInstance() {
 
 WestLogger::WestLogger() {
   std::string currentDate = TimeUtils::getCurrentTimeAsDate() + ".log";
-  _logFile.open(CoreConstants::INFO_FILE_NAME + currentDate,
+  _logFile.open(INFO_FILE_NAME + currentDate,
                 std::ios::out | std::ios::app);
-  _errorFile.open(CoreConstants::ERROR_FILE_NAME + currentDate,
+  _errorFile.open(ERROR_FILE_NAME + currentDate,
                   std::ios::out | std::ios::app);
-  _cycleFile.open(CoreConstants::CYCLE_FILE_NAME + currentDate, std::ios::out);
+  _cycleFile.open(CYCLE_FILE_NAME + currentDate, std::ios::out);
   _cycleLength = 100;
 
   if (!_logFile.is_open() || !_logFile.good()) {

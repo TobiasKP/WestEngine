@@ -3,8 +3,8 @@
 #include "../Config/Config.h"
 #include "../Constants/UniformConstants.h"
 #include "../CoreHeaders/Utils/DataUtils/UniformUtils.h"
-#include "../CoreHeaders/Utils/TimeUtils.h"
 
+#include <TimeUtils.hpp>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -185,14 +185,14 @@ void ShaderManager::addUniforms(GLuint programId, Entity *entity,
 GLuint ShaderManager::createShader(const std::string shaderFile,
                                    std::int32_t shaderType, GLuint programId) {
   GLuint shaderId = glCreateShader(shaderType);
-  if (shaderId == 0) { 
+  if (shaderId == 0) {
     logFailure(std::format("Error creating shader. Type: {}.\n", shaderType));
     return -1;
   }
 
-#ifdef DEBUG 
+#ifdef DEBUG
   logDebug(std::format("{} ### Created Shader: {} for File: {}.\n", getName(),
-                      shaderId, shaderFile));
+                       shaderId, shaderFile));
 #endif
 
   const GLchar *source = readShaderSource(shaderFile);
@@ -207,9 +207,9 @@ GLuint ShaderManager::createShader(const std::string shaderFile,
 
   glGetShaderiv(shaderId, GL_COMPILE_STATUS, &status);
   if (status == 0) {
-    glGetShaderInfoLog(shaderId, 2048, &size, errorLog); 
+    glGetShaderInfoLog(shaderId, 2048, &size, errorLog);
     logFailure(std::format("Error compiling shader. Type: {}, Info: {}\n",
-                        shaderType, errorLog));
+                           shaderType, errorLog));
     return 0;
   }
 
@@ -223,7 +223,7 @@ void ShaderManager::link(GLuint programId, GLuint vertexId, GLuint fragmentId) {
   GLchar errorLog[1024] = {};
   glGetProgramiv(programId, GL_LINK_STATUS, &status);
   if (status == 0) {
-    glGetProgramInfoLog(programId, 1024, &size, errorLog); 
+    glGetProgramInfoLog(programId, 1024, &size, errorLog);
     logFailure(std::format("Error linking program. Info: {}\n", errorLog));
   }
 
@@ -235,7 +235,7 @@ void ShaderManager::link(GLuint programId, GLuint vertexId, GLuint fragmentId) {
 
   glValidateProgram(programId);
   glGetProgramiv(programId, GL_VALIDATE_STATUS, &status);
-  if (status == 0) { 
+  if (status == 0) {
     logFailure(std::format("Error validating program. Info: {}\n", errorLog));
   }
 }
@@ -249,13 +249,13 @@ GLchar *ShaderManager::readShaderSource(const std::string shaderFile) {
 
   std::int32_t fd;
   snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", shaderFile.c_str());
-  if ((fd = open(filePath, O_RDONLY)) == -1) { 
+  if ((fd = open(filePath, O_RDONLY)) == -1) {
     logFailure(std::format("Error opening shader File. Path: {}\n", filePath));
     return nullptr;
   }
 
   FILE *file = fdopen(fd, "rb");
-  if (file == NULL) { 
+  if (file == NULL) {
     logFailure(std::format("Error opening File. Path: {}\n", filePath));
     return nullptr;
   }

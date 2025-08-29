@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Logging/WestLogger.h"
+#include <WestLogger.h>
 #include "../../../Constants/CoreConstants.h"
 
 struct Chunk {
