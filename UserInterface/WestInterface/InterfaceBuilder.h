@@ -3,6 +3,7 @@
 #include "../FacadeStructs.h"
 #include "Elements/ContainerElement.cpp"
 
+#include <WestLogger.h>
 #include <cstdint>
 
 static std::uint8_t _currentId = 1;
@@ -21,4 +22,5 @@ public:
 
 private:
   ContainerElement *_current = nullptr;
+  WestLogger &_logger = WestLogger::getLoggerInstance();
 };

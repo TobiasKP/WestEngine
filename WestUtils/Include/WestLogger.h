@@ -1,5 +1,15 @@
 #pragma once
 
+#if defined(_WIN32) || defined(_WIN64)
+#if defined(WESTUTILS_BUILDING_DLL)
+#define WESTUTILS __declspec(dllexport)
+#else
+#define WESTUTILS __declspec(dllimport)
+#endif
+#else
+#define WESTUTILS __attribute__((visibility("default")))
+#endif
+
 #include <cstdint>
 #include <fstream>
 #include <mutex>
@@ -9,7 +19,7 @@ const std::string INFO_FILE_NAME = "WestLog_";
 const std::string ERROR_FILE_NAME = "WestError_";
 const std::string CYCLE_FILE_NAME = "WestCyclingLog_";
 
-class WestLogger {
+class WESTUTILS WestLogger {
 public:
   static WestLogger &getLoggerInstance();
 

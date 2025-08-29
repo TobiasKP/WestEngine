@@ -43,7 +43,8 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "BUILD_CORE": "ON",
-        "BUILD_UI": "ON"
+        "BUILD_UI": "ON",
+        "BUILD_UTILS": "ON"
       },
       "condition": {
         "type": "equals",

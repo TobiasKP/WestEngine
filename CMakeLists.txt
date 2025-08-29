@@ -15,10 +15,11 @@ if(BUILD_UTILS)
   add_subdirectory(WestUtils/)
 endif()
 
+if(BUILD_UI)
+  add_subdirectory(UserInterface/)
+endif()
+
 if(BUILD_CORE)
   add_subdirectory(WestEngine/)
 endif()
 
-if(BUILD_UI)
-  add_subdirectory(UserInterface/)
-endif()

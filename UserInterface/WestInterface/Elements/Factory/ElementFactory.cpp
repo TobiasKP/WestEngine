@@ -1,12 +1,12 @@
 #include "ElementFactory.h"
 
-#include "../Observer/EventObserver.h"
-#include "../Observer/ValueObserver.h"
+#include "../../Observer/EventObserver.h"
+#include "../../Observer/ValueObserver.h"
 
-#include "Button.cpp"
-#include "ContainerElement.cpp"
-#include "Icon.cpp"
-#include "Label.cpp"
+#include "../Button.cpp"
+#include "../ContainerElement.cpp"
+#include "../Icon.cpp"
+#include "../Label.cpp"
 
 IElement *ElementFactory::createElementInternal(ElementProxy *e) {
   ElementType type = e->type;
@@ -14,12 +14,12 @@ IElement *ElementFactory::createElementInternal(ElementProxy *e) {
 
   switch (type) {
   case BUTTON:
-    result = new Button();
+    //result = new Button();
     fillBasicInfos(e, result);
     registerElementEvent(result);
     break;
   case LABEL:
-    result = new Label();
+    //result = new Label();
     fillBasicInfos(e, result);
     break;
   case CONTAINER:
@@ -27,7 +27,7 @@ IElement *ElementFactory::createElementInternal(ElementProxy *e) {
     fillBasicInfos(e, result);
     break;
   case ICON:
-    result = new Icon();
+    //result = new Icon();
     fillBasicInfos(e, result);
     break;
   default:

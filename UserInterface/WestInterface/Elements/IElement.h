@@ -36,8 +36,8 @@ struct IElement {
   // Bit flags for special behaviours
   std::uint8_t flags;
 
-  virtual void handler() = 0;
-  virtual ~IElement() = 0;
+  virtual void handler() {};
+  virtual ~IElement() {};
 
   ComponentData describe() {
     ComponentData cd;
