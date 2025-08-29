@@ -6,13 +6,13 @@
     {
       "name": "base",
       "hidden": true,
-      "toolchainFile": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      "toolchainFile": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "BUILD_CORE": "OFF",
         "BUILD_UI": "OFF",
         "BUILD_UTILS": "OFF"
-      },
+      }
     }, 
     {
       "name": "linux-release",
