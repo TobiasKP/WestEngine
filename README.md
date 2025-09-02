@@ -1,7 +1,8 @@
 # Installation Process
 
-1: [Section Link](#requirements) <br />
-2: [Section Link](#installation) <br />
+1: [Requirements](#requirements) <br />
+2: [Installation Guide](#installation) <br />
+3: [Project Documentation](#documentation) <br />
 
 ## Requirements
 
@@ -28,17 +29,21 @@ For building the project CMakePresets are given and listed in the CMakePresets.j
 |:-----------------------|:----------------------------------:|:------------------------------:|--------------------------------:|
 | Full Build Cycle       | windows-release                    | linux-release                  | macos-release                   |
 | Full Debug Cycle       | windows-debug                      | linux-debug                    | macos-debug                     |
-| Module                 | windows-debug-*`<module name>`*    | linux-debug-*`<module name>`*  | macos-debug-*`<module name>`*   |
-
+| Module                 | windows-debug-*module name*        | linux-debug-*module name*      | macos-debug-*module name*       |
+| Scripts                | TBD                                | TBD                            | TBD                             |
 
 Examples:
 
-setting the full project preset on a linux system: *cmake --preset linux-release* <br />
-setting the core module preset on a windows system: *cmake --preset windows-debug-core* <br />
+setting the full project preset on a linux system: *`cmake --preset linux-release`* <br />
+setting the core module preset on a windows system: *`cmake --preset windows-debug-core`* <br />
 
 afterwards the project can be build with the specified presets: <br />
-*cmake --build --preset your *`<preferred preset>`*
+`cmake --build --preset *<your preferred preset>`*
 
-The executable *WestCore* will be located in: ${CMAKE_SOURCE_DIR}/build/<used preset>/WestEngine/
+For debug builds the executable *WestCore* will be located in: `${CMAKE_SOURCE_DIR}/build/<used preset>/WestEngine/WestCore/`
 
-Write access in the folder runnint the application from is required for log files to be generated. 
+For release builds: TBD...
+
+Linux side not: Write access for the folder running the application from is required for log files to be generated. 
+
+## Documentation
