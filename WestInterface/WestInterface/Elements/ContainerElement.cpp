@@ -2,15 +2,21 @@
 
 #include <algorithm>
 #include <assert.h>
+#include <format>
 #include <vector>
 
-#include "IElement.h"
+#include "IElement.hpp"
 
 struct ContainerElement : public IElement {
   std::vector<IElement *> children;
   std::uint8_t gridCells = 0;
 
   ~ContainerElement() {
+#ifdef DEBUG
+    _logger.log(
+        Level::Info,
+        std::format("@@@ Deleting all children for interface: ", this->id));
+#endif
     for (IElement *e : children) {
       assert(e != nullptr);
       delete e;
@@ -24,10 +30,18 @@ struct ContainerElement : public IElement {
                      [&d_id](IElement *obj) { return obj->id == d_id; });
 
     if (result == children.end()) {
-      // TODO Debug Log
+      _logger.log(Level::Error,
+                  std::format("@@@ Trying to delete element: {} from "
+                              "interface: {} that does not exists.",
+                              d_id, this->id));
       return false;
     }
 
+#ifdef DEBUG
+    _logger.log(Level::Info,
+                std::format("@@@ Deleting element: {} from interface: {}", d_id,
+                            this->id));
+#endif
     children.erase(result);
     delete *result;
     return true;
@@ -39,12 +53,22 @@ struct ContainerElement : public IElement {
     float height = scale * SIZE_E;
 
     if (gridPositionX > gridCells) {
-      // TODO debug log
+#ifdef DEBUG
+      _logger.log(Level::Info,
+                  std::format("@@@ Added Element: {} is out of bounds from "
+                              "parent element in x position",
+                              e->id));
+#endif
       gridPositionX = gridCells;
     }
 
     if (gridPositionY > gridCells) {
-      // TODO debug log
+#ifdef DEBUG
+      _logger.log(Level::Info,
+                  std::format("@@@ Added Element: {} is out of bounds from "
+                              "parent element in y position",
+                              e->id));
+#endif
       gridPositionY = gridCells;
     }
 
@@ -54,17 +78,30 @@ struct ContainerElement : public IElement {
     float maxHeight = yLL + height * gridCells;
     if (elementPosX + SIZE_E * e->scale > maxWidth ||
         elementPosY + SIZE_E * e->scale > maxHeight) {
-      // TODO Log error element too large
+      _logger.log(Level::Error, std::format("@@@ Added Element: {} will be to "
+                                            "large for parent, not adding...",
+                                            e->id));
       return;
     }
 
     e->xLL = elementPosX;
     e->yLL = elementPosY;
     e->zIndex = 2;
-    // TODO Debug Log
+#ifdef DEBUG
+    _logger.log(
+        Level::Info,
+        std::format("@@@ Adding element: {} to children of interface: {}",
+                    e->id, this->id));
+#endif
 
     children.push_back(e);
   };
 
-  void handler() {};
+  void handler() {
+    _logger.log(
+        Level::Error,
+        std::format(
+            "@@@ Button handler of interface: {} called which does not exists!",
+            this->id));
+  };
 };

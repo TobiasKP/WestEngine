@@ -1,5 +1,8 @@
 #pragma once
 
-#include "IElement.h"
+#include "IElement.hpp"
 
-struct Label : public IElement {};
+struct Label : public IElement {
+  void handler() {};
+  ~Label() {};
+};

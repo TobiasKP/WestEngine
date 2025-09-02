@@ -1,5 +1,5 @@
 #pragma once
 
-#include "IElement.h"
+#include "IElement.hpp"
 
 struct Icon : public IElement {};

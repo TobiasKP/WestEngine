@@ -2,6 +2,7 @@
 
 #include "../FacadeStructs.h"
 #include "Elements/ContainerElement.cpp"
+#include "Elements/Factory/ElementFactory.h"
 
 #include <WestLogger.h>
 #include <cstdint>
@@ -22,5 +23,6 @@ public:
 
 private:
   ContainerElement *_current = nullptr;
+  ElementFactory *_factory = nullptr;
   WestLogger &_logger = WestLogger::getLoggerInstance();
 };

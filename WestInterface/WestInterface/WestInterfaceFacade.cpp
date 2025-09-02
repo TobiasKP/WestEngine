@@ -1,5 +1,7 @@
 #include "../WestInterfaceFacade.h"
 
+#include <format>
+
 WestInterfaceFacade::WestInterfaceFacade() {
   count = 0;
   filled = false;
@@ -16,10 +18,13 @@ WestInterfaceFacade::~WestInterfaceFacade() {
 }
 
 ContainerElement *WestInterfaceFacade::findInterfaceById(std::uint8_t id) {
+  if (id <= 0)
+    return nullptr;
+
   for (std::uint8_t i = 0; i < count; i++) {
-    if (_interfaces.at(i)->id == id) {
+    assert(_interfaces.at(i) != nullptr);
+    if (_interfaces.at(i)->id == id)
       return _interfaces.at(i);
-    }
   }
 
   return nullptr;
@@ -32,7 +37,11 @@ std::uint8_t WestInterfaceFacade::createNewInterface(
   _builder.createNewInterface(xScreenPosition, yScreenPosition, scale,
                               gridCells);
   for (auto *element : elements) {
-    // Todo log debug
+#ifdef DEBUG
+    _logger.log(Level::Cycle,
+                std::format("@@@ Addding new element to interface: {}",
+                            (int)element->type));
+#endif
     _builder.addElement(element);
   }
   ContainerElement *interface = _builder.build();
@@ -53,7 +62,8 @@ bool WestInterfaceFacade::destroyInterface(std::uint8_t interfaceId) {
   if (location == -1)
     return false;
 
-  // TODO Log debug
+  _logger.log(Level::Info,
+              std::format("@@@ Destroying interface: {}", interfaceId));
   ContainerElement *e = _interfaces.at(count);
   _interfaces.at(count) = nullptr;
   _interfaces.at(location) = e;
@@ -67,12 +77,17 @@ void WestInterfaceFacade::addElement(std::uint8_t interfaceId,
   ContainerElement *interface = findInterfaceById(interfaceId);
   if (interface == nullptr)
     return;
-  else {
-    // TODO Debug log
-  }
 
+  assert(element != nullptr);
   IElement *e = _builder.transform(element);
-  // TODO Debug log
+  assert(e != nullptr);
+#ifdef DEBUG
+  _logger.log(
+      Level::Info,
+      std::format(
+          "@@@ Adding additional element to interface: {}, after creation",
+          interfaceId));
+#endif
   interface->addChild(e, element->column, element->row);
 };
 

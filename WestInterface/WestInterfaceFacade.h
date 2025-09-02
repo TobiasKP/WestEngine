@@ -22,6 +22,7 @@
 #include <atomic>
 #include <cstdint>
 #include <string>
+#include <WestLogger.h>
 
 class WEST_INTERFACE WestInterfaceFacade {
 public:
@@ -71,6 +72,7 @@ private:
   EventObserver _eventObserver;
   InterfaceBuilder _builder;
   UIRenderManager _renderManager;
+  WestLogger &_logger = WestLogger::getLoggerInstance();
 
   ContainerElement *findInterfaceById(std::uint8_t id);
 };

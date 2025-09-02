@@ -2,11 +2,7 @@
 
 #include "../../Observer/EventObserver.h"
 #include "../../Observer/ValueObserver.h"
-
-#include "../Button.cpp"
-#include "../ContainerElement.cpp"
-#include "../Icon.cpp"
-#include "../Label.cpp"
+#include "../Umbrella.hpp"
 
 IElement *ElementFactory::createElementInternal(ElementProxy *e) {
   ElementType type = e->type;
@@ -14,12 +10,12 @@ IElement *ElementFactory::createElementInternal(ElementProxy *e) {
 
   switch (type) {
   case BUTTON:
-    //result = new Button();
+    // result = new Button();
     fillBasicInfos(e, result);
     registerElementEvent(result);
     break;
   case LABEL:
-    //result = new Label();
+    result = new Label();
     fillBasicInfos(e, result);
     break;
   case CONTAINER:
@@ -27,13 +23,26 @@ IElement *ElementFactory::createElementInternal(ElementProxy *e) {
     fillBasicInfos(e, result);
     break;
   case ICON:
-    //result = new Icon();
+    // result = new Icon();
     fillBasicInfos(e, result);
     break;
+  case DEBUG_ELEMENT:
+    result = new DebugLabel();
+    result->id = e->elementId;
+    result->xLL = e->xPosition;
+    result->yLL = e->yPosition;
+    result->scale = e->scale;
+    break;
   default:
+    result = new DebugLabel();
+    result->id = e->elementId;
+    result->xLL = e->xPosition;
+    result->yLL = e->yPosition;
+    result->scale = e->scale;
     break;
   }
 
+  assert(result != nullptr);
   return result;
 }
 
@@ -45,4 +54,13 @@ void ElementFactory::registerElementValue(IElement *e) {
   ValueObserver::registerElement(e);
 }
 
-void ElementFactory::fillBasicInfos(ElementProxy *ep, IElement *el) {}
+void ElementFactory::fillBasicInfos(ElementProxy *ep, IElement *el) {
+  el->id = ep->elementId;
+  el->xLL = ep->xPosition;
+  el->yLL = ep->yPosition;
+  el->scale = ep->scale;
+  el->colorR = ep->colorR;
+  el->colorG = ep->colorG;
+  el->colorB = ep->colorB;
+  el->colorA = ep->colorA;
+}

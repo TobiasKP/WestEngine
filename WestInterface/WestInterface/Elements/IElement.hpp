@@ -1,5 +1,6 @@
 #pragma once
 
+#include <WestLogger.h>
 #include <cstdint>
 
 #include "../RenderManagment/ComponentData.h"
@@ -44,6 +45,9 @@ struct IElement {
     describeMyself(cd);
     return cd;
   };
+
+protected:
+  WestLogger &_logger = WestLogger::getLoggerInstance();
 
 private:
   void describeMyself(ComponentData cd) {

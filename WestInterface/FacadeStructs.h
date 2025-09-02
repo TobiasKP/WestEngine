@@ -17,7 +17,7 @@
 #include <functional>
 #include <string>
 
-enum ElementType { LABEL, BUTTON, CONTAINER, ICON };
+enum ElementType { LABEL, BUTTON, CONTAINER, ICON, DEBUG_ELEMENT };
 
 struct WEST_INTERFACE ElementProxy {
   ElementType type;
