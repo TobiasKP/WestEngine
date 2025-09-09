@@ -8,10 +8,27 @@
 
 Requirements for the project to build and run correctly:
 
+**Software Requirements**
+
+These are needed for building the project yourself on your machine and are not necessary for the binaries only/release.
+
 OS: MacOS, Windows, Linux <br />
 OpenGL suitable graphics driver: [OpenGL introduction](www.khronos.org/opengl/wiki/Getting_Started) <br />
 C++ 20 (or later) & compiler (e.g. gcc): [C++ introduction](https://cplusplus.com/doc/tutorial/introduction) <br />
 CMake: [Cmake](https://cmake.org) <br />
+
+These instructions will not lead you to get a working cmake & vcpkg enviroment, please ensure that all necessary dependencies (e.g. ninja or zip) are already installed and working, specially on Linux distributions like Arch a lot of manual configuration is required.  
+
+**Hardware Requirements:**
+
+|Hardware       | Minimal        | Recommended |
+|:--------------|:--------------:|------------:|
+|CPU            |                |             |
+|GPU            |                |             |
+|Memory         |                |             |
+|OS Version     |                |             |
+|Free Disk Space|                |             |
+
 
 ## Installation
 
@@ -30,7 +47,7 @@ For building the project CMakePresets are given and listed in the CMakePresets.j
 | Full Build Cycle       | windows-release                    | linux-release                  | macos-release                   |
 | Full Debug Cycle       | windows-debug                      | linux-debug                    | macos-debug                     |
 | Module                 | windows-debug-*module name*        | linux-debug-*module name*      | macos-debug-*module name*       |
-| Scripts                | TBD                                | TBD                            | TBD                             |
+| Scripts                |                                    |                                |                                 |
 
 Examples:
 
@@ -47,3 +64,9 @@ For release builds: TBD...
 Linux side not: Write access for the folder running the application from is required for log files to be generated. 
 
 ## Documentation
+
+### Core Module
+
+### Interface Module
+
+### Utility Module
