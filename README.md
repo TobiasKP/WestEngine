@@ -17,7 +17,7 @@ OpenGL suitable graphics driver: [OpenGL introduction](www.khronos.org/opengl/wi
 C++ 20 (or later) & compiler (e.g. gcc): [C++ introduction](https://cplusplus.com/doc/tutorial/introduction) <br />
 CMake: [Cmake](https://cmake.org) <br />
 
-These instructions will not lead you to get a working cmake & vcpkg enviroment, please ensure that all necessary dependencies (e.g. ninja or zip) are already installed and working, specially on Linux distributions like Arch a lot of manual configuration is required.  
+These instructions will get you to a working cmake & vcpkg enviroment, please ensure that all necessary dependencies (e.g. ninja or zip) are already installed and working, specially on Linux distributions like Arch a lot of manual configuration is required. Also write/executable rights are needed for the repository folder.
 
 **Hardware Requirements:**
 
@@ -40,7 +40,7 @@ if already cloned without recourse option specified:
 
 *git submodule update --init --recursive*
 
-For building the project CMakePresets are given and listed in the CMakePresets.json. Following the two major options for first time building the project.
+For building the project CMakePresets are given and listed in the CMakePresets.json. For first time building the project choose either a full Debug Cycle or a full Build Cycle. The debug Cycle will build the whole project including all modules and dependencies with debug flag enabled, therefor assertions and additional logs are enabled. Also verbose building is enabled. The normal build cycle will build all modules and dependencies with debug mode disabled.  
 
 | Mode                   | Windows                            | Linux                          | MacOS                           |
 |:-----------------------|:----------------------------------:|:------------------------------:|--------------------------------:|
@@ -55,7 +55,7 @@ setting the full project preset on a linux system: *`cmake --preset linux-releas
 setting the core module preset on a windows system: *`cmake --preset windows-debug-core`* <br />
 
 afterwards the project can be build with the specified presets: <br />
-`cmake --build --preset *<your preferred preset>`*
+*`cmake --build --preset <your preferred preset>`*
 
 For debug builds the executable *WestCore* will be located in: `${CMAKE_SOURCE_DIR}/build/<used preset>/WestEngine/WestCore/`
 
