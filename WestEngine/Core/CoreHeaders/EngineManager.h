@@ -4,7 +4,9 @@
 
 #include "DataStructure/WestQ.h"
 #include "WindowManager.h"
-#include "../../Config/Config.h"
+
+#include "../Config/Config.h"
+
 
 class EngineManager : public IManager {
 
