@@ -15,16 +15,17 @@
 #include "WestInterface/InterfaceBuilder.h"
 #include "WestInterface/Observer/EventObserver.h"
 #include "WestInterface/Observer/ValueObserver.h"
-#include "WestInterface/RenderManagment/DrawData.h"
+#include "WestInterface/RenderManagment/ComponentData.h"
 #include "WestInterface/RenderManagment/UIRenderManager.h"
 
+#include <WestLogger.h>
 #include <array>
 #include <atomic>
 #include <cstdint>
 #include <string>
-#include <WestLogger.h>
 
 class WEST_INTERFACE WestInterfaceFacade {
+
 public:
   WestInterfaceFacade();
   ~WestInterfaceFacade();
@@ -32,7 +33,7 @@ public:
   // Managing Interfaces
   std::uint8_t createNewInterface(std::uint16_t xScreenPosition,
                                   std::uint16_t yScreenPosition, float scale,
-                                  std::uint8_t gridCells,
+                                  std::uint8_t gridCells, bool hiddenContainer,
                                   std::vector<ElementProxy *> elements);
   bool destroyInterface(std::uint8_t interfaceId);
 
@@ -42,7 +43,7 @@ public:
 
   // RenderLoop
   void updateRenderData();
-  const RenderData getRenderData();
+  ComponentData *getRenderData();
 
   // Events
   bool notify(std::uint8_t event, std::uint16_t mouseX, std::uint16_t mouseY);
@@ -66,12 +67,10 @@ protected:
 private:
   std::array<ContainerElement *, 32> _interfaces;
 
-  static constexpr RenderData _instance{};
-
-  ValueObserver _valueObserver;
-  EventObserver _eventObserver;
-  InterfaceBuilder _builder;
-  UIRenderManager _renderManager;
+  ValueObserver *_valueObserver;
+  EventObserver *_eventObserver;
+  InterfaceBuilder *_builder;
+  UIRenderManager *_renderManager;
   WestLogger &_logger = WestLogger::getLoggerInstance();
 
   ContainerElement *findInterfaceById(std::uint8_t id);

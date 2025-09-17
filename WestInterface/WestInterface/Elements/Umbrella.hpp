@@ -2,6 +2,6 @@
 #include "ContainerElement.cpp"
 #include "Icon.cpp"
 #include "Label.cpp"
-#include "DebugLabel.cpp"
+#include "DebugElement.cpp"
 
 

@@ -1,8 +1,8 @@
 #include "../CoreHeaders/SystemManager.h"
-#include "../Config/Config.h"
 
 #include <TimeUtils.hpp>
 #include <algorithm>
+#include <Config.h>
 
 #include "../CoreHeaders/Systems/Umbrella.h"
 

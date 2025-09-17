@@ -11,12 +11,13 @@
 #endif
 
 struct WEST_INTERFACE ComponentData {
-  // Bottom Left corner & scale
-  float xLL;
-  float yLL;
-  float scale;
-  //float uvTopLeft;
-  //float uvBottomRight;
+  // Location of component in Normalized Device Coordinates
+  float vertices[8];
+  float indices[6] = {0, 1, 3, 1, 2, 3};
+
+  // float uvTopLeft;
+  // float uvBottomRight;
+
   // Color of component:
   float colorR;
   float colorG;

@@ -1,22 +1,25 @@
 #include "../../CoreHeaders/Entity/Camera.h"
 
-#include <glm/gtc/matrix_transform.hpp>
 #include "glm/gtc/type_ptr.hpp"
+#include <glm/gtc/matrix_transform.hpp>
 
-#include "../Config/Config.h"
+#include <Config.h>
 
 Camera::~Camera() {}
 
 void Camera::update() {
   assert(_cameraUniforms != -1);
   glBindBuffer(GL_UNIFORM_BUFFER, _cameraUniforms);
-  glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(getViewMatrix()));
-  glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(getProjectionMatrix()));
+  glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
+                  glm::value_ptr(getViewMatrix()));
+  glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4),
+                  glm::value_ptr(getProjectionMatrix()));
   glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 glm::mat4 Camera::getProjectionMatrix() {
-  float aspectRatio = (float)Config::GeneralConfig.WIDTH / Config::GeneralConfig.HEIGHT;
+  float aspectRatio =
+      (float)Config::GeneralConfig.WIDTH / Config::GeneralConfig.HEIGHT;
   glm::mat4 mat = glm::perspective(_FOV, aspectRatio, _Z_NEAR, _Z_FAR);
   return mat;
 }

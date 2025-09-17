@@ -4,8 +4,8 @@
 #include <TimeUtils.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/glm.hpp>
+#include <Config.h>
 
-#include "../Config/Config.h"
 #include "../Constants/CoreConstants.h"
 #include "../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
 #include "../CoreHeaders/Utils/InputUtils/MouseCallbacks.h"
@@ -159,10 +159,7 @@ void WindowManager::resizeWindow(GLint width, GLint height) {
   logDebug(std::format("{} ### Resizing window to new height: {}, {}",
                        getName(), width, height));
 #endif
-  glfwSetWindowSize(_window, width, height);
-  // TODO set Ortho
-  // Global::UserInterface::ORTHO_MATRIX =
-  //     glm::ortho(0.0f, (float)width, 0.0f, (float)height);
+  glfwSetWindowSize(_window, width, height);  
   Config::GeneralConfig.HEIGHT = height;
   Config::GeneralConfig.WIDTH = width;
 }

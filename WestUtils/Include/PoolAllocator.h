@@ -1,13 +1,24 @@
 #pragma once
 
+#if defined(_WIN32) || defined(_WIN64)
+#if defined(WESTUTILS_BUILDING_DLL)
+#define WESTUTILS __declspec(dllexport)
+#else
+#define WESTUTILS __declspec(dllimport)
+#endif
+#else
+#define WESTUTILS __attribute__((visibility("default")))
+#endif
+
 #include <WestLogger.h>
-#include "../../../Constants/CoreConstants.h"
+
+#include "Config.h"
 
 struct Chunk {
   Chunk *next;
 };
 
-class PoolAllocator {
+class WESTUTILS PoolAllocator {
 public:
   PoolAllocator() {};
   ~PoolAllocator() {};
@@ -16,7 +27,7 @@ public:
   void deallocate(void *ptr, size_t size);
 
 private:
-  size_t _numberOfChunks = CoreConstants::CHUNK_SIZE;
+  size_t _numberOfChunks = Config::GeneralConfig.CHUNK_SIZE;
   Chunk *_allocationPointer = nullptr;
   WestLogger *_logger = &WestLogger::getLoggerInstance();
 

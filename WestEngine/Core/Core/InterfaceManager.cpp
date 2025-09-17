@@ -1,8 +1,7 @@
 #include "../CoreHeaders/InterfaceManager.h"
 
-#include "../Config/Config.h"
 //#include "UserInterface.h"
-
+#include <Config.h>
 // std::vector<IUserInterface *> InterfaceManager::_interfaces;
 
 InterfaceManager::InterfaceManager() : IManager(nullptr) {

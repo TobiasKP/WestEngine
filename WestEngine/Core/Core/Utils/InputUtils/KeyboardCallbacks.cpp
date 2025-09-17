@@ -1,6 +1,6 @@
 #include "../../../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
 
-#include "../../../Config/Config.h"
+#include <Config.h>
 
 InputManager *KeyboardCallbacks::_iManager = nullptr;
 WindowManager *KeyboardCallbacks::_wManager = nullptr;
@@ -28,8 +28,8 @@ void KeyboardCallbacks::keyboardCallback(GLFWwindow *window, int key,
   }
 }
 
-void KeyboardCallbacks::executeBoundOperation(std::int32_t key,
-                                              const std::string boundOperation) {
+void KeyboardCallbacks::executeBoundOperation(
+    std::int32_t key, const std::string boundOperation) {
   assert(_iManager != nullptr && _wManager != nullptr && _iObserver != nullptr);
   if (!_wManager->isKeyPressed(key) || Config::EngineInternals.PAUSE) {
     return;

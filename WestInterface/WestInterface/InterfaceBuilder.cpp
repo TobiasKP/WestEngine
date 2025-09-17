@@ -16,13 +16,17 @@ InterfaceBuilder::~InterfaceBuilder() {
 
 void InterfaceBuilder::createNewInterface(std::uint16_t xScreenPosition,
                                           std::uint16_t yScreenPosition,
-                                          float scale, std::uint8_t gridCells) {
+                                          float scale, std::uint8_t gridCells,
+                                          bool hiddenContainer) {
 
   _current = new ContainerElement();
   _current->scale = scale;
   _current->xLL = xScreenPosition;
   _current->yLL = yScreenPosition;
   _current->gridCells = gridCells;
+  if (hiddenContainer) {
+    _current->flags = 0x08;
+  }
   assert(_current != nullptr && _current->xLL >= 0 && _current->yLL >= 0);
 #ifdef DEBUG
   _logger.log(Level::Info, std::format("@@@ Creating new Interface -> {} : {}",

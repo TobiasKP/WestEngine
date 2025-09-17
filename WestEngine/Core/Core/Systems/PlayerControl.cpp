@@ -1,8 +1,8 @@
 #include "../../CoreHeaders/Systems/PlayerControl.h"
 
 #include <format>
+#include <Config.h>
 
-#include "../../Config/Config.h"
 #include "../../Constants/Systems.h"
 
 PlayerControl::PlayerControl(WestLogger *logger)

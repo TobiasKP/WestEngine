@@ -9,7 +9,8 @@
 #include <unistd.h>
 #endif
 
-#include "../../../Config/Config.h"
+#include <Config.h>
+
 #include "../../../Constants/CoreConstants.h"
 #include "../../../CoreHeaders/Entity/Entity.h"
 

@@ -6,6 +6,8 @@
 #include "Camera.h"
 #include "Entity.h"
 
+#include "../../Constants/CoreConstants.h"
+
 class Scene {
 public:
   static Scene &getSceneInstance();
@@ -13,7 +15,7 @@ public:
   Scene(Scene const &) = delete;
   void operator=(Scene const &) = delete;
 
-  //Functions
+  // Functions
   void init();
   void addEntity(Entity *entity);
   void addDebugEntity(Entity *entity);

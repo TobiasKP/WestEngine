@@ -1,6 +1,5 @@
 #include "../CoreHeaders/ShaderManager.h"
 
-#include "../Config/Config.h"
 #include "../Constants/UniformConstants.h"
 #include "../CoreHeaders/Utils/DataUtils/UniformUtils.h"
 
@@ -8,6 +7,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <Config.h>
 
 #ifdef _WIN32
 <include> direct.h

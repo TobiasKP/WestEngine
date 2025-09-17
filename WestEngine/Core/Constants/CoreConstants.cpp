@@ -14,7 +14,6 @@ const std::string DEBUG_F_SHADER = "/shader/Debug/DebugFShader.fs";
 
 const std::uint8_t MAX_Q_SIZE = 7;
 const std::uint16_t MAX_ENTITY_SIZE = 512;
-const std::uint8_t CHUNK_SIZE = 64;
 const std::uint16_t TEXT_SHADERGROUP = 998;
 const std::uint16_t DEBUG_SHADERGROUP = 999;
 

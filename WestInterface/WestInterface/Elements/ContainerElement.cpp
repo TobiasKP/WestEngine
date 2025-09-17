@@ -11,6 +11,8 @@ struct ContainerElement : public IElement {
   std::vector<IElement *> children;
   std::uint8_t gridCells = 0;
 
+  ContainerElement() {}
+
   ~ContainerElement() {
 #ifdef DEBUG
     _logger.log(
@@ -97,11 +99,21 @@ struct ContainerElement : public IElement {
     children.push_back(e);
   };
 
-  void handler() {
-    _logger.log(
-        Level::Error,
-        std::format(
-            "@@@ Button handler of interface: {} called which does not exists!",
-            this->id));
-  };
+  std::vector<ComponentData *> describeContainer() {
+    std::vector<ComponentData *> result;
+    for (IElement *element : children) {
+      result.push_back(element->describe());
+    }
+
+    if (!(flags & isHidden)) {
+      result.push_back(this->describe());
+    }
+    return result;
+  }
+
+  void describeMyself(ComponentData *cd) {
+    // TODO describe myself
+  }
+
+  void handler() {}
 };

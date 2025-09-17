@@ -40,8 +40,8 @@ struct IElement {
   virtual void handler() {};
   virtual ~IElement() {};
 
-  ComponentData describe() {
-    ComponentData cd;
+  ComponentData *describe() {
+    ComponentData *cd;
     describeMyself(cd);
     return cd;
   };
@@ -50,13 +50,5 @@ protected:
   WestLogger &_logger = WestLogger::getLoggerInstance();
 
 private:
-  void describeMyself(ComponentData cd) {
-    cd.xLL = xLL;
-    cd.yLL = yLL;
-    cd.scale = scale;
-    cd.colorR = colorR;
-    cd.colorG = colorG;
-    cd.colorB = colorB;
-    cd.colorA = colorA;
-  };
+  virtual void describeMyself(ComponentData *cd) {};
 };

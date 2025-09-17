@@ -10,9 +10,6 @@
 #define WEST_INTERFACE __attribute__((visibility("default")))
 #endif
 
-#include "WestInterface/RenderManagment/ComponentData.h"
-#include "WestInterface/RenderManagment/DrawData.h"
-
 #include <cstdint>
 #include <functional>
 #include <string>
@@ -46,9 +43,4 @@ struct WEST_INTERFACE ElementProxy {
 
     std::uint32_t iconId;
     std::uint8_t padding;*/
-};
-
-struct WEST_INTERFACE RenderData {
-  static DrawData d_instance;
-  static ComponentData c_data;
 };

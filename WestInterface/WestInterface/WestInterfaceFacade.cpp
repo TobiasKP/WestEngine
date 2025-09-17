@@ -32,19 +32,20 @@ ContainerElement *WestInterfaceFacade::findInterfaceById(std::uint8_t id) {
 
 std::uint8_t WestInterfaceFacade::createNewInterface(
     std::uint16_t xScreenPosition, std::uint16_t yScreenPosition, float scale,
-    std::uint8_t gridCells, std::vector<ElementProxy *> elements) {
+    std::uint8_t gridCells, bool hiddenContainer,
+    std::vector<ElementProxy *> elements) {
 
-  _builder.createNewInterface(xScreenPosition, yScreenPosition, scale,
-                              gridCells);
+  _builder->createNewInterface(xScreenPosition, yScreenPosition, scale,
+                               gridCells, hiddenContainer);
   for (auto *element : elements) {
 #ifdef DEBUG
     _logger.log(Level::Cycle,
                 std::format("@@@ Addding new element to interface: {}",
                             (int)element->type));
 #endif
-    _builder.addElement(element);
+    _builder->addElement(element);
   }
-  ContainerElement *interface = _builder.build();
+  ContainerElement *interface = _builder->build();
   _interfaces.at(count) = interface;
   count++;
   return interface->id;
@@ -79,7 +80,7 @@ void WestInterfaceFacade::addElement(std::uint8_t interfaceId,
     return;
 
   assert(element != nullptr);
-  IElement *e = _builder.transform(element);
+  IElement *e = _builder->transform(element);
   assert(e != nullptr);
 #ifdef DEBUG
   _logger.log(
@@ -100,9 +101,11 @@ bool WestInterfaceFacade::removeElement(std::uint8_t interfaceId,
   return interface->deleteChildById(elementId);
 };
 
-void WestInterfaceFacade::updateRenderData() {};
+void WestInterfaceFacade::updateRenderData() {
 
-const RenderData WestInterfaceFacade::getRenderData() { return _instance; };
+};
+
+ComponentData *WestInterfaceFacade::getRenderData() { return nullptr; };
 
 ///////////////////////////
 

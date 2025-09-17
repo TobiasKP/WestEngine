@@ -1,8 +1,7 @@
 #include "../../../CoreHeaders/Utils/Math/PositionCalculation.h"
 
 #include <glm/gtc/matrix_transform.hpp>
-
-#include "../../../Config/Config.h"
+#include <Config.h>
 
 glm::vec3 PositionCalculation::getWorldPosition(glm::vec2 screenPosition,
                                                 Camera *camera) {

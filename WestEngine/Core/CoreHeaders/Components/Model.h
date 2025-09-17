@@ -3,8 +3,7 @@
 #include "../Interfaces/IComponent.h"
 
 #include <cstdint>
-
-#include "../Utils/DataUtils/PoolAllocator.h"
+#include <PoolAllocator.h>
 
 struct Texture {
   std::int32_t id;
