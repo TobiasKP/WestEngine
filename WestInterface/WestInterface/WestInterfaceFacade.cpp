@@ -5,6 +5,7 @@
 WestInterfaceFacade::WestInterfaceFacade() {
   count = 0;
   filled = false;
+  _renderManager = new UIRenderManager();
   for (std::uint8_t i = 0; i < 32; i++) {
     _interfaces.at(i) = nullptr;
   }
@@ -102,10 +103,12 @@ bool WestInterfaceFacade::removeElement(std::uint8_t interfaceId,
 };
 
 void WestInterfaceFacade::updateRenderData() {
-
+  _renderManager->updateRenderData(_interfaces);
 };
 
-ComponentData *WestInterfaceFacade::getRenderData() { return nullptr; };
+std::vector<ComponentData *> WestInterfaceFacade::getRenderData() {
+  return _renderManager->getRenderData();
+};
 
 ///////////////////////////
 

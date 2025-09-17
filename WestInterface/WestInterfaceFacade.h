@@ -43,7 +43,7 @@ public:
 
   // RenderLoop
   void updateRenderData();
-  ComponentData *getRenderData();
+  std::vector<ComponentData *> getRenderData();
 
   // Events
   bool notify(std::uint8_t event, std::uint16_t mouseX, std::uint16_t mouseY);
@@ -61,7 +61,7 @@ public:
   friend class UIRenderManager;
 
 protected:
-  std::atomic_bool filled;
+  std::atomic_bool filled; //TODO: WHAT WAS THIS FOR?
   std::size_t count;
 
 private:
