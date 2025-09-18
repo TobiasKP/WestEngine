@@ -8,10 +8,11 @@
 class UIRenderManager {
 
 public:
-  UIRenderManager();
+  UIRenderManager() {};
   ~UIRenderManager();
 
-  void updateRenderData(std::array<ContainerElement *, 32> interfaces);
+  void updateRenderData(std::array<ContainerElement *, 32> interfaces,
+                        size_t count);
   std::vector<ComponentData *> getRenderData() { return data; }
 
 private:

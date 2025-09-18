@@ -3,6 +3,7 @@
 #include "Interfaces/IManager.h"
 
 #include <map>
+#include <WestInterfaceFacade.h>
 
 #include "Entity/Scene.h"
 #include "Systems/Umbrella.h"
@@ -23,6 +24,7 @@ public:
 private:
   std::map<std::int32_t, GLuint> _programList;
   std::int32_t _lastEntityCount;
+  WestInterfaceFacade* _facade;
   Scene *_scene;
 
   void initInterfaceShader();

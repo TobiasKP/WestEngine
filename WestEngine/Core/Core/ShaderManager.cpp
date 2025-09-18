@@ -3,11 +3,11 @@
 #include "../Constants/UniformConstants.h"
 #include "../CoreHeaders/Utils/DataUtils/UniformUtils.h"
 
+#include <Config.h>
 #include <TimeUtils.hpp>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <Config.h>
 
 #ifdef _WIN32
 <include> direct.h
@@ -21,10 +21,14 @@
 ShaderManager::ShaderManager()
     : IManager(nullptr) {
   setName(CoreConstants::SHADER_MANAGER);
+  _facade = nullptr;
+  _scene = nullptr;
 }
 
 ShaderManager::ShaderManager(WestLogger *logger) : IManager(logger) {
   setName(CoreConstants::SHADER_MANAGER);
+  _facade = nullptr;
+  _scene = nullptr;
 }
 
 ShaderManager::~ShaderManager() {}
@@ -49,12 +53,14 @@ std::int32_t ShaderManager::init() {
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
 
+  _facade = &WestInterfaceFacade::getInterfaceInstance();
   _scene = &Scene::getSceneInstance();
   _scene->getCamera()->setCameraUniforms(
       UniformUtils::createUniformBufferObject(UniformConstants::CAMERA_UNIFORMS,
                                               sizeof(glm::mat4) * 2, 1));
-  // initInterfaceShader();
+  initInterfaceShader();
 
+  assert(_facade != nullptr && _scene != nullptr);
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
@@ -102,12 +108,10 @@ void ShaderManager::update() {
 
 void ShaderManager::initInterfaceShader() {
   GLuint programId = glCreateProgram();
-  assert(Config::Interface.VERTEX_LOCATION != nullptr &&
-         Config::Interface.FRAG_LOCATION != nullptr);
   GLuint vertId =
-      createVertexShader(Config::Interface.VERTEX_LOCATION, programId);
-  GLuint fragId =
-      createFragmentShader(Config::Interface.FRAG_LOCATION, programId);
+      createVertexShader(WestInterfaceFacade::interfaceVertexShader, programId);
+  GLuint fragId = createFragmentShader(
+      WestInterfaceFacade::interfaceFragementShader, programId);
   link(programId, vertId, fragId);
 
   if (programId == -1) {
@@ -119,14 +123,7 @@ void ShaderManager::initInterfaceShader() {
                        getName(), programId));
 #endif
 
-  _programList[CoreConstants::TEXT_SHADERGROUP] = programId;
-  // Global::UserInterface::SHADER_PROGRAM = programId;
-  // Global::UserInterface::ORTHO_UNIFORM =
-  //     UniformUtils::createUniform(UniformConstants::ORTHO_UNIFORM,
-  //     programId);
-  // Global::UserInterface::TEXTURE_SAMPLER =
-  //     UniformUtils::createUniform(UniformConstants::TEXTURE_SAMPLER,
-  //     programId);
+  _programList[CoreConstants::INTERFACE_SHADERGROUP] = programId;
 }
 
 GLuint ShaderManager::initShader(Shader *s, Entity *entity) {

@@ -25,13 +25,6 @@ private:
   GLuint _quadVAO, _POS, _texture;
   Scene *_scene;
 
-  const std::int32_t _quadIndices[6] = {0, 1, 2, 0, 2, 3};
-  const float _quadVertices[12] = {0.0f,  50.0f,  // UL
-                                   0.0f,  0.0f,   // OL
-                                   50.0f, 0.0f,   // OR
-                                   50.0f, 50.0f}; // UR
-
-  void initInterfaceBuffer();
   void clearColor();
   void renderUserInterfaces();
   void renderGameEntities();

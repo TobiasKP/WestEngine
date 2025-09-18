@@ -3,5 +3,4 @@
 namespace Config {
 Internals EngineInternals;
 General GeneralConfig;
-UserInterface Interface;
 } // namespace Config

@@ -2,6 +2,11 @@
 
 #include <format>
 
+WestInterfaceFacade &WestInterfaceFacade::getInterfaceInstance() {
+  static WestInterfaceFacade instance;
+  return instance;
+}
+
 WestInterfaceFacade::WestInterfaceFacade() {
   count = 0;
   filled = false;
@@ -11,7 +16,9 @@ WestInterfaceFacade::WestInterfaceFacade() {
   }
 }
 
-WestInterfaceFacade::~WestInterfaceFacade() {
+WestInterfaceFacade::~WestInterfaceFacade() {}
+
+void WestInterfaceFacade::shutdown() {
   while (count > 0) {
     delete _interfaces.at(count);
     count--;
@@ -103,7 +110,7 @@ bool WestInterfaceFacade::removeElement(std::uint8_t interfaceId,
 };
 
 void WestInterfaceFacade::updateRenderData() {
-  _renderManager->updateRenderData(_interfaces);
+  _renderManager->updateRenderData(_interfaces, count);
 };
 
 std::vector<ComponentData *> WestInterfaceFacade::getRenderData() {

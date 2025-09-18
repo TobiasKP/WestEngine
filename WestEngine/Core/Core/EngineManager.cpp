@@ -28,8 +28,8 @@ EngineManager::EngineManager(WestLogger *logger) : IManager(logger) {
   _engineQ->enqueue(_windowManager);
   _engineQ->enqueue(new ShaderManager(logger));
   _engineQ->enqueue(new SystemManager(logger));
-  _engineQ->enqueue(new RenderManager(logger));
   _engineQ->enqueue(new InterfaceManager(logger));
+  _engineQ->enqueue(new RenderManager(logger));
   _engineQ->enqueue(new SceneManager(logger));
   assert(_engineQ->getSize() == _engineQ->getCapacity());
 }
@@ -46,9 +46,9 @@ std::int32_t EngineManager::startup() {
 
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
-  double res = TimeUtils::getDuration(start, end); 
+  double res = TimeUtils::getDuration(start, end);
   logDebug(std::format("{} ### All Managers started! startup time: {} ms.\n",
-                      getName(), res));
+                       getName(), res));
 #endif
 
   return success;
@@ -65,7 +65,7 @@ void EngineManager::shutdown() {
     item->shutdown();
   }
   KeyboardCallbacks::shutdown();
-  _engineQ->~WestQ(); 
+  _engineQ->~WestQ();
 }
 
 void EngineManager::update() {

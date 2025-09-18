@@ -20,12 +20,6 @@ struct General {
   const std::uint8_t CHUNK_SIZE = 64;
 };
 
-struct UserInterface {
-  char *BITMAP_LOCATION = nullptr;
-  char *FRAG_LOCATION = nullptr;
-  char *VERTEX_LOCATION = nullptr;
-};
-
 struct Internals {
   ThreadPool *THREADPOOL = new ThreadPool(4);
   std::atomic<bool> PAUSE = false;
@@ -34,6 +28,5 @@ struct Internals {
 
 extern Internals EngineInternals;
 extern General GeneralConfig;
-extern UserInterface Interface;
 
 } // namespace Config

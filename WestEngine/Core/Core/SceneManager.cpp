@@ -17,10 +17,18 @@
 SceneManager::SceneManager()
     : IManager(nullptr) {
   setName(CoreConstants::SCENE_MANAGER);
+  _scene = nullptr;
+  _loader = nullptr;
+  L = nullptr;
+  _builder = nullptr;
 }
 
 SceneManager::SceneManager(WestLogger *logger) : IManager(logger) {
   setName(CoreConstants::SCENE_MANAGER);
+  _scene = nullptr;
+  _loader = nullptr;
+  L = nullptr;
+  _builder = nullptr;
 }
 
 SceneManager::~SceneManager() {}
@@ -33,8 +41,10 @@ std::int32_t SceneManager::startup() {
   L = luaL_newstate();
   luaL_openlibs(L);
   _builder = new EntityBuilder(L, _loader);
+  assert(_loader != nullptr && _scene != nullptr && L != nullptr &&
+         _builder != nullptr);
 #ifdef DEBUG
-  logDebug(std::format("{} ### instantiated lus state\n", getName()));
+      logDebug(std::format("{} ### instantiated lus state\n", getName()));
 #endif
   return 0;
 }

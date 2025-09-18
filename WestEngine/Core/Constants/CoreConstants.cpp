@@ -14,8 +14,8 @@ const std::string DEBUG_F_SHADER = "/shader/Debug/DebugFShader.fs";
 
 const std::uint8_t MAX_Q_SIZE = 7;
 const std::uint16_t MAX_ENTITY_SIZE = 512;
-const std::uint16_t TEXT_SHADERGROUP = 998;
 const std::uint16_t DEBUG_SHADERGROUP = 999;
+const std::uint16_t INTERFACE_SHADERGROUP = 998;
 
 const std::string ENGINE_MANAGER = "ENGINE_MANAGER";
 const std::string WINDOW_MANAGER = "WINDOW_MANAGER";

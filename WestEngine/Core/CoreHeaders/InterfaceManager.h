@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Interfaces/IManager.h"
-//#include "/Interfaces/IUserInterface.h"
+
+#include <WestInterfaceFacade.h>
 
 class InterfaceManager : public IManager {
 public:
@@ -14,13 +15,6 @@ public:
   void update() override;
   std::int32_t init() override;
 
-  //static std::vector<IUserInterface *> getInterfaces() { return _interfaces; }
-
 private:
- // static std::vector<IUserInterface *> _interfaces;
-
-  static void addInterface(/*IUserInterface *interface*/) {
-   // _interfaces.emplace_back(interface);
-  }
-  void createMainMenu();
+  WestInterfaceFacade *_facade;
 };

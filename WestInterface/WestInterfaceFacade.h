@@ -27,8 +27,8 @@
 class WEST_INTERFACE WestInterfaceFacade {
 
 public:
-  WestInterfaceFacade();
-  ~WestInterfaceFacade();
+  static WestInterfaceFacade &getInterfaceInstance();
+  void shutdown();
 
   // Managing Interfaces
   std::uint8_t createNewInterface(std::uint16_t xScreenPosition,
@@ -58,13 +58,19 @@ public:
   // Get Resources
   const char *getResource(std::string resource);
 
+  static constexpr std::string interfaceVertexShader = "";
+  static constexpr std::string interfaceFragementShader = "";
+
   friend class UIRenderManager;
 
 protected:
-  std::atomic_bool filled; //TODO: WHAT WAS THIS FOR?
-  std::size_t count;
+  std::atomic_bool filled; // TODO: WHAT WAS THIS FOR?
+  size_t count;
 
 private:
+  WestInterfaceFacade();
+  ~WestInterfaceFacade();
+
   std::array<ContainerElement *, 32> _interfaces;
 
   ValueObserver *_valueObserver;

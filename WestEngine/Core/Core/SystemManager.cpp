@@ -1,8 +1,8 @@
 #include "../CoreHeaders/SystemManager.h"
 
+#include <Config.h>
 #include <TimeUtils.hpp>
 #include <algorithm>
-#include <Config.h>
 
 #include "../CoreHeaders/Systems/Umbrella.h"
 
@@ -73,7 +73,10 @@ void SystemManager::update() {
         }));
   }
 
+#ifdef DEBUG
   std::int32_t count = futures.size();
+#endif
+
   for (auto &future : futures)
     future.wait();
 

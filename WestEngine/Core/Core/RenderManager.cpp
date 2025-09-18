@@ -1,9 +1,8 @@
 #include "../CoreHeaders/RenderManager.h"
 
-#include <TimeUtils.hpp>
 #include <Config.h>
+#include <TimeUtils.hpp>
 
-#include "../CoreHeaders/InterfaceManager.h"
 #include "../CoreHeaders/Utils/DataUtils/ObjectLoader.h"
 #include "../CoreHeaders/Utils/DataUtils/UniformUtils.h"
 #include "../CoreHeaders/Utils/Math/PositionCalculation.h"
@@ -34,7 +33,6 @@ std::int32_t RenderManager::init() {
 #endif
 
   _scene = &Scene::getSceneInstance();
-  // initInterfaceBuffer();
 
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
@@ -50,37 +48,6 @@ void RenderManager::update() {
   clearColor();
   // renderUserInterfaces();
   renderGameEntities();
-}
-
-void RenderManager::initInterfaceBuffer() {
-  ObjectLoader *loader = new ObjectLoader(getLogger());
-  GLuint VBO, EBO;
-  glGenVertexArrays(1, &_quadVAO);
-  glGenBuffers(1, &VBO);
-  glGenBuffers(1, &EBO);
-  glGenBuffers(1, &_POS);
-
-  glBindVertexArray(_quadVAO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(_quadVertices), _quadVertices,
-               GL_STATIC_DRAW);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(_quadIndices), _quadIndices,
-               GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
-
-  glBindBuffer(GL_ARRAY_BUFFER, _POS);
-  glBufferData(GL_ARRAY_BUFFER, 1024 * sizeof(glm::vec2), nullptr,
-               GL_DYNAMIC_DRAW);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
-  glVertexAttribDivisor(1, 1);
-
-  glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1);
-  glEnableVertexAttribArray(2);
-  glBindVertexArray(0);
-  assert(Config::Interface.BITMAP_LOCATION != nullptr);
-  _texture = loader->loadTexture(Config::Interface.BITMAP_LOCATION);
 }
 
 void RenderManager::clearColor() {

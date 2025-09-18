@@ -15,8 +15,8 @@ extern const std::string LUA_INIT_FILE;
 extern const std::uint8_t MAX_Q_SIZE;
 extern const std::uint16_t MAX_ENTITY_SIZE;
 extern const std::uint8_t CHUNK_SIZE;
-extern const std::uint16_t TEXT_SHADERGROUP;
 extern const std::uint16_t DEBUG_SHADERGROUP;
+extern const std::uint16_t INTERFACE_SHADERGROUP;
 
 extern const std::string ENGINE_MANAGER;
 extern const std::string WINDOW_MANAGER;
