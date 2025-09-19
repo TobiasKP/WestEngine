@@ -12,8 +12,7 @@
 
 struct WEST_INTERFACE ComponentData {
   // Location of component in Normalized Device Coordinates
-  float vertices[8];
-  float indices[6] = {0, 1, 3, 1, 2, 3};
+  float vertices[8]; 
 
   // float uvTopLeft;
   // float uvBottomRight;

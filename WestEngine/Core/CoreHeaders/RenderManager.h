@@ -2,6 +2,8 @@
 
 #include "Interfaces/IManager.h"
 
+#include <WestInterfaceFacade.h>
+
 #include "Components/Umbrella.h"
 #include "Entity/Scene.h"
 
@@ -22,7 +24,8 @@ public:
 
 private:
   static GLuint _usedShaderProgram;
-  GLuint _quadVAO, _POS, _texture;
+  WestInterfaceFacade *_facade; 
+  GLuint _interfaceVBO, _interfaceVAO, _interfaceEBO, _interfaceCOL;
   Scene *_scene;
 
   void clearColor();

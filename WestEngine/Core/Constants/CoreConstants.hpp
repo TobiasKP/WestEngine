@@ -18,7 +18,6 @@ static constexpr std::string LUA_INIT_FILE = "/lua/Main.lua";
 static constexpr std::uint8_t MAX_Q_SIZE = 7;
 static constexpr std::uint16_t MAX_ENTITY_SIZE = 512;
 static constexpr std::uint8_t CHUNK_SIZE = 64;
-static constexpr std::uint16_t INTERFACE_SHADERGROUP = 998;
 static constexpr std::uint16_t DEBUG_SHADERGROUP = 999;
 
 static constexpr std::string ENGINE_MANAGER = "ENGINGE_MANAGER";

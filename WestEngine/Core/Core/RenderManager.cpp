@@ -3,7 +3,6 @@
 #include <Config.h>
 #include <TimeUtils.hpp>
 
-#include "../CoreHeaders/Utils/DataUtils/ObjectLoader.h"
 #include "../CoreHeaders/Utils/DataUtils/UniformUtils.h"
 #include "../CoreHeaders/Utils/Math/PositionCalculation.h"
 
@@ -11,15 +10,25 @@ GLuint RenderManager::_usedShaderProgram = 0;
 
 RenderManager::RenderManager() : IManager(nullptr) {
   setName(CoreConstants::RENDER_MANAGER);
+  _facade = nullptr;
+  _scene = nullptr;
 }
 
 RenderManager::RenderManager(WestLogger *logger) : IManager(logger) {
   setName(CoreConstants::RENDER_MANAGER);
+  _facade = nullptr;
+  _scene = nullptr;
 }
 
 RenderManager::~RenderManager() {}
 
-std::int32_t RenderManager::startup() { return 0; }
+std::int32_t RenderManager::startup() {
+  glGenVertexArrays(1, &_interfaceVAO);
+  glGenBuffers(1, &_interfaceVBO);
+  glGenBuffers(1, &_interfaceEBO);
+  glGenBuffers(1, &_interfaceCOL);
+  return 0;
+}
 
 void RenderManager::shutdown() {
 #ifdef DEBUG
@@ -33,6 +42,24 @@ std::int32_t RenderManager::init() {
 #endif
 
   _scene = &Scene::getSceneInstance();
+  _facade = &WestInterfaceFacade::getInterfaceInstance();
+  assert(_scene != nullptr && _facade != nullptr);
+
+  glBindVertexArray(_interfaceVAO);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _interfaceEBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(_facade->indices),
+               _facade->indices, GL_STATIC_DRAW);
+
+  
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
+
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(1);
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
 
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
@@ -46,7 +73,7 @@ std::int32_t RenderManager::init() {
 
 void RenderManager::update() {
   clearColor();
-  // renderUserInterfaces();
+  renderUserInterfaces();
   renderGameEntities();
 }
 
@@ -56,6 +83,7 @@ void RenderManager::clearColor() {
 
 void RenderManager::renderGameEntities() {
   for (Entity *entity : _scene->getEntities()) {
+    assert(entity != nullptr);
     Shader *s = (Shader *)entity->getComponent(BitMasks::Components::SHADER);
     if (!s->initialized) {
 #ifdef DEBUG
@@ -97,40 +125,26 @@ void RenderManager::renderGameEntities() {
 }
 
 void RenderManager::renderUserInterfaces() {
-  // glUseProgram(Global::UserInterface::SHADER_PROGRAM);
-  //_usedShaderProgram = Global::UserInterface::SHADER_PROGRAM;
-  glBindVertexArray(_quadVAO);
-  UniformUtils::setUniform(_texture, 0);
-  // UniformUtils::setUniform(Global::UserInterface::ORTHO_UNIFORM,
-  //                          Global::UserInterface::ORTHO_MATRIX);
-  std::vector<glm::vec2> positionsOfElements;
-  std::uint16_t totalCount;
-  /*for (IUserInterface *interface : InterfaceManager::getInterfaces()) {
-    if (!interface->isVisible())
-      continue;
-    for (IUserInterfaceElement *element : interface->getElements()) {
-      glm::vec2 pos = element->getPosition();
-      GLuint tiles = element->getNumberOfTiles();
-      totalCount += tiles;
-      for (std::uint8_t i = 0; i < tiles; i++) {
-        positionsOfElements.emplace_back(pos);
-      }
+  assert(Config::interfaceShaderProgram != -1);
+  // TODO calculate hash -> if no changes no need to rerender?
+  std::vector<ComponentData *> renderData = _facade->getRenderData();
+  if (renderData.size() == 0) {
+#ifdef DEBUG
+    logDebug(std::format(
+        "{} ### No render data for interfaces gathered skipping rendering",
+        getName()));
+#endif
+    return;
+  }
 
-      // TODO get all informations for a single transmit to the GPU
-      // multithreaded?
-    }
-  }*/
+  glUseProgram(Config::interfaceShaderProgram);
+  glBindBuffer(GL_ARRAY_BUFFER, _interfaceVBO);
+  //TODO Fill
+  glBindBuffer(GL_ARRAY_BUFFER, _interfaceCOL);
+  //TODO Fill
 
-  glBindBuffer(GL_ARRAY_BUFFER, _POS);
-  glInvalidateBufferData(_POS);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * positionsOfElements.size(),
-               positionsOfElements.data(), GL_DYNAMIC_DRAW);
 
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, _texture);
-  glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, totalCount);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
+  glUseProgram(_usedShaderProgram);
 }
 
 void RenderManager::updateUniforms(Entity *e, Model *model) {

@@ -58,7 +58,10 @@ std::int32_t ShaderManager::init() {
   _scene->getCamera()->setCameraUniforms(
       UniformUtils::createUniformBufferObject(UniformConstants::CAMERA_UNIFORMS,
                                               sizeof(glm::mat4) * 2, 1));
-  initInterfaceShader();
+  GLuint success = initInterfaceShader();
+  if (success == 1) {
+    return 1;
+  }
 
   assert(_facade != nullptr && _scene != nullptr);
 #ifdef DEBUG
@@ -98,6 +101,7 @@ void ShaderManager::update() {
     if (programId == -1) {
       logFailure(std::format("{} ### Could not create Shader for entity: {}.\n",
                              getName(), entity->getId()));
+      return;
     }
 
     s->programId = programId;
@@ -106,24 +110,31 @@ void ShaderManager::update() {
   }
 }
 
-void ShaderManager::initInterfaceShader() {
+GLuint ShaderManager::initInterfaceShader() {
   GLuint programId = glCreateProgram();
-  GLuint vertId =
-      createVertexShader(std::string(WestInterfaceFacade::interfaceVertexShader), programId);
-  GLuint fragId = createFragmentShader(
-      std::string(WestInterfaceFacade::interfaceFragementShader), programId);
-  link(programId, vertId, fragId);
-
   if (programId == -1) {
     logFailure(std::format(
         "{} ### Failed to create interface shader program.\n", getName()));
+    return 1;
   }
+  GLuint vertId = createVertexShader(
+      std::string(WestInterfaceFacade::interfaceVertexShader), programId);
+  GLuint fragId = createFragmentShader(
+      std::string(WestInterfaceFacade::interfaceFragementShader), programId);
+  if (vertId == -1 || fragId == -1) {
+    logFailure(std::format(
+        "{} ### Failed to create vertex/fragement interface shader.\n",
+        getName()));
+    return 1;
+  }
+  link(programId, vertId, fragId);
+
 #ifdef DEBUG
   logDebug(std::format("{} ### Created Shader for Interfaces. ProgramID: {}.\n",
                        getName(), programId));
 #endif
-
-  _programList[CoreConstants::INTERFACE_SHADERGROUP] = programId;
+  Config::interfaceShaderProgram = programId;
+  return 0;
 }
 
 GLuint ShaderManager::initShader(Shader *s, Entity *entity) {
@@ -195,7 +206,7 @@ GLuint ShaderManager::createShader(const std::string shaderFile,
   const GLchar *source = readShaderSource(shaderFile);
   if (source == NULL) {
     logFailure("Failed to read shader source from file\n");
-    return 0;
+    return -1;
   }
   GLchar errorLog[2048] = {};
   GLint size = 0, status = 0;
@@ -207,7 +218,7 @@ GLuint ShaderManager::createShader(const std::string shaderFile,
     glGetShaderInfoLog(shaderId, 2048, &size, errorLog);
     logFailure(std::format("Error compiling shader. Type: {}, Info: {}\n",
                            shaderType, errorLog));
-    return 0;
+    return -1;
   }
 
   glAttachShader(programId, shaderId);

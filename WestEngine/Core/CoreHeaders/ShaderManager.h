@@ -27,7 +27,7 @@ private:
   WestInterfaceFacade* _facade;
   Scene *_scene;
 
-  void initInterfaceShader();
+  GLuint initInterfaceShader();
   GLuint initShader(Shader *s, Entity *entity);
   GLuint createShader(const std::string shaderFile, std::int32_t shaderTyp,
                       GLuint programId);

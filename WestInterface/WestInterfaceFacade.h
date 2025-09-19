@@ -58,8 +58,11 @@ public:
   // Get Resources
   const char *getResource(std::string resource);
 
-  static constexpr std::string_view interfaceVertexShader = "shader/InterfaceVertexShader.vs";
-  static constexpr std::string_view interfaceFragementShader = "shader/InterfaceFragementShader.fs";
+  static constexpr std::string_view interfaceVertexShader =
+      "shader/InterfaceVertexShader.vs";
+  static constexpr std::string_view interfaceFragementShader =
+      "shader/InterfaceFragementShader.fs";
+  static constexpr float indices[6] = {0, 1, 3, 1, 2, 3};
 
   friend class UIRenderManager;
 

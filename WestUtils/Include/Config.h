@@ -17,6 +17,7 @@ namespace WESTUTILS Config {
 static std::atomic<bool> PAUSE = false;
 static std::atomic<std::uint32_t> INTERNAL_ENTITY_ID = 900000;
 static ThreadPool *THREADPOOL = new ThreadPool(4);
+static std::uint32_t interfaceShaderProgram = -1;
 
 static struct General {
   std::uint32_t WIDTH = 800, HEIGHT = 600;
