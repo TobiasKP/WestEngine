@@ -1,7 +1,5 @@
 #include "InterfaceBuilder.h"
 
-#include <format>
-
 InterfaceBuilder::InterfaceBuilder() { _factory = new ElementFactory(); }
 
 InterfaceBuilder::~InterfaceBuilder() {

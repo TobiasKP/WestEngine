@@ -6,7 +6,6 @@
 #include <glm/glm.hpp>
 #include <Config.h>
 
-#include "../Constants/CoreConstants.h"
 #include "../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
 #include "../CoreHeaders/Utils/InputUtils/MouseCallbacks.h"
 
@@ -14,14 +13,12 @@ WindowManager::WindowManager() : IManager(nullptr) {
   setName(CoreConstants::WINDOW_MANAGER);
   _width = 0;
   _height = 0;
-  _title = CoreConstants::UNDEFINED_STRING;
 }
 
 WindowManager::WindowManager(WestLogger *logger) : IManager(logger) {
   setName(CoreConstants::WINDOW_MANAGER);
   _width = Config::GeneralConfig.WIDTH;
-  _height = Config::GeneralConfig.HEIGHT;
-  _title = CoreConstants::TITLE;
+  _height = Config::GeneralConfig.HEIGHT; 
   assert(_width > 0 && _height > 0);
 }
 
@@ -56,7 +53,7 @@ std::int32_t WindowManager::startup() {
       "{} ### primary monitor resolution: {} x {}, setting to {} x {}\n",
       getName(), mode->width, mode->height, _width, _height));
 
-  _window = glfwCreateWindow(_width, _height, _title.c_str(), NULL, NULL);
+  _window = glfwCreateWindow(_width, _height, CoreConstants::TITLE.c_str(), NULL, NULL);
 
   if (!_window) {
     logFailure("Window creation failed\n");

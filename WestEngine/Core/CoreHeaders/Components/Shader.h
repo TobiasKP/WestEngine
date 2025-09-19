@@ -4,7 +4,7 @@
 #include <string>
 
 #include "../Interfaces/IComponent.h"
-#include "../../Constants/CoreConstants.h"
+#include "../../Constants/CoreConstants.hpp"
 
 struct Shader : public IComponent {
   bool initialized = false;

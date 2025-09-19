@@ -17,4 +17,7 @@ public:
 
 private:
   std::vector<ComponentData *> data;
+  std::mutex _vectorMutex;
+
+  void fillComponentData(std::vector<ComponentData *> cd);
 };

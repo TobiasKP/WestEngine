@@ -14,7 +14,7 @@ These are needed for building the project yourself on your machine and are not n
 
 OS: MacOS, Windows, Linux <br />
 OpenGL suitable graphics driver: [OpenGL introduction](www.khronos.org/opengl/wiki/Getting_Started) <br />
-C++ 20 (or later) & compiler (e.g. gcc): [C++ introduction](https://cplusplus.com/doc/tutorial/introduction) <br />
+C++ 23 (or later) & compiler (e.g. gcc): [C++ introduction](https://cplusplus.com/doc/tutorial/introduction) <br />
 CMake: [Cmake](https://cmake.org) <br />
 
 These instructions will get you to a working cmake & vcpkg enviroment, please ensure that all necessary dependencies (e.g. ninja or zip) are already installed and working, specially on Linux distributions like Arch a lot of manual configuration is required. Also write/executable rights are needed for the repository folder.

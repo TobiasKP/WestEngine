@@ -106,10 +106,12 @@ file(GLOB CONFIG_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Core/Game/Config/*")
 
 # General file copy post-build
 foreach(FOLDER lua assets shader engine config libs libs/STB libs/GLM)
+if(NOT EXISTS "${RESOURCE_BASE}/${FOLDER}")
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${RESOURCE_BASE}/${FOLDER}"
         COMMENT "Creating ${FOLDER} directory"
     )
+endif()
 endforeach()
 
 # ─────────────────────────────────────────────────────────────

@@ -16,7 +16,6 @@ public:
   // Getter
   inline GLint getWidth() { return _width; }
   inline GLint getHeight() { return _height; }
-  inline std::string etTitle() { return _title; }
   inline GLFWwindow *getWindow() { return _window; }
 
   // Overrides
@@ -39,7 +38,6 @@ public:
   static void errorCallback(std::int32_t error, const char* message); 
 
 private:
-  GLint _width, _height;
-  std::string _title = CoreConstants::UNDEFINED_STRING;
+  GLint _width, _height; 
   GLFWwindow *_window = nullptr;
 };

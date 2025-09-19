@@ -62,7 +62,7 @@ void SystemManager::update() {
 
   std::vector<std::future<void>> futures;
   for (ISystem *system : _systems) {
-    futures.emplace_back(Config::EngineInternals.THREADPOOL->enqueue(
+    futures.emplace_back(Config::THREADPOOL->enqueue(
         [system, logger = getLogger()] {
           if (system == nullptr) {
             logger->log(Level::Error,

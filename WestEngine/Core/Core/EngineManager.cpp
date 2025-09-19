@@ -1,9 +1,7 @@
 #include "../CoreHeaders/EngineManager.h"
 
-#include "../Constants/CoreConstants.h"
 #include <TimeUtils.hpp>
 
-#include "../CoreHeaders/InputManager.h"
 #include "../CoreHeaders/InterfaceManager.h"
 #include "../CoreHeaders/RenderManager.h"
 #include "../CoreHeaders/SceneManager.h"
@@ -80,7 +78,7 @@ void EngineManager::update() {
 
   while (!_exitEngine) {
 
-    while (Config::EngineInternals.PAUSE) {
+    while (Config::PAUSE) {
       iterateQ(CYCLE::PAUSE);
       _windowManager->setWindowTitle("paused ...");
     }

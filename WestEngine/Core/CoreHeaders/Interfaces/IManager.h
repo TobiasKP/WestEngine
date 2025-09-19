@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string>
 
-#include "../../Constants/CoreConstants.h"
+#include "../../Constants/CoreConstants.hpp"
 #include <WestLogger.h>
 
 class IManager {

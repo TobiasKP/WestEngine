@@ -109,9 +109,9 @@ void ShaderManager::update() {
 void ShaderManager::initInterfaceShader() {
   GLuint programId = glCreateProgram();
   GLuint vertId =
-      createVertexShader(WestInterfaceFacade::interfaceVertexShader, programId);
+      createVertexShader(std::string(WestInterfaceFacade::interfaceVertexShader), programId);
   GLuint fragId = createFragmentShader(
-      WestInterfaceFacade::interfaceFragementShader, programId);
+      std::string(WestInterfaceFacade::interfaceFragementShader), programId);
   link(programId, vertId, fragId);
 
   if (programId == -1) {

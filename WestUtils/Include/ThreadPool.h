@@ -10,11 +10,11 @@
 #define WESTUTILS __attribute__((visibility("default")))
 #endif
 
+#include <functional>
+#include <future>
 #include <mutex>
 #include <queue>
 #include <thread>
-#include <functional>
-#include <future>
 
 #include <WestLogger.h>
 
@@ -23,13 +23,14 @@ class WESTUTILS ThreadPool {
 public:
   ThreadPool(size_t numThreads = std::thread::hardware_concurrency());
   ~ThreadPool();
-  
-  std::future<void> enqueue(std::function<void()> task); 
+
+  std::future<void> enqueue(std::function<void()> task);
+  std::uint8_t getPoolSize() { return _threads.size(); }
 
 private:
   WestLogger *_logger = &WestLogger::getLoggerInstance();
   std::vector<std::thread> _threads;
-  std::queue<std::function<void()> > _tasks;
+  std::queue<std::function<void()>> _tasks;
   std::mutex _mutex;
   std::condition_variable _cv;
 

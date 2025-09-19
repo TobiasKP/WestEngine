@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "Entity.h"
 
-#include "../../Constants/CoreConstants.h"
+#include "../../Constants/CoreConstants.hpp"
 
 class Scene {
 public:

@@ -13,31 +13,37 @@ UIRenderManager::~UIRenderManager() {
 
 void UIRenderManager::updateRenderData(
     std::array<ContainerElement *, 32> interfaces, size_t count) {
+  if(count == 0) {
+    return;
+  }
 
   std::vector<std::future<void>> futures;
-  for (ISystem *system : _systems) {
-    futures.emplace_back(Config::EngineInternals.THREADPOOL->enqueue(
-        [system, logger = getLogger()] {
-          if (system == nullptr) {
-            logger->log(Level::Error,
-                        "System invalid null ptr check entity file or debug\n");
-            return;
+  const size_t workers =
+      std::max<size_t>(1, Config::THREADPOOL->getPoolSize());
+  const size_t stepsize = (count + workers - 1) / workers;
+  futures.reserve((count + stepsize - 1) / stepsize);
+
+  for (size_t begin = 0; begin < count; begin += stepsize) {
+    const size_t end = std::min(begin + stepsize, count);
+
+    futures.emplace_back(Config::THREADPOOL->enqueue(
+        [interfaces, begin, end, this] {
+          std::vector<ComponentData *> local;
+          for (size_t j = begin; j < end; ++j) {
+            std::vector<ComponentData *> interfaceResult =
+                interfaces[j]->describeContainer();
+            local.insert(local.end(), interfaceResult.begin(),
+                         interfaceResult.end());
           }
-          system->update();
+          fillComponentData(local);
         }));
   }
 
-#ifdef DEBUG
-  std::int32_t count = futures.size();
-#endif
-
   for (auto &future : futures)
     future.wait();
+}
 
-
-
-
-  for (size_t i = 0; i < count; ++i) {
-    data.push_back(interfaces[i]->describe());
-  }
+void UIRenderManager::fillComponentData(std::vector<ComponentData *> cd) {
+  std::lock_guard<std::mutex> lk(_vectorMutex);
+  data.insert(data.end(), cd.begin(), cd.end());
 }

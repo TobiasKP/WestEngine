@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "../Entity/Entity.h"
-#include "../../Constants/CoreConstants.h"
+#include "../../Constants/CoreConstants.hpp"
 
 class ISystem {
 public:

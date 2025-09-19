@@ -81,7 +81,7 @@ void RenderManager::renderGameEntities() {
 
     Model *model = (Model *)entity->getComponent(BitMasks::Components::MODEL);
     assert(model != nullptr);
-    if (!Config::EngineInternals.PAUSE) {
+    if (!Config::PAUSE) {
       _scene->getCamera()->update();
       updateUniforms(entity, model);
     }
