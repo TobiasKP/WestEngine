@@ -3,6 +3,8 @@
 #include <Config.h>
 #include <TimeUtils.hpp>
 
+#include <glm/ext/matrix_clip_space.hpp>
+
 #include "../CoreHeaders/Utils/DataUtils/UniformUtils.h"
 #include "../CoreHeaders/Utils/Math/PositionCalculation.h"
 
@@ -45,17 +47,24 @@ std::int32_t RenderManager::init() {
   _facade = &WestInterfaceFacade::getInterfaceInstance();
   assert(_scene != nullptr && _facade != nullptr);
 
+  // TODO outsource maybe even into a Model/Entity
   glBindVertexArray(_interfaceVAO);
+
+  glBindBuffer(GL_ARRAY_BUFFER, _interfaceVBO);
+  glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _interfaceEBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(_facade->indices),
                _facade->indices, GL_STATIC_DRAW);
 
-  
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
 
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+  glBindBuffer(GL_ARRAY_BUFFER, _interfaceCOL);
+  glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
+
+  glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
+  glVertexAttribDivisor(1, 1);
   glEnableVertexAttribArray(1);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -130,20 +139,41 @@ void RenderManager::renderUserInterfaces() {
   std::vector<ComponentData *> renderData = _facade->getRenderData();
   if (renderData.size() == 0) {
 #ifdef DEBUG
-    logDebug(std::format(
-        "{} ### No render data for interfaces gathered skipping rendering",
+    logCycle(std::format(
+        "{} ### No render data for interfaces gathered skipping rendering\n",
         getName()));
 #endif
     return;
   }
 
+  std::vector<float> vertices;
+  std::vector<float> colors;
+  for (ComponentData *cd : renderData) {
+    vertices.insert(vertices.end(), std::begin(cd->vertices),
+                    std::end(cd->vertices));
+    colors.insert(colors.end(),
+                  {cd->colorR, cd->colorG, cd->colorB, cd->colorA});
+  }
+  if (vertices.size() <= 0) {
+#ifdef DEBUG
+    logCycle(std::format(
+        "{} ### No vertice data for interfaces gathered skipping rendering\n",
+        getName()));
+#endif
+    return;
+  }
   glUseProgram(Config::interfaceShaderProgram);
   glBindBuffer(GL_ARRAY_BUFFER, _interfaceVBO);
-  //TODO Fill
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices.data(),
+               GL_STATIC_DRAW);
   glBindBuffer(GL_ARRAY_BUFFER, _interfaceCOL);
-  //TODO Fill
+  glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors.data(), GL_STATIC_DRAW);
+  glm::mat4 ortho = glm::ortho(0.0f, (float)Config::GeneralConfig.WIDTH, 0.0f,
+                               (float)Config::GeneralConfig.HEIGHT);
+  UniformUtils::setUniform(Config::interfaceOrthoUniform, ortho);
 
-
+  glBindVertexArray(_interfaceVAO);
+  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
   glUseProgram(_usedShaderProgram);
 }
 

@@ -14,12 +14,13 @@
 
 namespace WESTUTILS Config {
 
-static std::atomic<bool> PAUSE = false;
-static std::atomic<std::uint32_t> INTERNAL_ENTITY_ID = 900000;
-static ThreadPool *THREADPOOL = new ThreadPool(4);
-static std::uint32_t interfaceShaderProgram = -1;
+inline std::atomic<bool> PAUSE = false;
+inline std::atomic<std::uint32_t> INTERNAL_ENTITY_ID = 900000;
+inline ThreadPool *THREADPOOL = new ThreadPool(4);
+inline std::uint32_t interfaceShaderProgram = -1;
+inline std::uint32_t interfaceOrthoUniform = -1;
 
-static struct General {
+inline struct General {
   std::uint32_t WIDTH = 800, HEIGHT = 600;
   float SPEED = 0.05f, EPSILON = 1e-6f, FPS = 60.0f;
   const std::uint8_t CHUNK_SIZE = 64;

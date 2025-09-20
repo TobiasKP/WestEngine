@@ -41,5 +41,5 @@ private:
   GLuint createFragmentShader(const std::string file, GLuint programId) {
     return createShader(file, GL_FRAGMENT_SHADER, programId);
   }
-  void addUniforms(GLuint programId, Entity *entity, std::int32_t shadergroup);
+  void addUniforms(GLuint programId, Entity *entity);
 };

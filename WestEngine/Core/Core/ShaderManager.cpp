@@ -106,7 +106,7 @@ void ShaderManager::update() {
 
     s->programId = programId;
     s->initialized = true;
-    addUniforms(programId, entity, s->shadergroup);
+    addUniforms(programId, entity);
   }
 }
 
@@ -133,7 +133,14 @@ GLuint ShaderManager::initInterfaceShader() {
   logDebug(std::format("{} ### Created Shader for Interfaces. ProgramID: {}.\n",
                        getName(), programId));
 #endif
+
   Config::interfaceShaderProgram = programId;
+  Config::interfaceOrthoUniform = UniformUtils::createUniform(UniformConstants::ORTHO_UNIFORM, programId);
+  if(Config::interfaceOrthoUniform == -1) {  
+    logFailure(std::format(
+        "{} ### Failed to create ortho matrix uniform for interface shader program.\n", getName()));
+    return 1;
+  }
   return 0;
 }
 
@@ -169,8 +176,7 @@ GLuint ShaderManager::initShader(Shader *s, Entity *entity) {
 }
 
 // TODO make switch case
-void ShaderManager::addUniforms(GLuint programId, Entity *entity,
-                                std::int32_t shadergroup) {
+void ShaderManager::addUniforms(GLuint programId, Entity *entity) {
   Model *m = (Model *)entity->getComponent(BitMasks::Components::MODEL);
   if (m != nullptr && m->texture != nullptr)
     m->texture->uniform = UniformUtils::createUniform(
