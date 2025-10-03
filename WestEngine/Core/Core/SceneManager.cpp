@@ -1,6 +1,5 @@
 #include "../CoreHeaders/SceneManager.h"
 
-#include <TimeUtils.hpp>
 #include <filesystem>
 #include <lua.hpp>
 
@@ -45,7 +44,7 @@ std::int32_t SceneManager::startup() {
   assert(_loader != nullptr && _scene != nullptr && L != nullptr &&
          _builder != nullptr);
 #ifdef DEBUG
-  logDebug(std::format("{} ### instantiated lus state\n", getName()));
+  logDebug(std::format("{} ### instantiated Lua state\n", getName()));
 #endif
   return 0;
 }

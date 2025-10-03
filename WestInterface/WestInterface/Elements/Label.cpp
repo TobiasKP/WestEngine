@@ -4,6 +4,7 @@
 
 #include <Config.h>
 #include <format>
+#include <iostream>
 
 struct Label : public IElement {
   void handler() {
@@ -20,18 +21,16 @@ struct Label : public IElement {
     cd->colorB = this->colorB;
     cd->colorA = this->colorA;
     // top right
-    cd->vertices[0] = xLL + SIZE_E;
-    cd->vertices[1] = yLL + SIZE_E;
+    cd->vertices[0] = xLL + SIZE_E * scale;
+    cd->vertices[1] = yLL + SIZE_E * scale;
     // bottom right
-    cd->vertices[2] = xLL + SIZE_E;
+    cd->vertices[2] = xLL + SIZE_E * scale;
     cd->vertices[3] = yLL;
     // bottom left
     cd->vertices[4] = xLL;
     cd->vertices[5] = yLL;
     // top left
     cd->vertices[6] = xLL;
-    cd->vertices[7] = yLL + SIZE_E;
+    cd->vertices[7] = yLL + SIZE_E * scale;
   };
-
-  ~Label() {};
 };

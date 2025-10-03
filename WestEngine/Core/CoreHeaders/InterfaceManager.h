@@ -17,4 +17,8 @@ public:
 
 private:
   WestInterfaceFacade *_facade;
+
+#ifdef DEBUG
+  std::int32_t buildTechDemoFooter();
+#endif
 };

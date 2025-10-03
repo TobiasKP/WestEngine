@@ -7,7 +7,7 @@
 #include <WestLogger.h>
 #include <cstdint>
 
-static std::uint8_t _currentId = 1;
+static std::atomic_uint32_t CURRENT_ID = 1;
 
 class InterfaceBuilder {
 public:

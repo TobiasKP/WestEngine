@@ -6,7 +6,7 @@ InterfaceBuilder::~InterfaceBuilder() {
   if (_current != nullptr) {
     _logger.log(
         Level::Error,
-        "@@@ Interface still in build process but Builder was destroyed.");
+        "@@@ Interface still in build process but Builder was destroyed.\n");
     delete _current;
   }
   _factory->~ElementFactory();
@@ -22,13 +22,16 @@ void InterfaceBuilder::createNewInterface(std::uint16_t xScreenPosition,
   _current->xLL = xScreenPosition;
   _current->yLL = yScreenPosition;
   _current->gridCells = gridCells;
+  _current->id = CURRENT_ID;
   if (hiddenContainer) {
     _current->flags = 0x08;
   }
   assert(_current != nullptr && _current->xLL >= 0 && _current->yLL >= 0);
+  CURRENT_ID++;
 #ifdef DEBUG
-  _logger.log(Level::Info, std::format("@@@ Creating new Interface -> {} : {}",
-                                       xScreenPosition, yScreenPosition));
+  _logger.log(Level::Info,
+              std::format("@@@ Creating new Interface -> {} : {}\n",
+                          xScreenPosition, yScreenPosition));
 #endif
 }
 
@@ -45,7 +48,7 @@ ContainerElement *InterfaceBuilder::build() {
   _current = nullptr;
 #ifdef DEBUG
   _logger.log(Level::Info,
-              "@@@ Interface build complete returning Parent container");
+              "@@@ Interface build complete returning Parent container\n");
 #endif
   return result;
 }

@@ -4,7 +4,6 @@
 #include "../CoreHeaders/Utils/DataUtils/UniformUtils.h"
 
 #include <Config.h>
-#include <TimeUtils.hpp>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -88,10 +87,13 @@ void ShaderManager::update() {
     GLuint programId = -1;
     if (_programList.find(s->shadergroup) != _programList.end()) {
 #ifdef DEBUG
-      logCycle(
-          std::format("{} ### Shader already created setting programId: {} "
-                      "for group: {}.\n",
-                      getName(), _programList[s->shadergroup], s->shadergroup));
+      std::uint8_t cycle = getLogger()->getCycleLength();
+      if (cycle == 0) {
+        logCycle(std::format(
+            "{} ### Shader already created setting programId: {} "
+            "for group: {}.\n",
+            getName(), _programList[s->shadergroup], s->shadergroup));
+      }
 #endif
       programId = _programList[s->shadergroup];
     } else {
@@ -135,10 +137,12 @@ GLuint ShaderManager::initInterfaceShader() {
 #endif
 
   Config::interfaceShaderProgram = programId;
-  Config::interfaceOrthoUniform = UniformUtils::createUniform(UniformConstants::ORTHO_UNIFORM, programId);
-  if(Config::interfaceOrthoUniform == -1) {  
-    logFailure(std::format(
-        "{} ### Failed to create ortho matrix uniform for interface shader program.\n", getName()));
+  Config::interfaceOrthoUniform =
+      UniformUtils::createUniform(UniformConstants::ORTHO_UNIFORM, programId);
+  if (Config::interfaceOrthoUniform == -1) {
+    logFailure(std::format("{} ### Failed to create ortho matrix uniform for "
+                           "interface shader program.\n",
+                           getName()));
     return 1;
   }
   return 0;

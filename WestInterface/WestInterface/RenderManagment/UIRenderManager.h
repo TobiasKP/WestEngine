@@ -16,6 +16,7 @@ public:
   std::vector<ComponentData *> getRenderData() { return data; }
 
 private:
+  WestLogger *_logger = &WestLogger::getLoggerInstance();
   std::vector<ComponentData *> data;
   std::mutex _vectorMutex;
 

@@ -11,6 +11,7 @@ WestInterfaceFacade::WestInterfaceFacade() {
   count = 0;
   filled = false;
   _renderManager = new UIRenderManager();
+  _builder = new InterfaceBuilder();
   for (std::uint8_t i = 0; i < 32; i++) {
     _interfaces.at(i) = nullptr;
   }
@@ -23,6 +24,7 @@ void WestInterfaceFacade::shutdown() {
     delete _interfaces.at(count);
     count--;
   }
+  delete _builder;
 }
 
 ContainerElement *WestInterfaceFacade::findInterfaceById(std::uint8_t id) {
@@ -42,13 +44,16 @@ std::uint8_t WestInterfaceFacade::createNewInterface(
     std::uint16_t xScreenPosition, std::uint16_t yScreenPosition, float scale,
     std::uint8_t gridCells, bool hiddenContainer,
     std::vector<ElementProxy *> elements) {
+#ifdef DEBUG
+  _logger.log(Level::Info, "@@@ Creating new Interface\n");
+#endif
 
   _builder->createNewInterface(xScreenPosition, yScreenPosition, scale,
                                gridCells, hiddenContainer);
   for (auto *element : elements) {
 #ifdef DEBUG
     _logger.log(Level::Cycle,
-                std::format("@@@ Addding new element to interface: {}",
+                std::format("@@@ Addding new element to interface: {}\n",
                             (int)element->type));
 #endif
     _builder->addElement(element);
@@ -72,7 +77,7 @@ bool WestInterfaceFacade::destroyInterface(std::uint8_t interfaceId) {
     return false;
 
   _logger.log(Level::Info,
-              std::format("@@@ Destroying interface: {}", interfaceId));
+              std::format("@@@ Destroying interface: {}\n", interfaceId));
   ContainerElement *e = _interfaces.at(count);
   _interfaces.at(count) = nullptr;
   _interfaces.at(location) = e;
@@ -94,7 +99,7 @@ void WestInterfaceFacade::addElement(std::uint8_t interfaceId,
   _logger.log(
       Level::Info,
       std::format(
-          "@@@ Adding additional element to interface: {}, after creation",
+          "@@@ Adding additional element to interface: {}, after creation\n",
           interfaceId));
 #endif
   interface->addChild(e, element->column, element->row);
@@ -110,6 +115,9 @@ bool WestInterfaceFacade::removeElement(std::uint8_t interfaceId,
 };
 
 void WestInterfaceFacade::updateRenderData() {
+#ifdef DEBUG
+  _logger.log(Level::Cycle, "@@@ Updating render Data for interfaces\n");
+#endif
   _renderManager->updateRenderData(_interfaces, count);
 };
 

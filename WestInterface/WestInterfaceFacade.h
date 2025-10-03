@@ -62,7 +62,10 @@ public:
       "shader/InterfaceVertexShader.vs";
   static constexpr std::string_view interfaceFragementShader =
       "shader/InterfaceFragementShader.fs";
-  static constexpr float indices[6] = {0, 1, 3, 1, 2, 3};
+  static constexpr std::uint32_t indices[6] = {0, 1, 3, 1, 2, 3};
+  static constexpr float baseQuad[] = {0.0f, 0.0f,          1.0f * SIZE_E,
+                                       0.0f, 1.0f * SIZE_E, 1.0f * SIZE_E,
+                                       0.0f, 1.0f * SIZE_E};
 
   friend class UIRenderManager;
 

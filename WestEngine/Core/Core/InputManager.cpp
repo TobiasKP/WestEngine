@@ -3,7 +3,6 @@
 #include "../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
 #include "../CoreHeaders/Utils/InputUtils/MouseCallbacks.h"
 
-#include <TimeUtils.hpp>
 #include <cstring>
 #include <fcntl.h>
 #include <stdio.h>

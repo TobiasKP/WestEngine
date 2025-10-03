@@ -28,17 +28,11 @@ IElement *ElementFactory::createElementInternal(ElementProxy *e) {
     break;
   case DEBUG_ELEMENT:
     result = new DebugElement();
-    result->id = e->elementId;
-    result->xLL = e->xPosition;
-    result->yLL = e->yPosition;
-    result->scale = e->scale;
+    fillBasicInfos(e, result);
     break;
   default:
     result = new DebugElement();
-    result->id = e->elementId;
-    result->xLL = e->xPosition;
-    result->yLL = e->yPosition;
-    result->scale = e->scale;
+    fillBasicInfos(e, result);
     break;
   }
 

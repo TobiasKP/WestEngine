@@ -8,6 +8,7 @@
 
 #include "../../Constants/CoreConstants.hpp"
 #include <WestLogger.h>
+#include <TimeUtils.hpp>
 
 class IManager {
 

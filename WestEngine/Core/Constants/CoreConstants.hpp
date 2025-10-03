@@ -27,6 +27,6 @@ inline constexpr std::string INPUT_MANAGER = "INPUT_MANAGER";
 inline constexpr std::string SCENE_MANAGER = "SCENE_MANAGER";
 inline constexpr std::string SHADER_MANAGER = "SHADER_MANAGER";
 inline constexpr std::string ENTITY_SYSTEM_MANAGER = "SYSTEM_MANAGER";
-inline constexpr std::string INTERFACE_MANAGER = "UI_MANAGER";
+inline constexpr std::string INTERFACE_MANAGER = "INTERFA_MANAGER";
 
 } // namespace CoreConstants

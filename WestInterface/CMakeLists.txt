@@ -16,6 +16,10 @@ if(WIN32)
     target_compile_definitions(WestInterface PRIVATE WEST_INTERFACE_EXPORTS)
 endif()
 
+target_compile_definitions(WestInterface PRIVATE
+    $<$<CONFIG:DEBUG>:DEBUG>
+)
+
 set(RESOURCE_BASE "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../WestEngine")
 
 if(NOT EXISTS "${RESOURCE_BASE}/shader")

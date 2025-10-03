@@ -1,7 +1,6 @@
 #include "../CoreHeaders/RenderManager.h"
 
 #include <Config.h>
-#include <TimeUtils.hpp>
 
 #include <glm/ext/matrix_clip_space.hpp>
 
@@ -29,6 +28,7 @@ std::int32_t RenderManager::startup() {
   glGenBuffers(1, &_interfaceVBO);
   glGenBuffers(1, &_interfaceEBO);
   glGenBuffers(1, &_interfaceCOL);
+  glGenBuffers(1, &_interfaceOFFSET);
   return 0;
 }
 
@@ -51,7 +51,8 @@ std::int32_t RenderManager::init() {
   glBindVertexArray(_interfaceVAO);
 
   glBindBuffer(GL_ARRAY_BUFFER, _interfaceVBO);
-  glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(_facade->baseQuad), _facade->baseQuad,
+               GL_STATIC_DRAW);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _interfaceEBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(_facade->indices),
@@ -67,6 +68,13 @@ std::int32_t RenderManager::init() {
   glVertexAttribDivisor(1, 1);
   glEnableVertexAttribArray(1);
 
+  glBindBuffer(GL_ARRAY_BUFFER, _interfaceOFFSET);
+  glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
+
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+  glVertexAttribDivisor(2, 1);
+  glEnableVertexAttribArray(2);
+
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 
@@ -81,9 +89,19 @@ std::int32_t RenderManager::init() {
 }
 
 void RenderManager::update() {
+#ifdef DEBUG
+  double start = TimeUtils::getCurrentTimeAsTime();
+#endif
   clearColor();
   renderUserInterfaces();
   renderGameEntities();
+#ifdef DEBUG
+  double end = TimeUtils::getCurrentTimeAsTime();
+  double res = TimeUtils::getDuration(start, end);
+  logCycle(
+      std::format("{} ### {} render time for all entites in scene: {} ms.\n",
+                  getName(), getName(), res));
+#endif
 }
 
 void RenderManager::clearColor() {
@@ -128,52 +146,63 @@ void RenderManager::renderGameEntities() {
       glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, 0);
     else
       glDrawElements(GL_TRIANGLES, model->vertexCount, GL_UNSIGNED_INT, 0);
-
-    glBindVertexArray(0);
   }
 }
 
 void RenderManager::renderUserInterfaces() {
   assert(Config::interfaceShaderProgram != -1);
+
   // TODO calculate hash -> if no changes no need to rerender?
   std::vector<ComponentData *> renderData = _facade->getRenderData();
   if (renderData.size() == 0) {
-#ifdef DEBUG
-    logCycle(std::format(
+    logFailure(std::format(
         "{} ### No render data for interfaces gathered skipping rendering\n",
         getName()));
-#endif
     return;
   }
 
-  std::vector<float> vertices;
+  std::vector<float> instanceOffsets;
   std::vector<float> colors;
   for (ComponentData *cd : renderData) {
-    vertices.insert(vertices.end(), std::begin(cd->vertices),
-                    std::end(cd->vertices));
+    // Extract bottom-left corner from vertices as instance offset
+    // TODO remove most of vertices from INterface
+    instanceOffsets.insert(
+        instanceOffsets.end(),
+        {cd->vertices[4], cd->vertices[5]}); // 3rd vertex (bottom-left)
     colors.insert(colors.end(),
                   {cd->colorR, cd->colorG, cd->colorB, cd->colorA});
   }
-  if (vertices.size() <= 0) {
-#ifdef DEBUG
-    logCycle(std::format(
-        "{} ### No vertice data for interfaces gathered skipping rendering\n",
+
+  if (instanceOffsets.size() <= 0) {
+    logFailure(std::format(
+        "{} ### No instance data for interfaces gathered skipping rendering\n",
         getName()));
-#endif
     return;
   }
+
+#ifdef DEBUG
+  std::uint8_t cycle = getLogger()->getCycleLength();
+  if (cycle == 0)
+    logCycle(std::format("{} ### Rendering Interfaces ...\n", getName()));
+#endif
   glUseProgram(Config::interfaceShaderProgram);
-  glBindBuffer(GL_ARRAY_BUFFER, _interfaceVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices.data(),
-               GL_STATIC_DRAW);
+  glBindVertexArray(_interfaceVAO);
+
   glBindBuffer(GL_ARRAY_BUFFER, _interfaceCOL);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(),
+               GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ARRAY_BUFFER, _interfaceOFFSET);
+  glBufferData(GL_ARRAY_BUFFER, instanceOffsets.size() * sizeof(float),
+               instanceOffsets.data(), GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
   glm::mat4 ortho = glm::ortho(0.0f, (float)Config::GeneralConfig.WIDTH, 0.0f,
                                (float)Config::GeneralConfig.HEIGHT);
   UniformUtils::setUniform(Config::interfaceOrthoUniform, ortho);
-
-  glBindVertexArray(_interfaceVAO);
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+  std::cout << "drawing interfaces " << std::endl;
+  glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0,
+                          renderData.size());
   glUseProgram(_usedShaderProgram);
 }
 

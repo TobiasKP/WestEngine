@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <PoolAllocator.h>
+#include <GL/glew.h>
 
 struct Texture {
   std::int32_t id;

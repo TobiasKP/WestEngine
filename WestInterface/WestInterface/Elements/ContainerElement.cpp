@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <assert.h>
 #include <format>
+#include <iostream>
 #include <vector>
 
 #include "IElement.hpp"
@@ -58,7 +59,7 @@ struct ContainerElement : public IElement {
 #ifdef DEBUG
       _logger.log(Level::Info,
                   std::format("@@@ Added Element: {} is out of bounds from "
-                              "parent element in x position",
+                              "parent element in x position\n",
                               e->id));
 #endif
       gridPositionX = gridCells;
@@ -68,7 +69,7 @@ struct ContainerElement : public IElement {
 #ifdef DEBUG
       _logger.log(Level::Info,
                   std::format("@@@ Added Element: {} is out of bounds from "
-                              "parent element in y position",
+                              "parent element in y position\n",
                               e->id));
 #endif
       gridPositionY = gridCells;
@@ -78,10 +79,16 @@ struct ContainerElement : public IElement {
     float elementPosY = yLL + height * gridPositionY;
     float maxWidth = xLL + width * gridCells;
     float maxHeight = yLL + height * gridCells;
+#ifdef DEBUG
+    _logger.log(
+        Level::Info,
+        std::format("@@@ Element lower Left -> {}:{} - max Size -> {}:{}\n",
+                    elementPosX, elementPosY, maxWidth, maxHeight));
+#endif
     if (elementPosX + SIZE_E * e->scale > maxWidth ||
         elementPosY + SIZE_E * e->scale > maxHeight) {
       _logger.log(Level::Error, std::format("@@@ Added Element: {} will be to "
-                                            "large for parent, not adding...",
+                                            "large for parent, not adding...\n",
                                             e->id));
       return;
     }
@@ -92,7 +99,7 @@ struct ContainerElement : public IElement {
 #ifdef DEBUG
     _logger.log(
         Level::Info,
-        std::format("@@@ Adding element: {} to children of interface: {}",
+        std::format("@@@ Adding element: {} to children of interface: {}\n",
                     e->id, this->id));
 #endif
 
@@ -102,17 +109,30 @@ struct ContainerElement : public IElement {
   std::vector<ComponentData *> describeContainer() {
     std::vector<ComponentData *> result;
     for (IElement *element : children) {
+      assert(element != nullptr);
       result.push_back(element->describe());
     }
 
     if (!(flags & isHidden)) {
-      result.push_back(this->describe());
+      result.push_back(describe());
     }
+
     return result;
   }
 
   void describeMyself(ComponentData *cd) {
-    // TODO describe myself
+    // top right
+    cd->vertices[0] = xLL + (gridCells * SIZE_E) * scale;
+    cd->vertices[1] = yLL + (gridCells * SIZE_E) * scale;
+    // bottom right
+    cd->vertices[2] = xLL + (gridCells * SIZE_E) * scale;
+    cd->vertices[3] = yLL;
+    // bottom left
+    cd->vertices[4] = xLL;
+    cd->vertices[5] = yLL;
+    // top left
+    cd->vertices[6] = xLL;
+    cd->vertices[7] = yLL + (gridCells * SIZE_E) * scale; 
   }
 
   void handler() {}

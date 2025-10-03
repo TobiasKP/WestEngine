@@ -25,7 +25,7 @@ public:
 private:
   static GLuint _usedShaderProgram;
   WestInterfaceFacade *_facade; 
-  GLuint _interfaceVBO, _interfaceVAO, _interfaceEBO, _interfaceCOL;
+  GLuint _interfaceVBO, _interfaceVAO, _interfaceEBO, _interfaceCOL, _interfaceOFFSET;
   Scene *_scene;
 
   void clearColor();

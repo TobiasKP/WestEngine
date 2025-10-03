@@ -1,7 +1,5 @@
 #include "../CoreHeaders/EngineManager.h"
 
-#include <TimeUtils.hpp>
-
 #include "../CoreHeaders/InterfaceManager.h"
 #include "../CoreHeaders/RenderManager.h"
 #include "../CoreHeaders/SceneManager.h"

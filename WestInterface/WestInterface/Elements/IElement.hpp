@@ -5,16 +5,17 @@
 
 #include "../RenderManagment/ComponentData.h"
 
-static const std::uint8_t SIZE_E = 10;
-static const std::uint16_t hasTexture = 0x01;
-static const std::uint16_t isInteractive = 0x02;
-static const std::uint16_t hasText = 0x04;
-static const std::uint16_t isHidden = 0x08;
+static constexpr std::uint8_t SIZE_E = 100;
+static constexpr std::uint16_t hasTexture = 0x01;
+static constexpr std::uint16_t isInteractive = 0x02;
+static constexpr std::uint16_t hasText = 0x04;
+static constexpr std::uint16_t isHidden = 0x08;
 
 // For Textrendering form Bitmap in Resources.
 struct Text {};
 
-struct IElement {
+struct IElement { 
+  ~IElement() { delete _cd; };
   // Public identifier
   std::uint32_t id;
 
@@ -38,17 +39,16 @@ struct IElement {
   std::uint8_t flags;
 
   virtual void handler() {};
-  virtual ~IElement() {};
 
   ComponentData *describe() {
-    ComponentData *cd;
-    describeMyself(cd);
-    return cd;
+    describeMyself(_cd);
+    return _cd;
   };
 
 protected:
   WestLogger &_logger = WestLogger::getLoggerInstance();
 
 private:
+  ComponentData *_cd = new ComponentData();
   virtual void describeMyself(ComponentData *cd) {};
 };
