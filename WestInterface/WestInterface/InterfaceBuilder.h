@@ -16,7 +16,8 @@ public:
 
   void createNewInterface(std::uint16_t xScreenPosition,
                           std::uint16_t yScreenPosition, float scale,
-                          std::uint8_t gridCells, bool hiddenContainer);
+                          std::uint8_t rows, std::uint8_t columns,
+                          bool hiddenContainer);
   void addElement(ElementProxy *e);
   ContainerElement *build();
   IElement *transform(ElementProxy *e);

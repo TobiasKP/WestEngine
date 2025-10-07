@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 #if defined(_WIN32) || defined(_WIN64)
 #ifdef WEST_INTERFACE_EXPORTS
 #define WEST_INTERFACE __declspec(dllexport)
@@ -11,15 +13,22 @@
 #endif
 
 struct WEST_INTERFACE ComponentData {
-  // Location of component in Normalized Device Coordinates
-  float vertices[8]; 
+  std::uint32_t flags; 
+  float vertices[2];
 
   // float uvTopLeft;
   // float uvBottomRight;
 
-  // Color of component:
   float colorR;
   float colorG;
   float colorB;
   float colorA;
 };
+
+/*****************************************
+ * FLAG DESCRIPTION
+ * 0x01 = Border and no filling
+ *
+ *
+ *
+ */

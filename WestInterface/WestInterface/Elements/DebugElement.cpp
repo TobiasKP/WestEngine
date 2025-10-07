@@ -4,18 +4,11 @@
 
 struct DebugElement : public Label {
 
-  DebugElement() {
-    zIndex = 100;
-    flags = 0x00;
-  }
+  DebugElement() : Label() { zIndex = 100; }
 
-  void handler() {
-    Label::handler();
-  };
-  
-  void describeMyself(ComponentData* cd) {
-    Label::describeMyself(cd);
-  };
+  void handler() { Label::handler(); };
 
- 
+  void describeMyself(ComponentData *cd, std::uint8_t row, std::uint8_t column) {
+    Label::describeMyself(cd, row, column);
+  };
 };

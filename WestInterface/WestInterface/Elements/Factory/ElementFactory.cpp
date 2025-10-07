@@ -57,4 +57,6 @@ void ElementFactory::fillBasicInfos(ElementProxy *ep, IElement *el) {
   el->colorG = ep->colorG;
   el->colorB = ep->colorB;
   el->colorA = ep->colorA;
+  el->rowElements = ep->rowElements;
+  el->columnElements = ep->columnElements;
 }

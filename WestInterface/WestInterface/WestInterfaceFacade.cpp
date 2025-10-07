@@ -42,14 +42,14 @@ ContainerElement *WestInterfaceFacade::findInterfaceById(std::uint8_t id) {
 
 std::uint8_t WestInterfaceFacade::createNewInterface(
     std::uint16_t xScreenPosition, std::uint16_t yScreenPosition, float scale,
-    std::uint8_t gridCells, bool hiddenContainer,
+    std::uint8_t rows, std::uint8_t columns, bool hiddenContainer,
     std::vector<ElementProxy *> elements) {
 #ifdef DEBUG
   _logger.log(Level::Info, "@@@ Creating new Interface\n");
 #endif
 
-  _builder->createNewInterface(xScreenPosition, yScreenPosition, scale,
-                               gridCells, hiddenContainer);
+  _builder->createNewInterface(xScreenPosition, yScreenPosition, scale, rows,
+                               columns, hiddenContainer);
   for (auto *element : elements) {
 #ifdef DEBUG
     _logger.log(Level::Cycle,

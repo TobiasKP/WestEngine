@@ -11,8 +11,8 @@
 #endif
 
 #include <cstdint>
-#include <functional>
-#include <string>
+// #include <functional>
+// #include <string>
 
 enum ElementType { LABEL, BUTTON, CONTAINER, ICON, DEBUG_ELEMENT };
 
@@ -32,6 +32,8 @@ struct WEST_INTERFACE ElementProxy {
   float yPosition;
   float scale;
 
+  std::uint8_t rowElements = 1;
+  std::uint8_t columnElements = 1;
   std::uint8_t row;
   std::uint8_t column;
 

@@ -10,9 +10,8 @@
 
 struct ContainerElement : public IElement {
   std::vector<IElement *> children;
-  std::uint8_t gridCells = 0;
 
-  ContainerElement() {}
+  ContainerElement() { flags = 0x01; }
 
   ~ContainerElement() {
 #ifdef DEBUG
@@ -55,30 +54,30 @@ struct ContainerElement : public IElement {
     float width = scale * SIZE_E;
     float height = scale * SIZE_E;
 
-    if (gridPositionX > gridCells) {
+    if (gridPositionX > rowElements) {
 #ifdef DEBUG
       _logger.log(Level::Info,
                   std::format("@@@ Added Element: {} is out of bounds from "
                               "parent element in x position\n",
                               e->id));
 #endif
-      gridPositionX = gridCells;
+      gridPositionX = rowElements;
     }
 
-    if (gridPositionY > gridCells) {
+    if (gridPositionY > columnElements) {
 #ifdef DEBUG
       _logger.log(Level::Info,
                   std::format("@@@ Added Element: {} is out of bounds from "
                               "parent element in y position\n",
                               e->id));
 #endif
-      gridPositionY = gridCells;
+      gridPositionY = columnElements;
     }
 
     float elementPosX = xLL + width * gridPositionX;
     float elementPosY = yLL + height * gridPositionY;
-    float maxWidth = xLL + width * gridCells;
-    float maxHeight = yLL + height * gridCells;
+    float maxWidth = xLL + width * rowElements;
+    float maxHeight = yLL + height * columnElements;
 #ifdef DEBUG
     _logger.log(
         Level::Info,
@@ -107,32 +106,32 @@ struct ContainerElement : public IElement {
   };
 
   std::vector<ComponentData *> describeContainer() {
-    std::vector<ComponentData *> result;
+    std::vector<ComponentData *> result; 
     for (IElement *element : children) {
-      assert(element != nullptr);
-      result.push_back(element->describe());
+      assert(element != nullptr && element->rowElements > 0 &&
+             element->columnElements > 0);
+      for (std::uint8_t i = 0; i < element->rowElements; i++) {
+        for (std::uint8_t j = 0; j < element->columnElements; j++) {           
+          result.push_back(element->describe(i, j));
+        }
+      }
     }
 
-    if (!(flags & isHidden)) {
-      result.push_back(describe());
+    assert(rowElements > 0 && columnElements > 0);
+    for (std::uint8_t i = 0; i < rowElements; i++) {
+      for (std::uint8_t j = 0; j < columnElements; j++) { 
+        result.push_back(describe(i, j));
+      }
     }
 
     return result;
   }
 
-  void describeMyself(ComponentData *cd) {
-    // top right
-    cd->vertices[0] = xLL + (gridCells * SIZE_E) * scale;
-    cd->vertices[1] = yLL + (gridCells * SIZE_E) * scale;
-    // bottom right
-    cd->vertices[2] = xLL + (gridCells * SIZE_E) * scale;
-    cd->vertices[3] = yLL;
-    // bottom left
-    cd->vertices[4] = xLL;
-    cd->vertices[5] = yLL;
-    // top left
-    cd->vertices[6] = xLL;
-    cd->vertices[7] = yLL + (gridCells * SIZE_E) * scale; 
+  void describeMyself(ComponentData *cd, std::uint8_t row,
+                      std::uint8_t column) {
+    cd->vertices[0] = xLL + (SIZE_E * row);
+    cd->vertices[1] = yLL + (SIZE_E * column);
+    cd->flags = flags;
   }
 
   void handler() {}

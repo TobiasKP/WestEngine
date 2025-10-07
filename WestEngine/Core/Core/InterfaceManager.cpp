@@ -54,9 +54,9 @@ std::int32_t InterfaceManager::buildTechDemoFooter() {
   redQuad->colorA = 1.0f;
   redQuad->xPosition = 0.0f;
   redQuad->yPosition = 0.0f;
-  redQuad->scale = 1.0f;
-  redQuad->column = 0;
+  redQuad->scale = 1.0f; 
   redQuad->row = 0;
+  redQuad->column = 0; 
 
   elements.push_back(redQuad);
   assert(elements.size() > 0);
@@ -64,7 +64,7 @@ std::int32_t InterfaceManager::buildTechDemoFooter() {
   logDebug(
       std::format("{} ### Creating Tech Demo interface footer\n", getName()));
   std::uint8_t footerId =
-      _facade->createNewInterface(0.0f, 0.0f, 1.0f, 1.0f, false, elements);
+      _facade->createNewInterface(0.0f, 0.0f, 1.0f, 2, 1, false, elements);
   logDebug(std::format("{} ### Created Tech Demo footer -> {}\n", getName(),
                        footerId));
   delete redQuad;

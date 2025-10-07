@@ -14,14 +14,16 @@ InterfaceBuilder::~InterfaceBuilder() {
 
 void InterfaceBuilder::createNewInterface(std::uint16_t xScreenPosition,
                                           std::uint16_t yScreenPosition,
-                                          float scale, std::uint8_t gridCells,
+                                          float scale, std::uint8_t rows,
+                                          std::uint8_t columns,
                                           bool hiddenContainer) {
 
   _current = new ContainerElement();
   _current->scale = scale;
   _current->xLL = xScreenPosition;
   _current->yLL = yScreenPosition;
-  _current->gridCells = gridCells;
+  _current->rowElements = rows;
+  _current->columnElements = columns;
   _current->id = CURRENT_ID;
   if (hiddenContainer) {
     _current->flags = 0x08;

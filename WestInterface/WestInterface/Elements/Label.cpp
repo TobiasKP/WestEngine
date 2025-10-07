@@ -4,9 +4,14 @@
 
 #include <Config.h>
 #include <format>
-#include <iostream>
+//#include <iostream>
 
 struct Label : public IElement {
+
+  Label() {
+    flags = 0;
+  }
+
   void handler() {
     _logger.log(
         Level::Error,
@@ -15,22 +20,14 @@ struct Label : public IElement {
             this->id));
   };
 
-  void describeMyself(ComponentData *cd) {
+  void describeMyself(ComponentData *cd, std::uint8_t row, std::uint8_t column) {
     cd->colorR = this->colorR;
     cd->colorG = this->colorG;
     cd->colorB = this->colorB;
     cd->colorA = this->colorA;
-    // top right
-    cd->vertices[0] = xLL + SIZE_E * scale;
-    cd->vertices[1] = yLL + SIZE_E * scale;
-    // bottom right
-    cd->vertices[2] = xLL + SIZE_E * scale;
-    cd->vertices[3] = yLL;
-    // bottom left
-    cd->vertices[4] = xLL;
-    cd->vertices[5] = yLL;
-    // top left
-    cd->vertices[6] = xLL;
-    cd->vertices[7] = yLL + SIZE_E * scale;
+
+    cd->vertices[0] = xLL + (SIZE_E * row);
+    cd->vertices[1] = yLL + (SIZE_E * column); 
+    cd->flags = flags;
   };
 };

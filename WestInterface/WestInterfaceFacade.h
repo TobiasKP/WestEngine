@@ -33,7 +33,7 @@ public:
   // Managing Interfaces
   std::uint8_t createNewInterface(std::uint16_t xScreenPosition,
                                   std::uint16_t yScreenPosition, float scale,
-                                  std::uint8_t gridCells, bool hiddenContainer,
+                                  std::uint8_t rows, std::uint8_t columns, bool hiddenContainer,
                                   std::vector<ElementProxy *> elements);
   bool destroyInterface(std::uint8_t interfaceId);
 
