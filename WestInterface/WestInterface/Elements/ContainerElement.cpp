@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <assert.h>
 #include <format>
-#include <iostream>
 #include <vector>
 
 #include "IElement.hpp"
@@ -44,8 +43,9 @@ struct ContainerElement : public IElement {
                 std::format("@@@ Deleting element: {} from interface: {}", d_id,
                             this->id));
 #endif
+    IElement *elementToDelete = *result;
     children.erase(result);
-    delete *result;
+    delete elementToDelete;
     return true;
   }
 
@@ -106,12 +106,12 @@ struct ContainerElement : public IElement {
   };
 
   std::vector<ComponentData *> describeContainer() {
-    std::vector<ComponentData *> result; 
+    std::vector<ComponentData *> result;
     for (IElement *element : children) {
       assert(element != nullptr && element->rowElements > 0 &&
              element->columnElements > 0);
       for (std::uint8_t i = 0; i < element->rowElements; i++) {
-        for (std::uint8_t j = 0; j < element->columnElements; j++) {           
+        for (std::uint8_t j = 0; j < element->columnElements; j++) {
           result.push_back(element->describe(i, j));
         }
       }
@@ -119,7 +119,7 @@ struct ContainerElement : public IElement {
 
     assert(rowElements > 0 && columnElements > 0);
     for (std::uint8_t i = 0; i < rowElements; i++) {
-      for (std::uint8_t j = 0; j < columnElements; j++) { 
+      for (std::uint8_t j = 0; j < columnElements; j++) {
         result.push_back(describe(i, j));
       }
     }
@@ -130,7 +130,7 @@ struct ContainerElement : public IElement {
   void describeMyself(ComponentData *cd, std::uint8_t row,
                       std::uint8_t column) {
     cd->vertices[0] = xLL + (SIZE_E * row);
-    cd->vertices[1] = yLL + (SIZE_E * column);
+    cd->vertices[1] = yLL + (SIZE_E * column); 
     cd->flags = flags;
   }
 

@@ -33,7 +33,8 @@ public:
   // Managing Interfaces
   std::uint8_t createNewInterface(std::uint16_t xScreenPosition,
                                   std::uint16_t yScreenPosition, float scale,
-                                  std::uint8_t rows, std::uint8_t columns, bool hiddenContainer,
+                                  std::uint8_t rows, std::uint8_t columns,
+                                  bool hiddenContainer,
                                   std::vector<ElementProxy *> elements);
   bool destroyInterface(std::uint8_t interfaceId);
 
@@ -66,11 +67,12 @@ public:
   static constexpr float baseQuad[] = {0.0f, 0.0f,          1.0f * SIZE_E,
                                        0.0f, 1.0f * SIZE_E, 1.0f * SIZE_E,
                                        0.0f, 1.0f * SIZE_E};
+  static constexpr float baseTex[] = {0.0f, 0.0f, 1.0f, 0.0f,
+                                      1.0f, 1.0f, 0.0f, 1.0f};
 
   friend class UIRenderManager;
 
-protected:
-  std::atomic_bool filled; // TODO: WHAT WAS THIS FOR?
+protected: 
   size_t count;
 
 private:

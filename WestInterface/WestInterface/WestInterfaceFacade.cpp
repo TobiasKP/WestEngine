@@ -9,7 +9,6 @@ WestInterfaceFacade &WestInterfaceFacade::getInterfaceInstance() {
 
 WestInterfaceFacade::WestInterfaceFacade() {
   count = 0;
-  filled = false;
   _renderManager = new UIRenderManager();
   _builder = new InterfaceBuilder();
   for (std::uint8_t i = 0; i < 32; i++) {
@@ -78,11 +77,15 @@ bool WestInterfaceFacade::destroyInterface(std::uint8_t interfaceId) {
 
   _logger.log(Level::Info,
               std::format("@@@ Destroying interface: {}\n", interfaceId));
-  ContainerElement *e = _interfaces.at(count);
-  _interfaces.at(count) = nullptr;
-  _interfaces.at(location) = e;
+  ContainerElement *elementToDelete = _interfaces.at(location);
+ 
+  if (location != count - 1) {
+    _interfaces.at(location) = _interfaces.at(count - 1);
+  }
+  _interfaces.at(count - 1) = nullptr;
   count--;
-  e->~ContainerElement();
+
+  delete elementToDelete;
   return true;
 }
 

@@ -12,7 +12,7 @@ static constexpr std::uint16_t multElements = 0x01;
 struct Text {};
 
 struct IElement {
-  ~IElement() { delete _cd; };
+  ~IElement() = default;
   // Public identifier
   std::uint32_t id;
 
@@ -42,14 +42,15 @@ struct IElement {
   virtual void handler() {};
 
   ComponentData *describe(std::uint8_t row = 0, std::uint8_t column = 0) {
-    describeMyself(_cd, row, column);
-    return _cd;
+    //TODO Consider Pooling Component Data to avoid so many allocations
+    ComponentData *cd = new ComponentData();
+    describeMyself(cd, row, column);
+    return cd;
   };
 
 protected:
   WestLogger &_logger = WestLogger::getLoggerInstance();
 
 private:
-  ComponentData *_cd = new ComponentData();
   virtual void describeMyself(ComponentData *cd, std::uint8_t row = 0, std::uint8_t column = 0) {};
 };

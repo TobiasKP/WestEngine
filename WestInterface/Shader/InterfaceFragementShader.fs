@@ -1,23 +1,26 @@
 #version 460 core
 
+#extension GL_EXT_gpu_shader4 : enable
+
 in flat vec4 vColor;
 in flat uint vFlags;
-in vec2 quadPos;
+in vec2 TexCoord;
 
 out vec4 fragColor;
 
 void main() {
     if ((vFlags & 0x01u) != 0u) {
-        vec2 edgeDist = min(abs(quadPos + 1.0), abs(1.0 - quadPos));
-        float borderWidth = 0.02;
-        float minEdgeDist = min(edgeDist.x, edgeDist.y);
-
-        if (minEdgeDist < borderWidth) {
-            fragColor = vColor;
+        float borderWidth = 0.01;
+        float maxX = 1.0 - borderWidth;
+        float minX = borderWidth;
+        float maxY = 1.0 - borderWidth;
+        float minY = borderWidth;
+        if (TexCoord.x < maxX && TexCoord.x > minX && TexCoord.y < maxY && TexCoord.y > minY) {
+            discard; 
         } else {
-            fragColor = vec4(0.0, 0.0, 0.0, 0.0);
+            fragColor = vec4(0.0, 0.0, 0.0, 1.0);
         }
-    } else {
+    } else {     
         fragColor = vColor;
     }
 }

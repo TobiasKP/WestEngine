@@ -30,6 +30,7 @@ std::int32_t RenderManager::startup() {
   glGenBuffers(1, &_interfaceCOL);
   glGenBuffers(1, &_interfaceOFFSET);
   glGenBuffers(1, &_interfaceFLAGS);
+  glGenBuffers(1, &_interfaceTEX);
   return 0;
 }
 
@@ -76,13 +77,20 @@ std::int32_t RenderManager::init() {
   glVertexAttribDivisor(2, 1);
   glEnableVertexAttribArray(2);
 
+  glBindBuffer(GL_ARRAY_BUFFER, _interfaceTEX);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(_facade->baseTex), _facade->baseTex,
+               GL_STATIC_DRAW);
+
+  glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(3);
+
   glBindBuffer(GL_ARRAY_BUFFER, _interfaceFLAGS);
   glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
 
-  glVertexAttribPointer(3, 1, GL_DOUBLE, GL_FALSE, sizeof(std::uint32_t),
-                        (void *)0);
-  glVertexAttribDivisor(3, 1);
-  glEnableVertexAttribArray(3);
+  glVertexAttribIPointer(4, 1, GL_UNSIGNED_INT, sizeof(std::uint32_t),
+                         (void *)0);
+  glVertexAttribDivisor(4, 1);
+  glEnableVertexAttribArray(4);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
@@ -172,13 +180,13 @@ void RenderManager::renderUserInterfaces() {
 
   std::vector<float> instanceOffsets;
   std::vector<float> colors;
-  std::vector<std::uint64_t> flags;
+  std::vector<std::uint32_t> flags;
   for (ComponentData *cd : renderData) {
     instanceOffsets.insert(instanceOffsets.end(),
-                           {cd->vertices[0], cd->vertices[1]});
+                           {cd->vertices[0], cd->vertices[1]}); 
     colors.insert(colors.end(),
                   {cd->colorR, cd->colorG, cd->colorB, cd->colorA});
-    std::cout << static_cast<int>(cd->flags) << std::endl;
+
     flags.push_back(cd->flags);
   }
 
@@ -195,6 +203,8 @@ void RenderManager::renderUserInterfaces() {
     logCycle(std::format("{} ### Rendering Interfaces ...\n", getName()));
 #endif
   glUseProgram(Config::interfaceShaderProgram);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glBindVertexArray(_interfaceVAO);
 
   glBindBuffer(GL_ARRAY_BUFFER, _interfaceCOL);
@@ -215,7 +225,13 @@ void RenderManager::renderUserInterfaces() {
   UniformUtils::setUniform(Config::interfaceOrthoUniform, ortho);
   glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0,
                           renderData.size());
+  glDisable(GL_BLEND);
   glUseProgram(_usedShaderProgram);
+
+  // Cleanup ComponentData instances
+  for (ComponentData *cd : renderData) {
+    delete cd;
+  }
 }
 
 void RenderManager::updateUniforms(Entity *e, Model *model) {
