@@ -20,14 +20,16 @@
 
 #include <WestLogger.h>
 #include <array>
-#include <atomic>
 #include <cstdint>
 #include <string>
+
+#include <GL/glew.h>
 
 class WEST_INTERFACE WestInterfaceFacade {
 
 public:
   static WestInterfaceFacade &getInterfaceInstance();
+  void init();
   void shutdown();
 
   // Managing Interfaces
@@ -69,10 +71,12 @@ public:
                                        0.0f, 1.0f * SIZE_E};
   static constexpr float baseTex[] = {0.0f, 0.0f, 1.0f, 0.0f,
                                       1.0f, 1.0f, 0.0f, 1.0f};
+  GLuint _interfaceVBO, _interfaceVAO, _interfaceEBO, _interfaceCOL,
+      _interfaceOFFSET, _interfaceFLAGS, _interfaceTEX;
 
   friend class UIRenderManager;
 
-protected: 
+protected:
   size_t count;
 
 private:

@@ -1,5 +1,7 @@
 #include "../WestInterfaceFacade.h"
 
+#include <GLFW/glfw3.h>
+
 #include <format>
 
 WestInterfaceFacade &WestInterfaceFacade::getInterfaceInstance() {
@@ -24,6 +26,59 @@ void WestInterfaceFacade::shutdown() {
     count--;
   }
   delete _builder;
+}
+
+void WestInterfaceFacade::init() {
+  glGenVertexArrays(1, &_interfaceVAO);
+  glGenBuffers(1, &_interfaceVBO);
+  glGenBuffers(1, &_interfaceEBO);
+  glGenBuffers(1, &_interfaceCOL);
+  glGenBuffers(1, &_interfaceOFFSET);
+  glGenBuffers(1, &_interfaceFLAGS);
+  glGenBuffers(1, &_interfaceTEX);
+
+  glBindVertexArray(_interfaceVAO);
+
+  glBindBuffer(GL_ARRAY_BUFFER, _interfaceVBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(baseQuad), baseQuad, GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _interfaceEBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+               GL_STATIC_DRAW);
+
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
+
+  glBindBuffer(GL_ARRAY_BUFFER, _interfaceCOL);
+  glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
+
+  glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
+  glVertexAttribDivisor(1, 1);
+  glEnableVertexAttribArray(1);
+
+  glBindBuffer(GL_ARRAY_BUFFER, _interfaceOFFSET);
+  glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
+
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+  glVertexAttribDivisor(2, 1);
+  glEnableVertexAttribArray(2);
+
+  glBindBuffer(GL_ARRAY_BUFFER, _interfaceTEX);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(baseTex), baseTex, GL_STATIC_DRAW);
+
+  glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(3);
+
+  glBindBuffer(GL_ARRAY_BUFFER, _interfaceFLAGS);
+  glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
+
+  glVertexAttribIPointer(4, 1, GL_UNSIGNED_INT, sizeof(std::uint32_t),
+                         (void *)0);
+  glVertexAttribDivisor(4, 1);
+  glEnableVertexAttribArray(4);
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
 }
 
 ContainerElement *WestInterfaceFacade::findInterfaceById(std::uint8_t id) {
@@ -78,7 +133,7 @@ bool WestInterfaceFacade::destroyInterface(std::uint8_t interfaceId) {
   _logger.log(Level::Info,
               std::format("@@@ Destroying interface: {}\n", interfaceId));
   ContainerElement *elementToDelete = _interfaces.at(location);
- 
+
   if (location != count - 1) {
     _interfaces.at(location) = _interfaces.at(count - 1);
   }

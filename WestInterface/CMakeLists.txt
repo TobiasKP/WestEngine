@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 project(WestInterface VERSION 1.0)
 
+# ─────────────────────────────────────────────────────────────
+# Packages
+# ─────────────────────────────────────────────────────────────
+find_package(GLEW REQUIRED)
+find_package(glfw3 CONFIG REQUIRED)
+
 # Collect all source and header files
 file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
@@ -10,7 +16,11 @@ file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS
 # === Shared Library ===
 add_library(WestInterface SHARED ${LIB_SOURCES})
 target_include_directories(WestInterface PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(WestInterface PUBLIC WestUtils)
+target_link_libraries(WestInterface PUBLIC 
+    GLEW::GLEW
+    glfw
+    WestUtils
+)
 
 if(WIN32)
     target_compile_definitions(WestInterface PRIVATE WEST_INTERFACE_EXPORTS)

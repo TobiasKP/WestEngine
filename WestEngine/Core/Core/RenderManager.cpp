@@ -23,16 +23,7 @@ RenderManager::RenderManager(WestLogger *logger) : IManager(logger) {
 
 RenderManager::~RenderManager() {}
 
-std::int32_t RenderManager::startup() {
-  glGenVertexArrays(1, &_interfaceVAO);
-  glGenBuffers(1, &_interfaceVBO);
-  glGenBuffers(1, &_interfaceEBO);
-  glGenBuffers(1, &_interfaceCOL);
-  glGenBuffers(1, &_interfaceOFFSET);
-  glGenBuffers(1, &_interfaceFLAGS);
-  glGenBuffers(1, &_interfaceTEX);
-  return 0;
-}
+std::int32_t RenderManager::startup() { return 0; }
 
 void RenderManager::shutdown() {
 #ifdef DEBUG
@@ -48,52 +39,7 @@ std::int32_t RenderManager::init() {
   _scene = &Scene::getSceneInstance();
   _facade = &WestInterfaceFacade::getInterfaceInstance();
   assert(_scene != nullptr && _facade != nullptr);
-
-  // TODO outsource maybe even into a Model/Entity
-  glBindVertexArray(_interfaceVAO);
-
-  glBindBuffer(GL_ARRAY_BUFFER, _interfaceVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(_facade->baseQuad), _facade->baseQuad,
-               GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _interfaceEBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(_facade->indices),
-               _facade->indices, GL_STATIC_DRAW);
-
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
-  glEnableVertexAttribArray(0);
-
-  glBindBuffer(GL_ARRAY_BUFFER, _interfaceCOL);
-  glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
-
-  glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
-  glVertexAttribDivisor(1, 1);
-  glEnableVertexAttribArray(1);
-
-  glBindBuffer(GL_ARRAY_BUFFER, _interfaceOFFSET);
-  glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
-
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
-  glVertexAttribDivisor(2, 1);
-  glEnableVertexAttribArray(2);
-
-  glBindBuffer(GL_ARRAY_BUFFER, _interfaceTEX);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(_facade->baseTex), _facade->baseTex,
-               GL_STATIC_DRAW);
-
-  glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
-  glEnableVertexAttribArray(3);
-
-  glBindBuffer(GL_ARRAY_BUFFER, _interfaceFLAGS);
-  glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
-
-  glVertexAttribIPointer(4, 1, GL_UNSIGNED_INT, sizeof(std::uint32_t),
-                         (void *)0);
-  glVertexAttribDivisor(4, 1);
-  glEnableVertexAttribArray(4);
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
+  _facade->init();
 
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
@@ -183,7 +129,7 @@ void RenderManager::renderUserInterfaces() {
   std::vector<std::uint32_t> flags;
   for (ComponentData *cd : renderData) {
     instanceOffsets.insert(instanceOffsets.end(),
-                           {cd->vertices[0], cd->vertices[1]}); 
+                           {cd->vertices[0], cd->vertices[1]});
     colors.insert(colors.end(),
                   {cd->colorR, cd->colorG, cd->colorB, cd->colorA});
 
@@ -205,17 +151,17 @@ void RenderManager::renderUserInterfaces() {
   glUseProgram(Config::interfaceShaderProgram);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glBindVertexArray(_interfaceVAO);
+  glBindVertexArray(_facade->_interfaceVAO);
 
-  glBindBuffer(GL_ARRAY_BUFFER, _interfaceCOL);
+  glBindBuffer(GL_ARRAY_BUFFER, _facade->_interfaceCOL);
   glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(),
                GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ARRAY_BUFFER, _interfaceOFFSET);
+  glBindBuffer(GL_ARRAY_BUFFER, _facade->_interfaceOFFSET);
   glBufferData(GL_ARRAY_BUFFER, instanceOffsets.size() * sizeof(float),
                instanceOffsets.data(), GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ARRAY_BUFFER, _interfaceFLAGS);
+  glBindBuffer(GL_ARRAY_BUFFER, _facade->_interfaceFLAGS);
   glBufferData(GL_ARRAY_BUFFER, flags.size() * sizeof(std::uint32_t),
                flags.data(), GL_STATIC_DRAW);
 
@@ -228,7 +174,6 @@ void RenderManager::renderUserInterfaces() {
   glDisable(GL_BLEND);
   glUseProgram(_usedShaderProgram);
 
-  // Cleanup ComponentData instances
   for (ComponentData *cd : renderData) {
     delete cd;
   }
