@@ -5,7 +5,7 @@
 #include <unordered_map>
 
 #include "../Interfaces/IComponent.h"
-#include "../Utils/DataUtils/PoolAllocator.h"
+#include <PoolAllocator.h>
 
 class Entity {
 public:

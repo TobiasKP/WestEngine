@@ -2,13 +2,13 @@
 
 #include <cassert>
 #include <cstdint>
-#include <string>
 #include <format>
 #include <iostream>
+#include <string>
 
-#include "../../Constants/CoreConstants.h"
+#include "../../Constants/CoreConstants.hpp"
 #include <WestLogger.h>
-
+#include <TimeUtils.hpp>
 
 class IManager {
 
@@ -27,12 +27,17 @@ public:
   inline WestLogger *getLogger() { return this->_logger; }
 
 protected:
-  inline void logFailure(const std::string message) { _logger->writeError(message); }
-  inline void logDebug(const std::string message) { _logger->writeInfo(message); };
-  inline void logCycle(const std::string message) { _logger->writeCycleLog(message); }
+  inline void logFailure(const std::string message) {
+    _logger->log(Level::Error, message);
+  }
+  inline void logDebug(const std::string message) {
+    _logger->log(Level::Info, message);
+  };
+  inline void logCycle(const std::string message) {
+    _logger->log(Level::Cycle, message);
+  }
 
 private:
   WestLogger *_logger = nullptr;
   std::string _name = CoreConstants::UNDEFINED_STRING;
 };
-

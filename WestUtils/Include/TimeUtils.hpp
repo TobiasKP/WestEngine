@@ -1,9 +1,19 @@
 #pragma once
 
+#if defined(_WIN32) || defined(_WIN64)
+#if defined(WESTUTILS_BUILDING_DLL)
+#define WESTUTILS __declspec(dllexport)
+#else
+#define WESTUTILS __declspec(dllimport)
+#endif
+#else
+#define WESTUTILS __attribute__((visibility("default")))
+#endif
+
 #include <chrono>
 #include <string>
 
-namespace TimeUtils {
+namespace WESTUTILS TimeUtils {
 static double getCurrentTimeAsTime() {
   auto long_time = std::chrono::high_resolution_clock::now();
   auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(

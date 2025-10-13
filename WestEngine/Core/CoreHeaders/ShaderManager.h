@@ -3,6 +3,7 @@
 #include "Interfaces/IManager.h"
 
 #include <map>
+#include <WestInterfaceFacade.h>
 
 #include "Entity/Scene.h"
 #include "Systems/Umbrella.h"
@@ -23,9 +24,10 @@ public:
 private:
   std::map<std::int32_t, GLuint> _programList;
   std::int32_t _lastEntityCount;
+  WestInterfaceFacade* _facade;
   Scene *_scene;
 
-  void initInterfaceShader();
+  GLuint initInterfaceShader();
   GLuint initShader(Shader *s, Entity *entity);
   GLuint createShader(const std::string shaderFile, std::int32_t shaderTyp,
                       GLuint programId);
@@ -39,5 +41,5 @@ private:
   GLuint createFragmentShader(const std::string file, GLuint programId) {
     return createShader(file, GL_FRAGMENT_SHADER, programId);
   }
-  void addUniforms(GLuint programId, Entity *entity, std::int32_t shadergroup);
+  void addUniforms(GLuint programId, Entity *entity);
 };

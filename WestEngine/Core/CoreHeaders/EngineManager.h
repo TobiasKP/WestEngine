@@ -2,9 +2,10 @@
 
 #include "Interfaces/IManager.h"
 
+#include <Config.h>
+
 #include "DataStructure/WestQ.h"
 #include "WindowManager.h"
-#include "../../Config/Config.h"
 
 class EngineManager : public IManager {
 
@@ -41,5 +42,3 @@ private:
   std::int32_t executeCycle(CYCLE code, IManager *item);
   bool isPauseCycle(CYCLE code, IManager *item);
 };
-
-

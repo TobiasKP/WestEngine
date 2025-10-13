@@ -1,12 +1,10 @@
 #include "../CoreHeaders/WindowManager.h"
 
+#include <GLFW/glfw3.h>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/glm.hpp>
-#include <GLFW/glfw3.h>
-#include <TimeUtils.hpp>
+#include <Config.h>
 
-#include "../Config/Config.h"
-#include "../Constants/CoreConstants.h"
 #include "../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
 #include "../CoreHeaders/Utils/InputUtils/MouseCallbacks.h"
 
@@ -14,14 +12,12 @@ WindowManager::WindowManager() : IManager(nullptr) {
   setName(CoreConstants::WINDOW_MANAGER);
   _width = 0;
   _height = 0;
-  _title = CoreConstants::UNDEFINED_STRING;
 }
 
 WindowManager::WindowManager(WestLogger *logger) : IManager(logger) {
   setName(CoreConstants::WINDOW_MANAGER);
   _width = Config::GeneralConfig.WIDTH;
-  _height = Config::GeneralConfig.HEIGHT;
-  _title = CoreConstants::TITLE;
+  _height = Config::GeneralConfig.HEIGHT; 
   assert(_width > 0 && _height > 0);
 }
 
@@ -56,7 +52,7 @@ std::int32_t WindowManager::startup() {
       "{} ### primary monitor resolution: {} x {}, setting to {} x {}\n",
       getName(), mode->width, mode->height, _width, _height));
 
-  _window = glfwCreateWindow(_width, _height, _title.c_str(), NULL, NULL);
+  _window = glfwCreateWindow(_width, _height, CoreConstants::TITLE.c_str(), NULL, NULL);
 
   if (!_window) {
     logFailure("Window creation failed\n");
@@ -138,17 +134,19 @@ void WindowManager::update() {
 }
 
 void WindowManager::errorCallback(std::int32_t error, const char *message) {
-  WestLogger::getLoggerInstance().writeError(
-      std::format("$$$ {} thrown: {}", error, message));
+  WestLogger::getLoggerInstance().log(
+      Level::Error, std::format("$$$ {} thrown: {}", error, message));
 }
 
 void WindowManager::messageCallback(GLenum source, GLenum type, GLuint id,
                                     GLenum severity, GLsizei length,
                                     const GLchar *message, const void *me) {
-  WestLogger::getLoggerInstance().writeInfo(std::format(
-      "$$$ GL CALLBACK: {} type = 0x{}, severity = 0x{}, message = {}\n",
-      (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity,
-      message));
+  WestLogger::getLoggerInstance().log(
+      Level::Info,
+      std::format(
+          "$$$ GL CALLBACK: {} type = 0x{}, severity = 0x{}, message = {}\n",
+          (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity,
+          message));
 }
 
 void WindowManager::resizeWindow(GLint width, GLint height) {
@@ -157,10 +155,7 @@ void WindowManager::resizeWindow(GLint width, GLint height) {
   logDebug(std::format("{} ### Resizing window to new height: {}, {}",
                        getName(), width, height));
 #endif
-  glfwSetWindowSize(_window, width, height);
-  // TODO set Ortho
-  // Global::UserInterface::ORTHO_MATRIX =
-  //     glm::ortho(0.0f, (float)width, 0.0f, (float)height);
+  glfwSetWindowSize(_window, width, height);  
   Config::GeneralConfig.HEIGHT = height;
   Config::GeneralConfig.WIDTH = width;
 }

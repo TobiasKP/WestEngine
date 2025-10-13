@@ -1,6 +1,6 @@
 #include "../CoreHeaders/SceneManager.h"
 
-#include <TimeUtils.hpp>
+#include <filesystem>
 #include <lua.hpp>
 
 #ifdef _WIN32
@@ -17,10 +17,18 @@
 SceneManager::SceneManager()
     : IManager(nullptr) {
   setName(CoreConstants::SCENE_MANAGER);
+  _scene = nullptr;
+  _loader = nullptr;
+  L = nullptr;
+  _builder = nullptr;
 }
 
 SceneManager::SceneManager(WestLogger *logger) : IManager(logger) {
   setName(CoreConstants::SCENE_MANAGER);
+  _scene = nullptr;
+  _loader = nullptr;
+  L = nullptr;
+  _builder = nullptr;
 }
 
 SceneManager::~SceneManager() {}
@@ -33,8 +41,10 @@ std::int32_t SceneManager::startup() {
   L = luaL_newstate();
   luaL_openlibs(L);
   _builder = new EntityBuilder(L, _loader);
+  assert(_loader != nullptr && _scene != nullptr && L != nullptr &&
+         _builder != nullptr);
 #ifdef DEBUG
-  logDebug(std::format("{} ### instantiated lus state\n", getName()));
+  logDebug(std::format("{} ### instantiated Lua state\n", getName()));
 #endif
   return 0;
 }
@@ -61,6 +71,13 @@ std::int32_t SceneManager::init() {
 
   snprintf(filePath, sizeof(filePath), "%s%s", cwd,
            CoreConstants::LUA_INIT_FILE.c_str());
+  if (!std::filesystem::exists(filePath)) {
+    logFailure(std::format(
+        "{} ### Lua init file: {} - not found! Aborting Scene init ", getName(),
+        filePath));
+    return 1;
+  }
+
   luaL_dofile(L, filePath);
   lua_getglobal(L, "Init");
   lua_call(L, 0, 0);
@@ -82,7 +99,7 @@ std::int32_t SceneManager::init() {
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
   logDebug(
-      std::format("{} ### %s init time: {} ms.\n", getName(), getName(), res));
+      std::format("{} ### {} init time: {} ms.\n", getName(), getName(), res));
 #endif
 
   return 0;

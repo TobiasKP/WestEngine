@@ -1,15 +1,16 @@
 #include "../../CoreHeaders/Systems/PlayerControl.h"
 
 #include <format>
+#include <Config.h>
 
-#include "../../Config/Config.h"
 #include "../../Constants/Systems.h"
 
 PlayerControl::PlayerControl(WestLogger *logger)
     : ISystem(), _logger(logger), _cameraPending(false) {
   setName(Systems::PLAYER_CONTROL);
 #ifdef DEBUG
-  _logger->writeInfo(std::format("{} *** Initialized debug information", getName()));
+  _logger->log(Level::Info,
+               std::format("{} *** Initialized debug information", getName()));
   _debugDrawUtils = new DebugDrawUtils(_logger);
   _debugEntity = nullptr;
   _drawn = false, _camLog = true, _posLog = true;
@@ -29,9 +30,9 @@ void PlayerControl::update() {
 
 #ifdef DEBUG
     if (_camLog) {
-      _logger->writeInfo(
-          std::format("{} *** updating Camera position ({}, {}, {})\n",
-                      getName(), localCam.x, localCam.y, localCam.z));
+      _logger->log(Level::Info,
+                   std::format("{} *** updating Camera position ({}, {}, {})\n",
+                               getName(), localCam.x, localCam.y, localCam.z));
       _camLog = false;
     }
 #endif
@@ -54,8 +55,10 @@ void PlayerControl::update() {
   if (pending || !destinationReached(posComp)) {
     glm::vec3 localDest;
 #ifdef DEBUG
-    if (_debugEntity != nullptr && !_debugEntity->isDestroyed() && pending) { 
-      _logger->writeInfo(std::format("{} *** Destroying destination Debug Line\n", getName()));
+    if (_debugEntity != nullptr && !_debugEntity->isDestroyed() && pending) {
+      _logger->log(
+          Level::Info,
+          std::format("{} *** Destroying destination Debug Line\n", getName()));
       _debugEntity->destroy();
       _drawn = false;
     }
@@ -66,8 +69,10 @@ void PlayerControl::update() {
     }
 #ifdef DEBUG
     if (_posLog) {
-      glm::vec3 currentPos = posComp->position; 
-      _logger->writeInfo(std::format("{} *** Moving entity at position: ({}, {}, {}) - to "
+      glm::vec3 currentPos = posComp->position;
+      _logger->log(
+          Level::Info,
+          std::format("{} *** Moving entity at position: ({}, {}, {}) - to "
                       "position: ({}, {}, {})\n",
                       getName(), currentPos.x, currentPos.y, currentPos.z,
                       _moveToDestination.x, _moveToDestination.y,
@@ -109,8 +114,10 @@ bool PlayerControl::destinationReached(Position *posComp) {
   bool reached = glm::all(glm::epsilonEqual(
       posComp->position, _moveToDestination, Config::GeneralConfig.EPSILON));
 #ifdef DEBUG
-  if (_debugEntity != nullptr && !_debugEntity->isDestroyed() && reached) { 
-    _logger->writeInfo(std::format("{} *** Destroying destination Debug Line\n", getName()));
+  if (_debugEntity != nullptr && !_debugEntity->isDestroyed() && reached) {
+    _logger->log(
+        Level::Info,
+        std::format("{} *** Destroying destination Debug Line\n", getName()));
     _debugEntity->destroy();
     _drawn = false;
   }
@@ -151,8 +158,10 @@ void PlayerControl::updateDebuggingInfo() {
       Config::GeneralConfig.SPEED * Config::GeneralConfig.SPEED) {
     return;
   }
- 
-  _logger->writeInfo(std::format("{} *** Drawing destination Debug Line from: {}, {}, {}\n",
+
+  _logger->log(
+      Level::Info,
+      std::format("{} *** Drawing destination Debug Line from: {}, {}, {}\n",
                   getName(), posComp->position.x, posComp->position.y,
                   posComp->position.z));
 

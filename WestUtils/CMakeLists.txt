@@ -8,25 +8,16 @@ file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
   "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
 )
 
-file(GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS
-  "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp"
-) 
-
-add_library(WestUtils STATIC 
-  ${SOURCE_FILES}
-  ${HEADER_FILES}
-)
+add_library(WestUtils SHARED ${SOURCE_FILES}) 
 
 target_include_directories(WestUtils
   PUBLIC
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-    "$<INSTALL_INTERFACE:include>"
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Include>"
+    "$<INSTALL_INTERFACE:Include>"
 )
 
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory "${LIB_DEST}"
-    COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:WestUtils>" "${LIB_DEST}"
-)
+if(NOT WIN32)
+  target_compile_options(WestUtils PRIVATE -fvisibility=hidden)
+endif()
 
-
+target_compile_definitions(WestUtils PRIVATE WESTUTILS_BUILDING_DLL)

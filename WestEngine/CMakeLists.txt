@@ -14,20 +14,8 @@ find_package(Stb REQUIRED)
 
 
 # ─────────────────────────────────────────────────────────────
-# Custom static libraries 
+# Custom shared libraries 
 # ─────────────────────────────────────────────────────────────
-set(MODULES_DIR "${CMAKE_SOURCE_DIR}/Libs")
-set(WESTUTILS_ARCHIVE
-  "${MODULES_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}WestUtils${CMAKE_STATIC_LIBRARY_SUFFIX}"
-)
-
-add_library(WestUtilities STATIC IMPORTED GLOBAL)
-set_target_properties(WestUtilities PROPERTIES
-  IMPORTED_LOCATION
-    "${WESTUTILS_ARCHIVE}"
-  INTERFACE_INCLUDE_DIRECTORIES
-    "${CMAKE_SOURCE_DIR}/WestUtils/Include"
-)
 
 # ─────────────────────────────────────────────────────────────
 # Includes (shared across platforms)
@@ -44,17 +32,14 @@ include_directories(
 # Platform-specific configuration
 # ─────────────────────────────────────────────────────────────
 if (WIN32)
-    set(PLATFORM "windows")   
-    #set(WEST_INTERFACE_LIB WestInterface)
+    set(PLATFORM "windows")    
     set(OPENGL_LIB opengl32)
     add_definitions(-DGLEW_STATIC -DLUA_STATIC) 
 elseif(APPLE)
-    set(PLATFORM "mac")   
-    #set(WEST_INTERFACE_LIB WestInterface)
+    set(PLATFORM "mac")    
     set(OPENGL_LIB "-framework OpenGL -framework Cocoa -framework IOKit")
 elseif(UNIX)
-    set(PLATFORM "linux")   
-    #set(WEST_INTERFACE_LIB WestInterface)
+    set(PLATFORM "linux")    
     set(OPENGL_LIB GL)
 endif()
 
@@ -72,7 +57,8 @@ add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 target_link_libraries(${PROJECT_NAME} 
     PRIVATE
-    WestUtilities 
+    WestUtils
+    WestInterface
     GLEW::GLEW
     glfw
     ${LUA_LIBRARIES}
@@ -120,38 +106,13 @@ file(GLOB CONFIG_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Core/Game/Config/*")
 
 # General file copy post-build
 foreach(FOLDER lua assets shader engine config libs libs/STB libs/GLM)
+if(NOT EXISTS "${RESOURCE_BASE}/${FOLDER}")
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${RESOURCE_BASE}/${FOLDER}"
         COMMENT "Creating ${FOLDER} directory"
     )
-endforeach()
-
-# ─────────────────────────────────────────────────────────────
-# Post-build file copying of custom modules
-# ─────────────────────────────────────────────────────────────
-if (WIN32)
-    foreach(DLL_NAME 
-        #WestInterface.dll
-    )
-        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_CURRENT_SOURCE_DIR}/Core/Libs/*/${PLATFORM}/lib/${DLL_NAME}"
-            $<TARGET_FILE_DIR:${PROJECT_NAME}>
-            COMMENT "Copying ${DLL_NAME} to build output"
-        )
-    endforeach()
-elseif(UNIX)
-    foreach(SO_NAME     
-        #WestInterface.so
-    )
-        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_CURRENT_SOURCE_DIR}/Core/Libs/*/${PLATFORM}/lib/${SO_NAME}"
-            $<TARGET_FILE_DIR:${PROJECT_NAME}>
-            COMMENT "Copying ${SO_NAME} to build output"
-        )
-    endforeach()
 endif()
+endforeach()
 
 # ─────────────────────────────────────────────────────────────
 # Additional data copying (scripts, assets, configs, shaders)

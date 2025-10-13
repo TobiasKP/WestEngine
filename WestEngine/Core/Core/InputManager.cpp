@@ -3,7 +3,6 @@
 #include "../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
 #include "../CoreHeaders/Utils/InputUtils/MouseCallbacks.h"
 
-#include <TimeUtils.hpp>
 #include <cstring>
 #include <fcntl.h>
 #include <stdio.h>
@@ -45,7 +44,7 @@ std::int32_t InputManager::startup() {
 
   std::int32_t fd;
   snprintf(filePath, sizeof(filePath), "%s%s", cwd,
-           CoreConstants::INPUT_CONFIG_FILE_NAME.c_str());
+           CoreConstants::INPUT_CONFIG_FILE_NAME);
   if ((fd = open(filePath, O_RDONLY)) == -1) {
     logFailure(std::format("{} ### Error opening Input Config file: {}\n {}\n",
                            getName(), filePath, std::strerror(errno)));
@@ -59,7 +58,7 @@ std::int32_t InputManager::startup() {
   }
 
   snprintf(filePath, sizeof(filePath), "%s%s", cwd,
-           CoreConstants::AVAILABLE_INPUTS_FILE_NAME.c_str());
+           CoreConstants::AVAILABLE_INPUTS_FILE_NAME);
   if ((fd = open(filePath, O_RDONLY)) == -1) {
     logFailure(
         std::format("{} ### Error opening avialable Inputs file: {}\n {}\n",

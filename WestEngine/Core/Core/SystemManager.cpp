@@ -1,8 +1,7 @@
 #include "../CoreHeaders/SystemManager.h"
-#include "../Config/Config.h"
 
+#include <Config.h>
 #include <algorithm>
-#include <TimeUtils.hpp>
 
 #include "../CoreHeaders/Systems/Umbrella.h"
 
@@ -18,11 +17,12 @@ SystemManager::SystemManager(WestLogger *logger) : IManager(logger) {
 
 SystemManager::~SystemManager() {}
 
-std::int32_t SystemManager::startup() { 
+std::int32_t SystemManager::startup() {
   _systems = {new PlayerControl(getLogger())};
 
 #ifdef DEBUG
-  logDebug(std::format("{} ### Instantiated critical game systems\n", getName()));
+  logDebug(
+      std::format("{} ### Instantiated critical game systems\n", getName()));
 #endif
   return 0;
 }
@@ -52,40 +52,43 @@ std::int32_t SystemManager::init() {
 
 void SystemManager::update() {
 #ifdef DEBUG
-  std::uint8_t cycle = WestLogger::getCycleLength();
+  std::uint8_t cycle = getLogger()->getCycleLength();
   double start = TimeUtils::getCurrentTimeAsTime();
-  for (ISystem *system : _systems) {   
+  for (ISystem *system : _systems) {
     system->updateDebuggingInfo();
   }
 #endif
 
   std::vector<std::future<void>> futures;
   for (ISystem *system : _systems) {
-    futures.emplace_back(Config::EngineInternals.THREADPOOL->enqueue(
+    futures.emplace_back(Config::THREADPOOL->enqueue(
         [system, logger = getLogger()] {
           if (system == nullptr) {
-            logger->writeError(
-                "System invalid null ptr check entity file or debug\n");
+            logger->log(Level::Error,
+                        "System invalid null ptr check entity file or debug\n");
             return;
           }
           system->update();
         }));
   }
 
+#ifdef DEBUG
   std::int32_t count = futures.size();
+#endif
+
   for (auto &future : futures)
     future.wait();
 
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
-  _avgTime += res; 
+  _avgTime += res;
   if (cycle == 0) {
     logCycle(std::format(
         "{} ### EntitySystemManager run {} cycles for all "
         "entities: (number of entites) {} - average time per cycle: {} ms.\n",
         getName(), cycle, count, _avgTime / cycle));
-     _avgTime = 0;
+    _avgTime = 0;
   }
 #endif
 }

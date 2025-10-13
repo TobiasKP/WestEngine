@@ -44,6 +44,7 @@ std::vector<Entity *> Scene::getEntities() {
   return entities;
 }
 
+//TODO Sort by entity shader group
 void Scene::addEntity(Entity *entity) {
   assert(entity != nullptr);
   std::lock_guard<std::mutex> lock(_mutex);

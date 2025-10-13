@@ -9,8 +9,8 @@
 #include <unistd.h>
 #endif
 
-#include "../../../Config/Config.h"
-#include "../../../Constants/CoreConstants.h"
+#include <Config.h>
+
 #include "../../../CoreHeaders/Entity/Entity.h"
 
 DebugDrawUtils::DebugDrawUtils(WestLogger *logger) {
@@ -38,7 +38,7 @@ Entity *DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction,
   s->fragShaderFile = CoreConstants::DEBUG_F_SHADER;
   s->shadergroup = CoreConstants::DEBUG_SHADERGROUP;
 
-  Entity *e = new Entity(Config::EngineInternals.INTERNAL_ENTITY_ID++);
+  Entity *e = new Entity(Config::INTERNAL_ENTITY_ID++);
   e->addComponent(BitMasks::Components::SHADER, s);
   e->addComponent(BitMasks::Components::MODEL, m);
   e->debugEntity();

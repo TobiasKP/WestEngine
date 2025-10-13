@@ -1,6 +1,6 @@
 #include "../../../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
 
-#include "../../../Config/Config.h"
+#include <Config.h>
 
 InputManager *KeyboardCallbacks::_iManager = nullptr;
 WindowManager *KeyboardCallbacks::_wManager = nullptr;
@@ -21,17 +21,17 @@ void KeyboardCallbacks::keyboardCallback(GLFWwindow *window, int key,
   if (command.compare(CoreConstants::UNDEFINED_STRING)) {
     return;
   } else if (command.compare("Pause") == 0 && action == GLFW_PRESS) {
-    Config::EngineInternals.PAUSE = !Config::EngineInternals.PAUSE;
+    Config::PAUSE = !Config::PAUSE;
   } else if (command.compare("OpenMenu") == 0 && action == GLFW_PRESS &&
-             !Config::EngineInternals.PAUSE) {
+             !Config::PAUSE) {
     _iObserver->setGeneralFlag(BitMasks::General::MENU);
   }
 }
 
-void KeyboardCallbacks::executeBoundOperation(std::int32_t key,
-                                              const std::string boundOperation) {
+void KeyboardCallbacks::executeBoundOperation(
+    std::int32_t key, const std::string boundOperation) {
   assert(_iManager != nullptr && _wManager != nullptr && _iObserver != nullptr);
-  if (!_wManager->isKeyPressed(key) || Config::EngineInternals.PAUSE) {
+  if (!_wManager->isKeyPressed(key) || Config::PAUSE) {
     return;
   }
 

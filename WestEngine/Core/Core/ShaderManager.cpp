@@ -1,10 +1,9 @@
 #include "../CoreHeaders/ShaderManager.h"
 
-#include "../Config/Config.h"
 #include "../Constants/UniformConstants.h"
 #include "../CoreHeaders/Utils/DataUtils/UniformUtils.h"
 
-#include <TimeUtils.hpp>
+#include <Config.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,10 +20,14 @@
 ShaderManager::ShaderManager()
     : IManager(nullptr) {
   setName(CoreConstants::SHADER_MANAGER);
+  _facade = nullptr;
+  _scene = nullptr;
 }
 
 ShaderManager::ShaderManager(WestLogger *logger) : IManager(logger) {
   setName(CoreConstants::SHADER_MANAGER);
+  _facade = nullptr;
+  _scene = nullptr;
 }
 
 ShaderManager::~ShaderManager() {}
@@ -49,12 +52,17 @@ std::int32_t ShaderManager::init() {
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
 
+  _facade = &WestInterfaceFacade::getInterfaceInstance();
   _scene = &Scene::getSceneInstance();
   _scene->getCamera()->setCameraUniforms(
       UniformUtils::createUniformBufferObject(UniformConstants::CAMERA_UNIFORMS,
                                               sizeof(glm::mat4) * 2, 1));
-  // initInterfaceShader();
+  GLuint success = initInterfaceShader();
+  if (success == 1) {
+    return 1;
+  }
 
+  assert(_facade != nullptr && _scene != nullptr);
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
@@ -79,10 +87,13 @@ void ShaderManager::update() {
     GLuint programId = -1;
     if (_programList.find(s->shadergroup) != _programList.end()) {
 #ifdef DEBUG
-      logDebug(
-          std::format("{} ### Shader already created setting programId: {} "
-                      "for group: {}.\n",
-                      getName(), _programList[s->shadergroup], s->shadergroup));
+      std::uint8_t cycle = getLogger()->getCycleLength();
+      if (cycle == 0) {
+        logCycle(std::format(
+            "{} ### Shader already created setting programId: {} "
+            "for group: {}.\n",
+            getName(), _programList[s->shadergroup], s->shadergroup));
+      }
 #endif
       programId = _programList[s->shadergroup];
     } else {
@@ -92,41 +103,49 @@ void ShaderManager::update() {
     if (programId == -1) {
       logFailure(std::format("{} ### Could not create Shader for entity: {}.\n",
                              getName(), entity->getId()));
+      return;
     }
 
     s->programId = programId;
     s->initialized = true;
-    addUniforms(programId, entity, s->shadergroup);
+    addUniforms(programId, entity);
   }
 }
 
-void ShaderManager::initInterfaceShader() {
+GLuint ShaderManager::initInterfaceShader() {
   GLuint programId = glCreateProgram();
-  assert(Config::Interface.VERTEX_LOCATION != nullptr &&
-         Config::Interface.FRAG_LOCATION != nullptr);
-  GLuint vertId =
-      createVertexShader(Config::Interface.VERTEX_LOCATION, programId);
-  GLuint fragId =
-      createFragmentShader(Config::Interface.FRAG_LOCATION, programId);
-  link(programId, vertId, fragId);
-
   if (programId == -1) {
     logFailure(std::format(
         "{} ### Failed to create interface shader program.\n", getName()));
+    return 1;
   }
+  GLuint vertId = createVertexShader(
+      std::string(WestInterfaceFacade::interfaceVertexShader), programId);
+  GLuint fragId = createFragmentShader(
+      std::string(WestInterfaceFacade::interfaceFragementShader), programId);
+  if (vertId == -1 || fragId == -1) {
+    logFailure(std::format(
+        "{} ### Failed to create vertex/fragement interface shader.\n",
+        getName()));
+    return 1;
+  }
+  link(programId, vertId, fragId);
+
 #ifdef DEBUG
   logDebug(std::format("{} ### Created Shader for Interfaces. ProgramID: {}.\n",
                        getName(), programId));
 #endif
 
-  _programList[CoreConstants::TEXT_SHADERGROUP] = programId;
-  // Global::UserInterface::SHADER_PROGRAM = programId;
-  // Global::UserInterface::ORTHO_UNIFORM =
-  //     UniformUtils::createUniform(UniformConstants::ORTHO_UNIFORM,
-  //     programId);
-  // Global::UserInterface::TEXTURE_SAMPLER =
-  //     UniformUtils::createUniform(UniformConstants::TEXTURE_SAMPLER,
-  //     programId);
+  Config::interfaceShaderProgram = programId;
+  Config::interfaceOrthoUniform =
+      UniformUtils::createUniform(UniformConstants::ORTHO_UNIFORM, programId);
+  if (Config::interfaceOrthoUniform == -1) {
+    logFailure(std::format("{} ### Failed to create ortho matrix uniform for "
+                           "interface shader program.\n",
+                           getName()));
+    return 1;
+  }
+  return 0;
 }
 
 GLuint ShaderManager::initShader(Shader *s, Entity *entity) {
@@ -161,8 +180,7 @@ GLuint ShaderManager::initShader(Shader *s, Entity *entity) {
 }
 
 // TODO make switch case
-void ShaderManager::addUniforms(GLuint programId, Entity *entity,
-                                std::int32_t shadergroup) {
+void ShaderManager::addUniforms(GLuint programId, Entity *entity) {
   Model *m = (Model *)entity->getComponent(BitMasks::Components::MODEL);
   if (m != nullptr && m->texture != nullptr)
     m->texture->uniform = UniformUtils::createUniform(
@@ -198,7 +216,7 @@ GLuint ShaderManager::createShader(const std::string shaderFile,
   const GLchar *source = readShaderSource(shaderFile);
   if (source == NULL) {
     logFailure("Failed to read shader source from file\n");
-    return 0;
+    return -1;
   }
   GLchar errorLog[2048] = {};
   GLint size = 0, status = 0;
@@ -210,7 +228,7 @@ GLuint ShaderManager::createShader(const std::string shaderFile,
     glGetShaderInfoLog(shaderId, 2048, &size, errorLog);
     logFailure(std::format("Error compiling shader. Type: {}, Info: {}\n",
                            shaderType, errorLog));
-    return 0;
+    return -1;
   }
 
   glAttachShader(programId, shaderId);

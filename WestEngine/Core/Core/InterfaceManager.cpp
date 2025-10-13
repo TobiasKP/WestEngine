@@ -1,51 +1,77 @@
 #include "../CoreHeaders/InterfaceManager.h"
 
-#include "../Config/Config.h"
-//#include "UserInterface.h"
-
-// std::vector<IUserInterface *> InterfaceManager::_interfaces;
-
 InterfaceManager::InterfaceManager() : IManager(nullptr) {
   setName(CoreConstants::INTERFACE_MANAGER);
+  _facade = nullptr;
 };
 
 InterfaceManager::InterfaceManager(WestLogger *logger) : IManager(logger) {
   setName(CoreConstants::INTERFACE_MANAGER);
+  _facade = nullptr;
 };
 
-InterfaceManager::~InterfaceManager() {
-  // for (IUserInterface *interface : _interfaces) {
-  //  interface->~IUserInterface();
-  // }
-}
+InterfaceManager::~InterfaceManager() {}
 
 std::int32_t InterfaceManager::startup() {
-  //Config::Interface.BITMAP_LOCATION = UserInterface::getBitmap();
-  //Config::Interface.VERTEX_LOCATION = UserInterface::getVertexShader();
-  //Config::Interface.FRAG_LOCATION = UserInterface::getFragmentShader();
-  // _interfaces.reserve(8);
+  _facade = &WestInterfaceFacade::getInterfaceInstance();
+  assert(_facade != nullptr);
   return 0;
 }
 
-void InterfaceManager::shutdown() {
-  // for (IUserInterface *interface : _interfaces) {
-  //   interface->~IUserInterface();
-  // }
-}
+void InterfaceManager::shutdown() { _facade->shutdown(); }
 
 std::int32_t InterfaceManager::init() {
-  // assert(Global::UserInterface::SHADER_PROGRAM != -1 &&
-  //       Global::UserInterface::ORTHO_UNIFORM != -1 &&
-  //      Global::UserInterface::TEXTURE_SAMPLER != -1);
-  createMainMenu();
-  return 0;
+#ifdef DEBUG
+  double start = TimeUtils::getCurrentTimeAsTime();
+#endif
+
+  std::int32_t result = 0;
+
+#ifdef DEBUG
+  result = buildTechDemoFooter();
+  double end = TimeUtils::getCurrentTimeAsTime();
+  double res = TimeUtils::getDuration(start, end);
+  logDebug(
+      std::format("{} ### {} init time: {} ms.\n", getName(), getName(), res));
+#endif
+  return result;
 }
 
-void InterfaceManager::update() {}
+void InterfaceManager::update() { _facade->updateRenderData(); }
 
-void InterfaceManager::createMainMenu() {
-  /* MainMenu *mainMenu = new MainMenu();
-   mainMenu->addExitButton();
-   mainMenu->toggleVisible();
-   addInterface(mainMenu);*/
+#ifdef DEBUG
+
+std::int32_t InterfaceManager::buildTechDemoFooter() {
+  assert(_facade != nullptr);
+  std::vector<ElementProxy *> elements;
+
+  ElementProxy *redQuad = new ElementProxy();
+  redQuad->type = DEBUG_ELEMENT;
+  redQuad->elementId = 1;
+  redQuad->colorR = 1.0f;
+  redQuad->colorG = 0.0f;
+  redQuad->colorB = 0.0f;
+  redQuad->colorA = 1.0f;
+  redQuad->xPosition = 0.0f;
+  redQuad->yPosition = 0.0f;
+  redQuad->scale = 1.0f; 
+  redQuad->row = 0;
+  redQuad->column = 0; 
+
+  elements.push_back(redQuad);
+  assert(elements.size() > 0);
+
+  logDebug(
+      std::format("{} ### Creating Tech Demo interface footer\n", getName()));
+  std::uint8_t footerId =
+      _facade->createNewInterface(0.0f, 0.0f, 1.0f, 2, 1, false, elements);
+  logDebug(std::format("{} ### Created Tech Demo footer -> {}\n", getName(),
+                       footerId));
+  delete redQuad;
+  if (footerId >= 1)
+    return 0;
+  else
+    return 1;
 }
+
+#endif

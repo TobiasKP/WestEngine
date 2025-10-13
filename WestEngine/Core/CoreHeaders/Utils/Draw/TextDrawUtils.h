@@ -1,3 +1,5 @@
+//TODO REMOVE -> to interface
+
 #pragma once
 
 #include <GL/glew.h>

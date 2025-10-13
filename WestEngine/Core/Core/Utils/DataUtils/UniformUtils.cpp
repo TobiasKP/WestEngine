@@ -12,7 +12,7 @@ GLuint UniformUtils::createUniform(const char *name, GLuint programId) {
     char err[128] = "Could not create Uniform: ";
     strcat(err, name);
     strcat(err, "\n");
-    WestLogger::getLoggerInstance().writeError(err);
+    WestLogger::getLoggerInstance().log(Level::Error, err);
   }
   return location;
 }
