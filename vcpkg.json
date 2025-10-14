@@ -6,7 +6,6 @@
     "glfw3",
     "lua",
     "glm",
-    "assimp",
     "stb"
   ]
 }

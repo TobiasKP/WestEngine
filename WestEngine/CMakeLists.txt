@@ -9,7 +9,6 @@ find_package(GLEW REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(Lua REQUIRED)
 find_package(glm CONFIG REQUIRED)
-find_package(assimp CONFIG REQUIRED)
 find_package(Stb REQUIRED)
 
 
@@ -62,8 +61,7 @@ target_link_libraries(${PROJECT_NAME}
     GLEW::GLEW
     glfw
     ${LUA_LIBRARIES}
-    glm::glm
-    assimp::assimp 
+    glm::glm 
     ${OPENGL_LIB}
     #${WEST_INTERFACE_LIB} 
 )
