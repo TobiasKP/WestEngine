@@ -150,25 +150,49 @@ Model *ObjectLoader::loadOBJModel(FILE *file) {
   }
 
   fclose(file);
+  float *textureArray = nullptr;
+  if (mappedTextures.empty() && !vertices.empty()) {
+    mappedTextures = generatePlanarUV(vertices);
+    textureArray = mappedTextures.data();
+  } else {
+    textureArray = mappedTextures.data();
+  }
+  assert(textureArray != nullptr);
 
   float *vertexArray = vertices.empty() ? nullptr : vertices.data();
   std::int32_t *indexArray = indices.empty() ? nullptr : indices.data();
-  float *textureArray =
-      mappedTextures.empty() ? nullptr : mappedTextures.data();
   float *normalArray = mappedNormals.empty() ? nullptr : mappedNormals.data();
+
   return loadModel(vertexArray, vertices.size() * sizeof(float), indexArray,
                    indices.size() * sizeof(std::int32_t), textureArray,
-                   textures.size() * sizeof(float), normalArray,
+                   mappedTextures.size() * sizeof(float), normalArray,
                    normals.size() * sizeof(float));
 }
 
 GLuint ObjectLoader::loadTexture(const char *textureFile) {
   assert(_logger != nullptr);
   std::int32_t width, height, numComponents;
+
+  char cwd[128];
+  char filePath[PATH_MAX];
+  if (getcwd(cwd, sizeof(cwd)) == NULL) {
+    _logger->log(Level::Error, "---Error getting current working directory!\n");
+    return -1;
+  }
+
+  snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", textureFile);
+#ifdef DEBUG
+  _logger->log(Level::Info, std::format("---Loading Texture: {}\n", filePath));
+#endif
   unsigned char *imgData =
-      stbi_load(textureFile, &width, &height, &numComponents, 0);
-  if (!imgData)
-    _logger->log(Level::Error, "---No Imagedata loaded for texture.");
+      stbi_load(filePath, &width, &height, &numComponents, 0);
+  if (imgData == NULL) {
+    _logger->log(
+        Level::Error,
+        std::format("---No Imagedata loaded for texture: {} - STBI Error: {}\n",
+                    filePath, stbi_failure_reason()));
+    return -1;
+  }
 
   GLuint id;
   glGenTextures(1, &id);
@@ -180,6 +204,9 @@ GLuint ObjectLoader::loadTexture(const char *textureFile) {
   glGenerateMipmap(GL_TEXTURE_2D);
   stbi_image_free(imgData);
 
+#ifdef DEBUG
+  _logger->log(Level::Info, "---Loaded Texture, stored Data for Model\n");
+#endif
   return id;
 }
 
@@ -254,6 +281,43 @@ void ObjectLoader::unloadModel(Model *model) {
   _logger->log(Level::Info,
                "--- Deleted Vertex Array, Buffer and Textures from gl\n");
 #endif
+}
+
+std::vector<float>
+ObjectLoader::generatePlanarUV(const std::vector<float> &vertices) {
+  std::vector<float> uvs;
+  float minX = vertices[0], maxX = vertices[0];
+  float minZ = vertices[2], maxZ = vertices[2];
+
+  for (size_t i = 0; i < vertices.size(); i += 3) {
+    float x = vertices[i];
+    float z = vertices[i + 2];
+
+    minX = std::min(minX, x);
+    maxX = std::max(maxX, x);
+    minZ = std::min(minZ, z);
+    maxZ = std::max(maxZ, z);
+  }
+
+  float rangeX = maxX - minX;
+  float rangeZ = maxZ - minZ;
+
+  for (size_t i = 0; i < vertices.size(); i += 3) {
+    float x = vertices[i];
+    float z = vertices[i + 2];
+
+    float u = (rangeX > 0) ? (x - minX) / rangeX : 0.5f;
+    float v = (rangeZ > 0) ? (z - minZ) / rangeZ : 0.5f;
+
+    uvs.push_back(u);
+    uvs.push_back(v);
+  }
+
+  _logger->log(
+      Level::Info,
+      "--- No UV specified for given object, creating default ones.\n");
+
+  return uvs;
 }
 
 void ObjectLoader::cleanup() {

@@ -148,7 +148,7 @@ void EntityBuilder::shaderInfo(Entity *e) {
 #ifdef DEBUG
   WestLogger::getLoggerInstance().log(
       Level::Info,
-      std::format("Loading Shader:\n\t{}\n\t{}", vertexPath, fragmentPath));
+      std::format("Loading Shader:\n\t{}\n\t{}\n", vertexPath, fragmentPath));
 #endif
 
   Shader *s = loadShader(strdup(vertexPath), strdup(fragmentPath), group);
