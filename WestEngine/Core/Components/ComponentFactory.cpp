@@ -1,6 +1,6 @@
 #include "../../CoreHeaders/Components/ComponentFactory.h"
 
-#include "../../Constants/Components.h"
+#include "../../Constants/Components.hpp"
 #include "../../CoreHeaders/Components/Umbrella.h"
 
 void ComponentFactory::createComponent(

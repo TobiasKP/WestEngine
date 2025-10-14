@@ -3,7 +3,7 @@
 #include <format>
 #include <Config.h>
 
-#include "../../Constants/Systems.h"
+#include "../../Constants/Systems.hpp"
 
 PlayerControl::PlayerControl(WestLogger *logger)
     : ISystem(), _logger(logger), _cameraPending(false) {

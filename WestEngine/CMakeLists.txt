@@ -24,8 +24,8 @@ message(STATUS "Including headers ...")
 include_directories(
     ${LUA_INCLUDE_DIR}
     ${Stb_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/CoreHeaders   
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Libs/WEST_INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/CoreHeaders
+    ${CMAKE_CURRENT_SOURCE_DIR}/Libs/WEST_INTERFACE
 )
 
 # ─────────────────────────────────────────────────────────────
@@ -47,11 +47,11 @@ endif()
 # Link Directories and Targets
 # ─────────────────────────────────────────────────────────────
 message(STATUS "Linking libraries for platform: ${PLATFORM}")
-link_directories(   
-    #${CMAKE_SOURCE_DIR}/Core/Libs/WEST_INTERFACE/${PLATFORM}/lib
+link_directories(
+    #${CMAKE_SOURCE_DIR}/Libs/WEST_INTERFACE/${PLATFORM}/lib
 )
 
-file(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/Core/*.cpp)
+file(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
@@ -102,7 +102,7 @@ add_custom_target(copy_compile_commands ALL
 set(RESOURCE_BASE "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
 set(ENGINE_DIR "${RESOURCE_BASE}/engine")
 
-file(GLOB CONFIG_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Core/Game/Config/*")
+file(GLOB CONFIG_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Game/Config/*")
 
 # General file copy post-build
 foreach(FOLDER lua assets shader engine config libs libs/STB libs/GLM)
@@ -119,19 +119,19 @@ endforeach()
 # ─────────────────────────────────────────────────────────────
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/Core/Constants/AvailableInputCommands.cfg" "${ENGINE_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/Constants/AvailableInputCommands.cfg" "${ENGINE_DIR}"
 )
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Core/Game/Scripts" "${RESOURCE_BASE}/lua"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Game/Scripts" "${RESOURCE_BASE}/lua"
 )
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Core/Game/Assets" "${RESOURCE_BASE}/assets"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Game/Assets" "${RESOURCE_BASE}/assets"
 )
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Core/Shader" "${RESOURCE_BASE}/shader"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Shader" "${RESOURCE_BASE}/shader"
 )
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

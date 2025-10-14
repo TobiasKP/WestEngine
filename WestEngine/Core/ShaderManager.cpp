@@ -1,6 +1,6 @@
 #include "../CoreHeaders/ShaderManager.h"
 
-#include "../Constants/UniformConstants.h"
+#include "../Constants/UniformConstants.hpp"
 #include "../CoreHeaders/Utils/DataUtils/UniformUtils.h"
 
 #include <Config.h>
