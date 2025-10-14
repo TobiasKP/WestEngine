@@ -1,7 +1,7 @@
 #include "../../CoreHeaders/Entity/EntityBuilder.h"
 
-#include "../../Constants/Components.h"
-#include "../../Constants/Systems.h"
+#include "../../Constants/Components.hpp"
+#include "../../Constants/Systems.hpp"
 #include "../../CoreHeaders/Entity/Scene.h"
 
 #include <format>

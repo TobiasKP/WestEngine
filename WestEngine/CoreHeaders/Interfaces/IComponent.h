@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 #include <cassert>
 
-#include "../../Constants/BitMasks.h"
+#include "../../Constants/BitMasks.hpp"
 
 struct IComponent {
  const std::uint16_t _guid = 0;

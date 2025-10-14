@@ -1,8 +1,7 @@
 #include "../../../CoreHeaders/Utils/InputUtils/InputObserver.h"
 
-#include "../../../Constants/Systems.h"
+#include "../../../Constants/Systems.hpp"
 #include "../../../CoreHeaders/SystemManager.h"
-
 
 InputObserver::InputObserver() {
   _control =
@@ -22,8 +21,7 @@ void InputObserver::notify() {
   {
     std::lock_guard<std::mutex> lock(_controlMutex);
     if (static_cast<bool>(_controlFlags & BitMasks::Control::CAMERA_MOVING)) {
-      _control->setCameraMovement(
-          glm::vec3(_x, _y, 0));
+      _control->setCameraMovement(glm::vec3(_x, _y, 0));
       _x = 0;
       _y = 0;
     }

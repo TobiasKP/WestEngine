@@ -12,6 +12,5 @@ namespace Components {
 constexpr std::uint16_t MODEL{0b0000'0000'0000'0001};
 constexpr std::uint16_t SHADER{0b0000'0000'0000'0010};
 constexpr std::uint16_t POSITION{0b0000'0000'0000'0100};
-constexpr std::uint16_t TEXT{0b0000'0000'0000'1000};
 } // namespace Components
 }; // namespace BitMasks
