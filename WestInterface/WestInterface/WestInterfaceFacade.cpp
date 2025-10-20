@@ -13,6 +13,7 @@ WestInterfaceFacade::WestInterfaceFacade() {
   count = 0;
   _renderManager = new UIRenderManager();
   _builder = new InterfaceBuilder();
+  _textManager = new TextRenderManager();
   for (std::uint8_t i = 0; i < 32; i++) {
     _interfaces.at(i) = nullptr;
   }
@@ -26,6 +27,7 @@ void WestInterfaceFacade::shutdown() {
     count--;
   }
   delete _builder;
+  delete _textManager;
 }
 
 void WestInterfaceFacade::init() {
@@ -79,6 +81,8 @@ void WestInterfaceFacade::init() {
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
+
+  _textManager->initializeFontAtlas();
 }
 
 ContainerElement *WestInterfaceFacade::findInterfaceById(std::uint8_t id) {
@@ -96,7 +100,7 @@ ContainerElement *WestInterfaceFacade::findInterfaceById(std::uint8_t id) {
 
 std::uint8_t WestInterfaceFacade::createNewInterface(
     std::uint16_t xScreenPosition, std::uint16_t yScreenPosition, float scale,
-    std::uint8_t rows, std::uint8_t columns, bool hiddenContainer,
+    std::uint16_t rows, std::uint16_t columns, bool hiddenContainer,
     std::vector<ElementProxy *> elements) {
 #ifdef DEBUG
   _logger.log(Level::Info, "@@@ Creating new Interface\n");

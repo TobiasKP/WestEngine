@@ -101,6 +101,8 @@ struct ContainerElement : public IElement {
         std::format("@@@ Adding element: {} to children of interface: {}\n",
                     e->id, this->id));
 #endif
+    e->dataPool = dataPool;
+    assert(e->dataPool != nullptr);
 
     children.push_back(e);
   };
@@ -130,7 +132,7 @@ struct ContainerElement : public IElement {
   void describeMyself(ComponentData *cd, std::uint8_t row,
                       std::uint8_t column) {
     cd->vertices[0] = xLL + (SIZE_E * row);
-    cd->vertices[1] = yLL + (SIZE_E * column); 
+    cd->vertices[1] = yLL + (SIZE_E * column);
     cd->flags = flags;
   }
 

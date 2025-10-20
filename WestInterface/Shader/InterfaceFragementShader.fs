@@ -10,7 +10,7 @@ out vec4 fragColor;
 
 void main() {
     if ((vFlags & 0x01u) != 0u) {
-        float borderWidth = 0.01;
+        float borderWidth = 0.1;
         float maxX = 1.0 - borderWidth;
         float minX = borderWidth;
         float maxY = 1.0 - borderWidth;

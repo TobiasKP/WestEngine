@@ -12,7 +12,7 @@
 
 #include <cstdint>
 // #include <functional>
-// #include <string>
+#include <string>
 
 enum ElementType { LABEL, BUTTON, CONTAINER, ICON, DEBUG_ELEMENT };
 
@@ -37,10 +37,11 @@ struct WEST_INTERFACE ElementProxy {
   std::uint8_t row;
   std::uint8_t column;
 
+  std::string text = "";
   /*
     std::string value;
 
-    std::string text;
+
     std::uint32_t textureId;
 
     std::uint32_t iconId;

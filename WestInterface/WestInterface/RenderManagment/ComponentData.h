@@ -13,11 +13,9 @@
 #endif
 
 struct WEST_INTERFACE ComponentData {
-  std::uint32_t flags; 
+  std::uint32_t flags;
   float vertices[2];
-
-  // float uvTopLeft;
-  // float uvBottomRight;
+  float textureCoords[8];
 
   float colorR;
   float colorG;
@@ -27,7 +25,7 @@ struct WEST_INTERFACE ComponentData {
 
 /*****************************************
  * FLAG DESCRIPTION
- * 0x01 = Border and no filling
+ * 0x01 = Border and no filling pixels -> discarded
  *
  *
  *

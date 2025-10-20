@@ -16,4 +16,6 @@ private:
   void registerElementEvent(IElement *e);
   void registerElementValue(IElement *e);
   void fillBasicInfos(ElementProxy *ep, IElement *el);
+  void fillText(ElementProxy *ep, IElement *el);
+  std::vector<float> getTextureCoordinatesForChar(char character);  
 };

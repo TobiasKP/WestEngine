@@ -16,7 +16,7 @@ public:
 
   void createNewInterface(std::uint16_t xScreenPosition,
                           std::uint16_t yScreenPosition, float scale,
-                          std::uint8_t rows, std::uint8_t columns,
+                          std::uint16_t rows, std::uint16_t columns,
                           bool hiddenContainer);
   void addElement(ElementProxy *e);
   ContainerElement *build();
@@ -25,5 +25,6 @@ public:
 private:
   ContainerElement *_current = nullptr;
   ElementFactory *_factory = nullptr;
+  ComponentDataPool *_dataPool = nullptr;
   WestLogger &_logger = WestLogger::getLoggerInstance();
 };

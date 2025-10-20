@@ -1,6 +1,9 @@
 #include "InterfaceBuilder.h"
 
-InterfaceBuilder::InterfaceBuilder() { _factory = new ElementFactory(); }
+InterfaceBuilder::InterfaceBuilder() {
+  _factory = new ElementFactory();
+  _dataPool = new ComponentDataPool();
+}
 
 InterfaceBuilder::~InterfaceBuilder() {
   if (_current != nullptr) {
@@ -14,17 +17,19 @@ InterfaceBuilder::~InterfaceBuilder() {
 
 void InterfaceBuilder::createNewInterface(std::uint16_t xScreenPosition,
                                           std::uint16_t yScreenPosition,
-                                          float scale, std::uint8_t rows,
-                                          std::uint8_t columns,
+                                          float scale, std::uint16_t rows,
+                                          std::uint16_t columns,
                                           bool hiddenContainer) {
-
+  
   _current = new ContainerElement();
+  _current->poolPosition = _dataPool->reserveNew(rows * columns);
   _current->scale = scale;
   _current->xLL = xScreenPosition;
   _current->yLL = yScreenPosition;
   _current->rowElements = rows;
   _current->columnElements = columns;
   _current->id = CURRENT_ID;
+  _current->dataPool = _dataPool;
   if (hiddenContainer) {
     _current->flags = 0x08;
   }

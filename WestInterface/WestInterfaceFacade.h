@@ -17,6 +17,7 @@
 #include "WestInterface/Observer/ValueObserver.h"
 #include "WestInterface/RenderManagment/ComponentData.h"
 #include "WestInterface/RenderManagment/UIRenderManager.h"
+#include "WestInterface/RenderManagment/TextRenderManager.h"
 
 #include <WestLogger.h>
 #include <array>
@@ -35,7 +36,7 @@ public:
   // Managing Interfaces
   std::uint8_t createNewInterface(std::uint16_t xScreenPosition,
                                   std::uint16_t yScreenPosition, float scale,
-                                  std::uint8_t rows, std::uint8_t columns,
+                                  std::uint16_t rows, std::uint16_t columns,
                                   bool hiddenContainer,
                                   std::vector<ElementProxy *> elements);
   bool destroyInterface(std::uint8_t interfaceId);
@@ -88,7 +89,8 @@ private:
   ValueObserver *_valueObserver;
   EventObserver *_eventObserver;
   InterfaceBuilder *_builder;
-  UIRenderManager *_renderManager;
+  UIRenderManager *_renderManager; 
+  TextRenderManager *_textManager;
   WestLogger &_logger = WestLogger::getLoggerInstance();
 
   ContainerElement *findInterfaceById(std::uint8_t id);

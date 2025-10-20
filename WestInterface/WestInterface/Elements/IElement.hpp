@@ -4,15 +4,20 @@
 #include <cstdint>
 
 #include "../RenderManagment/ComponentData.h"
+#include "../RenderManagment/ComponentDataPool.h"
 
-static constexpr std::uint8_t SIZE_E = 100;
-static constexpr std::uint16_t multElements = 0x01;
+static constexpr std::uint8_t SIZE_E = 10;
 
 // For Textrendering form Bitmap in Resources.
-struct Text {};
+struct Text {
+  std::string plaintext;
+  std::vector<float> coordinates;
+};
 
 struct IElement {
-  ~IElement() = default;
+  IElement() { text = nullptr; }
+  ~IElement() {}
+
   // Public identifier
   std::uint32_t id;
 
@@ -36,21 +41,32 @@ struct IElement {
   std::uint64_t flags;
 
   // Number of quads being next to each other
-  std::uint8_t rowElements = 0;
-  std::uint8_t columnElements = 0;
+  std::uint16_t rowElements = 0;
+  std::uint16_t columnElements = 0;
+
+  std::unique_ptr<Text> text;
+
+  bool changed = true;
+  std::uint32_t poolPosition = 0;
+  ComponentDataPool *dataPool = nullptr;
 
   virtual void handler() {};
 
   ComponentData *describe(std::uint8_t row = 0, std::uint8_t column = 0) {
-    //TODO Consider Pooling Component Data to avoid so many allocations
-    ComponentData *cd = new ComponentData();
-    describeMyself(cd, row, column);
-    return cd;
+    ComponentData *data =
+        dataPool->getDataAtLocation(poolPosition + row + column);
+    if (!changed)
+      return data;
+
+    describeMyself(data, row, column);
+    changed = false;
+    return data;
   };
 
 protected:
   WestLogger &_logger = WestLogger::getLoggerInstance();
 
 private:
-  virtual void describeMyself(ComponentData *cd, std::uint8_t row = 0, std::uint8_t column = 0) {};
+  virtual void describeMyself(ComponentData *cd, std::uint8_t row = 0,
+                              std::uint8_t column = 0) {};
 };
