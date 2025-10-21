@@ -114,8 +114,6 @@ void RenderManager::renderGameEntities() {
 
 void RenderManager::renderUserInterfaces() {
   assert(Config::interfaceShaderProgram != -1);
-
-  // TODO calculate hash -> if no changes no need to rerender?
   std::vector<ComponentData *> renderData = _facade->getRenderData();
   if (renderData.size() == 0) {
     logFailure(std::format(
@@ -148,6 +146,7 @@ void RenderManager::renderUserInterfaces() {
   if (cycle == 0)
     logCycle(std::format("{} ### Rendering Interfaces ...\n", getName()));
 #endif
+
   glUseProgram(Config::interfaceShaderProgram);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -173,10 +172,6 @@ void RenderManager::renderUserInterfaces() {
                           renderData.size());
   glDisable(GL_BLEND);
   glUseProgram(_usedShaderProgram);
-
-  for (ComponentData *cd : renderData) {
-    delete cd;
-  }
 }
 
 void RenderManager::updateUniforms(Entity *e, Model *model) {

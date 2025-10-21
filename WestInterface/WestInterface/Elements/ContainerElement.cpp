@@ -18,11 +18,17 @@ struct ContainerElement : public IElement {
         Level::Info,
         std::format("@@@ Deleting all children for interface: ", this->id));
 #endif
+    assert(dataPool != nullptr);
     for (IElement *e : children) {
       assert(e != nullptr);
+      if (rowElements > 0 && columnElements > 0)
+        dataPool->deleteRange(e->poolPosition,
+                              e->poolPosition +
+                                  e->rowElements * e->columnElements - 1);
       delete e;
     }
-    children.clear();
+    dataPool->deleteRange(poolPosition,
+                          poolPosition + rowElements * columnElements - 1);
   }
 
   bool deleteChildById(std::uint32_t d_id) {
@@ -44,8 +50,17 @@ struct ContainerElement : public IElement {
                             this->id));
 #endif
     IElement *elementToDelete = *result;
+    assert(dataPool != nullptr);
+    if (elementToDelete->rowElements > 0 &&
+        elementToDelete->columnElements > 0) {
+      dataPool->deleteRange(elementToDelete->poolPosition,
+                            elementToDelete->poolPosition +
+                                elementToDelete->rowElements *
+                                    elementToDelete->columnElements -
+                                1);
+    }
+
     children.erase(result);
-    delete elementToDelete;
     return true;
   }
 
@@ -117,6 +132,7 @@ struct ContainerElement : public IElement {
           result.push_back(element->describe(i, j));
         }
       }
+      element->changed = false;
     }
 
     assert(rowElements > 0 && columnElements > 0);
@@ -125,6 +141,7 @@ struct ContainerElement : public IElement {
         result.push_back(describe(i, j));
       }
     }
+    changed = false;
 
     return result;
   }
@@ -134,6 +151,19 @@ struct ContainerElement : public IElement {
     cd->vertices[0] = xLL + (SIZE_E * row);
     cd->vertices[1] = yLL + (SIZE_E * column);
     cd->flags = flags;
+  }
+
+  void updatePositions(std::uint32_t oldPos, std::uint32_t newPos) {
+    if (poolPosition == oldPos) {
+      poolPosition = newPos;
+      return;
+    }
+    for (IElement *child : children) {
+      if (child->poolPosition == oldPos) {
+        child->poolPosition = newPos;
+        return;
+      }
+    }
   }
 
   void handler() {}

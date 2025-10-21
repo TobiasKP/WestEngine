@@ -16,7 +16,7 @@ struct Text {
 
 struct IElement {
   IElement() { text = nullptr; }
-  ~IElement() {}
+  ~IElement() {};
 
   // Public identifier
   std::uint32_t id;
@@ -55,11 +55,11 @@ struct IElement {
   ComponentData *describe(std::uint8_t row = 0, std::uint8_t column = 0) {
     ComponentData *data =
         dataPool->getDataAtLocation(poolPosition + row + column);
+
     if (!changed)
       return data;
 
-    describeMyself(data, row, column);
-    changed = false;
+    describeMyself(data, row, column); 
     return data;
   };
 
