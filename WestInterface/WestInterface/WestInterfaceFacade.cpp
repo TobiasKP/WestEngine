@@ -1,6 +1,7 @@
 #include "../WestInterfaceFacade.h"
 
 #include <GLFW/glfw3.h>
+#include <stb_image.h>
 
 #include <format>
 
@@ -38,6 +39,8 @@ void WestInterfaceFacade::init() {
   glGenBuffers(1, &_interfaceOFFSET);
   glGenBuffers(1, &_interfaceFLAGS);
   glGenBuffers(1, &_interfaceTEX);
+  glGenBuffers(1, &_interfaceUV);
+  glGenTextures(1, &_interfaceTEXTURE_ID);
 
   glBindVertexArray(_interfaceVAO);
 
@@ -61,7 +64,7 @@ void WestInterfaceFacade::init() {
   glBindBuffer(GL_ARRAY_BUFFER, _interfaceOFFSET);
   glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
 
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
   glVertexAttribDivisor(2, 1);
   glEnableVertexAttribArray(2);
 
@@ -71,16 +74,49 @@ void WestInterfaceFacade::init() {
   glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(3);
 
-  glBindBuffer(GL_ARRAY_BUFFER, _interfaceFLAGS);
+  glBindBuffer(GL_ARRAY_BUFFER, _interfaceUV);
   glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
 
-  glVertexAttribIPointer(4, 1, GL_UNSIGNED_INT, sizeof(std::uint32_t),
-                         (void *)0);
+  glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
   glVertexAttribDivisor(4, 1);
   glEnableVertexAttribArray(4);
 
+  glBindBuffer(GL_ARRAY_BUFFER, _interfaceFLAGS);
+  glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
+
+  glVertexAttribIPointer(5, 1, GL_UNSIGNED_INT, sizeof(std::uint32_t),
+                         (void *)0);
+  glVertexAttribDivisor(5, 1);
+  glEnableVertexAttribArray(5);
+
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
+
+  std::int32_t width, height, numComponents;
+  const char *textureFile = "/assets/Textures/font.bmp";
+  char cwd[128];
+  char filePath[PATH_MAX];
+  if (getcwd(cwd, sizeof(cwd)) == NULL) {
+    _logger.log(Level::Error, "---Error getting current working directory!\n");
+  }
+
+  snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", textureFile);
+
+  unsigned char *imgData =
+      stbi_load(filePath, &width, &height, &numComponents, 0);
+  if (imgData == NULL) {
+    _logger.log(
+        Level::Error,
+        std::format("---No Imagedata loaded for texture: {} - STBI Error: {}\n",
+                    filePath, stbi_failure_reason()));
+  }
+
+  glBindTexture(GL_TEXTURE_2D, _interfaceTEXTURE_ID);
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+               GL_UNSIGNED_BYTE, imgData);
+  glGenerateMipmap(GL_TEXTURE_2D);
+  stbi_image_free(imgData);
 
   _textManager->initializeFontAtlas();
 }
@@ -99,15 +135,15 @@ ContainerElement *WestInterfaceFacade::findInterfaceById(std::uint8_t id) {
 }
 
 std::uint8_t WestInterfaceFacade::createNewInterface(
-    std::uint16_t xScreenPosition, std::uint16_t yScreenPosition, float scale,
-    std::uint16_t rows, std::uint16_t columns, bool hiddenContainer,
-    std::vector<ElementProxy *> elements) {
+    std::uint16_t xScreenPosition, std::uint16_t yScreenPosition,
+    float stretchX, float stretchY, std::uint16_t rows, std::uint16_t columns,
+    bool hiddenContainer, std::vector<ElementProxy *> elements) {
 #ifdef DEBUG
   _logger.log(Level::Info, "@@@ Creating new Interface\n");
 #endif
 
-  _builder->createNewInterface(xScreenPosition, yScreenPosition, scale, rows,
-                               columns, hiddenContainer);
+  _builder->createNewInterface(xScreenPosition, yScreenPosition, stretchX,
+                               stretchY, rows, columns, hiddenContainer);
   for (auto *element : elements) {
 #ifdef DEBUG
     _logger.log(Level::Cycle,

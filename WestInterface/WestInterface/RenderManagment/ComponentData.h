@@ -15,7 +15,9 @@
 struct WEST_INTERFACE ComponentData {
   std::uint32_t flags;
   float vertices[2];
-  float textureCoords[8];
+  float textureCoords[4] = {0.0f, 0.0f, 1.0f, 1.0f};
+  float stretchX;
+  float stretchY;
 
   float colorR;
   float colorG;

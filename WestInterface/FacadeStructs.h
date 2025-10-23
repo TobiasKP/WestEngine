@@ -30,7 +30,8 @@ struct WEST_INTERFACE ElementProxy {
 
   float xPosition;
   float yPosition;
-  float scale;
+  float stretchX = 1.0f;
+  float stretchY = 1.0f;
 
   std::uint8_t rowElements = 1;
   std::uint8_t columnElements = 1;

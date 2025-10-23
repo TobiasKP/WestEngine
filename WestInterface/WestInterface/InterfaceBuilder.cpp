@@ -18,7 +18,8 @@ InterfaceBuilder::~InterfaceBuilder() {
 
 void InterfaceBuilder::createNewInterface(std::uint16_t xScreenPosition,
                                           std::uint16_t yScreenPosition,
-                                          float scale, std::uint16_t rows,
+                                          float stretchX, float stretchY,
+                                          std::uint16_t rows,
                                           std::uint16_t columns,
                                           bool hiddenContainer) {
 
@@ -29,7 +30,8 @@ void InterfaceBuilder::createNewInterface(std::uint16_t xScreenPosition,
       [this](std::uint32_t oldPos, std::uint32_t newPos) {
         _current->updatePositions(oldPos, newPos);
       });
-  _current->scale = scale;
+  _current->stretchX = stretchX;
+  _current->stretchY = stretchY;
   _current->xLL = xScreenPosition;
   _current->yLL = yScreenPosition;
   _current->rowElements = rows;
@@ -56,7 +58,7 @@ void InterfaceBuilder::addElement(ElementProxy *e) {
   if (newElement->poolPosition == -1) {
     _logger.log(
         Level::Error,
-        "@@@ Error reserving size for new Element do not add Element.\n"); 
+        "@@@ Error reserving size for new Element do not add Element.\n");
     return;
   }
 

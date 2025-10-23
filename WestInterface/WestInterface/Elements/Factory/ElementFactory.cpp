@@ -13,7 +13,7 @@ IElement *ElementFactory::createElementInternal(ElementProxy *e) {
 
   switch (type) {
   case BUTTON:
-    // result = new Button();
+    result = new Button();
     fillBasicInfos(e, result);
     fillText(e, result);
     registerElementEvent(result);
@@ -52,27 +52,29 @@ void ElementFactory::fillText(ElementProxy *ep, IElement *el) {
 
   Text *t = new Text();
   t->plaintext = ep->text;
-  t->coordinates.reserve(ep->text.size() * 8);
+  t->coordinates.reserve(ep->text.size() * 4);
   for (char c : ep->text) {
-    std::vector<float> coords = getTextureCoordinatesForChar(c);
+    std::array<float, 4> coords = getTextureCoordinatesForChar(c);
     t->coordinates.insert(t->coordinates.end(), coords.begin(), coords.end());
   }
+  assert(t->coordinates.size() == ep->text.size() * 4);
   el->text = std::unique_ptr<Text>(t);
 }
 
 void ElementFactory::registerElementEvent(IElement *e) {
-  EventObserver::registerElement(e);
+  // EventObserver::registerElement(e);
 }
 
 void ElementFactory::registerElementValue(IElement *e) {
-  ValueObserver::registerElement(e);
+  // ValueObserver::registerElement(e);
 }
 
 void ElementFactory::fillBasicInfos(ElementProxy *ep, IElement *el) {
   el->id = ep->elementId;
   el->xLL = ep->xPosition;
   el->yLL = ep->yPosition;
-  el->scale = ep->scale;
+  el->stretchX = ep->stretchX;
+  el->stretchY = ep->stretchY;
   el->colorR = ep->colorR;
   el->colorG = ep->colorG;
   el->colorB = ep->colorB;
@@ -81,24 +83,20 @@ void ElementFactory::fillBasicInfos(ElementProxy *ep, IElement *el) {
   el->columnElements = ep->columnElements;
 }
 
-std::vector<float>
+std::array<float, 4>
 ElementFactory::getTextureCoordinatesForChar(char character) {
-  std::unordered_map<char, TextRenderManager::GlyphData> res =
+  const std::unordered_map<char, TextRenderManager::GlyphData> &res =
       TextRenderManager::getGlyphCache();
 
-  assert(character >= 32 && character <= 126);
-  TextRenderManager::GlyphData *d;
+  assert(character >= 32 && character <= 126 && res.size() > 0);
+
   auto it = res.find(character);
-  if (it != res.end()) {
-    d = &(it->second);
-    return d->textureCoords;
-  }
+  if (it != res.end())
+    return it->second.textureCoords;
 
   auto fallback = res.find(' ');
-  if (fallback != res.end()) {
-    d = &(fallback->second);
-    return d->textureCoords;
-  }
+  if (fallback != res.end())
+    return fallback->second.textureCoords;
 
-  return std::vector<float>(0);
+  return std::array<float, 4>{0};
 }

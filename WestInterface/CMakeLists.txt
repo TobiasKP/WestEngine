@@ -35,7 +35,7 @@ set(RESOURCE_BASE "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../WestEngine")
 if(NOT EXISTS "${RESOURCE_BASE}/shader")
   add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E make_directory "${RESOURCE_BASE}/shader"
-      COMMENT "Creating ${FOLDER} directory"
+      COMMENT "Creating ${FOLDER} shader directory"
   )
 endif()
 
@@ -44,3 +44,13 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 )
 
 
+if(NOT EXISTS "${RESOURCE_BASE}/assets/Textures")
+  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E make_directory "${RESOURCE_BASE}/assets/Textures"
+      COMMENT "Creating ${FOLDER} texture directory"
+  )
+endif()
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Resources" "${RESOURCE_BASE}/assets/Textures"
+)

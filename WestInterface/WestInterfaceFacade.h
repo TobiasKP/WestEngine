@@ -16,8 +16,8 @@
 #include "WestInterface/Observer/EventObserver.h"
 #include "WestInterface/Observer/ValueObserver.h"
 #include "WestInterface/RenderManagment/ComponentData.h"
-#include "WestInterface/RenderManagment/UIRenderManager.h"
 #include "WestInterface/RenderManagment/TextRenderManager.h"
+#include "WestInterface/RenderManagment/UIRenderManager.h"
 
 #include <WestLogger.h>
 #include <array>
@@ -35,9 +35,9 @@ public:
 
   // Managing Interfaces
   std::uint8_t createNewInterface(std::uint16_t xScreenPosition,
-                                  std::uint16_t yScreenPosition, float scale,
-                                  std::uint16_t rows, std::uint16_t columns,
-                                  bool hiddenContainer,
+                                  std::uint16_t yScreenPosition, float stretchX,
+                                  float stretchY, std::uint16_t rows,
+                                  std::uint16_t columns, bool hiddenContainer,
                                   std::vector<ElementProxy *> elements);
   bool destroyInterface(std::uint8_t interfaceId);
 
@@ -72,8 +72,10 @@ public:
                                        0.0f, 1.0f * SIZE_E};
   static constexpr float baseTex[] = {0.0f, 0.0f, 1.0f, 0.0f,
                                       1.0f, 1.0f, 0.0f, 1.0f};
+
   GLuint _interfaceVBO, _interfaceVAO, _interfaceEBO, _interfaceCOL,
-      _interfaceOFFSET, _interfaceFLAGS, _interfaceTEX;
+      _interfaceOFFSET, _interfaceFLAGS, _interfaceTEX, _interfaceTEXTURE_ID,
+      _interfaceUV;
 
   friend class UIRenderManager;
 
@@ -89,7 +91,7 @@ private:
   ValueObserver *_valueObserver;
   EventObserver *_eventObserver;
   InterfaceBuilder *_builder;
-  UIRenderManager *_renderManager; 
+  UIRenderManager *_renderManager;
   TextRenderManager *_textManager;
   WestLogger &_logger = WestLogger::getLoggerInstance();
 

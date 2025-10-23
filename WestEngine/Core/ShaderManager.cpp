@@ -139,6 +139,8 @@ GLuint ShaderManager::initInterfaceShader() {
   Config::interfaceShaderProgram = programId;
   Config::interfaceOrthoUniform =
       UniformUtils::createUniform(UniformConstants::ORTHO_UNIFORM, programId);
+  Config::interfaceTextureUniform =
+      UniformUtils::createUniform(UniformConstants::TEXTURE_SAMPLER, programId);
   if (Config::interfaceOrthoUniform == -1) {
     logFailure(std::format("{} ### Failed to create ortho matrix uniform for "
                            "interface shader program.\n",

@@ -6,7 +6,7 @@
 #include "../RenderManagment/ComponentData.h"
 #include "../RenderManagment/ComponentDataPool.h"
 
-static constexpr std::uint8_t SIZE_E = 10;
+static constexpr std::uint8_t SIZE_E = 40;
 
 // For Textrendering form Bitmap in Resources.
 struct Text {
@@ -22,20 +22,21 @@ struct IElement {
   std::uint32_t id;
 
   // zIndex. gives the element "stack"
-  std::uint8_t zIndex;
+  std::uint8_t zIndex = 1;
 
   // Sizing params: Each element has a basic size of
   // 10*10px with xLL & yLL as the most lower left corner of the element.
   // Size will be adjusted by different scaling given element.
   float xLL;
   float yLL;
-  float scale;
+  float stretchX;
+  float stretchY;
 
   // Color of each Element with transparancy.
-  float colorR;
-  float colorG;
-  float colorB;
-  float colorA;
+  float colorR = 0.0f;
+  float colorG = 0.0f;
+  float colorB = 0.0f;
+  float colorA = 1.0f;
 
   // Bit flags for special behaviours
   std::uint64_t flags;
@@ -58,8 +59,8 @@ struct IElement {
 
     if (!changed)
       return data;
-
-    describeMyself(data, row, column); 
+ 
+    describeMyself(data, row, column);
     return data;
   };
 

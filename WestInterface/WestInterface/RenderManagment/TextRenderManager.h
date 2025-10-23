@@ -6,12 +6,11 @@
 #include <cstdint>
 #include <glm/glm.hpp>
 #include <unordered_map>
-#include <vector>
 
 class TextRenderManager {
 public:
   struct GlyphData {
-    std::vector<GLfloat> textureCoords;
+    std::array<GLfloat, 4> textureCoords;
   };
 
   TextRenderManager();

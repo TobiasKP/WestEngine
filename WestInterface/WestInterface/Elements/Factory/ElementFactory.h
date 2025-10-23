@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include "../../../FacadeStructs.h"
 #include "../IElement.hpp"
 
@@ -17,5 +19,5 @@ private:
   void registerElementValue(IElement *e);
   void fillBasicInfos(ElementProxy *ep, IElement *el);
   void fillText(ElementProxy *ep, IElement *el);
-  std::vector<float> getTextureCoordinatesForChar(char character);  
+  std::array<float, 4> getTextureCoordinatesForChar(char character);  
 };

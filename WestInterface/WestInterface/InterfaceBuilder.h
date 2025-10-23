@@ -15,9 +15,9 @@ public:
   ~InterfaceBuilder();
 
   void createNewInterface(std::uint16_t xScreenPosition,
-                          std::uint16_t yScreenPosition, float scale,
-                          std::uint16_t rows, std::uint16_t columns,
-                          bool hiddenContainer);
+                          std::uint16_t yScreenPosition, float stretchX,
+                          float stretchY, std::uint16_t rows,
+                          std::uint16_t columns, bool hiddenContainer);
   void addElement(ElementProxy *e);
   ContainerElement *build();
   IElement *transform(ElementProxy *e);
