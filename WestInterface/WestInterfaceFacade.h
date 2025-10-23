@@ -62,6 +62,8 @@ public:
   // Get Resources
   const char *getResource(std::string resource);
 
+  std::vector<ElementBounds *> getShownElementsBoundaries();
+
   static constexpr std::string_view interfaceVertexShader =
       "shader/InterfaceVertexShader.vs";
   static constexpr std::string_view interfaceFragementShader =
@@ -86,13 +88,13 @@ private:
   WestInterfaceFacade();
   ~WestInterfaceFacade();
 
-  std::array<ContainerElement *, 32> _interfaces;
+  std::array<ContainerElement *, 32> _interfaces{nullptr};
 
-  ValueObserver *_valueObserver;
-  EventObserver *_eventObserver;
-  InterfaceBuilder *_builder;
-  UIRenderManager *_renderManager;
-  TextRenderManager *_textManager;
+  ValueObserver *_valueObserver = nullptr;
+  EventObserver *_eventObserver = nullptr;
+  InterfaceBuilder *_builder = nullptr;
+  UIRenderManager *_renderManager = nullptr;
+  TextRenderManager *_textManager = nullptr;
   WestLogger &_logger = WestLogger::getLoggerInstance();
 
   ContainerElement *findInterfaceById(std::uint8_t id);

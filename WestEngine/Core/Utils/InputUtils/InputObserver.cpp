@@ -6,6 +6,7 @@
 InputObserver::InputObserver() {
   _control =
       (PlayerControl *)SystemManager::getSystemByName(Systems::PLAYER_CONTROL);
+  _facade = &WestInterfaceFacade::getInterfaceInstance();
 }
 
 void InputObserver::notify() {
@@ -20,6 +21,19 @@ void InputObserver::notify() {
   }
   {
     std::lock_guard<std::mutex> lock(_controlMutex);
+
+    if (static_cast<bool>(_controlFlags & BitMasks::Control::UI_HOVERED)) {
+      assert(_interfaceId != -1);
+      // TODO add interfaceID
+      _facade->notify(0x01, _x, _y);
+      _interfaceId = -1;
+    }
+
+    if (static_cast<bool>(_controlFlags & BitMasks::Control::UI_UNHOVERED)) { 
+      _facade->notify(0x02, -1, -1);
+      _interfaceId = -1;
+    }
+
     if (static_cast<bool>(_controlFlags & BitMasks::Control::CAMERA_MOVING)) {
       _control->setCameraMovement(glm::vec3(_x, _y, 0));
       _x = 0;

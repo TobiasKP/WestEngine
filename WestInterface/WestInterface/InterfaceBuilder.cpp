@@ -1,7 +1,14 @@
 #include "InterfaceBuilder.h"
 
 InterfaceBuilder::InterfaceBuilder() {
-  _factory = new ElementFactory();
+  _factory = nullptr;
+  _dataPool = nullptr;
+}
+
+InterfaceBuilder::InterfaceBuilder(EventObserver *eo, ValueObserver *vo) {
+  _vObserver = vo;
+  _eObserver = eo;
+  _factory = new ElementFactory(eo, vo);
   _dataPool = new ComponentDataPool();
 }
 

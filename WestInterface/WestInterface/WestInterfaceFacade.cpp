@@ -12,9 +12,12 @@ WestInterfaceFacade &WestInterfaceFacade::getInterfaceInstance() {
 
 WestInterfaceFacade::WestInterfaceFacade() {
   count = 0;
+  _valueObserver = new ValueObserver();
+  _eventObserver = new EventObserver();
+  assert(_valueObserver != nullptr && _eventObserver != nullptr);
   _renderManager = new UIRenderManager();
-  _builder = new InterfaceBuilder();
   _textManager = new TextRenderManager();
+  _builder = new InterfaceBuilder(_eventObserver, _valueObserver);
   for (std::uint8_t i = 0; i < 32; i++) {
     _interfaces.at(i) = nullptr;
   }
@@ -223,16 +226,36 @@ std::vector<ComponentData *> WestInterfaceFacade::getRenderData() {
   return _renderManager->getRenderData();
 };
 
-///////////////////////////
-
+//TODO add ID transmission
 bool WestInterfaceFacade::notify(std::uint8_t event, std::uint16_t mouseX,
                                  std::uint16_t mouseY) {
-  return false;
+  bool evResult = _eventObserver->handleEvent(event, mouseX, mouseY, "");
+  return evResult;
 };
 
 bool WestInterfaceFacade::notify(std::uint8_t event, std::string value) {
+  bool evResult = _eventObserver->handleEvent(event, -1, -1, value);
   return false;
 };
+
+std::vector<ElementBounds *> WestInterfaceFacade::getShownElementsBoundaries() {
+  std::vector<ElementBounds *> result;
+  for (ContainerElement *el : _interfaces) {
+    if (el == nullptr)
+      break;
+
+    ElementBounds *b = new ElementBounds();
+    b->id = el->id;
+    b->xLeft = el->xLL;
+    b->yBottom = el->yLL;
+    b->xRight = el->xLL + (el->columnElements * SIZE_E * el->stretchX);
+    b->yTop = el->yLL + (el->rowElements * SIZE_E * el->stretchY);
+    result.push_back(b);
+  }
+  return result;
+}
+
+///////////////////////////
 
 bool WestInterfaceFacade::resize(std::uint8_t interfaceId, std::uint16_t width,
                                  std::uint16_t height) {

@@ -59,7 +59,7 @@ struct IElement {
 
     if (!changed)
       return data;
- 
+  
     describeMyself(data, row, column);
     return data;
   };

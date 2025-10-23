@@ -26,4 +26,8 @@ void main() {
     } else {
         fragColor = texture(textureSampler, TexCoord);
     }
+
+    if ((vFlags & 0x02u) != 0u) {
+        discard;
+    }
 }

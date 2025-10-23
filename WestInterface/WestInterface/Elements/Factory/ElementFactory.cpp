@@ -1,7 +1,5 @@
 #include "ElementFactory.h"
 
-#include "../../Observer/EventObserver.h"
-#include "../../Observer/ValueObserver.h"
 #include "../../RenderManagment/TextRenderManager.h"
 #include "../Umbrella.hpp"
 
@@ -62,11 +60,11 @@ void ElementFactory::fillText(ElementProxy *ep, IElement *el) {
 }
 
 void ElementFactory::registerElementEvent(IElement *e) {
-  // EventObserver::registerElement(e);
+  _eObserver->registerElement(e);
 }
 
 void ElementFactory::registerElementValue(IElement *e) {
-  // ValueObserver::registerElement(e);
+  _vObserver->registerElement(e);
 }
 
 void ElementFactory::fillBasicInfos(ElementProxy *ep, IElement *el) {

@@ -25,10 +25,15 @@ struct WEST_INTERFACE ComponentData {
   float colorA;
 };
 
+struct WEST_INTERFACE ElementBounds {
+  std::uint32_t id;
+  float xLeft, xRight, yBottom, yTop;
+};
+
 /*****************************************
  * FLAG DESCRIPTION
  * 0x01 = Border and no filling pixels -> discarded
- *
+ * 0x02 = Mouse Hovered
  *
  *
  */

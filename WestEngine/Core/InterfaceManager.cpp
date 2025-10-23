@@ -1,13 +1,19 @@
 #include "../CoreHeaders/InterfaceManager.h"
 
+#include "Utils/InputUtils/MouseCallbacks.h"
+
 InterfaceManager::InterfaceManager() : IManager(nullptr) {
   setName(CoreConstants::INTERFACE_MANAGER);
   _facade = nullptr;
+  _interfaces = 0;
+  _cachedInterfaces = 0;
 };
 
 InterfaceManager::InterfaceManager(WestLogger *logger) : IManager(logger) {
   setName(CoreConstants::INTERFACE_MANAGER);
   _facade = nullptr;
+  _interfaces = 0;
+  _cachedInterfaces = 0;
 };
 
 InterfaceManager::~InterfaceManager() {}
@@ -38,7 +44,14 @@ std::int32_t InterfaceManager::init() {
   return result;
 }
 
-void InterfaceManager::update() { _facade->updateRenderData(); }
+void InterfaceManager::update() {
+  _facade->updateRenderData();
+  if (_interfaces != _cachedInterfaces) {
+    std::vector<ElementBounds *> result = _facade->getShownElementsBoundaries();
+    MouseCallbacks::setElementBounds(result);
+    _cachedInterfaces = result.size();
+  }
+}
 
 #ifdef DEBUG
 
@@ -73,6 +86,7 @@ std::int32_t InterfaceManager::buildTechDemoFooter() {
       std::format("{} ### Creating Tech Demo interface footer\n", getName()));
   std::uint8_t footerId = _facade->createNewInterface(0.0f, 0.0f, 16.0f, 1.0f,
                                                       1, 1, false, elements);
+  _interfaces++;
   logDebug(std::format("{} ### Created Tech Demo footer -> {}\n", getName(),
                        footerId));
   delete redQuad;

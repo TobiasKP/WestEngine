@@ -3,6 +3,8 @@
 #include "../FacadeStructs.h"
 #include "Elements/ContainerElement.cpp"
 #include "Elements/Factory/ElementFactory.h"
+#include "Observer/EventObserver.h"
+#include "Observer/ValueObserver.h"
 
 #include <WestLogger.h>
 #include <cstdint>
@@ -11,6 +13,7 @@ static std::atomic_uint32_t CURRENT_ID = 1;
 
 class InterfaceBuilder {
 public:
+  InterfaceBuilder(EventObserver *eo, ValueObserver *vo);
   InterfaceBuilder();
   ~InterfaceBuilder();
 
@@ -26,5 +29,7 @@ private:
   ContainerElement *_current = nullptr;
   ElementFactory *_factory = nullptr;
   ComponentDataPool *_dataPool = nullptr;
+  EventObserver *_eObserver = nullptr;
+  ValueObserver *_vObserver = nullptr;
   WestLogger &_logger = WestLogger::getLoggerInstance();
 };
