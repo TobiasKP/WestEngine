@@ -50,8 +50,9 @@ public:
   std::vector<ComponentData *> getRenderData();
 
   // Events
-  bool notify(std::uint8_t event, std::uint16_t mouseX, std::uint16_t mouseY);
-  bool notify(std::uint8_t event, std::string value);
+  bool notify(std::int16_t elementId, std::uint8_t event, std::uint16_t mouseX,
+              std::uint16_t mouseY);
+  bool notify(std::int16_t elementId, std::uint8_t event, std::string value);
 
   // Changes to Interface
   bool resize(std::uint8_t interfaceId, std::uint16_t width,

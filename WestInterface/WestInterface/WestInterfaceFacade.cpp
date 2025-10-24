@@ -226,31 +226,35 @@ std::vector<ComponentData *> WestInterfaceFacade::getRenderData() {
   return _renderManager->getRenderData();
 };
 
-//TODO add ID transmission
-bool WestInterfaceFacade::notify(std::uint8_t event, std::uint16_t mouseX,
-                                 std::uint16_t mouseY) {
-  bool evResult = _eventObserver->handleEvent(event, mouseX, mouseY, "");
+bool WestInterfaceFacade::notify(std::int16_t elementId, std::uint8_t event,
+                                 std::uint16_t mouseX, std::uint16_t mouseY) {
+  bool evResult =
+      _eventObserver->handleEvent(elementId, event, mouseX, mouseY, "");
   return evResult;
 };
 
-bool WestInterfaceFacade::notify(std::uint8_t event, std::string value) {
-  bool evResult = _eventObserver->handleEvent(event, -1, -1, value);
+bool WestInterfaceFacade::notify(std::int16_t elementId, std::uint8_t event,
+                                 std::string value) {
+  bool evResult = _eventObserver->handleEvent(elementId, event, -1, -1, value);
   return false;
 };
 
 std::vector<ElementBounds *> WestInterfaceFacade::getShownElementsBoundaries() {
   std::vector<ElementBounds *> result;
-  for (ContainerElement *el : _interfaces) {
-    if (el == nullptr)
+  for (ContainerElement *ce : _interfaces) {
+    if (ce == nullptr)
       break;
-
-    ElementBounds *b = new ElementBounds();
-    b->id = el->id;
-    b->xLeft = el->xLL;
-    b->yBottom = el->yLL;
-    b->xRight = el->xLL + (el->columnElements * SIZE_E * el->stretchX);
-    b->yTop = el->yLL + (el->rowElements * SIZE_E * el->stretchY);
-    result.push_back(b);
+    for (IElement *el : ce->children) {
+      if (!el->supportsEvents)
+        continue;
+      ElementBounds *b = new ElementBounds();
+      b->id = el->id;
+      b->xLeft = el->xLL;
+      b->yBottom = el->yLL;
+      b->xRight = el->xLL + (el->columnElements * SIZE_E * el->stretchX);
+      b->yTop = el->yLL + (el->rowElements * SIZE_E * el->stretchY);
+      result.push_back(b);
+    }
   }
   return result;
 }

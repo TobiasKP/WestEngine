@@ -8,7 +8,7 @@ glm::vec2 MouseCallbacks::_currentPos = glm::vec2(0.0f);
 std::int32_t MouseCallbacks::_inWindow = 0;
 std::int32_t MouseCallbacks::_leftButtonPress = 0;
 std::int32_t MouseCallbacks::_rightButtonPress = 0;
-std::int16_t MouseCallbacks::_currentHover = 0;
+std::int16_t MouseCallbacks::_currentHover = -1;
 std::vector<ElementBounds *> MouseCallbacks::_elements;
 
 InputObserver *MouseCallbacks::_iObserver = nullptr;
@@ -20,11 +20,16 @@ void MouseCallbacks::mouseCallback(GLFWwindow *window, double x, double y) {
     return;
 
   std::int16_t hover = isInterfaceHovered();
-  if (hover != -1 && hover != _currentHover) {
-    _iObserver->setControlFlag(BitMasks::Control::UI_HOVERED, hover);
-  } 
-  /*else if (hover == -1)
-    _iObserver->setControlFlag(BitMasks::Control::UI_UNHOVERED, hover);*/
+
+  if (hover != _currentHover) {
+    if (_currentHover != -1) {
+      _iObserver->setControlFlag(BitMasks::Control::UI_UNHOVERED, _currentHover);
+    }
+
+    if (hover != -1) {
+      _iObserver->setControlFlag(BitMasks::Control::UI_HOVERED, hover);
+    }
+  }
 
   _currentHover = hover;
 }

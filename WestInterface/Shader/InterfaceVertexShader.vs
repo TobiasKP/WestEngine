@@ -12,12 +12,14 @@ uniform mat4 orthoMatrix;
 out flat vec4 vColor;
 out flat uint vFlags;
 out vec2 TexCoord;
+out vec2 QuadCoord;
 out vec2 scale;
 
 void main() {
     vColor = iColor;
     vFlags = flags;
     TexCoord = mix(uvCoords.xy, uvCoords.zw, texCoords);
+    QuadCoord = texCoords;
     scale = vec2(instanceOffset.z, instanceOffset.w);
     gl_Position = orthoMatrix * vec4((position.x + instanceOffset.x) * instanceOffset.z, (position.y + instanceOffset.y) * instanceOffset.w, 0.0, 1.0);
 }

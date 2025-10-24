@@ -12,7 +12,7 @@ public:
   IObserver() {};
   virtual ~IObserver() {};
 
-  virtual bool handleEvent(std::uint16_t event, std::uint16_t mouseX,
+  virtual bool handleEvent(std::int16_t elementId,std::uint16_t event, std::uint16_t mouseX,
                            std::uint16_t mouseY, std::string value) {
     return false;
   };

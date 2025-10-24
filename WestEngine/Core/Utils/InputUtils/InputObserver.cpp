@@ -25,12 +25,12 @@ void InputObserver::notify() {
     if (static_cast<bool>(_controlFlags & BitMasks::Control::UI_HOVERED)) {
       assert(_interfaceId != -1);
       // TODO add interfaceID
-      _facade->notify(0x01, _x, _y);
+      _facade->notify(_interfaceId, 0x01, _x, _y);
       _interfaceId = -1;
     }
 
-    if (static_cast<bool>(_controlFlags & BitMasks::Control::UI_UNHOVERED)) { 
-      _facade->notify(0x02, -1, -1);
+    if (static_cast<bool>(_controlFlags & BitMasks::Control::UI_UNHOVERED)) {
+      _facade->notify(_interfaceId, 0x02, -1, -1);
       _interfaceId = -1;
     }
 

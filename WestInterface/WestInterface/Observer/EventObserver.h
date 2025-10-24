@@ -7,7 +7,7 @@ public:
   EventObserver();
   ~EventObserver() override;
 
-  virtual bool handleEvent(std::uint16_t event, std::uint16_t mouseX,
+  virtual bool handleEvent(std::int16_t elementId,std::uint16_t event, std::uint16_t mouseX,
                            std::uint16_t mouseY, std::string value) override;
 
   virtual void registerElement(IElement *e) override;

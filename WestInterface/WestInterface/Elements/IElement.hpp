@@ -48,6 +48,7 @@ struct IElement {
   std::unique_ptr<Text> text;
 
   bool changed = true;
+  bool supportsEvents = false;
   std::uint32_t poolPosition = 0;
   ComponentDataPool *dataPool = nullptr;
 

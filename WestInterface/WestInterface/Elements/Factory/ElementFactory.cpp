@@ -60,10 +60,12 @@ void ElementFactory::fillText(ElementProxy *ep, IElement *el) {
 }
 
 void ElementFactory::registerElementEvent(IElement *e) {
+  e->supportsEvents = true;
   _eObserver->registerElement(e);
 }
 
 void ElementFactory::registerElementValue(IElement *e) {
+  e->supportsEvents = true;
   _vObserver->registerElement(e);
 }
 
