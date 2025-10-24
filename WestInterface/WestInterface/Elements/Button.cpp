@@ -1,21 +1,21 @@
 
 #pragma once
 
+#include <cassert>
+
 #include "Label.cpp"
 
 struct Button : public Label {
   std::uint8_t eventId;
 
   void handler() {
-    _logger.log(
-        Level::Error,
-        std::format(
-            "@@@ Button handler of interface: {} called which does not exists!",
-            this->id));
+    assert(eventHandler != nullptr);
+    if (eventHandler)
+      eventHandler();
   };
 
   void describeMyself(ComponentData *cd, std::uint8_t row,
                       std::uint8_t column) {
-    Label::describeMyself(cd, row, column); 
+    Label::describeMyself(cd, row, column);
   };
 };

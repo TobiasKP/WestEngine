@@ -23,7 +23,8 @@ void MouseCallbacks::mouseCallback(GLFWwindow *window, double x, double y) {
 
   if (hover != _currentHover) {
     if (_currentHover != -1) {
-      _iObserver->setControlFlag(BitMasks::Control::UI_UNHOVERED, _currentHover);
+      _iObserver->setControlFlag(BitMasks::Control::UI_UNHOVERED,
+                                 _currentHover);
     }
 
     if (hover != -1) {
@@ -47,9 +48,14 @@ void MouseCallbacks::mouseButtonCallback(GLFWwindow *window,
     return;
 
   if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS) {
-    glm::vec3 destination = PositionCalculation::getWorldPosition(
-        _currentPos, Scene::getSceneInstance().getCamera());
-    _iObserver->setControlFlag(BitMasks::Control::PLAYER_MOVING, destination);
+    std::int16_t hover = isInterfaceHovered();
+    if (hover != -1) {
+      _iObserver->setControlFlag(BitMasks::Control::UI_CLICKED, hover);
+    } else {
+      glm::vec3 destination = PositionCalculation::getWorldPosition(
+          _currentPos, Scene::getSceneInstance().getCamera());
+      _iObserver->setControlFlag(BitMasks::Control::PLAYER_MOVING, destination);
+    }
   }
   if (button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS) {
     // TODO More actions

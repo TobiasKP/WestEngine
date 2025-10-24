@@ -29,6 +29,9 @@ bool EventObserver::handleEvent(std::int16_t elementId, std::uint16_t event,
     e->flags &= ~0x02;
     executeElement(e);
   }
+  if (event & 0x04) {
+    e->handler();
+  }
 
   return false;
 };

@@ -9,11 +9,13 @@ InterfaceManager::InterfaceManager() : IManager(nullptr) {
   _cachedInterfaces = 0;
 };
 
-InterfaceManager::InterfaceManager(WestLogger *logger) : IManager(logger) {
+InterfaceManager::InterfaceManager(WestLogger *logger, WindowManager *manager)
+    : IManager(logger) {
   setName(CoreConstants::INTERFACE_MANAGER);
   _facade = nullptr;
   _interfaces = 0;
   _cachedInterfaces = 0;
+  _windowManager = manager;
 };
 
 InterfaceManager::~InterfaceManager() {}
@@ -79,6 +81,11 @@ std::int32_t InterfaceManager::buildTechDemoFooter() {
   quitButton->column = 0;
   quitButton->columnElements = 4;
   quitButton->text = "Quit";
+  quitButton->eventHandler = [this]() {
+    assert(_windowManager != nullptr);
+    _windowManager->setWindowShouldClose();
+  };
+
   elements.push_back(quitButton);
 
   assert(elements.size() > 0);

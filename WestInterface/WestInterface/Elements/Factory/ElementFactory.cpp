@@ -14,7 +14,7 @@ IElement *ElementFactory::createElementInternal(ElementProxy *e) {
     result = new Button();
     fillBasicInfos(e, result);
     fillText(e, result);
-    registerElementEvent(result);
+    registerElementEvent(e, result);
     break;
   case LABEL:
     result = new Label();
@@ -59,12 +59,13 @@ void ElementFactory::fillText(ElementProxy *ep, IElement *el) {
   el->text = std::unique_ptr<Text>(t);
 }
 
-void ElementFactory::registerElementEvent(IElement *e) {
+void ElementFactory::registerElementEvent(ElementProxy *ep, IElement *e) {
+  e->eventHandler = ep->eventHandler;
   e->supportsEvents = true;
   _eObserver->registerElement(e);
 }
 
-void ElementFactory::registerElementValue(IElement *e) {
+void ElementFactory::registerElementValue(ElementProxy *ep, IElement *e) { 
   e->supportsEvents = true;
   _vObserver->registerElement(e);
 }
@@ -81,6 +82,7 @@ void ElementFactory::fillBasicInfos(ElementProxy *ep, IElement *el) {
   el->colorA = ep->colorA;
   el->rowElements = ep->rowElements;
   el->columnElements = ep->columnElements;
+  el->eventHandler = ep->eventHandler;
 }
 
 std::array<float, 4>

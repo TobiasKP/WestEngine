@@ -1,13 +1,14 @@
 #pragma once
 
 #include "Interfaces/IManager.h"
+#include "WindowManager.h"
 
 #include <WestInterfaceFacade.h>
 
 class InterfaceManager : public IManager {
 public:
   InterfaceManager();
-  InterfaceManager(WestLogger *logger);
+  InterfaceManager(WestLogger *logger, WindowManager *manager);
   ~InterfaceManager() override;
 
   std::int32_t startup() override;
@@ -20,6 +21,7 @@ private:
   std::uint8_t _cachedInterfaces;
 
   WestInterfaceFacade *_facade;
+  WindowManager *_windowManager;
 
 #ifdef DEBUG
   std::int32_t buildTechDemoFooter();

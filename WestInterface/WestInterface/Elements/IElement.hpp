@@ -2,6 +2,7 @@
 
 #include <WestLogger.h>
 #include <cstdint>
+#include <functional>
 
 #include "../RenderManagment/ComponentData.h"
 #include "../RenderManagment/ComponentDataPool.h"
@@ -52,6 +53,8 @@ struct IElement {
   std::uint32_t poolPosition = 0;
   ComponentDataPool *dataPool = nullptr;
 
+  std::function<void()> eventHandler = nullptr;
+
   virtual void handler() {};
 
   ComponentData *describe(std::uint8_t row = 0, std::uint8_t column = 0) {
@@ -60,7 +63,7 @@ struct IElement {
 
     if (!changed)
       return data;
-  
+
     describeMyself(data, row, column);
     return data;
   };

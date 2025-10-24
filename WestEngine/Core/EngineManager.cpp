@@ -24,7 +24,7 @@ EngineManager::EngineManager(WestLogger *logger) : IManager(logger) {
   _engineQ->enqueue(_windowManager);
   _engineQ->enqueue(new ShaderManager(logger));
   _engineQ->enqueue(new SystemManager(logger));
-  _engineQ->enqueue(new InterfaceManager(logger));
+  _engineQ->enqueue(new InterfaceManager(logger, _windowManager));
   _engineQ->enqueue(new RenderManager(logger));
   _engineQ->enqueue(new SceneManager(logger));
   assert(_engineQ->getSize() == _engineQ->getCapacity());

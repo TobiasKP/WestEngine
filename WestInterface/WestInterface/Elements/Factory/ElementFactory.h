@@ -20,8 +20,8 @@ public:
 
 private:
   IElement *createElementInternal(ElementProxy *e);
-  void registerElementEvent(IElement *e);
-  void registerElementValue(IElement *e);
+  void registerElementEvent(ElementProxy *ep, IElement *e);
+  void registerElementValue(ElementProxy *ep, IElement *e);
   void fillBasicInfos(ElementProxy *ep, IElement *el);
   void fillText(ElementProxy *ep, IElement *el);
   std::array<float, 4> getTextureCoordinatesForChar(char character);

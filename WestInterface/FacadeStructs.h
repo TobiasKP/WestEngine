@@ -11,7 +11,7 @@
 #endif
 
 #include <cstdint>
-// #include <functional>
+#include <functional>
 #include <string>
 
 enum ElementType { LABEL, BUTTON, CONTAINER, ICON, DEBUG_ELEMENT };
@@ -21,7 +21,7 @@ struct WEST_INTERFACE ElementProxy {
   std::uint32_t elementId;
 
   // std::uint8_t eventId;
-  // std::function<void()> eventHandler;
+  std::function<void()> eventHandler = nullptr;
 
   float colorR;
   float colorG;
