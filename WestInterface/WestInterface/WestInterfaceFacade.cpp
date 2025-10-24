@@ -1,6 +1,7 @@
 #include "../WestInterfaceFacade.h"
 
 #include <GLFW/glfw3.h>
+#include <stb_image.h>
 
 #include <format>
 
@@ -11,8 +12,12 @@ WestInterfaceFacade &WestInterfaceFacade::getInterfaceInstance() {
 
 WestInterfaceFacade::WestInterfaceFacade() {
   count = 0;
+  _valueObserver = new ValueObserver();
+  _eventObserver = new EventObserver();
+  assert(_valueObserver != nullptr && _eventObserver != nullptr);
   _renderManager = new UIRenderManager();
-  _builder = new InterfaceBuilder();
+  _textManager = new TextRenderManager();
+  _builder = new InterfaceBuilder(_eventObserver, _valueObserver);
   for (std::uint8_t i = 0; i < 32; i++) {
     _interfaces.at(i) = nullptr;
   }
@@ -26,6 +31,7 @@ void WestInterfaceFacade::shutdown() {
     count--;
   }
   delete _builder;
+  delete _textManager;
 }
 
 void WestInterfaceFacade::init() {
@@ -36,6 +42,8 @@ void WestInterfaceFacade::init() {
   glGenBuffers(1, &_interfaceOFFSET);
   glGenBuffers(1, &_interfaceFLAGS);
   glGenBuffers(1, &_interfaceTEX);
+  glGenBuffers(1, &_interfaceUV);
+  glGenTextures(1, &_interfaceTEXTURE_ID);
 
   glBindVertexArray(_interfaceVAO);
 
@@ -59,7 +67,7 @@ void WestInterfaceFacade::init() {
   glBindBuffer(GL_ARRAY_BUFFER, _interfaceOFFSET);
   glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
 
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
   glVertexAttribDivisor(2, 1);
   glEnableVertexAttribArray(2);
 
@@ -69,16 +77,51 @@ void WestInterfaceFacade::init() {
   glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(3);
 
-  glBindBuffer(GL_ARRAY_BUFFER, _interfaceFLAGS);
+  glBindBuffer(GL_ARRAY_BUFFER, _interfaceUV);
   glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
 
-  glVertexAttribIPointer(4, 1, GL_UNSIGNED_INT, sizeof(std::uint32_t),
-                         (void *)0);
+  glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
   glVertexAttribDivisor(4, 1);
   glEnableVertexAttribArray(4);
 
+  glBindBuffer(GL_ARRAY_BUFFER, _interfaceFLAGS);
+  glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
+
+  glVertexAttribIPointer(5, 1, GL_UNSIGNED_INT, sizeof(std::uint32_t),
+                         (void *)0);
+  glVertexAttribDivisor(5, 1);
+  glEnableVertexAttribArray(5);
+
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
+
+  std::int32_t width, height, numComponents;
+  const char *textureFile = "/assets/Textures/font.bmp";
+  char cwd[128];
+  char filePath[PATH_MAX];
+  if (getcwd(cwd, sizeof(cwd)) == NULL) {
+    _logger.log(Level::Error, "---Error getting current working directory!\n");
+  }
+
+  snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", textureFile);
+
+  unsigned char *imgData =
+      stbi_load(filePath, &width, &height, &numComponents, 0);
+  if (imgData == NULL) {
+    _logger.log(
+        Level::Error,
+        std::format("---No Imagedata loaded for texture: {} - STBI Error: {}\n",
+                    filePath, stbi_failure_reason()));
+  }
+
+  glBindTexture(GL_TEXTURE_2D, _interfaceTEXTURE_ID);
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+               GL_UNSIGNED_BYTE, imgData);
+  glGenerateMipmap(GL_TEXTURE_2D);
+  stbi_image_free(imgData);
+
+  _textManager->initializeFontAtlas();
 }
 
 ContainerElement *WestInterfaceFacade::findInterfaceById(std::uint8_t id) {
@@ -95,15 +138,15 @@ ContainerElement *WestInterfaceFacade::findInterfaceById(std::uint8_t id) {
 }
 
 std::uint8_t WestInterfaceFacade::createNewInterface(
-    std::uint16_t xScreenPosition, std::uint16_t yScreenPosition, float scale,
-    std::uint8_t rows, std::uint8_t columns, bool hiddenContainer,
-    std::vector<ElementProxy *> elements) {
+    std::uint16_t xScreenPosition, std::uint16_t yScreenPosition,
+    float stretchX, float stretchY, std::uint16_t rows, std::uint16_t columns,
+    bool hiddenContainer, std::vector<ElementProxy *> elements) {
 #ifdef DEBUG
   _logger.log(Level::Info, "@@@ Creating new Interface\n");
 #endif
 
-  _builder->createNewInterface(xScreenPosition, yScreenPosition, scale, rows,
-                               columns, hiddenContainer);
+  _builder->createNewInterface(xScreenPosition, yScreenPosition, stretchX,
+                               stretchY, rows, columns, hiddenContainer);
   for (auto *element : elements) {
 #ifdef DEBUG
     _logger.log(Level::Cycle,
@@ -183,16 +226,40 @@ std::vector<ComponentData *> WestInterfaceFacade::getRenderData() {
   return _renderManager->getRenderData();
 };
 
+bool WestInterfaceFacade::notify(std::int16_t elementId, std::uint8_t event,
+                                 std::uint16_t mouseX, std::uint16_t mouseY) {
+  bool evResult =
+      _eventObserver->handleEvent(elementId, event, mouseX, mouseY, "");
+  return evResult;
+};
+
+bool WestInterfaceFacade::notify(std::int16_t elementId, std::uint8_t event,
+                                 std::string value) {
+  bool evResult = _eventObserver->handleEvent(elementId, event, -1, -1, value);
+  return false;
+};
+
+std::vector<ElementBounds *> WestInterfaceFacade::getShownElementsBoundaries() {
+  std::vector<ElementBounds *> result;
+  for (ContainerElement *ce : _interfaces) {
+    if (ce == nullptr)
+      break;
+    for (IElement *el : ce->children) {
+      if (!el->supportsEvents)
+        continue;
+      ElementBounds *b = new ElementBounds();
+      b->id = el->id;
+      b->xLeft = el->xLL;
+      b->yBottom = el->yLL;
+      b->xRight = el->xLL + (el->columnElements * SIZE_E * el->stretchX);
+      b->yTop = el->yLL + (el->rowElements * SIZE_E * el->stretchY);
+      result.push_back(b);
+    }
+  }
+  return result;
+}
+
 ///////////////////////////
-
-bool WestInterfaceFacade::notify(std::uint8_t event, std::uint16_t mouseX,
-                                 std::uint16_t mouseY) {
-  return false;
-};
-
-bool WestInterfaceFacade::notify(std::uint8_t event, std::string value) {
-  return false;
-};
 
 bool WestInterfaceFacade::resize(std::uint8_t interfaceId, std::uint16_t width,
                                  std::uint16_t height) {

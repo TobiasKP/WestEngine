@@ -4,13 +4,10 @@
 
 #include <Config.h>
 #include <format>
-//#include <iostream>
 
 struct Label : public IElement {
 
-  Label() {
-    flags = 0;
-  }
+  Label() { flags = 0; }
 
   void handler() {
     _logger.log(
@@ -20,14 +17,23 @@ struct Label : public IElement {
             this->id));
   };
 
-  void describeMyself(ComponentData *cd, std::uint8_t row, std::uint8_t column) {
+  void describeMyself(ComponentData *cd, std::uint8_t row,
+                      std::uint8_t column) {
     cd->colorR = this->colorR;
     cd->colorG = this->colorG;
     cd->colorB = this->colorB;
     cd->colorA = this->colorA;
 
-    cd->vertices[0] = xLL + (SIZE_E * row);
-    cd->vertices[1] = yLL + (SIZE_E * column); 
-    cd->flags = flags;
+    cd->vertices[1] = yLL + (SIZE_E * row);
+    cd->vertices[0] = xLL + (SIZE_E * column);
+    cd->stretchX = stretchX;
+    cd->stretchY = stretchY;
+    cd->flags = flags;  
+    if (text != nullptr && text->coordinates.size() > 4 * column) {  
+      cd->textureCoords[0] = text->coordinates[0 + 4 * column];
+      cd->textureCoords[1] = text->coordinates[1 + 4 * column];
+      cd->textureCoords[2] = text->coordinates[2 + 4 * column];
+      cd->textureCoords[3] = text->coordinates[3 + 4 * column];
+    }
   };
 };

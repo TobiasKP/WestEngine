@@ -13,11 +13,11 @@
 #endif
 
 struct WEST_INTERFACE ComponentData {
-  std::uint32_t flags; 
+  std::uint32_t flags;
   float vertices[2];
-
-  // float uvTopLeft;
-  // float uvBottomRight;
+  float textureCoords[4] = {0.0f, 0.0f, 1.0f, 1.0f};
+  float stretchX;
+  float stretchY;
 
   float colorR;
   float colorG;
@@ -25,10 +25,15 @@ struct WEST_INTERFACE ComponentData {
   float colorA;
 };
 
+struct WEST_INTERFACE ElementBounds {
+  std::uint32_t id;
+  float xLeft, xRight, yBottom, yTop;
+};
+
 /*****************************************
  * FLAG DESCRIPTION
- * 0x01 = Border and no filling
- *
+ * 0x01 = Border and no filling pixels -> discarded
+ * 0x02 = Mouse Hovered
  *
  *
  */

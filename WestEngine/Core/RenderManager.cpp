@@ -39,7 +39,6 @@ std::int32_t RenderManager::init() {
   _scene = &Scene::getSceneInstance();
   _facade = &WestInterfaceFacade::getInterfaceInstance();
   assert(_scene != nullptr && _facade != nullptr);
-  _facade->init();
 
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
@@ -114,26 +113,29 @@ void RenderManager::renderGameEntities() {
 
 void RenderManager::renderUserInterfaces() {
   assert(Config::interfaceShaderProgram != -1);
-
-  // TODO calculate hash -> if no changes no need to rerender?
   std::vector<ComponentData *> renderData = _facade->getRenderData();
   if (renderData.size() == 0) {
     logFailure(std::format(
         "{} ### No render data for interfaces gathered skipping rendering\n",
         getName()));
     return;
-  }
+  } 
 
   std::vector<float> instanceOffsets;
   std::vector<float> colors;
+  std::vector<float> textCoords;
   std::vector<std::uint32_t> flags;
   for (ComponentData *cd : renderData) {
-    instanceOffsets.insert(instanceOffsets.end(),
-                           {cd->vertices[0], cd->vertices[1]});
+    instanceOffsets.insert(
+        instanceOffsets.end(),
+        {cd->vertices[0], cd->vertices[1], cd->stretchX, cd->stretchY});
     colors.insert(colors.end(),
                   {cd->colorR, cd->colorG, cd->colorB, cd->colorA});
 
     flags.push_back(cd->flags);
+    textCoords.insert(textCoords.end(),
+                      {cd->textureCoords[0], cd->textureCoords[1],
+                       cd->textureCoords[2], cd->textureCoords[3]});
   }
 
   if (instanceOffsets.size() <= 0) {
@@ -148,6 +150,7 @@ void RenderManager::renderUserInterfaces() {
   if (cycle == 0)
     logCycle(std::format("{} ### Rendering Interfaces ...\n", getName()));
 #endif
+
   glUseProgram(Config::interfaceShaderProgram);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -165,7 +168,16 @@ void RenderManager::renderUserInterfaces() {
   glBufferData(GL_ARRAY_BUFFER, flags.size() * sizeof(std::uint32_t),
                flags.data(), GL_STATIC_DRAW);
 
+  glBindBuffer(GL_ARRAY_BUFFER, _facade->_interfaceUV);
+  glBufferData(GL_ARRAY_BUFFER, textCoords.size() * sizeof(float),
+               textCoords.data(), GL_STATIC_DRAW);
+
   glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  UniformUtils::setUniform(Config::interfaceTextureUniform, 0);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, _facade->_interfaceTEXTURE_ID);
+
   glm::mat4 ortho = glm::ortho(0.0f, (float)Config::GeneralConfig.WIDTH, 0.0f,
                                (float)Config::GeneralConfig.HEIGHT);
   UniformUtils::setUniform(Config::interfaceOrthoUniform, ortho);
@@ -173,10 +185,6 @@ void RenderManager::renderUserInterfaces() {
                           renderData.size());
   glDisable(GL_BLEND);
   glUseProgram(_usedShaderProgram);
-
-  for (ComponentData *cd : renderData) {
-    delete cd;
-  }
 }
 
 void RenderManager::updateUniforms(Entity *e, Model *model) {
