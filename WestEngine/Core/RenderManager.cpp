@@ -178,7 +178,7 @@ void RenderManager::renderUserInterfaces() {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, _facade->_interfaceFONT_TEXTURE_ID);
 
-  UniformUtils::setUniform(Config::interfaceTextureOneUniform, 0);
+  // UniformUtils::setUniform(Config::interfaceTextureOneUniform, 0);
 
   glm::mat4 ortho = glm::ortho(0.0f, (float)Config::GeneralConfig.WIDTH, 0.0f,
                                (float)Config::GeneralConfig.HEIGHT);
@@ -191,13 +191,16 @@ void RenderManager::renderUserInterfaces() {
 
 void RenderManager::updateUniforms(Entity *e, Model *model) {
 #ifdef DEBUG
-  if (e->isDebugEntity())
+  if (e->isDebugEntity()) {
     UniformUtils::setUniform(model->debugColorUniform, model->color);
+    assert(model->debugColorUniform != -1);
+  }
 #endif
 
   Texture *t = model->texture;
   if (t != nullptr) {
     UniformUtils::setUniform(t->uniform, 0);
+    assert(t->uniform != -1);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, t->id);
   }

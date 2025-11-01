@@ -11,10 +11,9 @@ in vec2 scale;
 out vec4 fragColor;
 
 uniform sampler2D fontTextureSampler;
-uniform sampler2DArray textureSampler;
 
-vec4 sampleTextureWithTransparency() {
-    vec4 texColor = texture(fontTextureSampler, TexCoord);
+vec4 sampleTextureWithTransparency() { 
+     vec4 texColor = texture(fontTextureSampler, TexCoord);
 
     float whiteness = (texColor.r + texColor.g + texColor.b) / 3.0;
     if (whiteness > 0.99) {

@@ -7,5 +7,5 @@ out vec4 fragColour;
 //uniform sampler2D textureSampler;
 
 void main() {
-    fragColour = vec4(0.0, 0.0, 0.0, 0.0);//texture(textureSampler, fragTextureCoord);
+    fragColour = vec4(0.0, 0.0, 0.0, 0.0); //texture(textureSampler, fragTextureCoord);
 }

@@ -153,14 +153,14 @@ GLuint ShaderManager::initInterfaceShader() {
                            getName()));
     return 1;
   }
-  Config::interfaceTextureOneUniform =
+  /*Config::interfaceTextureOneUniform =
       UniformUtils::createUniform(UniformConstants::TEXTURE_SAMPLER, programId);
   if (Config::interfaceTextureOneUniform == -1) {
     logFailure(std::format("{} ### Failed to create texture one uniform for "
                            "interface shader program.\n",
                            getName()));
     return 1;
-  }
+  }*/
   return 0;
 }
 
@@ -198,26 +198,21 @@ GLuint ShaderManager::initShader(Shader *s, Entity *entity) {
 // TODO make switch case
 void ShaderManager::addUniforms(GLuint programId, Entity *entity) {
   Model *m = (Model *)entity->getComponent(BitMasks::Components::MODEL);
-  if (m != nullptr && m->texture != nullptr) {
+  if (m != nullptr && m->texture != nullptr)
     m->texture->uniform = UniformUtils::createUniform(
         UniformConstants::TEXTURE_SAMPLER, programId);
-    assert(m->texture->uniform > -1);
-  }
 
 #ifdef DEBUG
   if (m != nullptr && entity->isDebugEntity())
     m->debugColorUniform =
         UniformUtils::createUniform(UniformConstants::COLOR, programId);
-  assert(m->debugColorUniform > -1);
 #endif
 
   Position *pos =
       (Position *)entity->getComponent(BitMasks::Components::POSITION);
-  if (pos != nullptr) {
+  if (pos != nullptr)
     pos->uniform = UniformUtils::createUniform(
         UniformConstants::TRANSFORMATION_MATRIX, programId);
-    assert(pos->uniform > -1);
-  }
 }
 
 GLuint ShaderManager::createShader(const std::string shaderFile,

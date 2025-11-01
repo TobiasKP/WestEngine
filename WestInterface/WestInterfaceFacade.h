@@ -99,4 +99,5 @@ private:
   WestLogger &_logger = WestLogger::getLoggerInstance();
 
   ContainerElement *findInterfaceById(std::uint8_t id);
+  void setupInstancedAttribute(GLuint buffer, GLuint index, GLint size, bool withDivisor);
 };

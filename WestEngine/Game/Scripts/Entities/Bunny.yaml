@@ -1,6 +1,6 @@
 id: 1
 name: "bunny"
-model: { mesh: "bunny.obj", texture: "test_texture.jpg" }
+model: { mesh: "bunny.obj", texture: "" }
 shader: { v: "Vertex.vs", f: "Fragment.fs" , group: 0 }
 components: 
   - { name: "Position", x: 0, y: 0, z: 0 }
