@@ -6,6 +6,7 @@
 
 #include "../RenderManagment/ComponentData.h"
 #include "../RenderManagment/ComponentDataPool.h"
+#include "../RenderManagment/TextRenderManager.h"
 
 static constexpr std::uint8_t SIZE_E = 40;
 
@@ -13,6 +14,7 @@ static constexpr std::uint8_t SIZE_E = 40;
 struct Text {
   std::string plaintext;
   std::vector<float> coordinates;
+  std::vector<float> positions;
 };
 
 struct IElement {
@@ -67,6 +69,17 @@ struct IElement {
     describeMyself(data, row, column);
     return data;
   };
+
+  float getElementWidth() {
+    float elementWidth = 0.0f;
+    if (this->text != nullptr && !this->text->plaintext.empty()) {
+      elementWidth = TextRenderManager::calculateTextWidth(
+          this->text->plaintext, this->stretchX);
+    } else {
+      elementWidth = this->columnElements * SIZE_E * this->stretchX;
+    }
+    return elementWidth;
+  }
 
 protected:
   WestLogger &_logger = WestLogger::getLoggerInstance();

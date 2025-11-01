@@ -77,7 +77,7 @@ public:
                                       1.0f, 1.0f, 0.0f, 1.0f};
 
   GLuint _interfaceVBO, _interfaceVAO, _interfaceEBO, _interfaceCOL,
-      _interfaceOFFSET, _interfaceFLAGS, _interfaceTEX, _interfaceTEXTURE_ID,
+      _interfaceOFFSET, _interfaceFLAGS, _interfaceTEX, _interfaceFONT_TEXTURE_ID,
       _interfaceUV;
 
   friend class UIRenderManager;

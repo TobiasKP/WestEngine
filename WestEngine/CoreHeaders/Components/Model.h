@@ -7,8 +7,8 @@
 #include <GL/glew.h>
 
 struct Texture {
-  std::int32_t id;
-  GLuint uniform;
+  std::int32_t id = -1;
+  GLuint uniform = -1;
 };
 
 struct Model : public IComponent {

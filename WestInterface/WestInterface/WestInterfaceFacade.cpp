@@ -5,6 +5,8 @@
 
 #include <format>
 
+#include "RenderManagment/TextRenderManager.h"
+
 WestInterfaceFacade &WestInterfaceFacade::getInterfaceInstance() {
   static WestInterfaceFacade instance;
   return instance;
@@ -43,7 +45,7 @@ void WestInterfaceFacade::init() {
   glGenBuffers(1, &_interfaceFLAGS);
   glGenBuffers(1, &_interfaceTEX);
   glGenBuffers(1, &_interfaceUV);
-  glGenTextures(1, &_interfaceTEXTURE_ID);
+  glGenTextures(1, &_interfaceFONT_TEXTURE_ID);
 
   glBindVertexArray(_interfaceVAO);
 
@@ -114,7 +116,7 @@ void WestInterfaceFacade::init() {
                     filePath, stbi_failure_reason()));
   }
 
-  glBindTexture(GL_TEXTURE_2D, _interfaceTEXTURE_ID);
+  glBindTexture(GL_TEXTURE_2D, _interfaceFONT_TEXTURE_ID);
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
                GL_UNSIGNED_BYTE, imgData);
@@ -251,7 +253,9 @@ std::vector<ElementBounds *> WestInterfaceFacade::getShownElementsBoundaries() {
       b->id = el->id;
       b->xLeft = el->xLL;
       b->yBottom = el->yLL;
-      b->xRight = el->xLL + (el->columnElements * SIZE_E * el->stretchX);
+
+      float elementWidth = el->getElementWidth();
+      b->xRight = el->xLL + elementWidth;
       b->yTop = el->yLL + (el->rowElements * SIZE_E * el->stretchY);
       result.push_back(b);
     }

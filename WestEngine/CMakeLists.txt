@@ -11,11 +11,6 @@ find_package(Lua REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(Stb REQUIRED)
 
-
-# ─────────────────────────────────────────────────────────────
-# Custom shared libraries 
-# ─────────────────────────────────────────────────────────────
-
 # ─────────────────────────────────────────────────────────────
 # Includes (shared across platforms)
 # ─────────────────────────────────────────────────────────────
@@ -111,6 +106,17 @@ if(NOT EXISTS "${RESOURCE_BASE}/${FOLDER}")
     )
 endif()
 endforeach()
+
+# ─────────────────────────────────────────────────────────────
+# Clean old log files before build
+# ─────────────────────────────────────────────────────────────
+
+add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E remove -f "${RESOURCE_BASE}/WestLog_*.log"
+    COMMAND ${CMAKE_COMMAND} -E remove -f "${RESOURCE_BASE}/WestError_*.log"
+    COMMAND ${CMAKE_COMMAND} -E remove -f "${RESOURCE_BASE}/WestCyclingLog_*.log"
+    COMMENT "Cleaning old WestLogger log files"
+)
 
 # ─────────────────────────────────────────────────────────────
 # Additional data copying (scripts, assets, configs, shaders)

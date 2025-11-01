@@ -34,6 +34,6 @@ struct WEST_INTERFACE ElementBounds {
  * FLAG DESCRIPTION
  * 0x01 = Border and no filling pixels -> discarded
  * 0x02 = Mouse Hovered
- *
+ * 0x04 = hasTexture
  *
  */

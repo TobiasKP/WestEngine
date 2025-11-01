@@ -119,7 +119,7 @@ void RenderManager::renderUserInterfaces() {
         "{} ### No render data for interfaces gathered skipping rendering\n",
         getName()));
     return;
-  } 
+  }
 
   std::vector<float> instanceOffsets;
   std::vector<float> colors;
@@ -174,9 +174,11 @@ void RenderManager::renderUserInterfaces() {
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-  UniformUtils::setUniform(Config::interfaceTextureUniform, 0);
+  UniformUtils::setUniform(Config::interfaceFontTextureUniform, 0);
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, _facade->_interfaceTEXTURE_ID);
+  glBindTexture(GL_TEXTURE_2D, _facade->_interfaceFONT_TEXTURE_ID);
+
+  UniformUtils::setUniform(Config::interfaceTextureOneUniform, 0);
 
   glm::mat4 ortho = glm::ortho(0.0f, (float)Config::GeneralConfig.WIDTH, 0.0f,
                                (float)Config::GeneralConfig.HEIGHT);

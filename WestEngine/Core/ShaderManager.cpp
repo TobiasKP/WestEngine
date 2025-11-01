@@ -139,10 +139,24 @@ GLuint ShaderManager::initInterfaceShader() {
   Config::interfaceShaderProgram = programId;
   Config::interfaceOrthoUniform =
       UniformUtils::createUniform(UniformConstants::ORTHO_UNIFORM, programId);
-  Config::interfaceTextureUniform =
-      UniformUtils::createUniform(UniformConstants::TEXTURE_SAMPLER, programId);
   if (Config::interfaceOrthoUniform == -1) {
     logFailure(std::format("{} ### Failed to create ortho matrix uniform for "
+                           "interface shader program.\n",
+                           getName()));
+    return 1;
+  }
+  Config::interfaceFontTextureUniform = UniformUtils::createUniform(
+      UniformConstants::FONT_TEXTURE_SAMPLER, programId);
+  if (Config::interfaceFontTextureUniform == -1) {
+    logFailure(std::format("{} ### Failed to create font sampler uniform for "
+                           "interface shader program.\n",
+                           getName()));
+    return 1;
+  }
+  Config::interfaceTextureOneUniform =
+      UniformUtils::createUniform(UniformConstants::TEXTURE_SAMPLER, programId);
+  if (Config::interfaceTextureOneUniform == -1) {
+    logFailure(std::format("{} ### Failed to create texture one uniform for "
                            "interface shader program.\n",
                            getName()));
     return 1;
@@ -184,14 +198,17 @@ GLuint ShaderManager::initShader(Shader *s, Entity *entity) {
 // TODO make switch case
 void ShaderManager::addUniforms(GLuint programId, Entity *entity) {
   Model *m = (Model *)entity->getComponent(BitMasks::Components::MODEL);
-  if (m != nullptr && m->texture != nullptr)
+  if (m != nullptr && m->texture != nullptr) {
     m->texture->uniform = UniformUtils::createUniform(
         UniformConstants::TEXTURE_SAMPLER, programId);
+    assert(m->texture->uniform > -1);
+  }
 
 #ifdef DEBUG
   if (m != nullptr && entity->isDebugEntity())
     m->debugColorUniform =
         UniformUtils::createUniform(UniformConstants::COLOR, programId);
+  assert(m->debugColorUniform > -1);
 #endif
 
   Position *pos =
@@ -199,6 +216,7 @@ void ShaderManager::addUniforms(GLuint programId, Entity *entity) {
   if (pos != nullptr) {
     pos->uniform = UniformUtils::createUniform(
         UniformConstants::TRANSFORMATION_MATRIX, programId);
+    assert(pos->uniform > -1);
   }
 }
 

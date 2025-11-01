@@ -16,11 +16,16 @@
 
 enum ElementType { LABEL, BUTTON, CONTAINER, ICON, DEBUG_ELEMENT };
 
+struct WEST_INTERFACE TextureInformation {
+  bool mipmap;
+  std::int32_t wrapping;
+  std::string path;
+};
+
 struct WEST_INTERFACE ElementProxy {
   ElementType type;
   std::uint32_t elementId;
 
-  // std::uint8_t eventId;
   std::function<void()> eventHandler = nullptr;
 
   float colorR;
@@ -39,12 +44,6 @@ struct WEST_INTERFACE ElementProxy {
   std::uint8_t column;
 
   std::string text = "";
-  /*
-    std::string value;
 
-
-    std::uint32_t textureId;
-
-    std::uint32_t iconId;
-    std::uint8_t padding;*/
+  TextureInformation *texture = nullptr;
 };

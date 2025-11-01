@@ -8,6 +8,10 @@ file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
   "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
 )
 
+
+# ─────────────────────────────────────────────────────────────
+# Building shared Library
+# ─────────────────────────────────────────────────────────────
 add_library(WestUtils SHARED ${SOURCE_FILES}) 
 
 target_include_directories(WestUtils

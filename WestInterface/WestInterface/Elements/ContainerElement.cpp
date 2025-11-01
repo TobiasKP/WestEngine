@@ -78,16 +78,19 @@ struct ContainerElement : public IElement {
         std::format("@@@ Element lower Left -> {}:{} - max Size -> {}:{}\n",
                     elementPosX, elementPosY, maxWidth, maxHeight));
 #endif
-    if (elementPosX + e->columnElements * SIZE_E * e->stretchX > maxWidth ||
+
+    float elementWidth = e->getElementWidth();
+    assert(elementWidth > 0.0f);
+    if (elementPosX + elementWidth > maxWidth ||
         elementPosY + e->rowElements * SIZE_E * e->stretchY > maxHeight) {
-      _logger.log(Level::Error, std::format("@@@ Added Element: {} will be to "
+      _logger.log(Level::Error, std::format("@@@ Added Element: {} will be too "
                                             "large for parent, not adding...\n",
                                             e->id));
       return;
     }
 
     e->xLL = elementPosX;
-    e->yLL = elementPosY; 
+    e->yLL = elementPosY;
 #ifdef DEBUG
     _logger.log(
         Level::Info,

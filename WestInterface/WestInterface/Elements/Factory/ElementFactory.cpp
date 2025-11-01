@@ -41,8 +41,13 @@ IElement *ElementFactory::createElementInternal(ElementProxy *e) {
   }
 
   assert(result != nullptr);
+  if (e->texture != nullptr)
+    fillTexture(e, result);
+
   return result;
 }
+
+void ElementFactory::fillTexture(ElementProxy *ep, IElement *el) {}
 
 void ElementFactory::fillText(ElementProxy *ep, IElement *el) {
   if (ep->text.size() == 0)
@@ -50,12 +55,19 @@ void ElementFactory::fillText(ElementProxy *ep, IElement *el) {
 
   Text *t = new Text();
   t->plaintext = ep->text;
+
   t->coordinates.reserve(ep->text.size() * 4);
+  t->positions.reserve(ep->text.size());
+  t->positions =
+      TextRenderManager::calculateTextPositions(ep->text, el->stretchX);
+
   for (char c : ep->text) {
     std::array<float, 4> coords = getTextureCoordinatesForChar(c);
     t->coordinates.insert(t->coordinates.end(), coords.begin(), coords.end());
   }
+
   assert(t->coordinates.size() == ep->text.size() * 4);
+  assert(t->positions.size() == ep->text.size());
   el->text = std::unique_ptr<Text>(t);
 }
 
@@ -65,7 +77,7 @@ void ElementFactory::registerElementEvent(ElementProxy *ep, IElement *e) {
   _eObserver->registerElement(e);
 }
 
-void ElementFactory::registerElementValue(ElementProxy *ep, IElement *e) { 
+void ElementFactory::registerElementValue(ElementProxy *ep, IElement *e) {
   e->supportsEvents = true;
   _vObserver->registerElement(e);
 }

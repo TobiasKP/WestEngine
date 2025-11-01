@@ -10,7 +10,19 @@ in vec2 scale;
 
 out vec4 fragColor;
 
-uniform sampler2D textureSampler;
+uniform sampler2D fontTextureSampler;
+uniform sampler2DArray textureSampler;
+
+vec4 sampleTextureWithTransparency() {
+    vec4 texColor = texture(fontTextureSampler, TexCoord);
+
+    float whiteness = (texColor.r + texColor.g + texColor.b) / 3.0;
+    if (whiteness > 0.99) {
+        discard;
+    }
+
+    return texColor;
+}
 
 void calculateBorderEffect(vec4 color, bool dis) {
     float borderWidth = 0.1;
@@ -22,7 +34,7 @@ void calculateBorderEffect(vec4 color, bool dis) {
         if (dis) {
             discard;
         } else {
-            fragColor = texture(textureSampler, TexCoord);
+            fragColor = sampleTextureWithTransparency();
         }
     } else {
         fragColor = color;
@@ -30,7 +42,7 @@ void calculateBorderEffect(vec4 color, bool dis) {
 }
 
 void calculateGlowEffect(vec3 glowColor, float intensity) {
-    vec4 baseColor = texture(textureSampler, TexCoord);
+    vec4 baseColor = sampleTextureWithTransparency();
     fragColor = vec4(baseColor.rgb + (glowColor * intensity), baseColor.a);
 }
 
@@ -38,7 +50,7 @@ void main() {
     if ((vFlags & 0x01u) != 0u) {
         calculateBorderEffect(vec4(0.0, 0.0, 0.0, 1.0), true);
     } else {
-        fragColor = texture(textureSampler, TexCoord);
+        fragColor = sampleTextureWithTransparency();
     }
 
     if ((vFlags & 0x02u) != 0u) {

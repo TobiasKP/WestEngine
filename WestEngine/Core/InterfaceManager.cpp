@@ -75,7 +75,7 @@ std::int32_t InterfaceManager::buildTechDemoFooter() {
   ElementProxy *quitButton = new ElementProxy();
   quitButton->type = BUTTON;
   quitButton->elementId = 2;
-  quitButton->xPosition = 480.0f;
+  quitButton->xPosition = 700.0f;
   quitButton->yPosition = 0.0f;
   quitButton->row = 0;
   quitButton->column = 0;
@@ -91,7 +91,7 @@ std::int32_t InterfaceManager::buildTechDemoFooter() {
   assert(elements.size() > 0);
   logDebug(
       std::format("{} ### Creating Tech Demo interface footer\n", getName()));
-  std::uint8_t footerId = _facade->createNewInterface(0.0f, 0.0f, 16.0f, 1.0f,
+  std::uint8_t footerId = _facade->createNewInterface(0.0f, 0.0f, 20.0f, 1.0f,
                                                       1, 1, false, elements);
   _interfaces++;
   logDebug(std::format("{} ### Created Tech Demo footer -> {}\n", getName(),
