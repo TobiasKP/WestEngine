@@ -153,14 +153,14 @@ GLuint ShaderManager::initInterfaceShader() {
                            getName()));
     return 1;
   }
-  /*Config::interfaceTextureOneUniform =
+  Config::interfaceTextureOneUniform =
       UniformUtils::createUniform(UniformConstants::TEXTURE_SAMPLER, programId);
   if (Config::interfaceTextureOneUniform == -1) {
     logFailure(std::format("{} ### Failed to create texture one uniform for "
                            "interface shader program.\n",
                            getName()));
     return 1;
-  }*/
+  }
   return 0;
 }
 

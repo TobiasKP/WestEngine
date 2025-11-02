@@ -15,17 +15,17 @@ public:
                                   std::int32_t action, std::int32_t mods);
 
   inline static void setInputObserver(InputObserver *o) { _iObserver = o; }
-  inline static void setElementBounds(std::vector<ElementBounds *> elements) {
+  inline static void setElementBounds(std::vector<ElementBounds *> &elements) {
     _elements = elements;
   };
 
 private:
-  static std::int16_t isInterfaceHovered();
+  static std::tuple<std::int16_t, bool> isInterfaceHovered();
 
   static std::vector<ElementBounds *> _elements;
 
   static glm::vec2 _currentPos;
-  static std::int16_t _currentHover;
+  static std::tuple<std::int16_t, bool> _currentHover;
   static std::int32_t _inWindow, _leftButtonPress, _rightButtonPress;
   static InputObserver *_iObserver;
 };

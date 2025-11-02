@@ -21,6 +21,7 @@ public:
                           std::uint16_t yScreenPosition, float stretchX,
                           float stretchY, std::uint16_t rows,
                           std::uint16_t columns, bool hiddenContainer);
+  void createBackground(TextureInformation *t);
   void addElement(ElementProxy *e);
   ContainerElement *build();
   IElement *transform(ElementProxy *e);

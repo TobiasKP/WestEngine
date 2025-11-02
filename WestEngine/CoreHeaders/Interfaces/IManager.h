@@ -7,8 +7,8 @@
 #include <string>
 
 #include "../../Constants/CoreConstants.hpp"
-#include <WestLogger.h>
 #include <TimeUtils.hpp>
+#include <WestLogger.h>
 
 class IManager {
 
@@ -21,7 +21,7 @@ public:
   virtual void update() = 0;
   virtual std::int32_t init() = 0;
 
-  inline void setName(std::string name) { this->_name = name; }
+  inline void setName(const std::string &name) { this->_name = name; }
 
   inline const std::string getName() { return this->_name; }
   inline WestLogger *getLogger() { return this->_logger; }

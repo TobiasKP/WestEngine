@@ -1,5 +1,7 @@
 #include "InterfaceBuilder.h"
 
+#include <stb_image.h>
+
 InterfaceBuilder::InterfaceBuilder() {
   _factory = nullptr;
   _dataPool = nullptr;
@@ -53,6 +55,38 @@ void InterfaceBuilder::createNewInterface(std::uint16_t xScreenPosition,
               std::format("@@@ Creating new Interface -> {} : {}\n",
                           xScreenPosition, yScreenPosition));
 #endif
+}
+void InterfaceBuilder::createBackground(TextureInformation *t) {
+  GLuint texture;
+  glGenTextures(1, &texture);
+
+  std::int32_t width, height, numComponents;
+  const char *textureFile = t->path;
+  char cwd[128];
+  char filePath[PATH_MAX];
+  if (getcwd(cwd, sizeof(cwd)) == NULL) {
+
+    _logger.log(Level::Error, "@@@ GNU.\n");
+    return;
+  }
+
+  snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", textureFile);
+
+  unsigned char *imgData =
+      stbi_load(filePath, &width, &height, &numComponents, 0);
+  if (imgData == NULL) {
+    _logger.log(Level::Error, "@@@ GNA.\n");
+    return;
+  }
+
+  glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGB, width, height, 1, 0, GL_RGB,
+               GL_UNSIGNED_BYTE, imgData);
+  glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+  stbi_image_free(imgData);
+  _current->texture = texture;
+  _current->flags |= 0x04;
 }
 
 void InterfaceBuilder::addElement(ElementProxy *e) {

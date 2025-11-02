@@ -19,7 +19,7 @@ enum ElementType { LABEL, BUTTON, CONTAINER, ICON, DEBUG_ELEMENT };
 struct WEST_INTERFACE TextureInformation {
   bool mipmap;
   std::int32_t wrapping;
-  std::string path;
+  const char *path;
 };
 
 struct WEST_INTERFACE ElementProxy {
@@ -33,6 +33,7 @@ struct WEST_INTERFACE ElementProxy {
   float colorB;
   float colorA;
 
+  std::int8_t zIndex = -1;
   float xPosition;
   float yPosition;
   float stretchX = 1.0f;
@@ -46,4 +47,18 @@ struct WEST_INTERFACE ElementProxy {
   std::string text = "";
 
   TextureInformation *texture = nullptr;
+};
+
+struct WEST_INTERFACE Container {
+  std::uint16_t xScreenPosition;
+  std::uint16_t yScreenPosition;
+  float stretchX;
+  float stretchY;
+  std::uint16_t rows;
+  std::uint16_t columns;
+  bool hiddenContainer;
+  std::vector<ElementProxy *> &elements;
+  TextureInformation *background = nullptr;
+
+  Container(std::vector<ElementProxy *> &vec) : elements(vec) {};
 };

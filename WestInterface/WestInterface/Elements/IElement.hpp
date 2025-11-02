@@ -24,8 +24,8 @@ struct IElement {
   // Public identifier
   std::uint32_t id;
 
-  // zIndex. gives the element "stack"
-  std::uint8_t zIndex = 1;
+  // zIndex
+  std::int8_t zIndex = -1;
 
   // Sizing params: Each element has a basic size of
   // 10*10px with xLL & yLL as the most lower left corner of the element.
@@ -49,6 +49,7 @@ struct IElement {
   std::uint16_t columnElements = 0;
 
   std::unique_ptr<Text> text;
+  GLuint texture;
 
   bool changed = true;
   bool supportsEvents = false;

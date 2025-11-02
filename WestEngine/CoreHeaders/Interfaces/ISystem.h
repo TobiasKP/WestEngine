@@ -16,7 +16,7 @@ public:
 
   // Getter
   inline std::string getName() { return _name; }
-  inline const std::vector<Entity *> getEntities() { return _entities; }
+  inline const std::vector<Entity *>& getEntities() { return _entities; }
 
   // Setter
   inline void setName(const std::string name) { _name = name; }

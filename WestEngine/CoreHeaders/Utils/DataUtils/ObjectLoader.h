@@ -33,5 +33,5 @@ private:
   void storeDataInAttribList(std::int32_t attribNo, std::int32_t vertexCount,
                              float *data, size_t dataLength);
   void unbind();
-  std::vector<float> generatePlanarUV(const std::vector<float>& vertices);
+  std::vector<float> generatePlanarUV(const std::vector<float> &vertices);
 };

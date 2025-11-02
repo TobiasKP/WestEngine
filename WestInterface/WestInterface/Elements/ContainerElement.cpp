@@ -10,7 +10,10 @@
 struct ContainerElement : public IElement {
   std::vector<IElement *> children;
 
-  ContainerElement() { flags = 0x01; }
+  ContainerElement() {
+    flags = 0x01;
+    zIndex = 1;
+  }
 
   ~ContainerElement() {
 #ifdef DEBUG
@@ -134,6 +137,9 @@ struct ContainerElement : public IElement {
     cd->stretchX = stretchX;
     cd->stretchY = stretchY;
     cd->flags = flags;
+    cd->zIndex = zIndex;
+    if(texture > 0)
+      cd->texture = texture;
   }
 
   void updatePositions(std::uint32_t oldPos, std::uint32_t newPos) {

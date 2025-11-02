@@ -86,13 +86,25 @@ std::int32_t InterfaceManager::buildTechDemoFooter() {
     _windowManager->setWindowShouldClose();
   };
 
+  TextureInformation *x = new TextureInformation();
+  x->path = "assets/Textures/test_texture.jpg";
+
   elements.push_back(quitButton);
 
   assert(elements.size() > 0);
   logDebug(
       std::format("{} ### Creating Tech Demo interface footer\n", getName()));
-  std::uint8_t footerId = _facade->createNewInterface(0.0f, 0.0f, 20.0f, 1.0f,
-                                                      1, 1, false, elements);
+  Container *c = new Container(elements);
+
+  c->xScreenPosition = 0.0f;
+  c->yScreenPosition = 0.0f;
+  c->stretchX = 20.0f;
+  c->stretchY = 1.0f;
+  c->rows = 1;
+  c->columns = 1;
+  c->hiddenContainer = false;
+  c->background = x;
+  std::uint8_t footerId = _facade->createNewInterface(c);
   _interfaces++;
   logDebug(std::format("{} ### Created Tech Demo footer -> {}\n", getName(),
                        footerId));

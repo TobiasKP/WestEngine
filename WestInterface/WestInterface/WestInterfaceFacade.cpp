@@ -4,7 +4,6 @@
 #include <stb_image.h>
 
 #include <format>
-#include <functional>
 
 #include "RenderManagment/TextRenderManager.h"
 
@@ -40,7 +39,6 @@ void WestInterfaceFacade::shutdown() {
 void WestInterfaceFacade::init() {
   glGenVertexArrays(1, &_interfaceVAO);
 
-  // Generate all buffers at once
   GLuint buffers[7] = {0};
   glGenBuffers(7, buffers);
   _interfaceVBO = buffers[0];
@@ -50,6 +48,13 @@ void WestInterfaceFacade::init() {
   _interfaceFLAGS = buffers[4];
   _interfaceTEX = buffers[5];
   _interfaceUV = buffers[6];
+  for (GLuint i : buffers) {
+    if (i == -1) {
+      _logger.log(Level::Error,
+                  "--- Error generating Buffers, check OpenGL error logs.\n");
+      return;
+    }
+  }
 
   glGenTextures(1, &_interfaceFONT_TEXTURE_ID);
 
@@ -140,17 +145,18 @@ ContainerElement *WestInterfaceFacade::findInterfaceById(std::uint8_t id) {
   return nullptr;
 }
 
-std::uint8_t WestInterfaceFacade::createNewInterface(
-    std::uint16_t xScreenPosition, std::uint16_t yScreenPosition,
-    float stretchX, float stretchY, std::uint16_t rows, std::uint16_t columns,
-    bool hiddenContainer, std::vector<ElementProxy *> elements) {
+std::uint8_t WestInterfaceFacade::createNewInterface(Container *c) {
 #ifdef DEBUG
   _logger.log(Level::Info, "@@@ Creating new Interface\n");
 #endif
 
-  _builder->createNewInterface(xScreenPosition, yScreenPosition, stretchX,
-                               stretchY, rows, columns, hiddenContainer);
-  for (auto *element : elements) {
+  _builder->createNewInterface(c->xScreenPosition, c->yScreenPosition, c->stretchX,
+                               c->stretchY, c->rows, c->columns, c->hiddenContainer);
+
+  if(c->background != nullptr) 
+    _builder->createBackground(c->background);
+
+  for (auto *element : c->elements) {
 #ifdef DEBUG
     _logger.log(Level::Cycle,
                 std::format("@@@ Addding new element to interface: {}\n",
@@ -161,6 +167,7 @@ std::uint8_t WestInterfaceFacade::createNewInterface(
   ContainerElement *interface = _builder->build();
   _interfaces.at(count) = interface;
   count++;
+  _renderManager->toggleDirty();
   return interface->id;
 }
 
@@ -186,6 +193,7 @@ bool WestInterfaceFacade::destroyInterface(std::uint8_t interfaceId) {
   _interfaces.at(count - 1) = nullptr;
   count--;
 
+  _renderManager->toggleDirty();
   delete elementToDelete;
   return true;
 }
@@ -206,6 +214,8 @@ void WestInterfaceFacade::addElement(std::uint8_t interfaceId,
           "@@@ Adding additional element to interface: {}, after creation\n",
           interfaceId));
 #endif
+
+  _renderManager->toggleDirty();
   interface->addChild(e, element->column, element->row);
 };
 
@@ -215,6 +225,7 @@ bool WestInterfaceFacade::removeElement(std::uint8_t interfaceId,
   if (interface == nullptr)
     return false;
 
+  _renderManager->toggleDirty();
   return interface->deleteChildById(elementId);
 };
 
@@ -225,7 +236,7 @@ void WestInterfaceFacade::updateRenderData() {
   _renderManager->updateRenderData(_interfaces, count);
 };
 
-std::vector<ComponentData *> WestInterfaceFacade::getRenderData() {
+std::vector<ComponentData *> &WestInterfaceFacade::getRenderData() {
   return _renderManager->getRenderData();
 };
 
@@ -233,35 +244,19 @@ bool WestInterfaceFacade::notify(std::int16_t elementId, std::uint8_t event,
                                  std::uint16_t mouseX, std::uint16_t mouseY) {
   bool evResult =
       _eventObserver->handleEvent(elementId, event, mouseX, mouseY, "");
+  _renderManager->toggleDirty();
   return evResult;
 };
 
 bool WestInterfaceFacade::notify(std::int16_t elementId, std::uint8_t event,
                                  std::string value) {
   bool evResult = _eventObserver->handleEvent(elementId, event, -1, -1, value);
+  _renderManager->toggleDirty();
   return false;
 };
 
 std::vector<ElementBounds *> WestInterfaceFacade::getShownElementsBoundaries() {
-  std::vector<ElementBounds *> result;
-  for (ContainerElement *ce : _interfaces) {
-    if (ce == nullptr)
-      break;
-    for (IElement *el : ce->children) {
-      if (!el->supportsEvents)
-        continue;
-      ElementBounds *b = new ElementBounds();
-      b->id = el->id;
-      b->xLeft = el->xLL;
-      b->yBottom = el->yLL;
-
-      float elementWidth = el->getElementWidth();
-      b->xRight = el->xLL + elementWidth;
-      b->yTop = el->yLL + (el->rowElements * SIZE_E * el->stretchY);
-      result.push_back(b);
-    }
-  }
-  return result;
+  return _renderManager->getBoundaries();
 }
 
 ///////////////////////////

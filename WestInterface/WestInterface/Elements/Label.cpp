@@ -25,7 +25,7 @@ struct Label : public IElement {
     cd->colorA = this->colorA;
 
     cd->vertices[1] = yLL + (SIZE_E * row);
- 
+
     if (text != nullptr && text->positions.size() > column) {
       cd->vertices[0] = xLL + text->positions[column];
     } else {
@@ -35,6 +35,7 @@ struct Label : public IElement {
     cd->stretchX = stretchX;
     cd->stretchY = stretchY;
     cd->flags = flags;
+    cd->zIndex = zIndex;
     if (text != nullptr && text->coordinates.size() > 4 * column) {
       cd->textureCoords[0] = text->coordinates[0 + 4 * column];
       cd->textureCoords[1] = text->coordinates[1 + 4 * column];
