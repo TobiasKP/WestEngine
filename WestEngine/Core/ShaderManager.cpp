@@ -139,10 +139,24 @@ GLuint ShaderManager::initInterfaceShader() {
   Config::interfaceShaderProgram = programId;
   Config::interfaceOrthoUniform =
       UniformUtils::createUniform(UniformConstants::ORTHO_UNIFORM, programId);
-  Config::interfaceTextureUniform =
-      UniformUtils::createUniform(UniformConstants::TEXTURE_SAMPLER, programId);
   if (Config::interfaceOrthoUniform == -1) {
     logFailure(std::format("{} ### Failed to create ortho matrix uniform for "
+                           "interface shader program.\n",
+                           getName()));
+    return 1;
+  }
+  Config::interfaceFontTextureUniform = UniformUtils::createUniform(
+      UniformConstants::FONT_TEXTURE_SAMPLER, programId);
+  if (Config::interfaceFontTextureUniform == -1) {
+    logFailure(std::format("{} ### Failed to create font sampler uniform for "
+                           "interface shader program.\n",
+                           getName()));
+    return 1;
+  }
+  Config::interfaceTextureOneUniform =
+      UniformUtils::createUniform(UniformConstants::TEXTURE_SAMPLER, programId);
+  if (Config::interfaceTextureOneUniform == -1) {
+    logFailure(std::format("{} ### Failed to create texture one uniform for "
                            "interface shader program.\n",
                            getName()));
     return 1;
@@ -196,10 +210,9 @@ void ShaderManager::addUniforms(GLuint programId, Entity *entity) {
 
   Position *pos =
       (Position *)entity->getComponent(BitMasks::Components::POSITION);
-  if (pos != nullptr) {
+  if (pos != nullptr)
     pos->uniform = UniformUtils::createUniform(
         UniformConstants::TRANSFORMATION_MATRIX, programId);
-  }
 }
 
 GLuint ShaderManager::createShader(const std::string shaderFile,

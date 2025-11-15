@@ -5,6 +5,8 @@
 
 #include <format>
 
+#include "RenderManagment/TextRenderManager.h"
+
 WestInterfaceFacade &WestInterfaceFacade::getInterfaceInstance() {
   static WestInterfaceFacade instance;
   return instance;
@@ -36,14 +38,25 @@ void WestInterfaceFacade::shutdown() {
 
 void WestInterfaceFacade::init() {
   glGenVertexArrays(1, &_interfaceVAO);
-  glGenBuffers(1, &_interfaceVBO);
-  glGenBuffers(1, &_interfaceEBO);
-  glGenBuffers(1, &_interfaceCOL);
-  glGenBuffers(1, &_interfaceOFFSET);
-  glGenBuffers(1, &_interfaceFLAGS);
-  glGenBuffers(1, &_interfaceTEX);
-  glGenBuffers(1, &_interfaceUV);
-  glGenTextures(1, &_interfaceTEXTURE_ID);
+
+  GLuint buffers[7] = {0};
+  glGenBuffers(7, buffers);
+  _interfaceVBO = buffers[0];
+  _interfaceEBO = buffers[1];
+  _interfaceCOL = buffers[2];
+  _interfaceOFFSET = buffers[3];
+  _interfaceFLAGS = buffers[4];
+  _interfaceTEX = buffers[5];
+  _interfaceUV = buffers[6];
+  for (GLuint i : buffers) {
+    if (i == -1) {
+      _logger.log(Level::Error,
+                  "--- Error generating Buffers, check OpenGL error logs.\n");
+      return;
+    }
+  }
+
+  glGenTextures(1, &_interfaceFONT_TEXTURE_ID);
 
   glBindVertexArray(_interfaceVAO);
 
@@ -57,19 +70,8 @@ void WestInterfaceFacade::init() {
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
 
-  glBindBuffer(GL_ARRAY_BUFFER, _interfaceCOL);
-  glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
-
-  glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
-  glVertexAttribDivisor(1, 1);
-  glEnableVertexAttribArray(1);
-
-  glBindBuffer(GL_ARRAY_BUFFER, _interfaceOFFSET);
-  glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
-
-  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
-  glVertexAttribDivisor(2, 1);
-  glEnableVertexAttribArray(2);
+  setupInstancedAttribute(_interfaceCOL, 1, 4, true);
+  setupInstancedAttribute(_interfaceOFFSET, 2, 4, true);
 
   glBindBuffer(GL_ARRAY_BUFFER, _interfaceTEX);
   glBufferData(GL_ARRAY_BUFFER, sizeof(baseTex), baseTex, GL_STATIC_DRAW);
@@ -77,16 +79,10 @@ void WestInterfaceFacade::init() {
   glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(3);
 
-  glBindBuffer(GL_ARRAY_BUFFER, _interfaceUV);
-  glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
-
-  glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
-  glVertexAttribDivisor(4, 1);
-  glEnableVertexAttribArray(4);
+  setupInstancedAttribute(_interfaceUV, 4, 4, true);
 
   glBindBuffer(GL_ARRAY_BUFFER, _interfaceFLAGS);
   glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
-
   glVertexAttribIPointer(5, 1, GL_UNSIGNED_INT, sizeof(std::uint32_t),
                          (void *)0);
   glVertexAttribDivisor(5, 1);
@@ -96,7 +92,7 @@ void WestInterfaceFacade::init() {
   glBindVertexArray(0);
 
   std::int32_t width, height, numComponents;
-  const char *textureFile = "/assets/Textures/font.bmp";
+  const char *textureFile = "/assets/Textures/courier.bmp";
   char cwd[128];
   char filePath[PATH_MAX];
   if (getcwd(cwd, sizeof(cwd)) == NULL) {
@@ -114,7 +110,7 @@ void WestInterfaceFacade::init() {
                     filePath, stbi_failure_reason()));
   }
 
-  glBindTexture(GL_TEXTURE_2D, _interfaceTEXTURE_ID);
+  glBindTexture(GL_TEXTURE_2D, _interfaceFONT_TEXTURE_ID);
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
                GL_UNSIGNED_BYTE, imgData);
@@ -122,6 +118,18 @@ void WestInterfaceFacade::init() {
   stbi_image_free(imgData);
 
   _textManager->initializeFontAtlas();
+}
+
+void WestInterfaceFacade::setupInstancedAttribute(GLuint buffer, GLuint index,
+                                                  GLint size,
+                                                  bool withDivisor) {
+  glBindBuffer(GL_ARRAY_BUFFER, buffer);
+  glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
+  glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, size * sizeof(float),
+                        (void *)0);
+  if (withDivisor)
+    glVertexAttribDivisor(index, 1);
+  glEnableVertexAttribArray(index);
 }
 
 ContainerElement *WestInterfaceFacade::findInterfaceById(std::uint8_t id) {
@@ -137,17 +145,19 @@ ContainerElement *WestInterfaceFacade::findInterfaceById(std::uint8_t id) {
   return nullptr;
 }
 
-std::uint8_t WestInterfaceFacade::createNewInterface(
-    std::uint16_t xScreenPosition, std::uint16_t yScreenPosition,
-    float stretchX, float stretchY, std::uint16_t rows, std::uint16_t columns,
-    bool hiddenContainer, std::vector<ElementProxy *> elements) {
+std::uint8_t WestInterfaceFacade::createNewInterface(Container *c) {
 #ifdef DEBUG
   _logger.log(Level::Info, "@@@ Creating new Interface\n");
 #endif
 
-  _builder->createNewInterface(xScreenPosition, yScreenPosition, stretchX,
-                               stretchY, rows, columns, hiddenContainer);
-  for (auto *element : elements) {
+  _builder->createNewInterface(c->xScreenPosition, c->yScreenPosition,
+                               c->stretchX, c->stretchY, c->rows, c->columns,
+                               c->hiddenContainer);
+
+  if (c->background != nullptr)
+    _builder->createBackground(c->background);
+
+  for (auto *element : c->elements) {
 #ifdef DEBUG
     _logger.log(Level::Cycle,
                 std::format("@@@ Addding new element to interface: {}\n",
@@ -158,6 +168,7 @@ std::uint8_t WestInterfaceFacade::createNewInterface(
   ContainerElement *interface = _builder->build();
   _interfaces.at(count) = interface;
   count++;
+  _renderManager->toggleDirty();
   return interface->id;
 }
 
@@ -183,6 +194,7 @@ bool WestInterfaceFacade::destroyInterface(std::uint8_t interfaceId) {
   _interfaces.at(count - 1) = nullptr;
   count--;
 
+  _renderManager->toggleDirty();
   delete elementToDelete;
   return true;
 }
@@ -203,6 +215,8 @@ void WestInterfaceFacade::addElement(std::uint8_t interfaceId,
           "@@@ Adding additional element to interface: {}, after creation\n",
           interfaceId));
 #endif
+
+  _renderManager->toggleDirty();
   interface->addChild(e, element->column, element->row);
 };
 
@@ -212,6 +226,7 @@ bool WestInterfaceFacade::removeElement(std::uint8_t interfaceId,
   if (interface == nullptr)
     return false;
 
+  _renderManager->toggleDirty();
   return interface->deleteChildById(elementId);
 };
 
@@ -222,7 +237,7 @@ void WestInterfaceFacade::updateRenderData() {
   _renderManager->updateRenderData(_interfaces, count);
 };
 
-std::vector<ComponentData *> WestInterfaceFacade::getRenderData() {
+std::vector<ComponentData *> &WestInterfaceFacade::getRenderData() {
   return _renderManager->getRenderData();
 };
 
@@ -230,33 +245,19 @@ bool WestInterfaceFacade::notify(std::int16_t elementId, std::uint8_t event,
                                  std::uint16_t mouseX, std::uint16_t mouseY) {
   bool evResult =
       _eventObserver->handleEvent(elementId, event, mouseX, mouseY, "");
+  _renderManager->toggleDirty();
   return evResult;
 };
 
 bool WestInterfaceFacade::notify(std::int16_t elementId, std::uint8_t event,
                                  std::string value) {
   bool evResult = _eventObserver->handleEvent(elementId, event, -1, -1, value);
+  _renderManager->toggleDirty();
   return false;
 };
 
 std::vector<ElementBounds *> WestInterfaceFacade::getShownElementsBoundaries() {
-  std::vector<ElementBounds *> result;
-  for (ContainerElement *ce : _interfaces) {
-    if (ce == nullptr)
-      break;
-    for (IElement *el : ce->children) {
-      if (!el->supportsEvents)
-        continue;
-      ElementBounds *b = new ElementBounds();
-      b->id = el->id;
-      b->xLeft = el->xLL;
-      b->yBottom = el->yLL;
-      b->xRight = el->xLL + (el->columnElements * SIZE_E * el->stretchX);
-      b->yTop = el->yLL + (el->rowElements * SIZE_E * el->stretchY);
-      result.push_back(b);
-    }
-  }
-  return result;
+  return _renderManager->getBoundaries();
 }
 
 ///////////////////////////

@@ -34,11 +34,7 @@ public:
   void shutdown();
 
   // Managing Interfaces
-  std::uint8_t createNewInterface(std::uint16_t xScreenPosition,
-                                  std::uint16_t yScreenPosition, float stretchX,
-                                  float stretchY, std::uint16_t rows,
-                                  std::uint16_t columns, bool hiddenContainer,
-                                  std::vector<ElementProxy *> elements);
+  std::uint8_t createNewInterface(Container *c);
   bool destroyInterface(std::uint8_t interfaceId);
 
   // Adding Elements or removing
@@ -47,7 +43,7 @@ public:
 
   // RenderLoop
   void updateRenderData();
-  std::vector<ComponentData *> getRenderData();
+  std::vector<ComponentData *> &getRenderData();
 
   // Events
   bool notify(std::int16_t elementId, std::uint8_t event, std::uint16_t mouseX,
@@ -60,7 +56,7 @@ public:
   bool reposition(std::uint8_t interfaceId, std::uint16_t xScreenPosition,
                   std::uint16_t yScreenPosition);
 
-  // Get Resources
+  // Get Resources TODO: reallobrate
   const char *getResource(std::string resource);
 
   std::vector<ElementBounds *> getShownElementsBoundaries();
@@ -77,8 +73,8 @@ public:
                                       1.0f, 1.0f, 0.0f, 1.0f};
 
   GLuint _interfaceVBO, _interfaceVAO, _interfaceEBO, _interfaceCOL,
-      _interfaceOFFSET, _interfaceFLAGS, _interfaceTEX, _interfaceTEXTURE_ID,
-      _interfaceUV;
+      _interfaceOFFSET, _interfaceFLAGS, _interfaceTEX,
+      _interfaceFONT_TEXTURE_ID, _interfaceUV;
 
   friend class UIRenderManager;
 
@@ -99,4 +95,6 @@ private:
   WestLogger &_logger = WestLogger::getLoggerInstance();
 
   ContainerElement *findInterfaceById(std::uint8_t id);
+  void setupInstancedAttribute(GLuint buffer, GLuint index, GLint size,
+                               bool withDivisor);
 };

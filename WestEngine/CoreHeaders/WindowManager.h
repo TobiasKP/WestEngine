@@ -28,7 +28,7 @@ public:
   inline bool windowShouldClose() { return glfwWindowShouldClose(_window); }
   inline void setWindowShouldClose() { glfwSetWindowShouldClose(_window, GLFW_TRUE); }
   void resizeWindow(GLint width, GLint height);
-  void setWindowTitle(std::string title);
+  void setWindowTitle(const std::string &title);
   void setClearColor(float r, float g, float b, float a) {
     glClearColor(r, g, b, a);
   }

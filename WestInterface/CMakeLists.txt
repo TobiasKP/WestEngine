@@ -13,7 +13,9 @@ file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/*.h
 )
 
-# === Shared Library ===
+# ─────────────────────────────────────────────────────────────
+# Building shared Library
+# ─────────────────────────────────────────────────────────────
 add_library(WestInterface SHARED ${LIB_SOURCES})
 target_include_directories(WestInterface PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(WestInterface PUBLIC 
@@ -32,6 +34,10 @@ target_compile_definitions(WestInterface PRIVATE
 
 set(RESOURCE_BASE "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../WestEngine")
 
+
+# ─────────────────────────────────────────────────────────────
+# Additional data copying (scripts, assets, configs, shaders)
+# ─────────────────────────────────────────────────────────────
 if(NOT EXISTS "${RESOURCE_BASE}/shader")
   add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E make_directory "${RESOURCE_BASE}/shader"

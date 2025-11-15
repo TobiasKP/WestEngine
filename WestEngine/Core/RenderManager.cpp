@@ -1,6 +1,7 @@
 #include "../CoreHeaders/RenderManager.h"
 
 #include <Config.h>
+#include <algorithm>
 
 #include <glm/ext/matrix_clip_space.hpp>
 
@@ -119,12 +120,13 @@ void RenderManager::renderUserInterfaces() {
         "{} ### No render data for interfaces gathered skipping rendering\n",
         getName()));
     return;
-  } 
+  }
 
   std::vector<float> instanceOffsets;
   std::vector<float> colors;
   std::vector<float> textCoords;
   std::vector<std::uint32_t> flags;
+  GLuint texture = 0;
   for (ComponentData *cd : renderData) {
     instanceOffsets.insert(
         instanceOffsets.end(),
@@ -136,6 +138,8 @@ void RenderManager::renderUserInterfaces() {
     textCoords.insert(textCoords.end(),
                       {cd->textureCoords[0], cd->textureCoords[1],
                        cd->textureCoords[2], cd->textureCoords[3]});
+    if (cd->texture > 0)
+      texture = cd->texture;
   }
 
   if (instanceOffsets.size() <= 0) {
@@ -153,6 +157,7 @@ void RenderManager::renderUserInterfaces() {
 
   glUseProgram(Config::interfaceShaderProgram);
   glEnable(GL_BLEND);
+  glEnable(GL_DEPTH_TEST);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glBindVertexArray(_facade->_interfaceVAO);
 
@@ -174,9 +179,13 @@ void RenderManager::renderUserInterfaces() {
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-  UniformUtils::setUniform(Config::interfaceTextureUniform, 0);
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, _facade->_interfaceTEXTURE_ID);
+  UniformUtils::setUniform(Config::interfaceFontTextureUniform, 0);
+  glBindTexture(GL_TEXTURE_2D, _facade->_interfaceFONT_TEXTURE_ID);
+
+  glActiveTexture(GL_TEXTURE1);
+  UniformUtils::setUniform(Config::interfaceTextureOneUniform, 1);
+  glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
 
   glm::mat4 ortho = glm::ortho(0.0f, (float)Config::GeneralConfig.WIDTH, 0.0f,
                                (float)Config::GeneralConfig.HEIGHT);
@@ -184,18 +193,22 @@ void RenderManager::renderUserInterfaces() {
   glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0,
                           renderData.size());
   glDisable(GL_BLEND);
+  glDisable(GL_DEPTH_TEST);
   glUseProgram(_usedShaderProgram);
 }
 
 void RenderManager::updateUniforms(Entity *e, Model *model) {
 #ifdef DEBUG
-  if (e->isDebugEntity())
+  if (e->isDebugEntity()) {
     UniformUtils::setUniform(model->debugColorUniform, model->color);
+    assert(model->debugColorUniform != -1);
+  }
 #endif
 
   Texture *t = model->texture;
   if (t != nullptr) {
     UniformUtils::setUniform(t->uniform, 0);
+    assert(t->uniform != -1);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, t->id);
   }

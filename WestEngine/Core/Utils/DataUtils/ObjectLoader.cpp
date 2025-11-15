@@ -283,7 +283,7 @@ void ObjectLoader::unloadModel(Model *model) {
 #endif
 }
 
-std::vector<float>
+std::vector<float> 
 ObjectLoader::generatePlanarUV(const std::vector<float> &vertices) {
   std::vector<float> uvs;
   float minX = vertices[0], maxX = vertices[0];

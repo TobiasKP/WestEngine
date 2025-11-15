@@ -1,5 +1,7 @@
 #include "InterfaceBuilder.h"
 
+#include <stb_image.h>
+
 InterfaceBuilder::InterfaceBuilder() {
   _factory = nullptr;
   _dataPool = nullptr;
@@ -53,6 +55,57 @@ void InterfaceBuilder::createNewInterface(std::uint16_t xScreenPosition,
               std::format("@@@ Creating new Interface -> {} : {}\n",
                           xScreenPosition, yScreenPosition));
 #endif
+}
+void InterfaceBuilder::createBackground(TextureInformation *t) {
+  GLuint texture;
+  glGenTextures(1, &texture);
+
+  std::int32_t width, height, numComponents;
+  const char *textureFile = t->path;
+  char cwd[128];
+  char filePath[PATH_MAX];
+  if (getcwd(cwd, sizeof(cwd)) == NULL) {
+
+    _logger.log(Level::Error, "@@@ GNU.\n");
+    return;
+  }
+
+  snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", textureFile);
+  stbi_set_flip_vertically_on_load(true);
+  unsigned char *imgData =
+      stbi_load(filePath, &width, &height, &numComponents, 0);
+  if (imgData == NULL) {
+    _logger.log(Level::Error, "@@@ GNA.\n");
+    return;
+  }
+
+  GLenum format;
+  switch (numComponents) {
+  case 1:
+    format = GL_RED;
+    break;
+  case 3:
+    format = GL_RGB;
+    break;
+  case 4:
+    format = GL_RGBA;
+    break;
+  default:
+    _logger.log(Level::Error, "@@@ Unsupported image format\n");
+    return;
+  }
+
+  glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, format, width, height / 2, 2, 0, GL_RGB,
+               GL_UNSIGNED_BYTE, imgData);
+  glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+  glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, t->wrapping_x);
+  glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, t->wrapping_y);
+  stbi_set_flip_vertically_on_load(false);
+  stbi_image_free(imgData);
+  _current->texture = texture;
+  _current->flags |= 0x04;
 }
 
 void InterfaceBuilder::addElement(ElementProxy *e) {

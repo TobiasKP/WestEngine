@@ -1,9 +1,9 @@
 #include "../CoreHeaders/WindowManager.h"
 
+#include <Config.h>
 #include <GLFW/glfw3.h>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/glm.hpp>
-#include <Config.h>
 
 #include "../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
 #include "../CoreHeaders/Utils/InputUtils/MouseCallbacks.h"
@@ -17,7 +17,7 @@ WindowManager::WindowManager() : IManager(nullptr) {
 WindowManager::WindowManager(WestLogger *logger) : IManager(logger) {
   setName(CoreConstants::WINDOW_MANAGER);
   _width = Config::GeneralConfig.WIDTH;
-  _height = Config::GeneralConfig.HEIGHT; 
+  _height = Config::GeneralConfig.HEIGHT;
   assert(_width > 0 && _height > 0);
 }
 
@@ -52,7 +52,8 @@ std::int32_t WindowManager::startup() {
       "{} ### primary monitor resolution: {} x {}, setting to {} x {}\n",
       getName(), mode->width, mode->height, _width, _height));
 
-  _window = glfwCreateWindow(_width, _height, CoreConstants::TITLE.c_str(), NULL, NULL);
+  _window = glfwCreateWindow(_width, _height, CoreConstants::TITLE.c_str(),
+                             NULL, NULL);
 
   if (!_window) {
     logFailure("Window creation failed\n");
@@ -155,12 +156,12 @@ void WindowManager::resizeWindow(GLint width, GLint height) {
   logDebug(std::format("{} ### Resizing window to new height: {}, {}",
                        getName(), width, height));
 #endif
-  glfwSetWindowSize(_window, width, height);  
+  glfwSetWindowSize(_window, width, height);
   Config::GeneralConfig.HEIGHT = height;
   Config::GeneralConfig.WIDTH = width;
 }
 
-void WindowManager::setWindowTitle(const std::string title) {
+void WindowManager::setWindowTitle(const std::string &title) {
   glfwSetWindowTitle(_window, title.c_str());
 }
 

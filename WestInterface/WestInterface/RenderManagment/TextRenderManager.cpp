@@ -44,4 +44,73 @@ void TextRenderManager::calculateGlyphCoordinates(char character,
       right,
       top,
   };
+
+  glyphData.width = CHAR_W;
+  glyphData.height = CHAR_H;
+  glyphData.bearingY = CHAR_H * 0.8f;
+
+  switch (character) {
+  case 'i':
+  case 'l':
+  case 't':
+  case 'I':
+  case 'f':
+  case '!':
+  case '.':
+  case ',':
+  case ':':
+  case ';':
+    glyphData.advance = CHAR_W * 0.35f;
+    glyphData.bearingX = CHAR_W * 0.1f;
+    break;
+
+  case ' ':
+    glyphData.advance = CHAR_W * 0.5f;
+    glyphData.bearingX = 0.0f;
+    break;
+
+  default:
+    glyphData.advance = CHAR_W * 0.5f;
+    glyphData.bearingX = CHAR_W * 0.2f;
+    break;
+  }
+}
+
+std::vector<float>
+TextRenderManager::calculateTextPositions(const std::string &text,
+                                          float scale) {
+  std::vector<float> positions;
+  positions.reserve(text.size());
+  float currentX = 0.0f;
+  for (char c : text) {
+    auto it = _glyphCache.find(c);
+    if (it != _glyphCache.end()) {
+      const GlyphData &glyph = it->second;
+      positions.push_back(currentX + (glyph.bearingX * scale));
+      currentX += glyph.advance * scale;
+    } else {
+      positions.push_back(currentX);
+      currentX += CHAR_W * 0.7f * scale;
+    }
+  }
+
+  return positions;
+}
+
+float TextRenderManager::calculateTextWidth(const std::string &text,
+                                            float scale) {
+  if (text.empty())
+    return 0.0f;
+
+  float totalWidth = 0.0f;
+  for (char c : text) {
+    auto it = _glyphCache.find(c);
+    if (it != _glyphCache.end()) {
+      totalWidth += (it->second.advance * scale) + 2.0;
+    } else {
+      totalWidth += CHAR_W * 0.7f * scale;
+    }
+  }
+
+  return totalWidth;
 }

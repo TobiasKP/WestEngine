@@ -6,6 +6,7 @@
 
 #include "../RenderManagment/ComponentData.h"
 #include "../RenderManagment/ComponentDataPool.h"
+#include "../RenderManagment/TextRenderManager.h"
 
 static constexpr std::uint8_t SIZE_E = 40;
 
@@ -13,6 +14,7 @@ static constexpr std::uint8_t SIZE_E = 40;
 struct Text {
   std::string plaintext;
   std::vector<float> coordinates;
+  std::vector<float> positions;
 };
 
 struct IElement {
@@ -22,8 +24,8 @@ struct IElement {
   // Public identifier
   std::uint32_t id;
 
-  // zIndex. gives the element "stack"
-  std::uint8_t zIndex = 1;
+  // zIndex
+  std::int8_t zIndex = -1;
 
   // Sizing params: Each element has a basic size of
   // 10*10px with xLL & yLL as the most lower left corner of the element.
@@ -47,6 +49,7 @@ struct IElement {
   std::uint16_t columnElements = 0;
 
   std::unique_ptr<Text> text;
+  GLuint texture;
 
   bool changed = true;
   bool supportsEvents = false;
@@ -67,6 +70,17 @@ struct IElement {
     describeMyself(data, row, column);
     return data;
   };
+
+  float getElementWidth() {
+    float elementWidth = 0.0f;
+    if (this->text != nullptr && !this->text->plaintext.empty()) {
+      elementWidth = TextRenderManager::calculateTextWidth(
+          this->text->plaintext, this->stretchX);
+    } else {
+      elementWidth = this->columnElements * SIZE_E * this->stretchX;
+    }
+    return elementWidth;
+  }
 
 protected:
   WestLogger &_logger = WestLogger::getLoggerInstance();

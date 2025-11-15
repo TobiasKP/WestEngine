@@ -11,6 +11,11 @@ class TextRenderManager {
 public:
   struct GlyphData {
     std::array<GLfloat, 4> textureCoords;
+    float advance;          // How far to advance for next character
+    float bearingX;         // Left bearing (offset from cursor)
+    float bearingY;         // Top bearing (offset from baseline)
+    float width;            // Actual glyph width
+    float height;           // Actual glyph height
   };
 
   TextRenderManager();
@@ -27,6 +32,9 @@ public:
   static const std::unordered_map<char, GlyphData> &getGlyphCache() {
     return _glyphCache;
   }
+ 
+  static std::vector<float> calculateTextPositions(const std::string &text, float scale = 1.0f);
+  static float calculateTextWidth(const std::string &text, float scale = 1.0f);
 
 private:
   void calculateGlyphCoordinates(char character, GlyphData &glyphData);

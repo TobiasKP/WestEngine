@@ -11,11 +11,6 @@ find_package(Lua REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(Stb REQUIRED)
 
-
-# ─────────────────────────────────────────────────────────────
-# Custom shared libraries 
-# ─────────────────────────────────────────────────────────────
-
 # ─────────────────────────────────────────────────────────────
 # Includes (shared across platforms)
 # ─────────────────────────────────────────────────────────────
@@ -63,7 +58,6 @@ target_link_libraries(${PROJECT_NAME}
     ${LUA_LIBRARIES}
     glm::glm 
     ${OPENGL_LIB}
-    #${WEST_INTERFACE_LIB} 
 )
 
 if(UNIX AND NOT APPLE) 
@@ -111,6 +105,17 @@ if(NOT EXISTS "${RESOURCE_BASE}/${FOLDER}")
     )
 endif()
 endforeach()
+
+# ─────────────────────────────────────────────────────────────
+# Clean old log files before build
+# ─────────────────────────────────────────────────────────────
+
+add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E remove -f "${RESOURCE_BASE}/WestLog_*.log"
+    COMMAND ${CMAKE_COMMAND} -E remove -f "${RESOURCE_BASE}/WestError_*.log"
+    COMMAND ${CMAKE_COMMAND} -E remove -f "${RESOURCE_BASE}/WestCyclingLog_*.log"
+    COMMENT "Cleaning old WestLogger log files"
+)
 
 # ─────────────────────────────────────────────────────────────
 # Additional data copying (scripts, assets, configs, shaders)

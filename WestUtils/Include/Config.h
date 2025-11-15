@@ -19,7 +19,8 @@ inline std::atomic<std::uint32_t> INTERNAL_ENTITY_ID = 900000;
 inline ThreadPool *THREADPOOL = new ThreadPool(4);
 inline std::uint32_t interfaceShaderProgram = -1;
 inline std::uint32_t interfaceOrthoUniform = -1;
-inline std::uint32_t interfaceTextureUniform = -1;
+inline std::uint32_t interfaceFontTextureUniform = -1;
+inline std::uint32_t interfaceTextureOneUniform = -1;
 
 inline struct General {
   std::uint32_t WIDTH = 800, HEIGHT = 600;
