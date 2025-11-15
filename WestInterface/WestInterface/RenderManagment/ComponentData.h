@@ -40,5 +40,7 @@ struct WEST_INTERFACE ElementBounds {
  * 0x0002 = Mouse Hovered
  * 0x0004 = hasTexture
  * 0x0008 = hasText
- * 0x0016 = ---
+ * 0x0010 = ---
+ * 0x0020 = blending texture borders
+ * 0x0040 = ---
  **********************************************************************************/

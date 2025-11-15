@@ -50,38 +50,18 @@ void TextRenderManager::calculateGlyphCoordinates(char character,
   glyphData.bearingY = CHAR_H * 0.8f;
 
   switch (character) {
-
   case 'i':
   case 'l':
+  case 't':
   case 'I':
+  case 'f':
   case '!':
   case '.':
   case ',':
   case ':':
   case ';':
-  case '\'':
-  case '`':
-    glyphData.advance = CHAR_W * 0.3f;
-    glyphData.bearingX = CHAR_W * 0.2f;
-    break;
-
-  case 'j':
-  case 't':
-  case 'f':
-  case 'r':
-    glyphData.advance = CHAR_W * 0.5f;
+    glyphData.advance = CHAR_W * 0.35f;
     glyphData.bearingX = CHAR_W * 0.1f;
-    break;
-
-  case 'w':
-  case 'W':
-  case 'm':
-  case 'M':
-  case 'Q':
-  case 'O':
-  case 'o':
-    glyphData.advance = CHAR_W * 0.5f;
-    glyphData.bearingX = CHAR_W * 0.03f;
     break;
 
   case ' ':
@@ -90,8 +70,8 @@ void TextRenderManager::calculateGlyphCoordinates(char character,
     break;
 
   default:
-    glyphData.advance = CHAR_W * 0.4f;
-    glyphData.bearingX = CHAR_W * 0.1f;
+    glyphData.advance = CHAR_W * 0.5f;
+    glyphData.bearingX = CHAR_W * 0.2f;
     break;
   }
 }

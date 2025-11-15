@@ -76,6 +76,7 @@ void ElementFactory::fillTexture(ElementProxy *ep, IElement *el) {
   glTexImage3D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 1, 0, GL_RGB,
                GL_UNSIGNED_BYTE, imgData);
   glGenerateMipmap(GL_TEXTURE_2D);
+
   stbi_image_free(imgData);
   el->texture = texture;
 }

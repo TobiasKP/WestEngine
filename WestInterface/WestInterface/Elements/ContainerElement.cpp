@@ -11,7 +11,7 @@ struct ContainerElement : public IElement {
   std::vector<IElement *> children;
 
   ContainerElement() {
-    flags = 0x01;
+    flags = 0x0001 | 0x0020; 
     zIndex = 1;
   }
 
@@ -138,7 +138,7 @@ struct ContainerElement : public IElement {
     cd->stretchY = stretchY;
     cd->flags = flags;
     cd->zIndex = zIndex;
-    if(texture > 0)
+    if (texture > 0)
       cd->texture = texture;
   }
 

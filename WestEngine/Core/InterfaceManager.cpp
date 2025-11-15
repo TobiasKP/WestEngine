@@ -66,6 +66,11 @@ std::int32_t InterfaceManager::buildTechDemoFooter() {
   redQuad->elementId = 1;
   redQuad->xPosition = 0.0f;
   redQuad->yPosition = 0.0f;
+
+  redQuad->colorR = 1.0f;
+  redQuad->colorG = 1.0f;
+  redQuad->colorB = 1.0f;
+  redQuad->colorA = 1.0f;
   redQuad->row = 0;
   redQuad->column = 0;
   redQuad->columnElements = 9;
@@ -77,6 +82,11 @@ std::int32_t InterfaceManager::buildTechDemoFooter() {
   quitButton->elementId = 2;
   quitButton->xPosition = 700.0f;
   quitButton->yPosition = 0.0f;
+  quitButton->colorR = 1.0f;
+  quitButton->colorG = 1.0f;
+  quitButton->colorB = 1.0f;
+  quitButton->colorA = 1.0f;
+  quitButton->row = 0;
   quitButton->row = 0;
   quitButton->column = 0;
   quitButton->columnElements = 4;
@@ -87,7 +97,9 @@ std::int32_t InterfaceManager::buildTechDemoFooter() {
   };
 
   TextureInformation *x = new TextureInformation();
-  x->path = "assets/Textures/test_texture.jpg";
+  x->path = "assets/Textures/Pattern_1.png";
+  x->wrapping_x = GL_REPEAT;
+  x->wrapping_y = GL_REPEAT;
 
   elements.push_back(quitButton);
 

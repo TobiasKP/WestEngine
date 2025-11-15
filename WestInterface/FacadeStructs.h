@@ -18,7 +18,8 @@ enum ElementType { LABEL, BUTTON, CONTAINER, ICON, DEBUG_ELEMENT };
 
 struct WEST_INTERFACE TextureInformation {
   bool mipmap;
-  std::int32_t wrapping;
+  std::int32_t wrapping_x;
+  std::int32_t wrapping_y;
   const char *path;
 };
 

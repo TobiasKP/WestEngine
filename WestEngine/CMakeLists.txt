@@ -58,7 +58,6 @@ target_link_libraries(${PROJECT_NAME}
     ${LUA_LIBRARIES}
     glm::glm 
     ${OPENGL_LIB}
-    #${WEST_INTERFACE_LIB} 
 )
 
 if(UNIX AND NOT APPLE) 

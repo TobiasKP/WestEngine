@@ -92,7 +92,7 @@ void WestInterfaceFacade::init() {
   glBindVertexArray(0);
 
   std::int32_t width, height, numComponents;
-  const char *textureFile = "/assets/Textures/font.bmp";
+  const char *textureFile = "/assets/Textures/courier.bmp";
   char cwd[128];
   char filePath[PATH_MAX];
   if (getcwd(cwd, sizeof(cwd)) == NULL) {
@@ -150,10 +150,11 @@ std::uint8_t WestInterfaceFacade::createNewInterface(Container *c) {
   _logger.log(Level::Info, "@@@ Creating new Interface\n");
 #endif
 
-  _builder->createNewInterface(c->xScreenPosition, c->yScreenPosition, c->stretchX,
-                               c->stretchY, c->rows, c->columns, c->hiddenContainer);
+  _builder->createNewInterface(c->xScreenPosition, c->yScreenPosition,
+                               c->stretchX, c->stretchY, c->rows, c->columns,
+                               c->hiddenContainer);
 
-  if(c->background != nullptr) 
+  if (c->background != nullptr)
     _builder->createBackground(c->background);
 
   for (auto *element : c->elements) {

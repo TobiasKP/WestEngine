@@ -71,7 +71,7 @@ void InterfaceBuilder::createBackground(TextureInformation *t) {
   }
 
   snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", textureFile);
-
+  stbi_set_flip_vertically_on_load(true);
   unsigned char *imgData =
       stbi_load(filePath, &width, &height, &numComponents, 0);
   if (imgData == NULL) {
@@ -79,11 +79,30 @@ void InterfaceBuilder::createBackground(TextureInformation *t) {
     return;
   }
 
+  GLenum format;
+  switch (numComponents) {
+  case 1:
+    format = GL_RED;
+    break;
+  case 3:
+    format = GL_RGB;
+    break;
+  case 4:
+    format = GL_RGBA;
+    break;
+  default:
+    _logger.log(Level::Error, "@@@ Unsupported image format\n");
+    return;
+  }
+
   glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-  glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGB, width, height, 1, 0, GL_RGB,
+  glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, format, width, height / 2, 2, 0, GL_RGB,
                GL_UNSIGNED_BYTE, imgData);
   glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+  glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, t->wrapping_x);
+  glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, t->wrapping_y);
+  stbi_set_flip_vertically_on_load(false);
   stbi_image_free(imgData);
   _current->texture = texture;
   _current->flags |= 0x04;
