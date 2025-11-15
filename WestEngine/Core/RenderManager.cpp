@@ -125,7 +125,7 @@ void RenderManager::renderUserInterfaces() {
   std::vector<float> instanceOffsets;
   std::vector<float> colors;
   std::vector<float> textCoords;
-  std::vector<std::uint32_t> flags; 
+  std::vector<std::uint32_t> flags;
   GLuint texture = 0;
   for (ComponentData *cd : renderData) {
     instanceOffsets.insert(
@@ -134,7 +134,7 @@ void RenderManager::renderUserInterfaces() {
     colors.insert(colors.end(),
                   {cd->colorR, cd->colorG, cd->colorB, cd->colorA});
 
-    flags.push_back(cd->flags); 
+    flags.push_back(cd->flags);
     textCoords.insert(textCoords.end(),
                       {cd->textureCoords[0], cd->textureCoords[1],
                        cd->textureCoords[2], cd->textureCoords[3]});
@@ -156,7 +156,8 @@ void RenderManager::renderUserInterfaces() {
 #endif
 
   glUseProgram(Config::interfaceShaderProgram);
-  glEnable(GL_BLEND | GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
+  glEnable(GL_DEPTH_TEST);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glBindVertexArray(_facade->_interfaceVAO);
 
@@ -191,7 +192,8 @@ void RenderManager::renderUserInterfaces() {
   UniformUtils::setUniform(Config::interfaceOrthoUniform, ortho);
   glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0,
                           renderData.size());
-  glDisable(GL_BLEND | GL_DEPTH_TEST);
+  glDisable(GL_BLEND);
+  glDisable(GL_DEPTH_TEST);
   glUseProgram(_usedShaderProgram);
 }
 

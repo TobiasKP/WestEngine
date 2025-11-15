@@ -25,7 +25,7 @@ private:
   std::vector<ComponentData *> _data;
   std::vector<ElementBounds *> _boundaryData;
   std::mutex _vectorMutex;
-  bool _dirty;
+  bool _dirty = true;
 
   void fillComponentData(std::vector<ComponentData *> &cd, std::vector<ElementBounds *> &eb);
   void gatherUIData(std::vector<ComponentData *> &local,

@@ -121,12 +121,12 @@ void UIRenderManager::fillComponentData(std::vector<ComponentData *> &cd,
                                         std::vector<ElementBounds *> &bounds) {
   std::lock_guard<std::mutex> lk(_vectorMutex);
   _data.insert(_data.end(), cd.begin(), cd.end());
-  std::sort(_data.begin(), _data.end(),
+  std::stable_sort(_data.begin(), _data.end(),
             [](const ComponentData *a, const ComponentData *b) {
               return a->zIndex < b->zIndex;
             });
   _boundaryData.insert(_boundaryData.end(), bounds.begin(), bounds.end());
-  std::sort(_boundaryData.begin(), _boundaryData.end(),
+  std::stable_sort(_boundaryData.begin(), _boundaryData.end(),
             [](const ElementBounds *a, const ElementBounds *b) {
               return a->zIndex > b->zIndex;
             });
