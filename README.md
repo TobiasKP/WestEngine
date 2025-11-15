@@ -65,6 +65,8 @@ Linux side not: Write access for the folder running the application from is requ
 
 ## Documentation
 
+**Project Overview:** [Project Documentation](PROJECT_DOCUMENTATION.md)
+
 ### Core Module
 
 ### Interface Module
