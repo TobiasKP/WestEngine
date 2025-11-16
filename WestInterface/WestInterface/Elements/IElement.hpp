@@ -1,24 +1,29 @@
 #pragma once
 
-#include <WestLogger.h>
-#include <cstdint>
-#include <functional>
-
 #include "../RenderManagment/ComponentData.h"
 #include "../RenderManagment/ComponentDataPool.h"
 #include "../RenderManagment/TextRenderManager.h"
 
+#include <cstdint>
+#include <functional>
+#include <WestLogger.h>
+
 static constexpr std::uint8_t SIZE_E = 40;
 
 // For Textrendering form Bitmap in Resources.
-struct Text {
+struct Text
+{
   std::string plaintext;
   std::vector<float> coordinates;
   std::vector<float> positions;
 };
 
-struct IElement {
-  IElement() { text = nullptr; }
+struct IElement
+{
+  IElement()
+  {
+    text = nullptr;
+  }
   ~IElement() {};
 
   // Public identifier
@@ -45,47 +50,51 @@ struct IElement {
   std::uint64_t flags;
 
   // Number of quads being next to each other
-  std::uint16_t rowElements = 0;
+  std::uint16_t rowElements    = 0;
   std::uint16_t columnElements = 0;
 
   std::unique_ptr<Text> text;
   GLuint texture;
 
-  bool changed = true;
-  bool supportsEvents = false;
-  std::uint32_t poolPosition = 0;
-  ComponentDataPool *dataPool = nullptr;
+  bool changed                = true;
+  bool supportsEvents         = false;
+  std::uint32_t poolPosition  = 0;
+  ComponentDataPool* dataPool = nullptr;
 
   std::function<void()> eventHandler = nullptr;
 
   virtual void handler() {};
 
-  ComponentData *describe(std::uint8_t row = 0, std::uint8_t column = 0) {
-    ComponentData *data =
-        dataPool->getDataAtLocation(poolPosition + row + column);
+  ComponentData* describe(std::uint8_t row = 0, std::uint8_t column = 0)
+  {
+    ComponentData* data = dataPool->getDataAtLocation(poolPosition + row + column);
 
     if (!changed)
+    {
       return data;
+    }
 
     describeMyself(data, row, column);
     return data;
   };
 
-  float getElementWidth() {
+  float getElementWidth()
+  {
     float elementWidth = 0.0f;
-    if (this->text != nullptr && !this->text->plaintext.empty()) {
-      elementWidth = TextRenderManager::calculateTextWidth(
-          this->text->plaintext, this->stretchX);
-    } else {
+    if (this->text != nullptr && !this->text->plaintext.empty())
+    {
+      elementWidth = TextRenderManager::calculateTextWidth(this->text->plaintext, this->stretchX);
+    }
+    else
+    {
       elementWidth = this->columnElements * SIZE_E * this->stretchX;
     }
     return elementWidth;
   }
 
 protected:
-  WestLogger &_logger = WestLogger::getLoggerInstance();
+  WestLogger& _logger = WestLogger::getLoggerInstance();
 
 private:
-  virtual void describeMyself(ComponentData *cd, std::uint8_t row = 0,
-                              std::uint8_t column = 0) {};
+  virtual void describeMyself(ComponentData* cd, std::uint8_t row = 0, std::uint8_t column = 0) {};
 };

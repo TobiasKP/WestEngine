@@ -2,4 +2,5 @@
 
 #include "IElement.hpp"
 
-struct Icon : public IElement {};
+struct Icon : public IElement
+{};

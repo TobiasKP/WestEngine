@@ -3,27 +3,32 @@
 #include "../../Constants/Components.hpp"
 #include "../../CoreHeaders/Components/Umbrella.h"
 
-void ComponentFactory::createComponent(
-    std::map<std::string, std::int32_t> infos, std::string name,
-    Entity *e) {
-  if (Components::POSITION.compare(name) == 0) {
+void ComponentFactory::createComponent(std::map<std::string, std::int32_t> infos, std::string name, Entity* e)
+{
+  if (Components::POSITION.compare(name) == 0)
+  {
     // TODO: Add rotation and scale
-    Position *p = new Position();
+    Position* p   = new Position();
     glm::vec3 pos = glm::vec3();
-    auto it = infos.find("x");
+    auto it       = infos.find("x");
     if (it != infos.end())
+    {
       pos.x = it->second;
+    }
     it = infos.find("y");
     if (it != infos.end())
+    {
       pos.y = it->second;
+    }
     it = infos.find("z");
     if (it != infos.end())
+    {
       pos.z = it->second;
+    }
 
     p->position = pos;
-    p->scale = 1.0f;
+    p->scale    = 1.0f;
     p->rotation = glm::vec3(1.0f);
     e->addComponent(BitMasks::Components::POSITION, p);
   }
 }
-

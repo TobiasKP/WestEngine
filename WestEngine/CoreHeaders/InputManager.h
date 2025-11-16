@@ -1,19 +1,18 @@
 #pragma once
 
 #include "Interfaces/IManager.h"
+#include "Utils/InputUtils/InputObserver.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <list>
 #include <map>
 
-#include "Utils/InputUtils/InputObserver.h"
-
-class InputManager : public IManager {
-
+class InputManager : public IManager
+{
 public:
   InputManager();
-  InputManager(WestLogger *logger);
+  InputManager(WestLogger* logger);
   ~InputManager();
 
   // Overrides
@@ -23,18 +22,16 @@ public:
   std::int32_t init() override;
 
   // Functions
-  void setKey(std::int32_t key, const char *command);
-  std::int32_t findByOperation(const char *command);
+  void setKey(std::int32_t key, const char* command);
+  std::int32_t findByOperation(const char* command);
   const std::string findByKey(std::int32_t key);
 
 private:
-  std::map<std::int32_t, const char *> _inputMap;
-  InputObserver *_observer;
-  FILE *_inputConfig;
-  FILE *_availableCommands;
+  std::map<std::int32_t, const char*> _inputMap;
+  InputObserver* _observer;
+  FILE* _inputConfig;
+  FILE* _availableCommands;
 
   // Functions
-  std::int32_t
-  checkInputConfigLineForErrors(const char *key, const char *value,
-                                std::list<const char *> _commandList);
+  std::int32_t checkInputConfigLineForErrors(const char* key, const char* value, std::list<const char*> _commandList);
 };

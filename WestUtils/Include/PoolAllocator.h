@@ -10,26 +10,28 @@
 #define WESTUTILS __attribute__((visibility("default")))
 #endif
 
-#include <WestLogger.h>
-
 #include "Config.h"
 
-struct Chunk {
-  Chunk *next;
+#include <WestLogger.h>
+
+struct Chunk
+{
+  Chunk* next;
 };
 
-class WESTUTILS PoolAllocator {
+class WESTUTILS PoolAllocator
+{
 public:
   PoolAllocator() {};
   ~PoolAllocator() {};
 
-  void *allocate(size_t size);
-  void deallocate(void *ptr, size_t size);
+  void* allocate(size_t size);
+  void deallocate(void* ptr, size_t size);
 
 private:
-  size_t _numberOfChunks = Config::GeneralConfig.CHUNK_SIZE;
-  Chunk *_allocationPointer = nullptr;
-  WestLogger *_logger = &WestLogger::getLoggerInstance();
+  size_t _numberOfChunks    = Config::GeneralConfig.CHUNK_SIZE;
+  Chunk* _allocationPointer = nullptr;
+  WestLogger* _logger       = &WestLogger::getLoggerInstance();
 
-  Chunk *allocateBlock(size_t size);
+  Chunk* allocateBlock(size_t size);
 };

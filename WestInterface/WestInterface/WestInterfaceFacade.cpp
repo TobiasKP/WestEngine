@@ -1,34 +1,38 @@
 #include "../WestInterfaceFacade.h"
 
+#include "RenderManagment/TextRenderManager.h"
+
+#include <format>
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
 
-#include <format>
-
-#include "RenderManagment/TextRenderManager.h"
-
-WestInterfaceFacade &WestInterfaceFacade::getInterfaceInstance() {
+WestInterfaceFacade& WestInterfaceFacade::getInterfaceInstance()
+{
   static WestInterfaceFacade instance;
   return instance;
 }
 
-WestInterfaceFacade::WestInterfaceFacade() {
-  count = 0;
+WestInterfaceFacade::WestInterfaceFacade()
+{
+  count          = 0;
   _valueObserver = new ValueObserver();
   _eventObserver = new EventObserver();
   assert(_valueObserver != nullptr && _eventObserver != nullptr);
   _renderManager = new UIRenderManager();
-  _textManager = new TextRenderManager();
-  _builder = new InterfaceBuilder(_eventObserver, _valueObserver);
-  for (std::uint8_t i = 0; i < 32; i++) {
+  _textManager   = new TextRenderManager();
+  _builder       = new InterfaceBuilder(_eventObserver, _valueObserver);
+  for (std::uint8_t i = 0; i < 32; i++)
+  {
     _interfaces.at(i) = nullptr;
   }
 }
 
 WestInterfaceFacade::~WestInterfaceFacade() {}
 
-void WestInterfaceFacade::shutdown() {
-  while (count > 0) {
+void WestInterfaceFacade::shutdown()
+{
+  while (count > 0)
+  {
     delete _interfaces.at(count);
     count--;
   }
@@ -36,22 +40,24 @@ void WestInterfaceFacade::shutdown() {
   delete _textManager;
 }
 
-void WestInterfaceFacade::init() {
+void WestInterfaceFacade::init()
+{
   glGenVertexArrays(1, &_interfaceVAO);
 
   GLuint buffers[7] = {0};
   glGenBuffers(7, buffers);
-  _interfaceVBO = buffers[0];
-  _interfaceEBO = buffers[1];
-  _interfaceCOL = buffers[2];
+  _interfaceVBO    = buffers[0];
+  _interfaceEBO    = buffers[1];
+  _interfaceCOL    = buffers[2];
   _interfaceOFFSET = buffers[3];
-  _interfaceFLAGS = buffers[4];
-  _interfaceTEX = buffers[5];
-  _interfaceUV = buffers[6];
-  for (GLuint i : buffers) {
-    if (i == -1) {
-      _logger.log(Level::Error,
-                  "--- Error generating Buffers, check OpenGL error logs.\n");
+  _interfaceFLAGS  = buffers[4];
+  _interfaceTEX    = buffers[5];
+  _interfaceUV     = buffers[6];
+  for (GLuint i : buffers)
+  {
+    if (i == -1)
+    {
+      _logger.log(Level::Error, "--- Error generating Buffers, check OpenGL error logs.\n");
       return;
     }
   }
@@ -64,10 +70,9 @@ void WestInterfaceFacade::init() {
   glBufferData(GL_ARRAY_BUFFER, sizeof(baseQuad), baseQuad, GL_STATIC_DRAW);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _interfaceEBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
-               GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(0);
 
   setupInstancedAttribute(_interfaceCOL, 1, 4, true);
@@ -76,15 +81,14 @@ void WestInterfaceFacade::init() {
   glBindBuffer(GL_ARRAY_BUFFER, _interfaceTEX);
   glBufferData(GL_ARRAY_BUFFER, sizeof(baseTex), baseTex, GL_STATIC_DRAW);
 
-  glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+  glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(3);
 
   setupInstancedAttribute(_interfaceUV, 4, 4, true);
 
   glBindBuffer(GL_ARRAY_BUFFER, _interfaceFLAGS);
   glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
-  glVertexAttribIPointer(5, 1, GL_UNSIGNED_INT, sizeof(std::uint32_t),
-                         (void *)0);
+  glVertexAttribIPointer(5, 1, GL_UNSIGNED_INT, sizeof(std::uint32_t), (void*)0);
   glVertexAttribDivisor(5, 1);
   glEnableVertexAttribArray(5);
 
@@ -92,103 +96,114 @@ void WestInterfaceFacade::init() {
   glBindVertexArray(0);
 
   std::int32_t width, height, numComponents;
-  const char *textureFile = "/assets/Textures/courier.bmp";
+  const char* textureFile = "/assets/Textures/courier.bmp";
   char cwd[128];
   char filePath[PATH_MAX];
-  if (getcwd(cwd, sizeof(cwd)) == NULL) {
+  if (getcwd(cwd, sizeof(cwd)) == NULL)
+  {
     _logger.log(Level::Error, "---Error getting current working directory!\n");
   }
 
   snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", textureFile);
 
-  unsigned char *imgData =
-      stbi_load(filePath, &width, &height, &numComponents, 0);
-  if (imgData == NULL) {
+  unsigned char* imgData = stbi_load(filePath, &width, &height, &numComponents, 0);
+  if (imgData == NULL)
+  {
     _logger.log(
-        Level::Error,
-        std::format("---No Imagedata loaded for texture: {} - STBI Error: {}\n",
-                    filePath, stbi_failure_reason()));
+      Level::Error,
+      std::format("---No Imagedata loaded for texture: {} - STBI Error: {}\n", filePath, stbi_failure_reason()));
   }
 
   glBindTexture(GL_TEXTURE_2D, _interfaceFONT_TEXTURE_ID);
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-               GL_UNSIGNED_BYTE, imgData);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imgData);
   glGenerateMipmap(GL_TEXTURE_2D);
   stbi_image_free(imgData);
 
   _textManager->initializeFontAtlas();
 }
 
-void WestInterfaceFacade::setupInstancedAttribute(GLuint buffer, GLuint index,
-                                                  GLint size,
-                                                  bool withDivisor) {
+void WestInterfaceFacade::setupInstancedAttribute(GLuint buffer, GLuint index, GLint size, bool withDivisor)
+{
   glBindBuffer(GL_ARRAY_BUFFER, buffer);
   glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
-  glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, size * sizeof(float),
-                        (void *)0);
+  glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, size * sizeof(float), (void*)0);
   if (withDivisor)
+  {
     glVertexAttribDivisor(index, 1);
+  }
   glEnableVertexAttribArray(index);
 }
 
-ContainerElement *WestInterfaceFacade::findInterfaceById(std::uint8_t id) {
+ContainerElement* WestInterfaceFacade::findInterfaceById(std::uint8_t id)
+{
   if (id <= 0)
+  {
     return nullptr;
+  }
 
-  for (std::uint8_t i = 0; i < count; i++) {
+  for (std::uint8_t i = 0; i < count; i++)
+  {
     assert(_interfaces.at(i) != nullptr);
     if (_interfaces.at(i)->id == id)
+    {
       return _interfaces.at(i);
+    }
   }
 
   return nullptr;
 }
 
-std::uint8_t WestInterfaceFacade::createNewInterface(Container *c) {
+std::uint8_t WestInterfaceFacade::createNewInterface(Container* c)
+{
 #ifdef DEBUG
   _logger.log(Level::Info, "@@@ Creating new Interface\n");
 #endif
 
-  _builder->createNewInterface(c->xScreenPosition, c->yScreenPosition,
-                               c->stretchX, c->stretchY, c->rows, c->columns,
-                               c->hiddenContainer);
+  _builder->createNewInterface(
+    c->xScreenPosition, c->yScreenPosition, c->stretchX, c->stretchY, c->rows, c->columns, c->hiddenContainer);
 
   if (c->background != nullptr)
+  {
     _builder->createBackground(c->background);
+  }
 
-  for (auto *element : c->elements) {
+  for (auto* element : c->elements)
+  {
 #ifdef DEBUG
-    _logger.log(Level::Cycle,
-                std::format("@@@ Addding new element to interface: {}\n",
-                            (int)element->type));
+    _logger.log(Level::Cycle, std::format("@@@ Addding new element to interface: {}\n", (int)element->type));
 #endif
     _builder->addElement(element);
   }
-  ContainerElement *interface = _builder->build();
-  _interfaces.at(count) = interface;
+  ContainerElement* interface = _builder->build();
+  _interfaces.at(count)       = interface;
   count++;
   _renderManager->toggleDirty();
   return interface->id;
 }
 
-bool WestInterfaceFacade::destroyInterface(std::uint8_t interfaceId) {
+bool WestInterfaceFacade::destroyInterface(std::uint8_t interfaceId)
+{
   std::int8_t location = -1;
-  for (std::uint8_t i = 0; i < count; i++) {
-    if (_interfaces.at(i)->id == interfaceId) {
+  for (std::uint8_t i = 0; i < count; i++)
+  {
+    if (_interfaces.at(i)->id == interfaceId)
+    {
       location = i;
       break;
     }
   }
 
   if (location == -1)
+  {
     return false;
+  }
 
-  _logger.log(Level::Info,
-              std::format("@@@ Destroying interface: {}\n", interfaceId));
-  ContainerElement *elementToDelete = _interfaces.at(location);
+  _logger.log(Level::Info, std::format("@@@ Destroying interface: {}\n", interfaceId));
+  ContainerElement* elementToDelete = _interfaces.at(location);
 
-  if (location != count - 1) {
+  if (location != count - 1)
+  {
     _interfaces.at(location) = _interfaces.at(count - 1);
   }
   _interfaces.at(count - 1) = nullptr;
@@ -199,81 +214,85 @@ bool WestInterfaceFacade::destroyInterface(std::uint8_t interfaceId) {
   return true;
 }
 
-void WestInterfaceFacade::addElement(std::uint8_t interfaceId,
-                                     ElementProxy *element) {
-  ContainerElement *interface = findInterfaceById(interfaceId);
+void WestInterfaceFacade::addElement(std::uint8_t interfaceId, ElementProxy* element)
+{
+  ContainerElement* interface = findInterfaceById(interfaceId);
   if (interface == nullptr)
+  {
     return;
+  }
 
   assert(element != nullptr);
-  IElement *e = _builder->transform(element);
+  IElement* e = _builder->transform(element);
   assert(e != nullptr);
 #ifdef DEBUG
-  _logger.log(
-      Level::Info,
-      std::format(
-          "@@@ Adding additional element to interface: {}, after creation\n",
-          interfaceId));
+  _logger.log(Level::Info,
+              std::format("@@@ Adding additional element to interface: {}, after creation\n", interfaceId));
 #endif
 
   _renderManager->toggleDirty();
   interface->addChild(e, element->column, element->row);
 };
 
-bool WestInterfaceFacade::removeElement(std::uint8_t interfaceId,
-                                        std::uint32_t elementId) {
-  ContainerElement *interface = findInterfaceById(interfaceId);
+bool WestInterfaceFacade::removeElement(std::uint8_t interfaceId, std::uint32_t elementId)
+{
+  ContainerElement* interface = findInterfaceById(interfaceId);
   if (interface == nullptr)
+  {
     return false;
+  }
 
   _renderManager->toggleDirty();
   return interface->deleteChildById(elementId);
 };
 
-void WestInterfaceFacade::updateRenderData() {
+void WestInterfaceFacade::updateRenderData()
+{
 #ifdef DEBUG
   _logger.log(Level::Cycle, "@@@ Updating render Data for interfaces\n");
 #endif
   _renderManager->updateRenderData(_interfaces, count);
 };
 
-std::vector<ComponentData *> &WestInterfaceFacade::getRenderData() {
+std::vector<ComponentData*>& WestInterfaceFacade::getRenderData()
+{
   return _renderManager->getRenderData();
 };
 
-bool WestInterfaceFacade::notify(std::int16_t elementId, std::uint8_t event,
-                                 std::uint16_t mouseX, std::uint16_t mouseY) {
-  bool evResult =
-      _eventObserver->handleEvent(elementId, event, mouseX, mouseY, "");
+bool WestInterfaceFacade::notify(std::int16_t elementId, std::uint8_t event, std::uint16_t mouseX, std::uint16_t mouseY)
+{
+  bool evResult = _eventObserver->handleEvent(elementId, event, mouseX, mouseY, "");
   _renderManager->toggleDirty();
   return evResult;
 };
 
-bool WestInterfaceFacade::notify(std::int16_t elementId, std::uint8_t event,
-                                 std::string value) {
+bool WestInterfaceFacade::notify(std::int16_t elementId, std::uint8_t event, std::string value)
+{
   bool evResult = _eventObserver->handleEvent(elementId, event, -1, -1, value);
   _renderManager->toggleDirty();
   return false;
 };
 
-std::vector<ElementBounds *> WestInterfaceFacade::getShownElementsBoundaries() {
+std::vector<ElementBounds*> WestInterfaceFacade::getShownElementsBoundaries()
+{
   return _renderManager->getBoundaries();
 }
 
 ///////////////////////////
 
-bool WestInterfaceFacade::resize(std::uint8_t interfaceId, std::uint16_t width,
-                                 std::uint16_t height) {
+bool WestInterfaceFacade::resize(std::uint8_t interfaceId, std::uint16_t width, std::uint16_t height)
+{
   return false;
 };
 
 bool WestInterfaceFacade::reposition(std::uint8_t interfaceId,
                                      std::uint16_t xScreenPosition,
-                                     std::uint16_t yScreenPosition) {
+                                     std::uint16_t yScreenPosition)
+{
   return false;
 };
 
-const char *WestInterfaceFacade::getResource(std::string resource) {
-
+const char* WestInterfaceFacade::getResource(std::string resource)
+{
   return NULL;
 }

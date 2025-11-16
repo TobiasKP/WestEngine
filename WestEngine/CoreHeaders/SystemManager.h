@@ -1,19 +1,18 @@
 #pragma once
 
-#include "Interfaces/IManager.h"
-
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <array>
-
 #include "Entity/Scene.h"
+#include "Interfaces/IManager.h"
 #include "Interfaces/ISystem.h"
 
-class SystemManager : public IManager {
+#include <array>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
+class SystemManager : public IManager
+{
 public:
   SystemManager();
-  SystemManager(WestLogger *logger);
+  SystemManager(WestLogger* logger);
   ~SystemManager();
 
   // Overrides
@@ -25,11 +24,11 @@ public:
   static ISystem* getSystemByName(const std::string name);
 
 private:
-  Scene *_scene;
-  static std::array<ISystem *, 1> _systems;
+  Scene* _scene;
+  static std::array<ISystem*, 1> _systems;
 
 #ifdef DEBUG
   std::int32_t _loggingFrequence = 0;
-  double _avgTime = 0;
+  double _avgTime                = 0;
 #endif
 };

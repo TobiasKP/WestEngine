@@ -12,11 +12,12 @@
 #define WEST_INTERFACE __attribute__((visibility("default")))
 #endif
 
-struct WEST_INTERFACE ComponentData {
+struct WEST_INTERFACE ComponentData
+{
   std::uint32_t flags;
   float vertices[2];
   float textureCoords[4] = {0.0f, 0.0f, 1.0f, 1.0f};
-  std::uint32_t texture = 0;
+  std::uint32_t texture  = 0;
   float stretchX;
   float stretchY;
   std::int8_t zIndex = 0;
@@ -27,7 +28,8 @@ struct WEST_INTERFACE ComponentData {
   float colorA;
 };
 
-struct WEST_INTERFACE ElementBounds {
+struct WEST_INTERFACE ElementBounds
+{
   std::uint32_t id;
   std::int8_t zIndex;
   float xLeft, xRight, yBottom, yTop;

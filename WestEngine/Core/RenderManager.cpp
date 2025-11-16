@@ -1,57 +1,63 @@
 #include "../CoreHeaders/RenderManager.h"
 
-#include <Config.h>
-#include <algorithm>
-
-#include <glm/ext/matrix_clip_space.hpp>
-
 #include "../CoreHeaders/Utils/DataUtils/UniformUtils.h"
 #include "../CoreHeaders/Utils/Math/PositionCalculation.h"
 
+#include <algorithm>
+#include <Config.h>
+#include <glm/ext/matrix_clip_space.hpp>
+
 GLuint RenderManager::_usedShaderProgram = 0;
 
-RenderManager::RenderManager() : IManager(nullptr) {
+RenderManager::RenderManager() : IManager(nullptr)
+{
   setName(CoreConstants::RENDER_MANAGER);
   _facade = nullptr;
-  _scene = nullptr;
+  _scene  = nullptr;
 }
 
-RenderManager::RenderManager(WestLogger *logger) : IManager(logger) {
+RenderManager::RenderManager(WestLogger* logger) : IManager(logger)
+{
   setName(CoreConstants::RENDER_MANAGER);
   _facade = nullptr;
-  _scene = nullptr;
+  _scene  = nullptr;
 }
 
 RenderManager::~RenderManager() {}
 
-std::int32_t RenderManager::startup() { return 0; }
+std::int32_t RenderManager::startup()
+{
+  return 0;
+}
 
-void RenderManager::shutdown() {
+void RenderManager::shutdown()
+{
 #ifdef DEBUG
   logDebug(std::format("{} ### Shutting down {}...\n", getName(), getName()));
 #endif
 }
 
-std::int32_t RenderManager::init() {
+std::int32_t RenderManager::init()
+{
 #ifdef DEBUG
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
 
-  _scene = &Scene::getSceneInstance();
+  _scene  = &Scene::getSceneInstance();
   _facade = &WestInterfaceFacade::getInterfaceInstance();
   assert(_scene != nullptr && _facade != nullptr);
 
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
-  logDebug(
-      std::format("{} ### RenderManager init time: {} ms.\n", getName(), res));
+  logDebug(std::format("{} ### RenderManager init time: {} ms.\n", getName(), res));
 #endif
 
   return 0;
 }
 
-void RenderManager::update() {
+void RenderManager::update()
+{
 #ifdef DEBUG
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
@@ -61,24 +67,25 @@ void RenderManager::update() {
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
-  logCycle(
-      std::format("{} ### {} render time for all entites in scene: {} ms.\n",
-                  getName(), getName(), res));
+  logCycle(std::format("{} ### {} render time for all entites in scene: {} ms.\n", getName(), getName(), res));
 #endif
 }
 
-void RenderManager::clearColor() {
+void RenderManager::clearColor()
+{
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void RenderManager::renderGameEntities() {
-  for (Entity *entity : _scene->getEntities()) {
+void RenderManager::renderGameEntities()
+{
+  for (Entity* entity : _scene->getEntities())
+  {
     assert(entity != nullptr);
-    Shader *s = (Shader *)entity->getComponent(BitMasks::Components::SHADER);
-    if (!s->initialized) {
+    Shader* s = (Shader*)entity->getComponent(BitMasks::Components::SHADER);
+    if (!s->initialized)
+    {
 #ifdef DEBUG
-      logDebug(std::format("!!! Entity shader not initialized! Entity: {}\n",
-                           entity->getId()));
+      logDebug(std::format("!!! Entity shader not initialized! Entity: {}\n", entity->getId()));
 #endif
       glUseProgram(0);
       _usedShaderProgram = 0;
@@ -86,7 +93,8 @@ void RenderManager::renderGameEntities() {
     }
 
     GLuint shaderProgramId = s->programId;
-    if (_usedShaderProgram != shaderProgramId) {
+    if (_usedShaderProgram != shaderProgramId)
+    {
       glUseProgram(shaderProgramId);
       _usedShaderProgram = shaderProgramId;
     }
@@ -97,28 +105,33 @@ void RenderManager::renderGameEntities() {
     assert(linked == GL_TRUE);
 #endif
 
-    Model *model = (Model *)entity->getComponent(BitMasks::Components::MODEL);
+    Model* model = (Model*)entity->getComponent(BitMasks::Components::MODEL);
     assert(model != nullptr);
-    if (!Config::PAUSE) {
+    if (!Config::PAUSE)
+    {
       _scene->getCamera()->update();
       updateUniforms(entity, model);
     }
 
     glBindVertexArray(model->id);
     if (entity->isDebugEntity())
+    {
       glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, 0);
+    }
     else
+    {
       glDrawElements(GL_TRIANGLES, model->vertexCount, GL_UNSIGNED_INT, 0);
+    }
   }
 }
 
-void RenderManager::renderUserInterfaces() {
+void RenderManager::renderUserInterfaces()
+{
   assert(Config::interfaceShaderProgram != -1);
-  std::vector<ComponentData *> renderData = _facade->getRenderData();
-  if (renderData.size() == 0) {
-    logFailure(std::format(
-        "{} ### No render data for interfaces gathered skipping rendering\n",
-        getName()));
+  std::vector<ComponentData*> renderData = _facade->getRenderData();
+  if (renderData.size() == 0)
+  {
+    logFailure(std::format("{} ### No render data for interfaces gathered skipping rendering\n", getName()));
     return;
   }
 
@@ -127,32 +140,32 @@ void RenderManager::renderUserInterfaces() {
   std::vector<float> textCoords;
   std::vector<std::uint32_t> flags;
   GLuint texture = 0;
-  for (ComponentData *cd : renderData) {
-    instanceOffsets.insert(
-        instanceOffsets.end(),
-        {cd->vertices[0], cd->vertices[1], cd->stretchX, cd->stretchY});
-    colors.insert(colors.end(),
-                  {cd->colorR, cd->colorG, cd->colorB, cd->colorA});
+  for (ComponentData* cd : renderData)
+  {
+    instanceOffsets.insert(instanceOffsets.end(), {cd->vertices[0], cd->vertices[1], cd->stretchX, cd->stretchY});
+    colors.insert(colors.end(), {cd->colorR, cd->colorG, cd->colorB, cd->colorA});
 
     flags.push_back(cd->flags);
     textCoords.insert(textCoords.end(),
-                      {cd->textureCoords[0], cd->textureCoords[1],
-                       cd->textureCoords[2], cd->textureCoords[3]});
+                      {cd->textureCoords[0], cd->textureCoords[1], cd->textureCoords[2], cd->textureCoords[3]});
     if (cd->texture > 0)
+    {
       texture = cd->texture;
+    }
   }
 
-  if (instanceOffsets.size() <= 0) {
-    logFailure(std::format(
-        "{} ### No instance data for interfaces gathered skipping rendering\n",
-        getName()));
+  if (instanceOffsets.size() <= 0)
+  {
+    logFailure(std::format("{} ### No instance data for interfaces gathered skipping rendering\n", getName()));
     return;
   }
 
 #ifdef DEBUG
   std::uint8_t cycle = getLogger()->getCycleLength();
   if (cycle == 0)
+  {
     logCycle(std::format("{} ### Rendering Interfaces ...\n", getName()));
+  }
 #endif
 
   glUseProgram(Config::interfaceShaderProgram);
@@ -162,20 +175,16 @@ void RenderManager::renderUserInterfaces() {
   glBindVertexArray(_facade->_interfaceVAO);
 
   glBindBuffer(GL_ARRAY_BUFFER, _facade->_interfaceCOL);
-  glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(),
-               GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, _facade->_interfaceOFFSET);
-  glBufferData(GL_ARRAY_BUFFER, instanceOffsets.size() * sizeof(float),
-               instanceOffsets.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, instanceOffsets.size() * sizeof(float), instanceOffsets.data(), GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, _facade->_interfaceFLAGS);
-  glBufferData(GL_ARRAY_BUFFER, flags.size() * sizeof(std::uint32_t),
-               flags.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, flags.size() * sizeof(std::uint32_t), flags.data(), GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, _facade->_interfaceUV);
-  glBufferData(GL_ARRAY_BUFFER, textCoords.size() * sizeof(float),
-               textCoords.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, textCoords.size() * sizeof(float), textCoords.data(), GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -187,36 +196,37 @@ void RenderManager::renderUserInterfaces() {
   UniformUtils::setUniform(Config::interfaceTextureOneUniform, 1);
   glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
 
-  glm::mat4 ortho = glm::ortho(0.0f, (float)Config::GeneralConfig.WIDTH, 0.0f,
-                               (float)Config::GeneralConfig.HEIGHT);
+  glm::mat4 ortho = glm::ortho(0.0f, (float)Config::GeneralConfig.WIDTH, 0.0f, (float)Config::GeneralConfig.HEIGHT);
   UniformUtils::setUniform(Config::interfaceOrthoUniform, ortho);
-  glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0,
-                          renderData.size());
+  glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, renderData.size());
   glDisable(GL_BLEND);
   glDisable(GL_DEPTH_TEST);
   glUseProgram(_usedShaderProgram);
 }
 
-void RenderManager::updateUniforms(Entity *e, Model *model) {
+void RenderManager::updateUniforms(Entity* e, Model* model)
+{
 #ifdef DEBUG
-  if (e->isDebugEntity()) {
+  if (e->isDebugEntity())
+  {
     UniformUtils::setUniform(model->debugColorUniform, model->color);
     assert(model->debugColorUniform != -1);
   }
 #endif
 
-  Texture *t = model->texture;
-  if (t != nullptr) {
+  Texture* t = model->texture;
+  if (t != nullptr)
+  {
     UniformUtils::setUniform(t->uniform, 0);
     assert(t->uniform != -1);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, t->id);
   }
 
-  Position *p = (Position *)e->getComponent(BitMasks::Components::POSITION);
-  if (p != nullptr) {
-    glm::mat4 transform = PositionCalculation::createTransformationMatrix(
-        p->position, p->rotation, p->scale);
+  Position* p = (Position*)e->getComponent(BitMasks::Components::POSITION);
+  if (p != nullptr)
+  {
+    glm::mat4 transform = PositionCalculation::createTransformationMatrix(p->position, p->rotation, p->scale);
     assert(p->uniform != -1);
     UniformUtils::setUniform(p->uniform, transform);
   }

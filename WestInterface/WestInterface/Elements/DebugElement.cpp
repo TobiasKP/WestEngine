@@ -2,13 +2,20 @@
 
 #include "Label.cpp"
 
-struct DebugElement : public Label {
+struct DebugElement : public Label
+{
+  DebugElement() : Label()
+  {
+    zIndex = 100;
+  }
 
-  DebugElement() : Label() { zIndex = 100; }
+  void handler()
+  {
+    Label::handler();
+  };
 
-  void handler() { Label::handler(); };
-
-  void describeMyself(ComponentData *cd, std::uint8_t row, std::uint8_t column) {
+  void describeMyself(ComponentData* cd, std::uint8_t row, std::uint8_t column)
+  {
     Label::describeMyself(cd, row, column);
   };
 };

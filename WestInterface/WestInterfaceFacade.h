@@ -19,62 +19,53 @@
 #include "WestInterface/RenderManagment/TextRenderManager.h"
 #include "WestInterface/RenderManagment/UIRenderManager.h"
 
-#include <WestLogger.h>
 #include <array>
 #include <cstdint>
-#include <string>
-
 #include <GL/glew.h>
+#include <string>
+#include <WestLogger.h>
 
-class WEST_INTERFACE WestInterfaceFacade {
-
+class WEST_INTERFACE WestInterfaceFacade
+{
 public:
-  static WestInterfaceFacade &getInterfaceInstance();
+  static WestInterfaceFacade& getInterfaceInstance();
   void init();
   void shutdown();
 
   // Managing Interfaces
-  std::uint8_t createNewInterface(Container *c);
+  std::uint8_t createNewInterface(Container* c);
   bool destroyInterface(std::uint8_t interfaceId);
 
   // Adding Elements or removing
-  void addElement(std::uint8_t interfaceId, ElementProxy *element);
+  void addElement(std::uint8_t interfaceId, ElementProxy* element);
   bool removeElement(std::uint8_t interfaceId, std::uint32_t elementId);
 
   // RenderLoop
   void updateRenderData();
-  std::vector<ComponentData *> &getRenderData();
+  std::vector<ComponentData*>& getRenderData();
 
   // Events
-  bool notify(std::int16_t elementId, std::uint8_t event, std::uint16_t mouseX,
-              std::uint16_t mouseY);
+  bool notify(std::int16_t elementId, std::uint8_t event, std::uint16_t mouseX, std::uint16_t mouseY);
   bool notify(std::int16_t elementId, std::uint8_t event, std::string value);
 
   // Changes to Interface
-  bool resize(std::uint8_t interfaceId, std::uint16_t width,
-              std::uint16_t height);
-  bool reposition(std::uint8_t interfaceId, std::uint16_t xScreenPosition,
-                  std::uint16_t yScreenPosition);
+  bool resize(std::uint8_t interfaceId, std::uint16_t width, std::uint16_t height);
+  bool reposition(std::uint8_t interfaceId, std::uint16_t xScreenPosition, std::uint16_t yScreenPosition);
 
   // Get Resources TODO: reallobrate
-  const char *getResource(std::string resource);
+  const char* getResource(std::string resource);
 
-  std::vector<ElementBounds *> getShownElementsBoundaries();
+  std::vector<ElementBounds*> getShownElementsBoundaries();
 
-  static constexpr std::string_view interfaceVertexShader =
-      "shader/InterfaceVertexShader.vs";
-  static constexpr std::string_view interfaceFragementShader =
-      "shader/InterfaceFragementShader.fs";
-  static constexpr std::uint32_t indices[6] = {0, 1, 3, 1, 2, 3};
-  static constexpr float baseQuad[] = {0.0f, 0.0f,          1.0f * SIZE_E,
-                                       0.0f, 1.0f * SIZE_E, 1.0f * SIZE_E,
-                                       0.0f, 1.0f * SIZE_E};
-  static constexpr float baseTex[] = {0.0f, 0.0f, 1.0f, 0.0f,
-                                      1.0f, 1.0f, 0.0f, 1.0f};
+  static constexpr std::string_view interfaceVertexShader    = "shader/InterfaceVertexShader.vs";
+  static constexpr std::string_view interfaceFragementShader = "shader/InterfaceFragementShader.fs";
+  static constexpr std::uint32_t indices[6]                  = {0, 1, 3, 1, 2, 3};
+  static constexpr float baseQuad[]                          = {
+    0.0f, 0.0f, 1.0f * SIZE_E, 0.0f, 1.0f * SIZE_E, 1.0f * SIZE_E, 0.0f, 1.0f * SIZE_E};
+  static constexpr float baseTex[] = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f};
 
-  GLuint _interfaceVBO, _interfaceVAO, _interfaceEBO, _interfaceCOL,
-      _interfaceOFFSET, _interfaceFLAGS, _interfaceTEX,
-      _interfaceFONT_TEXTURE_ID, _interfaceUV;
+  GLuint _interfaceVBO, _interfaceVAO, _interfaceEBO, _interfaceCOL, _interfaceOFFSET, _interfaceFLAGS, _interfaceTEX,
+    _interfaceFONT_TEXTURE_ID, _interfaceUV;
 
   friend class UIRenderManager;
 
@@ -85,16 +76,15 @@ private:
   WestInterfaceFacade();
   ~WestInterfaceFacade();
 
-  std::array<ContainerElement *, 32> _interfaces{nullptr};
+  std::array<ContainerElement*, 32> _interfaces{nullptr};
 
-  ValueObserver *_valueObserver = nullptr;
-  EventObserver *_eventObserver = nullptr;
-  InterfaceBuilder *_builder = nullptr;
-  UIRenderManager *_renderManager = nullptr;
-  TextRenderManager *_textManager = nullptr;
-  WestLogger &_logger = WestLogger::getLoggerInstance();
+  ValueObserver* _valueObserver   = nullptr;
+  EventObserver* _eventObserver   = nullptr;
+  InterfaceBuilder* _builder      = nullptr;
+  UIRenderManager* _renderManager = nullptr;
+  TextRenderManager* _textManager = nullptr;
+  WestLogger& _logger             = WestLogger::getLoggerInstance();
 
-  ContainerElement *findInterfaceById(std::uint8_t id);
-  void setupInstancedAttribute(GLuint buffer, GLuint index, GLint size,
-                               bool withDivisor);
+  ContainerElement* findInterfaceById(std::uint8_t id);
+  void setupInstancedAttribute(GLuint buffer, GLuint index, GLint size, bool withDivisor);
 };

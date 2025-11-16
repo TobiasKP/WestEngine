@@ -2,4 +2,5 @@
 
 #include "IObserver.h"
 
-class ValueObserver : public IObserver {};
+class ValueObserver : public IObserver
+{};

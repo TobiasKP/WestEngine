@@ -4,9 +4,10 @@
 
 Scene Scene::_sceneInstance;
 std::mutex Scene::_mutex;
-Camera *Scene::_camera;
+Camera* Scene::_camera;
 
-Scene &Scene::getSceneInstance() {
+Scene& Scene::getSceneInstance()
+{
   std::lock_guard<std::mutex> lock(_mutex);
 
   static Scene instance;
@@ -15,14 +16,16 @@ Scene &Scene::getSceneInstance() {
 
 Scene::Scene() {}
 
-Scene::~Scene() { }
+Scene::~Scene() {}
 
-void Scene::deleteScene() {
+void Scene::deleteScene()
+{
   delete _camera;
   _entities.clear();
 }
 
-void Scene::init() {
+void Scene::init()
+{
   std::lock_guard<std::mutex> lock(_mutex);
   _entities.reserve(512);
 #ifdef DEBUG
@@ -30,56 +33,63 @@ void Scene::init() {
 #endif
 }
 
-std::vector<Entity *> Scene::getEntities() {
-  std::vector<Entity *> entities;
+std::vector<Entity*> Scene::getEntities()
+{
+  std::vector<Entity*> entities;
   {
     std::lock_guard<std::mutex> lock(_mutex);
     entities = _entities;
   }
 #ifdef DEBUG
   if (_debugEntities.size() > 0)
-    entities.insert(entities.end(), _debugEntities.begin(),
-                    _debugEntities.end());
+  {
+    entities.insert(entities.end(), _debugEntities.begin(), _debugEntities.end());
+  }
 #endif
   return entities;
 }
 
-//TODO Sort by entity shader group
-void Scene::addEntity(Entity *entity) {
+// TODO Sort by entity shader group
+void Scene::addEntity(Entity* entity)
+{
   assert(entity != nullptr);
   std::lock_guard<std::mutex> lock(_mutex);
   _entities.emplace_back(entity);
 }
 
-void Scene::addDebugEntity(Entity *entity) {
+void Scene::addDebugEntity(Entity* entity)
+{
   assert(entity != nullptr);
   std::lock_guard<std::mutex> lock(_mutex);
   _debugEntities.emplace_back(entity);
 }
 
-void Scene::addCamera(Camera *cam) {
+void Scene::addCamera(Camera* cam)
+{
   assert(cam != nullptr);
   std::lock_guard<std::mutex> lock(_mutex);
   _camera = cam;
 }
 
-void Scene::removeEntity(Entity *entity) {
+void Scene::removeEntity(Entity* entity)
+{
   auto entityIt =
-      std::find_if(_entities.begin(), _entities.end(),
-                   [&](Entity *en) { return en->getId() == entity->getId(); });
+    std::find_if(_entities.begin(), _entities.end(), [&](Entity* en) { return en->getId() == entity->getId(); });
 
-  if (entityIt != _entities.end()) {
+  if (entityIt != _entities.end())
+  {
     std::lock_guard<std::mutex> lock(_mutex);
     _entities.erase(entityIt);
   }
 
 #ifdef DEBUG
-  if (entity->isDebugEntity()) {
+  if (entity->isDebugEntity())
+  {
     auto entityIt = std::find_if(
-        _debugEntities.begin(), _debugEntities.end(),
-        [&](Entity *en) { return en->getId() == entity->getId(); });
+      _debugEntities.begin(), _debugEntities.end(), [&](Entity* en) { return en->getId() == entity->getId(); });
 
-    if (entityIt != _debugEntities.end()) {
+    if (entityIt != _debugEntities.end())
+    {
       std::lock_guard<std::mutex> lock(_mutex);
       _debugEntities.erase(entityIt);
     }

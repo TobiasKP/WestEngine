@@ -16,14 +16,16 @@
 
 enum ElementType { LABEL, BUTTON, CONTAINER, ICON, DEBUG_ELEMENT };
 
-struct WEST_INTERFACE TextureInformation {
+struct WEST_INTERFACE TextureInformation
+{
   bool mipmap;
   std::int32_t wrapping_x;
   std::int32_t wrapping_y;
-  const char *path;
+  const char* path;
 };
 
-struct WEST_INTERFACE ElementProxy {
+struct WEST_INTERFACE ElementProxy
+{
   ElementType type;
   std::uint32_t elementId;
 
@@ -40,17 +42,18 @@ struct WEST_INTERFACE ElementProxy {
   float stretchX = 1.0f;
   float stretchY = 1.0f;
 
-  std::uint8_t rowElements = 1;
+  std::uint8_t rowElements    = 1;
   std::uint8_t columnElements = 1;
   std::uint8_t row;
   std::uint8_t column;
 
   std::string text = "";
 
-  TextureInformation *texture = nullptr;
+  TextureInformation* texture = nullptr;
 };
 
-struct WEST_INTERFACE Container {
+struct WEST_INTERFACE Container
+{
   std::uint16_t xScreenPosition;
   std::uint16_t yScreenPosition;
   float stretchX;
@@ -58,8 +61,8 @@ struct WEST_INTERFACE Container {
   std::uint16_t rows;
   std::uint16_t columns;
   bool hiddenContainer;
-  std::vector<ElementProxy *> &elements;
-  TextureInformation *background = nullptr;
+  std::vector<ElementProxy*>& elements;
+  TextureInformation* background = nullptr;
 
-  Container(std::vector<ElementProxy *> &vec) : elements(vec) {};
+  Container(std::vector<ElementProxy*>& vec) : elements(vec) {};
 };
