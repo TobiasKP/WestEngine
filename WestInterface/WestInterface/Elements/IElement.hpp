@@ -47,7 +47,7 @@ struct IElement
   float colorA = 1.0f;
 
   // Bit flags for special behaviours
-  std::uint64_t flags;
+  std::uint64_t flags = 0x00;
 
   // Number of quads being next to each other
   std::uint16_t rowElements    = 0;

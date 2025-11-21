@@ -131,19 +131,20 @@ void ElementFactory::registerElementValue(ElementProxy* ep, IElement* e)
 
 void ElementFactory::fillBasicInfos(ElementProxy* ep, IElement* el)
 {
-  el->id             = ep->elementId;
-  el->xLL            = ep->xPosition;
-  el->yLL            = ep->yPosition;
-  el->stretchX       = ep->stretchX;
-  el->stretchY       = ep->stretchY;
-  el->colorR         = ep->colorR;
-  el->colorG         = ep->colorG;
-  el->colorB         = ep->colorB;
-  el->colorA         = ep->colorA;
-  el->rowElements    = ep->rowElements;
-  el->columnElements = ep->columnElements;
-  el->eventHandler   = ep->eventHandler;
-  el->zIndex         = ep->zIndex;
+  el->id              = ep->elementId;
+  el->xLL             = ep->xPosition;
+  el->yLL             = ep->yPosition;
+  el->stretchX        = ep->stretchX;
+  el->stretchY        = ep->stretchY;
+  el->colorR          = ep->colorR / 255.0f;
+  el->colorG          = ep->colorG / 255.0f;
+  el->colorB          = ep->colorB / 255.0f;
+  el->colorA          = ep->colorA;
+  el->rowElements     = ep->rowElements;
+  el->columnElements  = ep->columnElements;
+  el->eventHandler    = ep->eventHandler;
+  el->zIndex          = ep->zIndex;
+  el->flags          |= ep->givenFlags;
 }
 
 std::array<float, 4> ElementFactory::getTextureCoordinatesForChar(char character)

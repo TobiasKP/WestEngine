@@ -27,34 +27,33 @@ InterfaceBuilder::~InterfaceBuilder()
   delete _dataPool;
 }
 
-void InterfaceBuilder::createNewInterface(std::uint16_t xScreenPosition,
-                                          std::uint16_t yScreenPosition,
-                                          float stretchX,
-                                          float stretchY,
-                                          std::uint16_t rows,
-                                          std::uint16_t columns,
-                                          bool hiddenContainer)
+void InterfaceBuilder::createNewInterface(Container* c)
 {
   _current = new ContainerElement();
   assert(_current != nullptr);
-  _current->poolPosition = _dataPool->reserveNew(rows * columns);
+  _current->poolPosition = _dataPool->reserveNew(c->rows * c->columns);
   _dataPool->setPositionUpdateCallback([this](std::uint32_t oldPos, std::uint32_t newPos)
                                        { _current->updatePositions(oldPos, newPos); });
-  _current->stretchX       = stretchX;
-  _current->stretchY       = stretchY;
-  _current->xLL            = xScreenPosition;
-  _current->yLL            = yScreenPosition;
-  _current->rowElements    = rows;
-  _current->columnElements = columns;
+  _current->stretchX       = c->stretchX;
+  _current->stretchY       = c->stretchY;
+  _current->xLL            = c->xScreenPosition;
+  _current->yLL            = c->yScreenPosition;
+  _current->rowElements    = c->rows;
+  _current->columnElements = c->columns;
+  _current->colorR         = c->colorR / 255.0;
+  _current->colorG         = c->colorG / 255.0;
+  _current->colorB         = c->colorB / 255.0;
   _current->id             = CURRENT_ID;
   _current->dataPool       = _dataPool;
   assert(_current->xLL >= 0 && _current->yLL >= 0);
   CURRENT_ID++;
 
 #ifdef DEBUG
-  _logger.log(Level::Info, std::format("@@@ Creating new Interface -> {} : {}\n", xScreenPosition, yScreenPosition));
+  _logger.log(Level::Info,
+              std::format("@@@ Creating new Interface -> {} : {}\n", c->xScreenPosition, c->yScreenPosition));
 #endif
 }
+
 void InterfaceBuilder::createBackground(TextureInformation* t)
 {
   GLuint texture;

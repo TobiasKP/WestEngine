@@ -18,6 +18,7 @@
 #include "WestInterface/RenderManagment/ComponentData.h"
 #include "WestInterface/RenderManagment/TextRenderManager.h"
 #include "WestInterface/RenderManagment/UIRenderManager.h"
+#include "WestInterface/SettingsInterface.h"
 
 #include <array>
 #include <cstdint>
@@ -83,6 +84,7 @@ private:
   InterfaceBuilder* _builder      = nullptr;
   UIRenderManager* _renderManager = nullptr;
   TextRenderManager* _textManager = nullptr;
+  SettingsInterface* _settings    = nullptr;
   WestLogger& _logger             = WestLogger::getLoggerInstance();
 
   ContainerElement* findInterfaceById(std::uint8_t id);

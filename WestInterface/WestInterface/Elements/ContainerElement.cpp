@@ -139,6 +139,10 @@ struct ContainerElement : public IElement
     cd->stretchY    = stretchY;
     cd->flags       = flags;
     cd->zIndex      = zIndex;
+    cd->colorR      = colorR;
+    cd->colorG      = colorG;
+    cd->colorB      = colorB;
+    cd->colorA      = colorA;
     if (texture > 0)
     {
       cd->texture = texture;

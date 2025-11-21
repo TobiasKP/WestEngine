@@ -20,7 +20,7 @@ void main() {
     vFlags = flags;
     TexCoord = mix(uvCoords.xy, uvCoords.zw, texCoords);
     QuadCoord = texCoords;
-    scale = vec2(instanceOffset.z, instanceOffset.w); 
+    scale = vec2(instanceOffset.z, instanceOffset.w);
     float depth = float(gl_InstanceID) * 0.001; // Calculate depth based on gl_InstanceID (sorted by zIndex on the CPU)
     gl_Position = orthoMatrix * vec4((position.x + instanceOffset.x) * instanceOffset.z, (position.y + instanceOffset.y) * instanceOffset.w, depth, 1.0);
 }

@@ -21,6 +21,8 @@ WestInterfaceFacade::WestInterfaceFacade()
   _renderManager = new UIRenderManager();
   _textManager   = new TextRenderManager();
   _builder       = new InterfaceBuilder(_eventObserver, _valueObserver);
+  assert(_builder != nullptr);
+  _settings = new SettingsInterface(*_builder);
   for (std::uint8_t i = 0; i < 32; i++)
   {
     _interfaces.at(i) = nullptr;
@@ -121,6 +123,10 @@ void WestInterfaceFacade::init()
   stbi_image_free(imgData);
 
   _textManager->initializeFontAtlas();
+  ContainerElement* tmp = _settings->init();
+  _interfaces.at(count) = tmp;
+  count++;
+  _renderManager->toggleDirty();
 }
 
 void WestInterfaceFacade::setupInstancedAttribute(GLuint buffer, GLuint index, GLint size, bool withDivisor)
@@ -160,8 +166,7 @@ std::uint8_t WestInterfaceFacade::createNewInterface(Container* c)
   _logger.log(Level::Info, "@@@ Creating new Interface\n");
 #endif
 
-  _builder->createNewInterface(
-    c->xScreenPosition, c->yScreenPosition, c->stretchX, c->stretchY, c->rows, c->columns, c->hiddenContainer);
+  _builder->createNewInterface(c);
 
   if (c->background != nullptr)
   {

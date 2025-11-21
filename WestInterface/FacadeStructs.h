@@ -46,13 +46,14 @@ struct WEST_INTERFACE ElementProxy
   std::uint8_t columnElements = 1;
   std::uint8_t row;
   std::uint8_t column;
+  std::uint32_t givenFlags;
 
   std::string text = "";
 
   TextureInformation* texture = nullptr;
 };
 
-struct WEST_INTERFACE Container
+struct WEST_INTERFACE Container : ElementProxy
 {
   std::uint16_t xScreenPosition;
   std::uint16_t yScreenPosition;

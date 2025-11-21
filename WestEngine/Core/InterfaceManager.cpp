@@ -75,9 +75,9 @@ std::int32_t InterfaceManager::buildTechDemoFooter()
   redQuad->xPosition    = 0.0f;
   redQuad->yPosition    = 0.0f;
 
-  redQuad->colorR         = 1.0f;
-  redQuad->colorG         = 1.0f;
-  redQuad->colorB         = 1.0f;
+  redQuad->colorR         = 215.0f;
+  redQuad->colorG         = 207.0f;
+  redQuad->colorB         = 196.0f;
   redQuad->colorA         = 1.0f;
   redQuad->row            = 0;
   redQuad->column         = 0;
@@ -90,14 +90,15 @@ std::int32_t InterfaceManager::buildTechDemoFooter()
   quitButton->elementId      = 2;
   quitButton->xPosition      = 700.0f;
   quitButton->yPosition      = 0.0f;
-  quitButton->colorR         = 1.0f;
-  quitButton->colorG         = 1.0f;
-  quitButton->colorB         = 1.0f;
+  quitButton->colorR         = 215.0f;
+  quitButton->colorG         = 207.0f;
+  quitButton->colorB         = 196.0f;
   quitButton->colorA         = 1.0f;
   quitButton->row            = 0;
   quitButton->row            = 0;
   quitButton->column         = 0;
   quitButton->columnElements = 4;
+  quitButton->givenFlags     = 0x0040;
   quitButton->text           = "Quit";
   quitButton->eventHandler   = [this]()
   {
@@ -120,6 +121,9 @@ std::int32_t InterfaceManager::buildTechDemoFooter()
   c->yScreenPosition    = 0.0f;
   c->stretchX           = 20.0f;
   c->stretchY           = 1.0f;
+  c->colorR             = 59.0f;
+  c->colorG             = 58.0f;
+  c->colorB             = 54.0f;
   c->rows               = 1;
   c->columns            = 1;
   c->hiddenContainer    = false;

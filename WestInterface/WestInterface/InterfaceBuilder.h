@@ -6,7 +6,6 @@
 #include "Observer/EventObserver.h"
 #include "Observer/ValueObserver.h"
 
-#include <cstdint>
 #include <WestLogger.h>
 
 static std::atomic_uint32_t CURRENT_ID = 1;
@@ -18,13 +17,7 @@ public:
   InterfaceBuilder();
   ~InterfaceBuilder();
 
-  void createNewInterface(std::uint16_t xScreenPosition,
-                          std::uint16_t yScreenPosition,
-                          float stretchX,
-                          float stretchY,
-                          std::uint16_t rows,
-                          std::uint16_t columns,
-                          bool hiddenContainer);
+  void createNewInterface(Container* c);
   void createBackground(TextureInformation* t);
   void addElement(ElementProxy* e);
   ContainerElement* build();

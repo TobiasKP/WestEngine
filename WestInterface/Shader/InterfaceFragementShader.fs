@@ -15,6 +15,9 @@ uniform sampler2DArray textureSampler;
 
 bool handled = false;
 float blendingWidth = 0.1;
+vec3 burgundy = vec3(0.557, 0.231, 0.275);
+vec3 gold = vec3(0.851, 0.643, 0.255);
+vec3 emerald = vec3(0.251, 0.506, 0.278);
 
 vec4 sampleText() {
     vec4 texColor = texture(fontTextureSampler, TexCoord);
@@ -60,7 +63,7 @@ void textureCheck() {
     }
 }
 
-void calculateBorderEffect(vec4 color) {
+void calculateBorderEffect() {
     float borderWidth = 0.1;
     float maxX = 1.0 - (borderWidth / scale.x);
     float minX = borderWidth / scale.x;
@@ -69,11 +72,21 @@ void calculateBorderEffect(vec4 color) {
     if (QuadCoord.x < maxX && QuadCoord.x > minX && QuadCoord.y < maxY && QuadCoord.y > minY && !handled) {
         textureCheck();
     } else {
-        fragColor = color;
+        fragColor = vColor;
     }
 }
 
-void calculateGlowEffect(vec3 glowColor, float intensity) {
+void calculateGlowEffect(float intensity) {
+    vec3 glowColor;
+    if ((vFlags & 0x0040u) != 0u) {
+        glowColor = burgundy;
+    } else if ((vFlags & 0x008u) != 0u) {
+        glowColor = gold;
+    } else if ((vFlags & 0x0100u) != 0u) {
+        glowColor = emerald;
+    } else {
+        glowColor = vec3(1.0, 0.0, 0.0);
+    }
     vec4 baseColor = sampleText();
     float baseBrightness = dot(baseColor.rgb, vec3(0.299, 0.587, 0.114));
     float adjustedIntensity = baseBrightness > 0.7 ? intensity * 0.3 : intensity;
@@ -83,12 +96,12 @@ void calculateGlowEffect(vec3 glowColor, float intensity) {
 
 void main() {
     if ((vFlags & 0x01u) != 0u) {
-        calculateBorderEffect(vec4(0.0, 0.0, 0.0, 1.0));
+        calculateBorderEffect();
         handled = true;
     }
 
     if ((vFlags & 0x02u) != 0u) {
-        calculateGlowEffect(vec3(1.0, 0.5, 0.0), 0.3);
+        calculateGlowEffect(2.0);
         handled = true;
     } else if ((vFlags & 0x08u) != 0u) {
         fragColor = sampleText();
