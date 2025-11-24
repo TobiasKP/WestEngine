@@ -3,7 +3,6 @@
 #include "../CoreHeaders/Utils/DataUtils/UniformUtils.h"
 #include "../CoreHeaders/Utils/Math/PositionCalculation.h"
 
-#include <algorithm>
 #include <Config.h>
 #include <glm/ext/matrix_clip_space.hpp>
 
@@ -194,7 +193,7 @@ void RenderManager::renderUserInterfaces()
 
   glActiveTexture(GL_TEXTURE1);
   UniformUtils::setUniform(Config::interfaceTextureOneUniform, 1);
-  glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
 
   glm::mat4 ortho = glm::ortho(0.0f, (float)Config::GeneralConfig.WIDTH, 0.0f, (float)Config::GeneralConfig.HEIGHT);
   UniformUtils::setUniform(Config::interfaceOrthoUniform, ortho);

@@ -40,9 +40,20 @@ WestLogger::WestLogger()
   _th = std::thread(&WestLogger::workerThread, this);
 }
 
-WestLogger::~WestLogger() {}
+WestLogger::~WestLogger()
+{
+  joinThreads();
+}
 
 void WestLogger::closeFileStreams()
+{
+  joinThreads();
+  _cycleFile.close();
+  _logFile.close();
+  _errorFile.close();
+}
+
+void WestLogger::joinThreads()
 {
   bool expected = false;
   if (_stopWorker.compare_exchange_strong(expected, true))
@@ -52,10 +63,6 @@ void WestLogger::closeFileStreams()
     {
       _th.join();
     }
-
-    _cycleFile.close();
-    _logFile.close();
-    _errorFile.close();
   }
 }
 

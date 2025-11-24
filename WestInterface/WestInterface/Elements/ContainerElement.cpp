@@ -13,7 +13,6 @@ struct ContainerElement : public IElement
 
   ContainerElement()
   {
-    flags  = 0x0001 | 0x0020;
     zIndex = 1;
   }
 

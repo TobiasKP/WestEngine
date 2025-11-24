@@ -54,7 +54,7 @@ void UIRenderManager::updateRenderData(std::array<ContainerElement*, 32>& interf
         std::vector<ComponentData*> local;
         std::vector<ElementBounds*> localB;
         gatherUIData(local, interfaces, begin, end);
-        gatherBoundaryData(localB, interfaces);
+        gatherBoundaryData(localB, interfaces, begin, end);
         fillComponentData(local, localB);
       }));
   }
@@ -75,10 +75,13 @@ void UIRenderManager::updateRenderData(std::array<ContainerElement*, 32>& interf
 }
 
 void UIRenderManager::gatherBoundaryData(std::vector<ElementBounds*>& local,
-                                         const std::array<ContainerElement*, 32>& interfaces)
+                                         const std::array<ContainerElement*, 32>& interfaces,
+                                         size_t begin,
+                                         size_t end)
 {
-  for (ContainerElement* ce : interfaces)
+  for (size_t j = begin; j < end; ++j)
   {
+    ContainerElement* ce = interfaces[j];
     if (ce == nullptr)
     {
       break;
@@ -89,11 +92,11 @@ void UIRenderManager::gatherBoundaryData(std::vector<ElementBounds*>& local,
       b->id            = el->id;
       b->zIndex        = el->zIndex;
       b->xLeft         = el->xLL;
-      b->yBottom       = el->yLL;
+      b->yBottom       = Config::GeneralConfig.HEIGHT - el->yLL;
 
       float elementWidth = el->getElementWidth();
       b->xRight          = el->xLL + elementWidth;
-      b->yTop            = el->yLL + (el->rowElements * SIZE_E * el->stretchY);
+      b->yTop            = Config::GeneralConfig.HEIGHT - (el->yLL + (el->rowElements * SIZE_E * el->stretchY));
       if (el->supportsEvents)
       {
         b->eventDriven = true;
@@ -105,11 +108,11 @@ void UIRenderManager::gatherBoundaryData(std::vector<ElementBounds*>& local,
     b->id            = ce->id;
     b->zIndex        = ce->zIndex;
     b->xLeft         = ce->xLL;
-    b->yBottom       = ce->yLL;
+    b->yBottom       = Config::GeneralConfig.HEIGHT - ce->yLL;
 
     float elementWidth = ce->getElementWidth();
     b->xRight          = ce->xLL + elementWidth;
-    b->yTop            = ce->yLL + (ce->rowElements * SIZE_E * ce->stretchY);
+    b->yTop            = Config::GeneralConfig.HEIGHT - (ce->yLL + (ce->rowElements * SIZE_E * ce->stretchY));
     local.push_back(b);
   }
 }

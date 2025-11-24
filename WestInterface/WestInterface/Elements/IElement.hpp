@@ -54,7 +54,7 @@ struct IElement
   std::uint16_t columnElements = 0;
 
   std::unique_ptr<Text> text;
-  GLuint texture;
+  GLuint texture = 0;
 
   bool changed                = true;
   bool supportsEvents         = false;

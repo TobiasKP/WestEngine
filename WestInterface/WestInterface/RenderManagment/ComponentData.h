@@ -38,11 +38,11 @@ struct WEST_INTERFACE ElementBounds
 
 /**********************************************************************************
  * FLAG DESCRIPTION
- * 0x00000001 = Border and no filling pixels -> discarded
+ * 0x00000001 = Border
  * 0x00000002 = Mouse Hovered
  * 0x00000004 = hasTexture
  * 0x00000008 = hasText
- * 0x00000010 = ---
+ * 0x00000010 = Border and discarded center Pixels
  * 0x00000020 = blending texture borders
  * 0x00000040 = highlight Color Burgundy
  * 0x00000080 = hightlight Color Gold 

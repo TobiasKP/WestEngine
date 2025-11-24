@@ -46,7 +46,7 @@ struct WEST_INTERFACE ElementProxy
   std::uint8_t columnElements = 1;
   std::uint8_t row;
   std::uint8_t column;
-  std::uint32_t givenFlags;
+  std::uint32_t givenFlags = 0x00;
 
   std::string text = "";
 

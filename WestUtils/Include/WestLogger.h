@@ -51,6 +51,7 @@ private:
   ~WestLogger();
 
   void workerThread();
+  void joinThreads();
 
   std::ofstream _logFile;
   std::ofstream _errorFile;

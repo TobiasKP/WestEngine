@@ -40,12 +40,17 @@ struct Label : public IElement
     cd->stretchY = stretchY;
     cd->flags    = flags;
     cd->zIndex   = zIndex;
-    if (text != nullptr && text->coordinates.size() > 4 * column)
+
+    if ((text != nullptr && text->coordinates.size() > 4 * column) && texture == 0)
     {
       cd->textureCoords[0] = text->coordinates[0 + 4 * column];
       cd->textureCoords[1] = text->coordinates[1 + 4 * column];
       cd->textureCoords[2] = text->coordinates[2 + 4 * column];
       cd->textureCoords[3] = text->coordinates[3 + 4 * column];
+    }
+    else if (texture > 0)
+    {
+      cd->texture = texture;
     }
   };
 };

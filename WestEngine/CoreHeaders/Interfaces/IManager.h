@@ -5,7 +5,6 @@
 #include <cassert>
 #include <cstdint>
 #include <format>
-#include <iostream>
 #include <string>
 #include <TimeUtils.hpp>
 #include <WestLogger.h>

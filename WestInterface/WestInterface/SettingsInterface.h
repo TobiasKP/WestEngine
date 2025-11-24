@@ -14,6 +14,8 @@ public:
 
 private:
   InterfaceBuilder* _interfaceBuilder;
+  WestLogger& _logger = WestLogger::getLoggerInstance();
+  std::vector<ElementProxy*> _elements;
 
   Container* createSettingButton();
   IElement* createSettingInterface();

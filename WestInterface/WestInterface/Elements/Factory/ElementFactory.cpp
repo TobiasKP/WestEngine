@@ -10,7 +10,6 @@ IElement* ElementFactory::createElementInternal(ElementProxy* e)
 {
   ElementType type = e->type;
   IElement* result = nullptr;
-
   switch (type)
   {
     case BUTTON:
@@ -81,7 +80,7 @@ void ElementFactory::fillTexture(ElementProxy* ep, IElement* el)
 
   glBindTexture(GL_TEXTURE_2D, texture);
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-  glTexImage3D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, imgData);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imgData);
   glGenerateMipmap(GL_TEXTURE_2D);
 
   stbi_image_free(imgData);

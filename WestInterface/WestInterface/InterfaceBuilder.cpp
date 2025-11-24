@@ -1,6 +1,7 @@
 #include "InterfaceBuilder.h"
 
 #include <stb_image.h>
+#include <Config.h>
 
 InterfaceBuilder::InterfaceBuilder()
 {
@@ -34,19 +35,19 @@ void InterfaceBuilder::createNewInterface(Container* c)
   _current->poolPosition = _dataPool->reserveNew(c->rows * c->columns);
   _dataPool->setPositionUpdateCallback([this](std::uint32_t oldPos, std::uint32_t newPos)
                                        { _current->updatePositions(oldPos, newPos); });
-  _current->stretchX       = c->stretchX;
-  _current->stretchY       = c->stretchY;
-  _current->xLL            = c->xScreenPosition;
-  _current->yLL            = c->yScreenPosition;
-  _current->rowElements    = c->rows;
-  _current->columnElements = c->columns;
-  _current->colorR         = c->colorR / 255.0;
-  _current->colorG         = c->colorG / 255.0;
-  _current->colorB         = c->colorB / 255.0;
-  _current->id             = CURRENT_ID;
-  _current->dataPool       = _dataPool;
-  assert(_current->xLL >= 0 && _current->yLL >= 0);
-  CURRENT_ID++;
+  _current->stretchX        = c->stretchX;
+  _current->stretchY        = c->stretchY;
+  _current->xLL             = c->xScreenPosition;
+  _current->yLL             = c->yScreenPosition;
+  _current->rowElements     = c->rows;
+  _current->columnElements  = c->columns;
+  _current->colorR          = c->colorR / 255.0;
+  _current->colorG          = c->colorG / 255.0;
+  _current->colorB          = c->colorB / 255.0;
+  _current->id              = Config::INTERNAL_UI_ID++;
+  _current->dataPool        = _dataPool;
+  _current->flags          |= c->givenFlags;
+  assert(_current->xLL >= 0 && _current->yLL >= 0); 
 
 #ifdef DEBUG
   _logger.log(Level::Info,
@@ -119,7 +120,6 @@ void InterfaceBuilder::addElement(ElementProxy* e)
     _logger.log(Level::Error, "@@@ Error reserving size for new Element do not add Element.\n");
     return;
   }
-
   _current->addChild(newElement, e->column, e->row);
 }
 

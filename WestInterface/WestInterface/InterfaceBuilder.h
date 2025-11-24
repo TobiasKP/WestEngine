@@ -8,8 +8,6 @@
 
 #include <WestLogger.h>
 
-static std::atomic_uint32_t CURRENT_ID = 1;
-
 class InterfaceBuilder
 {
 public:

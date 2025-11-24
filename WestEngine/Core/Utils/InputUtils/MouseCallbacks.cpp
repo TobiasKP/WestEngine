@@ -26,7 +26,7 @@ void MouseCallbacks::mouseCallback(GLFWwindow* window, double x, double y)
 
   if (std::get<0>(hover) != std::get<0>(_currentHover))
   {
-    if (std::get<0>(_currentHover) != -1 && std::get<1>(_currentHover))
+    if (std::get<0>(_currentHover) != -1)
     {
       _iObserver->setControlFlag(BitMasks::Control::UI_UNHOVERED, std::get<0>(_currentHover));
     }
@@ -79,9 +79,8 @@ std::tuple<std::int16_t, bool> MouseCallbacks::isInterfaceHovered()
 {
   for (ElementBounds* eb : _elements)
   {
-    if (_currentPos.x > eb->xLeft && _currentPos.x < eb->xRight
-        && _currentPos.y < Config::GeneralConfig.HEIGHT - eb->yBottom
-        && _currentPos.y > Config::GeneralConfig.HEIGHT - eb->yTop)
+    if (_currentPos.x > eb->xLeft && _currentPos.x < eb->xRight && _currentPos.y < eb->yBottom
+        && _currentPos.y > eb->yTop)
     {
       return std::make_tuple(eb->id, eb->eventDriven);
     }
