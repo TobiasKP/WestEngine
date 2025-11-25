@@ -5,7 +5,7 @@
 class EventObserver : public IObserver
 {
 public:
-  EventObserver();
+  EventObserver(WestLogger &l);
   ~EventObserver() override;
 
   virtual bool handleEvent(std::int16_t elementId,
@@ -15,6 +15,7 @@ public:
                            std::string value) override;
 
   virtual void registerElement(IElement* e) override;
+  virtual void deregisterElement(IElement* e) override;
 
 private:
   std::vector<IElement*> _registeredElements;

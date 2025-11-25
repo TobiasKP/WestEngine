@@ -2,9 +2,11 @@
 
 #include "EventObserver.h"
 
+#include <algorithm>
 #include <cassert>
 
-EventObserver::EventObserver() {}
+
+EventObserver::EventObserver(WestLogger& l) : IObserver(l) {}
 
 EventObserver::~EventObserver() {}
 
@@ -21,7 +23,14 @@ bool EventObserver::handleEvent(
       break;
     }
   }
-  assert(e != nullptr);
+
+  if (e == nullptr)
+  {
+    logger.log(Level::Info,
+               std::format("@@@ --- Warning --- Element with id: {}, does not exist in EventObserver, probably deletet",
+                           elementId));
+    return false;
+  }
 
   if (event & 0x01)
   {
@@ -44,6 +53,17 @@ bool EventObserver::handleEvent(
 void EventObserver::registerElement(IElement* e)
 {
   _registeredElements.push_back(e);
+}
+
+void EventObserver::deregisterElement(IElement* e)
+{
+  auto it = std::find_if(_registeredElements.begin(),
+                         _registeredElements.end(),
+                         [e](const IElement* element) { return element->id == e->id; });
+  if (it != _registeredElements.end())
+  {
+    _registeredElements.erase(it);
+  }
 }
 
 void EventObserver::executeElement(IElement* e)

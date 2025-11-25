@@ -18,11 +18,9 @@ vec3 burgundy = vec3(0.557, 0.231, 0.275);
 vec3 gold = vec3(0.851, 0.643, 0.255);
 vec3 emerald = vec3(0.251, 0.506, 0.278);
 
-vec4 sampleText() {
-    vec4 texColor = texture(fontTextureSampler, TexCoord);
-
+vec4 discardWhitePixels(vec4 texColor) {
     float whiteness = (texColor.r + texColor.g + texColor.b) / 3.0;
-    if (whiteness > 0.99) {
+    if (whiteness > 0.95) {
         discard;
     }
 
@@ -30,9 +28,15 @@ vec4 sampleText() {
     return vec4(vColor.rgb, darkness);
 }
 
+vec4 sampleText() {
+    vec4 texColor = texture(fontTextureSampler, TexCoord);
+    return discardWhitePixels(texColor);
+}
+
 void textureCheck() {
     if ((vFlags & 0x04u) != 0u) {
-        fragColor = texture(textureSampler, TexCoord);
+        vec4 texColor = texture(textureSampler, TexCoord);
+        fragColor = discardWhitePixels(texColor);
     } else if ((vFlags & 0x0010u) != 0u) {
         discard;
     } else {
@@ -49,7 +53,7 @@ void calculateBorderEffect() {
     if (QuadCoord.x < maxX && QuadCoord.x > minX && QuadCoord.y < maxY && QuadCoord.y > minY && !handled) {
         textureCheck();
     } else {
-        fragColor = vColor;
+        fragColor = vec4(vColor.rgb, 1.0);
     }
 }
 
@@ -68,7 +72,7 @@ void calculateGlowEffect(float intensity) {
     if ((vFlags & 0x0008u) != 0u) {
         baseColor = sampleText();
     } else {
-        baseColor = texture(textureSampler, TexCoord);
+        textureCheck();
     }
     float baseBrightness = dot(baseColor.rgb, vec3(0.299, 0.587, 0.114));
     float adjustedIntensity = baseBrightness > 0.7 ? intensity * 0.3 : intensity;

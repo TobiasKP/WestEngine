@@ -18,7 +18,6 @@ public:
   std::int32_t init() override;
 
 private:
-  std::uint8_t _interfaces;
   std::uint8_t _cachedInterfaces;
 
   WestInterfaceFacade* _facade;

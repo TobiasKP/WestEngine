@@ -44,6 +44,7 @@ void InterfaceBuilder::createNewInterface(Container* c)
   _current->colorR          = c->colorR / 255.0;
   _current->colorG          = c->colorG / 255.0;
   _current->colorB          = c->colorB / 255.0;
+  _current->colorA          = c->colorA;
   _current->id              = Config::INTERNAL_UI_ID++;
   _current->dataPool        = _dataPool;
   _current->flags          |= c->givenFlags;

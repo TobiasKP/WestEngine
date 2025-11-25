@@ -219,7 +219,8 @@ bool EngineManager::isPauseCycle(CYCLE code, IManager* item)
 {
   bool pauseExecute = code == CYCLE::PAUSE;
   bool isManager    = CoreConstants::INPUT_MANAGER.compare(item->getName()) == 0
-                   || CoreConstants::WINDOW_MANAGER.compare(item->getName()) == 0;
+                   || CoreConstants::WINDOW_MANAGER.compare(item->getName()) == 0
+                   || CoreConstants::INTERFACE_MANAGER.compare(item->getName()) == 0;
 
   return pauseExecute && !isManager;
 }

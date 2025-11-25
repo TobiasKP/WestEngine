@@ -14,9 +14,8 @@ WestInterfaceFacade& WestInterfaceFacade::getInterfaceInstance()
 
 WestInterfaceFacade::WestInterfaceFacade()
 {
-  count          = 0;
-  _valueObserver = new ValueObserver();
-  _eventObserver = new EventObserver();
+  _valueObserver = new ValueObserver(_logger);
+  _eventObserver = new EventObserver(_logger);
   assert(_valueObserver != nullptr && _eventObserver != nullptr);
   _renderManager = new UIRenderManager();
   _textManager   = new TextRenderManager();
@@ -33,10 +32,10 @@ WestInterfaceFacade::~WestInterfaceFacade() {}
 
 void WestInterfaceFacade::shutdown()
 {
-  while (count > 0)
+  while (Config::INTERNAL_UI_COUNT > 0)
   {
-    delete _interfaces.at(count);
-    count--;
+    delete _interfaces.at(Config::INTERNAL_UI_COUNT);
+    Config::INTERNAL_UI_COUNT--;
   }
   delete _builder;
   delete _textManager;
@@ -123,9 +122,9 @@ void WestInterfaceFacade::init()
   stbi_image_free(imgData);
 
   _textManager->initializeFontAtlas();
-  ContainerElement* tmp = _settings->init();
-  _interfaces.at(count) = tmp;
-  count++;
+  ContainerElement* tmp                     = _settings->init();
+  _interfaces.at(Config::INTERNAL_UI_COUNT) = tmp;
+  Config::INTERNAL_UI_COUNT++;
   _renderManager->toggleDirty();
 }
 
@@ -148,7 +147,7 @@ ContainerElement* WestInterfaceFacade::findInterfaceById(std::uint8_t id)
     return nullptr;
   }
 
-  for (std::uint8_t i = 0; i < count; i++)
+  for (std::uint8_t i = 0; i < Config::INTERNAL_UI_COUNT; i++)
   {
     assert(_interfaces.at(i) != nullptr);
     if (_interfaces.at(i)->id == id)
@@ -180,9 +179,9 @@ std::uint8_t WestInterfaceFacade::createNewInterface(Container* c)
 #endif
     _builder->addElement(element);
   }
-  ContainerElement* interface = _builder->build();
-  _interfaces.at(count)       = interface;
-  count++;
+  ContainerElement* interface               = _builder->build();
+  _interfaces.at(Config::INTERNAL_UI_COUNT) = interface;
+  Config::INTERNAL_UI_COUNT++;
   _renderManager->toggleDirty();
   return interface->id;
 }
@@ -190,7 +189,7 @@ std::uint8_t WestInterfaceFacade::createNewInterface(Container* c)
 bool WestInterfaceFacade::destroyInterface(std::uint8_t interfaceId)
 {
   std::int8_t location = -1;
-  for (std::uint8_t i = 0; i < count; i++)
+  for (std::uint8_t i = 0; i < Config::INTERNAL_UI_COUNT; i++)
   {
     if (_interfaces.at(i)->id == interfaceId)
     {
@@ -206,13 +205,19 @@ bool WestInterfaceFacade::destroyInterface(std::uint8_t interfaceId)
 
   _logger.log(Level::Info, std::format("@@@ Destroying interface: {}\n", interfaceId));
   ContainerElement* elementToDelete = _interfaces.at(location);
-
-  if (location != count - 1)
+  for (IElement* child : elementToDelete->children)
   {
-    _interfaces.at(location) = _interfaces.at(count - 1);
+    // Deregister all elements to prevent use-after-free crashes
+    _eventObserver->deregisterElement(child);
+    _valueObserver->deregisterElement(child);
   }
-  _interfaces.at(count - 1) = nullptr;
-  count--;
+
+  if (location != Config::INTERNAL_UI_COUNT - 1)
+  {
+    _interfaces.at(location) = _interfaces.at(Config::INTERNAL_UI_COUNT - 1);
+  }
+  _interfaces.at(Config::INTERNAL_UI_COUNT - 1) = nullptr;
+  Config::INTERNAL_UI_COUNT--;
 
   _renderManager->toggleDirty();
   delete elementToDelete;
@@ -256,7 +261,7 @@ void WestInterfaceFacade::updateRenderData()
 #ifdef DEBUG
   _logger.log(Level::Cycle, "@@@ Updating render Data for interfaces\n");
 #endif
-  _renderManager->updateRenderData(_interfaces, count);
+  _renderManager->updateRenderData(_interfaces, Config::INTERNAL_UI_COUNT);
 };
 
 std::vector<ComponentData*>& WestInterfaceFacade::getRenderData()

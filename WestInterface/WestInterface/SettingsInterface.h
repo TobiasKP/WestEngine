@@ -16,8 +16,10 @@ private:
   InterfaceBuilder* _interfaceBuilder;
   WestLogger& _logger = WestLogger::getLoggerInstance();
   std::vector<ElementProxy*> _elements;
+  std::uint8_t _id;
 
   Container* createSettingButton();
-  IElement* createSettingInterface();
-  IElement* createResolutionSetting();
+  void createSettingInterface();
+  ElementProxy* createResolutionSetting();
+  ElementProxy* createQuitSettingsButton();
 };

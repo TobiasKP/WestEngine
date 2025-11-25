@@ -67,7 +67,7 @@ struct IElement
 
   ComponentData* describe(std::uint8_t row = 0, std::uint8_t column = 0)
   {
-    ComponentData* data = dataPool->getDataAtLocation(poolPosition + row + column);
+    ComponentData* data = dataPool->getDataAtLocation(poolPosition + (row * columnElements) + column);
 
     if (!changed)
     {

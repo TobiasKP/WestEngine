@@ -9,7 +9,7 @@
 class IObserver
 {
 public:
-  IObserver() {};
+  IObserver(WestLogger &l) : logger(l) {};
   virtual ~IObserver() {};
 
   virtual bool handleEvent(
@@ -19,9 +19,14 @@ public:
   };
 
   virtual void registerElement(IElement* e) {};
+  virtual void deregisterElement(IElement* e) {};
+
+protected:
+  WestLogger& logger;
 
 private:
   std::vector<IElement*> _registeredElements;
+
 
   virtual void executeElement(IElement* e) {};
   virtual void sort() {};

@@ -18,6 +18,7 @@ namespace WESTUTILS Config
 extern WESTUTILS std::atomic<bool> PAUSE;
 extern WESTUTILS std::atomic<std::uint32_t> INTERNAL_ENTITY_ID;
 extern WESTUTILS std::atomic<std::uint32_t> INTERNAL_UI_ID;
+extern WESTUTILS std::atomic_size_t INTERNAL_UI_COUNT;
 extern WESTUTILS ThreadPool* THREADPOOL;
 extern WESTUTILS std::uint32_t interfaceShaderProgram;
 extern WESTUTILS std::uint32_t interfaceOrthoUniform;

@@ -12,6 +12,8 @@ struct Label : public IElement
     flags = 0;
   }
 
+  ~Label() {}
+
   void handler()
   {
     _logger.log(Level::Error,

@@ -70,8 +70,6 @@ public:
 
   friend class UIRenderManager;
 
-protected:
-  size_t count;
 
 private:
   WestInterfaceFacade();
