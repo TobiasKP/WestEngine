@@ -3,6 +3,7 @@
 #include "../../../CoreHeaders/Entity/Scene.h"
 #include "../../../CoreHeaders/Utils/Math/PositionCalculation.h"
 
+
 glm::vec2 MouseCallbacks::_currentPos = glm::vec2(0.0f);
 
 std::int32_t MouseCallbacks::_inWindow                       = 0;
@@ -26,7 +27,7 @@ void MouseCallbacks::mouseCallback(GLFWwindow* window, double x, double y)
 
   if (std::get<0>(hover) != std::get<0>(_currentHover))
   {
-    if (std::get<0>(_currentHover) != -1)
+    if (std::get<0>(_currentHover) != -1 && std::get<1>(_currentHover))
     {
       _iObserver->setControlFlag(BitMasks::Control::UI_UNHOVERED, std::get<0>(_currentHover));
     }

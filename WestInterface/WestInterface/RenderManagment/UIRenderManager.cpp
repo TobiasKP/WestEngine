@@ -105,10 +105,10 @@ void UIRenderManager::gatherBoundaryData(std::vector<ElementBounds*>& local,
       local.push_back(b);
     }
     ElementBounds* b = new ElementBounds();
-    b->id            = ce->id;
-    b->zIndex        = ce->zIndex;
-    b->xLeft         = ce->xLL;
-    b->yBottom       = Config::GeneralConfig.HEIGHT - ce->yLL;
+    b->id      = ce->id;
+    b->zIndex  = ce->zIndex;
+    b->xLeft   = ce->xLL;
+    b->yBottom = Config::GeneralConfig.HEIGHT - ce->yLL;
 
     float elementWidth = ce->getElementWidth();
     b->xRight          = ce->xLL + elementWidth;
