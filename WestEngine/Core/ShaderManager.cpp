@@ -48,7 +48,7 @@ void ShaderManager::shutdown()
   glUseProgram(0);
   for (auto& entity : _scene->getEntities())
   {
-    Shader* s        = (Shader*)entity->getComponent(BitMasks::Components::SHADER);
+    Shader* s        = (Shader*)entity.getComponent(BitMasks::Components::SHADER);
     GLuint programId = s->programId;
     glDeleteProgram(programId);
   }
@@ -84,14 +84,15 @@ void ShaderManager::update()
 {
   for (auto& entity : _scene->getEntities())
   {
-    Shader* s = (Shader*)entity->getComponent(BitMasks::Components::SHADER);
+    Shader* s = (Shader*)entity.getComponent(BitMasks::Components::SHADER);
+    assert(s != nullptr);
     if (s->initialized)
     {
       continue;
     }
 
 #ifdef DEBUG
-    logDebug(std::format("{} ### Initializing shader for Entity: {}.\n", getName(), entity->getId()));
+    logDebug(std::format("{} ### Initializing shader for Entity: {}.\n", getName(), entity.getId()));
 #endif
 
     GLuint programId = -1;
@@ -117,7 +118,7 @@ void ShaderManager::update()
 
     if (programId == -1)
     {
-      logFailure(std::format("{} ### Could not create Shader for entity: {}.\n", getName(), entity->getId()));
+      logFailure(std::format("{} ### Could not create Shader for entity: {}.\n", getName(), entity.getId()));
       return;
     }
 
@@ -176,7 +177,7 @@ GLuint ShaderManager::initInterfaceShader()
   return 0;
 }
 
-GLuint ShaderManager::initShader(Shader* s, Entity* entity)
+GLuint ShaderManager::initShader(Shader* s, const Entity& entity)
 {
 #ifdef DEBUG
   logDebug(std::format("{} ### Creating new Shader for group: {}.\n", getName(), s->shadergroup));
@@ -193,9 +194,15 @@ GLuint ShaderManager::initShader(Shader* s, Entity* entity)
 
   GLuint vertId = createVertexShader(s->vertexShaderFile, programId);
   GLuint fragId = createFragmentShader(s->fragShaderFile, programId);
+
   link(programId, vertId, fragId);
   _programList[s->shadergroup] = programId;
   GLuint uniformBlockIndex     = glGetUniformBlockIndex(programId, UniformConstants::CAMERA_UNIFORMS);
+
+#ifdef DEBUG
+  logDebug(std::format("{} ### Linked program: {}.\n", getName(), programId));
+#endif
+
   if (uniformBlockIndex != GL_INVALID_INDEX)
   {
     glUniformBlockBinding(programId, uniformBlockIndex, 1);
@@ -205,28 +212,28 @@ GLuint ShaderManager::initShader(Shader* s, Entity* entity)
     logDebug(std::format("{} ### Uniform Block not found for Enitity: {}. Check if "
                          "the Entity uses a Shader with Camera uniforms\n",
                          getName(),
-                         entity->getId()));
+                         entity.getId()));
   }
   return programId;
 }
 
 // TODO make switch case
-void ShaderManager::addUniforms(GLuint programId, Entity* entity)
+void ShaderManager::addUniforms(GLuint programId, const Entity& entity)
 {
-  Model* m = (Model*)entity->getComponent(BitMasks::Components::MODEL);
+  Model* m = (Model*)entity.getComponent(BitMasks::Components::MODEL);
   if (m != nullptr && m->texture != nullptr)
   {
     m->texture->uniform = UniformUtils::createUniform(UniformConstants::TEXTURE_SAMPLER, programId);
   }
 
 #ifdef DEBUG
-  if (m != nullptr && entity->isDebugEntity())
+  if (m != nullptr && entity.isDebugEntity())
   {
     m->debugColorUniform = UniformUtils::createUniform(UniformConstants::COLOR, programId);
   }
 #endif
 
-  Position* pos = (Position*)entity->getComponent(BitMasks::Components::POSITION);
+  Position* pos = (Position*)entity.getComponent(BitMasks::Components::POSITION);
   if (pos != nullptr)
   {
     pos->uniform = UniformUtils::createUniform(UniformConstants::TRANSFORMATION_MATRIX, programId);

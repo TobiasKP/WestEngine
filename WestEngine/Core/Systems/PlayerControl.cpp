@@ -1,6 +1,7 @@
 #include "../../CoreHeaders/Systems/PlayerControl.h"
 
 #include "../../Constants/Systems.hpp"
+#include "../CoreHeaders/Entity/Scene.h"
 
 #include <Config.h>
 #include <format>
@@ -11,7 +12,7 @@ PlayerControl::PlayerControl(WestLogger* logger) : ISystem(), _logger(logger), _
 #ifdef DEBUG
   _logger->log(Level::Info, std::format("{} *** Initialized debug information", getName()));
   _debugDrawUtils = new DebugDrawUtils(_logger);
-  _debugEntity    = nullptr;
+  _debugEntityId  = 0;
   _drawn = false, _camLog = true, _posLog = true;
 #endif
 };
@@ -20,7 +21,8 @@ PlayerControl::~PlayerControl() {}
 
 void PlayerControl::update()
 {
-  assert(_logger != nullptr);
+  std::vector<uint32_t> ids = getEntitieIds();
+  assert(_logger != nullptr && !ids.empty());
   if (_cameraPending.exchange(false))
   {
     glm::vec3 localCam;
@@ -51,18 +53,29 @@ void PlayerControl::update()
   Position* posComp = nullptr;
   {
     std::lock_guard<std::mutex> lock(_mutex);
-    posComp = (Position*)getEntities().front()->getComponent(BitMasks::Components::POSITION);
+    if (ids.empty())
+    {
+      _logger->log(Level::Info, std::format("{} *** No entitie for updating Entite in Player Control\n", getName()));
+      return;
+    }
+    std::uint32_t id = ids.front();
+    Entity* e        = Scene::getSceneInstance().getEntityById(id);
+    posComp          = (Position*)e->getComponent(BitMasks::Components::POSITION);
+    assert(posComp != nullptr);
   }
-  assert(posComp != nullptr);
   if (pending || !destinationReached(posComp))
   {
     glm::vec3 localDest;
 #ifdef DEBUG
-    if (_debugEntity != nullptr && !_debugEntity->isDestroyed() && pending)
+    if (_debugEntityId != 0 && pending)
     {
-      _logger->log(Level::Info, std::format("{} *** Destroying destination Debug Line\n", getName()));
-      _debugEntity->destroy();
-      _drawn = false;
+      Entity* debugEntity = Scene::getSceneInstance().getEntityById(_debugEntityId);
+      if (debugEntity != nullptr && !debugEntity->isDestroyed())
+      {
+        _logger->log(Level::Info, std::format("{} *** Destroying destination Debug Line\n", getName()));
+        debugEntity->destroy();
+        _drawn = false;
+      }
     }
 #endif
     {
@@ -123,11 +136,15 @@ bool PlayerControl::destinationReached(Position* posComp)
 {
   bool reached = glm::all(glm::epsilonEqual(posComp->position, _moveToDestination, Config::GeneralConfig.EPSILON));
 #ifdef DEBUG
-  if (_debugEntity != nullptr && !_debugEntity->isDestroyed() && reached)
+  if (_debugEntityId != 0 && reached)
   {
-    _logger->log(Level::Info, std::format("{} *** Destroying destination Debug Line\n", getName()));
-    _debugEntity->destroy();
-    _drawn = false;
+    Entity* debugEntity = Scene::getSceneInstance().getEntityById(_debugEntityId);
+    if (debugEntity != nullptr && !debugEntity->isDestroyed())
+    {
+      _logger->log(Level::Info, std::format("{} *** Destroying destination Debug Line\n", getName()));
+      debugEntity->destroy();
+      _drawn = false;
+    }
   }
 #endif
   return reached;
@@ -155,10 +172,16 @@ void PlayerControl::setDestinationPosition(glm::vec3 dest)
 
 void PlayerControl::updateDebuggingInfo()
 {
-  if (_debugEntity != nullptr && _debugEntity->isDestroyed())
+  if (_debugEntityId != 0)
   {
-    _debugDrawUtils->unloadModel(_debugEntity);
-    _debugEntity = nullptr;
+#ifdef DEBUG
+    _logger->log(Level::Info, std::format("{} *** Retreiving debug entity.\n", getName()));
+#endif
+    Entity* debugEntity = Scene::getSceneInstance().getEntityById(_debugEntityId);
+    if (debugEntity != nullptr && debugEntity->isDestroyed())
+    {
+      _debugDrawUtils->unloadModel(*debugEntity);
+    }
   }
 
   if (_drawn)
@@ -166,8 +189,31 @@ void PlayerControl::updateDebuggingInfo()
     return;
   }
 
-  Position* posComp = (Position*)getEntities().front()->getComponent(BitMasks::Components::POSITION);
+  std::vector<std::uint32_t> ids = getEntitieIds();
+  if (ids.empty())
+  {
+    _logger->log(Level::Info, std::format("{} *** No entitie for updating Debugging Info\n", getName()));
+    return;
+  }
+
+  std::uint32_t id = ids.front();
+  Entity* e        = Scene::getSceneInstance().getEntityById(id);
+  assert(e != nullptr);
+  Position* posComp = (Position*)e->getComponent(BitMasks::Components::POSITION); 
   assert(posComp != nullptr);
+#ifdef DEBUG
+  if (posComp == nullptr)
+  {
+    _logger->log(
+      Level::Error,
+      std::format("{} *** updateDebuggingInfo: Entity {} has no Position component!\n", getName(), e->getId()));
+    return;
+  }
+#endif
+  if (posComp == nullptr)
+  {
+    return;
+  }
   glm::vec3 direction = _moveToDestination - posComp->position;
   if (glm::length2(direction) <= Config::GeneralConfig.SPEED * Config::GeneralConfig.SPEED)
   {
@@ -182,6 +228,6 @@ void PlayerControl::updateDebuggingInfo()
                            posComp->position.z));
 
   glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0f);
-  _debugEntity    = _debugDrawUtils->addLine(posComp->position, direction, color);
+  _debugEntityId  = _debugDrawUtils->addLine(posComp->position, direction, color);
   _drawn          = true;
 }

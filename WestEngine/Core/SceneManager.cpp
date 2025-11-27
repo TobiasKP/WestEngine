@@ -115,22 +115,22 @@ void SceneManager::update()
 {
   for (auto& entity : _scene->getEntities())
   {
-    if (entity->isDestroyed())
+    if (entity.isDestroyed())
     {
       removeEntityFromScene(entity);
     }
   }
 }
 
-void SceneManager::removeEntityFromScene(Entity* entity)
+void SceneManager::removeEntityFromScene(const Entity& entity)
 {
 #ifdef DEBUG
-  logDebug(std::format("{} ### Removing Entitiy from Scene: {}\n", getName(), entity->getId()));
+  logDebug(std::format("{} ### Removing Entitiy from Scene: {}\n", getName(), entity.getId()));
 #endif
   _scene->removeEntity(entity);
-  if (!entity->isDebugEntity())
+  if (!entity.isDebugEntity())
   {
-    _loader->unloadModel((Model*)entity->getComponent(BitMasks::Components::MODEL));
+    _loader->unloadModel((Model*)entity.getComponent(BitMasks::Components::MODEL));
   }
 }
 

@@ -4,7 +4,7 @@ namespace WESTUTILS Config
 {
 
 std::atomic<bool> PAUSE                       = false;
-std::atomic<std::uint32_t> INTERNAL_ENTITY_ID = 900000;
+std::atomic<std::uint32_t> INTERNAL_ENTITY_ID = 1;
 std::atomic<std::uint32_t> INTERNAL_UI_ID     = 1;
 std::atomic_size_t INTERNAL_UI_COUNT          = 0;
 ThreadPool* THREADPOOL                        = new ThreadPool(4);

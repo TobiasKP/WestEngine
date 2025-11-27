@@ -17,14 +17,17 @@ public:
 
   // Functions
   void init();
-  void addEntity(Entity* entity);
-  void addDebugEntity(Entity* entity);
+  void addEntity(Entity&& entity);
+  void addDebugEntity(Entity&& entity);
   void addCamera(Camera* cam);
-  void removeEntity(Entity* entity);
+  void removeEntity(const Entity& entity);
   void deleteScene();
 
   // Getter
-  std::vector<Entity*> getEntities();
+  std::vector<Entity> getEntities();
+  //TODO: register ID in hashmap saving index in vector to have faster access if a specific Entity is searched
+  Entity* getEntityById(std::uint32_t id);
+
   inline std::string getSceneName()
   {
     return _sceneName;
@@ -39,8 +42,8 @@ private:
   static std::mutex _mutex;
 
   static Camera* _camera;
-  std::vector<Entity*> _entities;
-  std::vector<Entity*> _debugEntities;
+  std::vector<Entity> _entities;
+  std::vector<Entity> _debugEntities;
   std::string _sceneName = CoreConstants::UNDEFINED_STRING;
 
   Scene();

@@ -8,5 +8,5 @@ class SystemFactory
 {
 public:
   SystemFactory() {};
-  void createSystem(std::map<std::string, std::int32_t> infos, const std::string name, Entity* e);
+  void createSystem(std::map<std::string, std::int32_t> infos, const std::string name, const Entity& e);
 };

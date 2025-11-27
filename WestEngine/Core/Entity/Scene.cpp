@@ -33,9 +33,9 @@ void Scene::init()
 #endif
 }
 
-std::vector<Entity*> Scene::getEntities()
+std::vector<Entity> Scene::getEntities()
 {
-  std::vector<Entity*> entities;
+  std::vector<Entity> entities;
   {
     std::lock_guard<std::mutex> lock(_mutex);
     entities = _entities;
@@ -49,19 +49,39 @@ std::vector<Entity*> Scene::getEntities()
   return entities;
 }
 
-// TODO Sort by entity shader group
-void Scene::addEntity(Entity* entity)
+Entity* Scene::getEntityById(std::uint32_t id)
 {
-  assert(entity != nullptr);
-  std::lock_guard<std::mutex> lock(_mutex);
-  _entities.emplace_back(entity);
+  std::lock_guard<std::mutex> lock(_mutex); 
+  auto entityIt = std::find_if(_entities.begin(), _entities.end(),
+                               [id](const Entity& en) { return en.getId() == id; });
+  if (entityIt != _entities.end())
+  {
+    return &(*entityIt);
+  }
+
+#ifdef DEBUG
+  auto debugEntityIt = std::find_if(_debugEntities.begin(), _debugEntities.end(),
+                                    [id](const Entity& en) { return en.getId() == id; });
+  if (debugEntityIt != _debugEntities.end())
+  {
+    return &(*debugEntityIt);
+  }
+#endif
+
+  return nullptr;
 }
 
-void Scene::addDebugEntity(Entity* entity)
+// TODO Sort by entity shader group
+void Scene::addEntity(Entity&& entity)
 {
-  assert(entity != nullptr);
   std::lock_guard<std::mutex> lock(_mutex);
-  _debugEntities.emplace_back(entity);
+  _entities.emplace_back(std::move(entity));
+}
+
+void Scene::addDebugEntity(Entity&& entity)
+{ 
+  std::lock_guard<std::mutex> lock(_mutex);
+  _debugEntities.emplace_back(std::move(entity));
 }
 
 void Scene::addCamera(Camera* cam)
@@ -71,10 +91,10 @@ void Scene::addCamera(Camera* cam)
   _camera = cam;
 }
 
-void Scene::removeEntity(Entity* entity)
+void Scene::removeEntity(const Entity& entity)
 {
   auto entityIt =
-    std::find_if(_entities.begin(), _entities.end(), [&](Entity* en) { return en->getId() == entity->getId(); });
+    std::find_if(_entities.begin(), _entities.end(), [&](const Entity& en) { return en.getId() == entity.getId(); });
 
   if (entityIt != _entities.end())
   {
@@ -83,10 +103,10 @@ void Scene::removeEntity(Entity* entity)
   }
 
 #ifdef DEBUG
-  if (entity->isDebugEntity())
+  if (entity.isDebugEntity())
   {
     auto entityIt = std::find_if(
-      _debugEntities.begin(), _debugEntities.end(), [&](Entity* en) { return en->getId() == entity->getId(); });
+      _debugEntities.begin(), _debugEntities.end(), [&](const Entity& en) { return en.getId() == entity.getId(); });
 
     if (entityIt != _debugEntities.end())
     {

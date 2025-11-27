@@ -31,7 +31,7 @@ private:
   Scene* _scene;
 
   GLuint initInterfaceShader();
-  GLuint initShader(Shader* s, Entity* entity);
+  GLuint initShader(Shader* s, const Entity& entity);
   GLuint createShader(const std::string shaderFile, std::int32_t shaderTyp, GLuint programId);
   GLchar* readShaderSource(const std::string shaderFile);
   void link(GLuint programId, GLuint vertexId, GLuint fragmentId);
@@ -45,5 +45,5 @@ private:
   {
     return createShader(file, GL_FRAGMENT_SHADER, programId);
   }
-  void addUniforms(GLuint programId, Entity* entity);
+  void addUniforms(GLuint programId, const Entity& entity);
 };

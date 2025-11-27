@@ -14,7 +14,7 @@
 #include <functional>
 #include <string>
 
-enum ElementType { LABEL, BUTTON, CONTAINER, ICON, DEBUG_ELEMENT };
+enum ElementType { LABEL, BUTTON, CONTAINER, ICON, DEBUG_ELEMENT, DROPDOWN };
 
 struct WEST_INTERFACE TextureInformation
 {

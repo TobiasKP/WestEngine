@@ -20,9 +20,10 @@ public:
   {
     return _name;
   }
-  inline const std::vector<Entity*>& getEntities()
+
+  inline const std::vector<std::uint32_t>& getEntitieIds()
   {
-    return _entities;
+    return _entitieIds;
   }
 
   // Setter
@@ -32,10 +33,10 @@ public:
   }
 
   // Functions
-  inline void addEntity(Entity* e)
+  inline void addEntity(const Entity& e)
   {
     std::lock_guard<std::mutex> lock(_mutex);
-    _entities.emplace_back(e);
+    _entitieIds.emplace_back(e.getId());
   }
   virtual void update()              = 0;
   virtual void updateDebuggingInfo() = 0;
@@ -45,5 +46,5 @@ protected:
 
 private:
   std::string _name = CoreConstants::UNDEFINED_STRING;
-  std::vector<Entity*> _entities;
+  std::vector<std::uint32_t> _entitieIds;
 };

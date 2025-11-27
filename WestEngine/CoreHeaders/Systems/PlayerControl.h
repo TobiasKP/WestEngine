@@ -34,5 +34,5 @@ private:
   // Debug fields
   DebugDrawUtils* _debugDrawUtils;
   bool _drawn, _camLog, _posLog;
-  Entity* _debugEntity;
+  std::uint32_t _debugEntityId;
 };

@@ -11,8 +11,8 @@ class DebugDrawUtils
 {
 public:
   DebugDrawUtils(WestLogger* logger);
-  void unloadModel(Entity* entity);
-  Entity* addLine(glm::vec3 start, glm::vec3 direction, glm::vec3 color);
+  void unloadModel(const Entity& entity);
+  std::uint32_t addLine(glm::vec3 start, glm::vec3 direction, glm::vec3 color);
 
 private:
   ObjectLoader* _loader;

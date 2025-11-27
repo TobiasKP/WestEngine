@@ -84,19 +84,20 @@ void SettingsInterface::createSettingInterface()
 {
   std::vector<ElementProxy*> e;
   e.push_back(createQuitSettingsButton());
+  e.push_back(createResolutionSetting());
   Container* c                = new Container(e);
   WestInterfaceFacade& facade = WestInterfaceFacade::getInterfaceInstance();
-  c->xScreenPosition          = Config::GeneralConfig.WIDTH / 3;
-  c->yScreenPosition          = Config::GeneralConfig.HEIGHT - (Config::GeneralConfig.HEIGHT / 3);
+  c->xScreenPosition          = Config::GeneralConfig.WIDTH / 4;
+  c->yScreenPosition          = 75;
   c->colorR                   = 59.0f;
   c->colorG                   = 58.0f;
   c->colorB                   = 54.0f;
-  c->colorA                   = 0.9f;
+  c->colorA                   = 0.7f;
   c->hiddenContainer          = false;
   c->stretchX                 = 1.0f;
   c->stretchY                 = 1.0f;
-  c->rows                     = 4;
-  c->columns                  = 5;
+  c->rows                     = 10;
+  c->columns                  = 10;
   c->hiddenContainer          = false;
   assert(_id == 0);
   _id = facade.createNewInterface(c);
@@ -107,18 +108,18 @@ ElementProxy* SettingsInterface::createQuitSettingsButton()
   ElementProxy* quitButton   = new ElementProxy();
   quitButton->type           = BUTTON;
   quitButton->elementId      = Config::INTERNAL_UI_ID++;
-  float x                    = Config::GeneralConfig.WIDTH / 3;
-  float y                    = Config::GeneralConfig.HEIGHT - (Config::GeneralConfig.HEIGHT / 3) - 1;
+  float x                    = (float)Config::GeneralConfig.WIDTH / 4 - 1;
+  float y                    = 75;
   quitButton->xPosition      = x;
   quitButton->yPosition      = y;
   quitButton->colorR         = 215.0f;
   quitButton->colorG         = 207.0f;
   quitButton->colorB         = 196.0f;
   quitButton->colorA         = 1.0f;
-  quitButton->row            = 3;
-  quitButton->column         = 4;
+  quitButton->row            = 9;
+  quitButton->column         = 9;
   quitButton->columnElements = 1;
-  quitButton->givenFlags     = 0x040 | 0x0008;
+  quitButton->givenFlags     = 0x0040 | 0x0008;
   quitButton->text           = "X";
   quitButton->eventHandler   = [this]()
   {
@@ -128,6 +129,7 @@ ElementProxy* SettingsInterface::createQuitSettingsButton()
   };
 
   /*
+   * TODO: Add proper UI Component with UI Bitmap
   TextureInformation* tex = new TextureInformation();
   tex->path               = "assets/Textures/gear.png";
   tex->wrapping_x         = GL_CLAMP_TO_BORDER;
@@ -139,5 +141,29 @@ ElementProxy* SettingsInterface::createQuitSettingsButton()
 
 ElementProxy* SettingsInterface::createResolutionSetting()
 {
-  return nullptr;
+  ElementProxy* resolution   = new ElementProxy();
+  resolution->type           = DROPDOWN;
+  resolution->elementId      = Config::INTERNAL_UI_ID++;
+  float x                    = (float)Config::GeneralConfig.WIDTH / 4;
+  float y                    = 75; 
+  resolution->xPosition      = x;
+  resolution->yPosition      = y;
+  resolution->colorR         = 215.0f;
+  resolution->colorG         = 207.0f;
+  resolution->colorB         = 196.0f;
+  resolution->colorA         = 1.0f;
+  resolution->text           = "Screen Resolution";
+  resolution->row            = 1;
+  resolution->column         = 1;
+  resolution->columnElements = resolution->text.length() + 1;
+  resolution->givenFlags     = 0x0100 | 0x0008;
+  resolution->eventHandler   = [this]() {};
+  /*
+   * TODO: Add proper UI Component with UI Bitmap
+  TextureInformation* tex = new TextureInformation();
+  tex->path               = "assets/Textures/gear.png";
+  tex->wrapping_x         = GL_CLAMP_TO_BORDER;
+  tex->wrapping_y         = GL_CLAMP_TO_BORDER;
+  quitButton->texture     = tex;*/
+  return resolution;
 }

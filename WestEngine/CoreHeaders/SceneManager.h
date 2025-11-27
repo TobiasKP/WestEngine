@@ -27,7 +27,7 @@ private:
   EntityBuilder* _builder;
 
   // Functions
-  void removeEntityFromScene(Entity* entity);
+  void removeEntityFromScene(const Entity& entity);
   void deleteScene();
   void loadNewScene() {};
 };

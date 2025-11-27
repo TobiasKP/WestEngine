@@ -3,7 +3,7 @@
 #include "../../Constants/Components.hpp"
 #include "../../CoreHeaders/Components/Umbrella.h"
 
-void ComponentFactory::createComponent(std::map<std::string, std::int32_t> infos, std::string name, Entity* e)
+void ComponentFactory::createComponent(std::map<std::string, std::int32_t> infos, std::string name, Entity& e)
 {
   if (Components::POSITION.compare(name) == 0)
   {
@@ -29,6 +29,6 @@ void ComponentFactory::createComponent(std::map<std::string, std::int32_t> infos
     p->position = pos;
     p->scale    = 1.0f;
     p->rotation = glm::vec3(1.0f);
-    e->addComponent(BitMasks::Components::POSITION, p);
+    e.addComponent(BitMasks::Components::POSITION, p); 
   }
 }

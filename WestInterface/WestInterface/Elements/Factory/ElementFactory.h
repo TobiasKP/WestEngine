@@ -4,6 +4,7 @@
 #include "../../Observer/EventObserver.h"
 #include "../../Observer/ValueObserver.h"
 #include "../IElement.hpp"
+#include "../DropDown.cpp"
 
 #include <array>
 
@@ -29,6 +30,7 @@ private:
   void fillBasicInfos(ElementProxy* ep, IElement* el);
   void fillText(ElementProxy* ep, IElement* el);
   void fillTexture(ElementProxy* ep, IElement* el);
+  void fillDropdown(ElementProxy* ep, DropDown* d);
   std::array<float, 4> getTextureCoordinatesForChar(char character);
 
   ValueObserver* _vObserver;

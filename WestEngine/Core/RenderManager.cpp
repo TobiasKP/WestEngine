@@ -77,14 +77,13 @@ void RenderManager::clearColor()
 
 void RenderManager::renderGameEntities()
 {
-  for (Entity* entity : _scene->getEntities())
+  for (const Entity& entity : _scene->getEntities())
   {
-    assert(entity != nullptr);
-    Shader* s = (Shader*)entity->getComponent(BitMasks::Components::SHADER);
+    Shader* s = (Shader*)entity.getComponent(BitMasks::Components::SHADER);
     if (!s->initialized)
     {
 #ifdef DEBUG
-      logDebug(std::format("!!! Entity shader not initialized! Entity: {}\n", entity->getId()));
+      logDebug(std::format("!!! Entity shader not initialized! Entity: {}\n", entity.getId()));
 #endif
       glUseProgram(0);
       _usedShaderProgram = 0;
@@ -104,7 +103,7 @@ void RenderManager::renderGameEntities()
     assert(linked == GL_TRUE);
 #endif
 
-    Model* model = (Model*)entity->getComponent(BitMasks::Components::MODEL);
+    Model* model = (Model*)entity.getComponent(BitMasks::Components::MODEL);
     assert(model != nullptr);
     if (!Config::PAUSE)
     {
@@ -113,7 +112,7 @@ void RenderManager::renderGameEntities()
     }
 
     glBindVertexArray(model->id);
-    if (entity->isDebugEntity())
+    if (entity.isDebugEntity())
     {
       glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, 0);
     }
@@ -134,19 +133,37 @@ void RenderManager::renderUserInterfaces()
     return;
   }
 
+  const size_t dataSize = renderData.size();
   std::vector<float> instanceOffsets;
   std::vector<float> colors;
   std::vector<float> textCoords;
   std::vector<std::uint32_t> flags;
+
+  instanceOffsets.reserve(dataSize * 4);
+  colors.reserve(dataSize * 4);
+  textCoords.reserve(dataSize * 4);
+  flags.reserve(dataSize);
+
   GLuint texture = 0;
   for (ComponentData* cd : renderData)
   {
-    instanceOffsets.insert(instanceOffsets.end(), {cd->vertices[0], cd->vertices[1], cd->stretchX, cd->stretchY});
-    colors.insert(colors.end(), {cd->colorR, cd->colorG, cd->colorB, cd->colorA});
+    instanceOffsets.emplace_back(cd->vertices[0]);
+    instanceOffsets.emplace_back(cd->vertices[1]);
+    instanceOffsets.emplace_back(cd->stretchX);
+    instanceOffsets.emplace_back(cd->stretchY);
 
-    flags.push_back(cd->flags);
-    textCoords.insert(textCoords.end(),
-                      {cd->textureCoords[0], cd->textureCoords[1], cd->textureCoords[2], cd->textureCoords[3]});
+    colors.emplace_back(cd->colorR);
+    colors.emplace_back(cd->colorG);
+    colors.emplace_back(cd->colorB);
+    colors.emplace_back(cd->colorA);
+
+    flags.emplace_back(cd->flags);
+
+    textCoords.emplace_back(cd->textureCoords[0]);
+    textCoords.emplace_back(cd->textureCoords[1]);
+    textCoords.emplace_back(cd->textureCoords[2]);
+    textCoords.emplace_back(cd->textureCoords[3]);
+
     if (cd->texture > 0)
     {
       texture = cd->texture;
@@ -204,10 +221,10 @@ void RenderManager::renderUserInterfaces()
   glUseProgram(_usedShaderProgram);
 }
 
-void RenderManager::updateUniforms(Entity* e, Model* model)
+void RenderManager::updateUniforms(const Entity& e, Model* model)
 {
 #ifdef DEBUG
-  if (e->isDebugEntity())
+  if (e.isDebugEntity())
   {
     UniformUtils::setUniform(model->debugColorUniform, model->color);
     assert(model->debugColorUniform != -1);
@@ -223,7 +240,7 @@ void RenderManager::updateUniforms(Entity* e, Model* model)
     glBindTexture(GL_TEXTURE_2D, t->id);
   }
 
-  Position* p = (Position*)e->getComponent(BitMasks::Components::POSITION);
+  Position* p = (Position*)e.getComponent(BitMasks::Components::POSITION);
   if (p != nullptr)
   {
     glm::mat4 transform = PositionCalculation::createTransformationMatrix(p->position, p->rotation, p->scale);

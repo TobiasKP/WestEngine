@@ -93,11 +93,12 @@ void UIRenderManager::gatherBoundaryData(std::vector<ElementBounds*>& local,
       b->zIndex        = el->zIndex;
       b->xLeft         = el->xLL;
       b->yBottom       = Config::GeneralConfig.HEIGHT - el->yLL;
-      if ((el->flags & 0x08) == 0x01)
+      // TODO + 15/ + 10 is for margin error, find a better solution
+      if (el->flags & 0x08)
       {
         b->xLeft += 10;
       }
-      // TODO + 15 is for margin error, find a better solution
+
       float elementWidth = el->getElementWidth() + 15;
       b->xRight          = el->xLL + elementWidth;
       b->yTop            = Config::GeneralConfig.HEIGHT - (el->yLL + (el->rowElements * SIZE_E * el->stretchY));

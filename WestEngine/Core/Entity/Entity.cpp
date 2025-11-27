@@ -18,14 +18,67 @@ Entity::Entity(std::uint32_t id) : _id(id)
 
 Entity::~Entity()
 {
-  delete _allocator;
   _components.clear();
 }
 
-IComponent* Entity::getComponent(std::uint16_t componentMask)
+
+Entity::Entity(const Entity& other)
+  : _id(other._id), _name(other._name), _componentMask(other._componentMask), _destroyed(other._destroyed),
+    _debugEntity(other._debugEntity)
+{
+  _components = other._components;
+}
+
+Entity& Entity::operator=(const Entity& other)
+{ 
+  if (this != &other)
+  {
+    _id            = other._id;
+    _name          = other._name;
+    _componentMask = other._componentMask;
+    _destroyed     = other._destroyed;
+    _debugEntity   = other._debugEntity;
+    _components    = other._components;
+  }
+  return *this;
+}
+
+Entity::Entity(Entity&& other) noexcept
+  : _id(other._id), _name(other._name), _componentMask(other._componentMask), _destroyed(other._destroyed),
+    _debugEntity(other._debugEntity), _components(std::move(other._components))
+{ 
+  other._componentMask = 0;
+  other._destroyed     = false;
+  other._debugEntity   = false;
+}
+
+Entity& Entity::operator=(Entity&& other) noexcept
+{
+  if (this != &other)
+  {
+    _id            = other._id;
+    _name          = other._name;
+    _componentMask = other._componentMask;
+    _destroyed     = other._destroyed;
+    _debugEntity   = other._debugEntity;
+    _components    = other._components;
+    other._componentMask = 0;
+    other._destroyed     = false;
+    other._debugEntity   = false;
+  }
+  return *this;
+}
+
+void Entity::addComponent(std::uint16_t flag, IComponent* component)
+{
+  _componentMask |= flag;
+  _components.insert(std::make_pair(flag, component));
+}
+
+IComponent* Entity::getComponent(std::uint16_t componentMask) const
 {
   if (!static_cast<bool>(componentMask & _componentMask))
-  {
+  { 
     return nullptr;
   }
 

@@ -19,7 +19,7 @@ DebugDrawUtils::DebugDrawUtils(WestLogger* logger)
   _scene  = &Scene::getSceneInstance();
 }
 
-Entity* DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction, glm::vec3 color)
+std::uint32_t DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction, glm::vec3 color)
 {
   glm::vec3 end          = start + direction;
   GLfloat vertices[]     = {start.x, start.y, start.z, end.x, end.y, end.z};
@@ -31,7 +31,7 @@ Entity* DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction, glm::vec3 
   char filePath[PATH_MAX];
   if (getcwd(cwd, sizeof(cwd)) == NULL)
   {
-    return nullptr;
+    return -1;
   }
 
   Shader* s           = new Shader();
@@ -39,16 +39,17 @@ Entity* DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction, glm::vec3 
   s->fragShaderFile   = CoreConstants::DEBUG_F_SHADER;
   s->shadergroup      = CoreConstants::DEBUG_SHADERGROUP;
 
-  Entity* e = new Entity(Config::INTERNAL_ENTITY_ID++);
-  e->addComponent(BitMasks::Components::SHADER, s);
-  e->addComponent(BitMasks::Components::MODEL, m);
-  e->debugEntity();
-
-  _scene->addDebugEntity(e);
-  return e;
+  Entity e;
+  e.setId(Config::INTERNAL_ENTITY_ID++);
+  e.addComponent(BitMasks::Components::SHADER, s);
+  e.addComponent(BitMasks::Components::MODEL, m);
+  e.debugEntity();
+ 
+  _scene->addDebugEntity(std::move(e)); 
+  return e.getId();
 };
 
-void DebugDrawUtils::unloadModel(Entity* entity)
+void DebugDrawUtils::unloadModel(const Entity& entity)
 {
-  _loader->unloadModel((Model*)entity->getComponent(BitMasks::Components::MODEL));
+  _loader->unloadModel((Model*)entity.getComponent(BitMasks::Components::MODEL));
 }

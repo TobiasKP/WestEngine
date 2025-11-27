@@ -3,6 +3,7 @@
 #include "../../RenderManagment/TextRenderManager.h"
 #include "../Umbrella.hpp"
 
+#include <Config.h>
 #include <stb_image.h>
 #include <unordered_map>
 
@@ -35,6 +36,10 @@ IElement* ElementFactory::createElementInternal(ElementProxy* e)
       result = new DebugElement();
       fillBasicInfos(e, result);
       fillText(e, result);
+      break;
+    case DROPDOWN:
+      result = new DropDown();
+      fillDropdown(e, (DropDown*)result);
       break;
     default:
       result = new DebugElement();
@@ -144,6 +149,30 @@ void ElementFactory::fillBasicInfos(ElementProxy* ep, IElement* el)
   el->eventHandler    = ep->eventHandler;
   el->zIndex          = ep->zIndex;
   el->flags          |= ep->givenFlags;
+}
+
+void ElementFactory::fillDropdown(ElementProxy* ep, DropDown* d)
+{
+  fillBasicInfos(ep, d);
+
+  Label* l = new Label();
+  fillText(ep, l);
+  fillBasicInfos(ep, l);
+  l->columnElements = ep->text.length();
+
+  Button* b = new Button();
+  ep->text  = std::format("{}x{}", Config::GeneralConfig.WIDTH, Config::GeneralConfig.HEIGHT);
+  fillText(ep, b);
+  fillBasicInfos(ep, b);
+  b->xLL            = ep->xPosition + l->columnElements * SIZE_E;
+  b->rowElements    = 1;
+  b->columnElements = ep->text.length();
+  d->columnElements = l->columnElements + b->columnElements;
+  registerElementEvent(ep, b);
+
+  d->label  = l;
+  d->button = b;
+  assert(l != nullptr && b != nullptr && d != nullptr);
 }
 
 std::array<float, 4> ElementFactory::getTextureCoordinatesForChar(char character)

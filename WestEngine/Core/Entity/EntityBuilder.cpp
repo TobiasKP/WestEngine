@@ -4,6 +4,7 @@
 #include "../../Constants/Systems.hpp"
 #include "../../CoreHeaders/Entity/Scene.h"
 
+#include <Config.h>
 #include <format>
 #include <stdio.h>
 #include <string.h>
@@ -13,7 +14,8 @@ void EntityBuilder::createEntities()
   lua_pushnil(L);
   while (lua_next(L, -2) != 0)
   {
-    Entity* e = new Entity();
+    Entity e;
+    e.setId(Config::INTERNAL_ENTITY_ID++);
     lua_pushnil(L);
     while (lua_next(L, -2) != 0)
     {
@@ -41,13 +43,13 @@ void EntityBuilder::createEntities()
     lua_pop(L, 1);
 
 #ifdef DEBUG
-    WestLogger::getLoggerInstance().log(Level::Info, "Adding new Entity to Scene\n");
+    WestLogger::getLoggerInstance().log(Level::Info, std::format("Adding new Entity to Scene:{}\n", e.getId()));
 #endif
-    Scene::getSceneInstance().addEntity(e);
+    Scene::getSceneInstance().addEntity(std::move(e));
   }
 }
 
-void EntityBuilder::createProperties(Entity* e)
+void EntityBuilder::createProperties(Entity& e)
 {
   std::map<std::string, std::int32_t> infos;
   std::string name = CoreConstants::UNDEFINED_STRING;
@@ -92,19 +94,15 @@ void EntityBuilder::parseInfos(std::map<std::string, std::int32_t>& infos, std::
   }
 }
 
-void EntityBuilder::basicInfo(const char* key, Entity* e)
+void EntityBuilder::basicInfo(const char* key, Entity& e)
 {
-  if (strcmp(key, "id") == 0)
+  if (strcmp(key, "name") == 0)
   {
-    e->setId(lua_tonumber(L, -1));
-  }
-  else if (strcmp(key, "name") == 0)
-  {
-    e->setName((char*)lua_tostring(L, -1));
+    e.setName((char*)lua_tostring(L, -1));
   }
 }
 
-void EntityBuilder::modelInfo(Entity* e)
+void EntityBuilder::modelInfo(Entity& e)
 {
   char meshPath[256] = {0};
   char texPath[256]  = {0};
@@ -147,10 +145,10 @@ void EntityBuilder::modelInfo(Entity* e)
     m->texture = t;
   }
 
-  e->addComponent(BitMasks::Components::MODEL, m);
+  e.addComponent(BitMasks::Components::MODEL, m);
 }
 
-void EntityBuilder::shaderInfo(Entity* e)
+void EntityBuilder::shaderInfo(Entity& e)
 {
   char vertexPath[256]   = {0};
   char fragmentPath[256] = {0};
@@ -188,7 +186,7 @@ void EntityBuilder::shaderInfo(Entity* e)
 #endif
 
   Shader* s = loadShader(strdup(vertexPath), strdup(fragmentPath), group);
-  e->addComponent(BitMasks::Components::SHADER, s);
+  e.addComponent(BitMasks::Components::SHADER, s);
 }
 
 Model* EntityBuilder::loadModel(float* vertices,
