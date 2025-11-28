@@ -14,13 +14,13 @@ struct Label : public IElement
 
   ~Label() {}
 
-  void handler()
+  void handler() override
   {
     _logger.log(Level::Error,
                 std::format("@@@ Button handler of interface: {} called which does not exists!", this->id));
   };
 
-  void describeMyself(ComponentData* cd, std::uint8_t row, std::uint8_t column)
+  void describeMyself(ComponentData* cd, std::uint8_t row, std::uint8_t column) override
   {
     cd->colorR = this->colorR;
     cd->colorG = this->colorG;
@@ -42,9 +42,9 @@ struct Label : public IElement
     cd->stretchY = stretchY;
     cd->flags    = flags;
     cd->zIndex   = zIndex;
-
+  
     if ((text != nullptr && text->coordinates.size() > 4 * column) && texture == 0)
-    {
+    {  
       cd->textureCoords[0] = text->coordinates[0 + 4 * column];
       cd->textureCoords[1] = text->coordinates[1 + 4 * column];
       cd->textureCoords[2] = text->coordinates[2 + 4 * column];
@@ -55,4 +55,26 @@ struct Label : public IElement
       cd->texture = texture;
     }
   };
+
+  void getBoundaries(ElementBounds& bounds) override
+  {
+    if (!supportsEvents)
+    {
+      return;
+    }
+    bounds.id      = id;
+    bounds.zIndex  = zIndex;
+    bounds.xLeft   = xLL;
+    bounds.yBottom = Config::GeneralConfig.HEIGHT - yLL;
+    // TODO + 15/ + 10 is for margin error, find a better solution
+    if (flags & 0x08)
+    {
+      bounds.xLeft += 10;
+    }
+
+    float elementWidth = getElementWidth() + 15;
+    bounds.xRight      = xLL + elementWidth;
+    bounds.yTop        = Config::GeneralConfig.HEIGHT - (yLL + (rowElements * SIZE_E * stretchY));
+    bounds.eventDriven = true;
+  }
 };

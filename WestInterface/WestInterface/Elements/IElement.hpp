@@ -28,6 +28,7 @@ struct IElement
 
   // Public identifier
   std::uint32_t id;
+  IElement* parent = nullptr;
 
   // zIndex
   std::int8_t zIndex = -1;
@@ -64,6 +65,8 @@ struct IElement
   std::function<void()> eventHandler = nullptr;
 
   virtual void handler() {};
+
+  virtual void getBoundaries(ElementBounds& bounds) {};
 
   ComponentData* describe(std::uint8_t row = 0, std::uint8_t column = 0)
   {

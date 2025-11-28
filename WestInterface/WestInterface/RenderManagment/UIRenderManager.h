@@ -40,5 +40,5 @@ private:
                     const std::array<ContainerElement*, 32>& interfaces,
                     size_t begin,
                     size_t end);
-  void gatherBoundaryData(std::vector<ElementBounds*>& local, const std::array<ContainerElement*, 32>& interfaces, size_t begin, size_t end);
+  void gatherBoundaryData(std::vector<ElementBounds*>& local, const std::array<ContainerElement*, 32>& interfaces, size_t begin, size_t end); 
 };

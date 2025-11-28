@@ -119,7 +119,7 @@ ElementProxy* SettingsInterface::createQuitSettingsButton()
   quitButton->row            = 9;
   quitButton->column         = 9;
   quitButton->columnElements = 1;
-  quitButton->givenFlags     = 0x0040 | 0x0008;
+  quitButton->givenFlags     = 0x0040;
   quitButton->text           = "X";
   quitButton->eventHandler   = [this]()
   {
@@ -145,9 +145,11 @@ ElementProxy* SettingsInterface::createResolutionSetting()
   resolution->type           = DROPDOWN;
   resolution->elementId      = Config::INTERNAL_UI_ID++;
   float x                    = (float)Config::GeneralConfig.WIDTH / 4;
-  float y                    = 75; 
-  resolution->xPosition      = x;
-  resolution->yPosition      = y;
+  float y                    = 75;
+  resolution->stretchX       = 0.8f;
+  resolution->stretchY       = 0.8f;
+  resolution->xPosition      = x * 1.3;
+  resolution->yPosition      = y * 1.4;
   resolution->colorR         = 215.0f;
   resolution->colorG         = 207.0f;
   resolution->colorB         = 196.0f;
@@ -155,9 +157,12 @@ ElementProxy* SettingsInterface::createResolutionSetting()
   resolution->text           = "Screen Resolution";
   resolution->row            = 1;
   resolution->column         = 1;
+  resolution->zIndex         = 5;
   resolution->columnElements = resolution->text.length() + 1;
-  resolution->givenFlags     = 0x0100 | 0x0008;
-  resolution->eventHandler   = [this]() {};
+  resolution->givenFlags     = 0x0040;
+  resolution->eventHandler   = [this]() {
+
+  };
   /*
    * TODO: Add proper UI Component with UI Bitmap
   TextureInformation* tex = new TextureInformation();

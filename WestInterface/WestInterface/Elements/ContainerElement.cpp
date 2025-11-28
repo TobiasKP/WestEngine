@@ -4,8 +4,10 @@
 
 #include <algorithm>
 #include <assert.h>
+#include <Config.h>
 #include <format>
 #include <vector>
+
 
 struct ContainerElement : public IElement
 {
@@ -134,7 +136,7 @@ struct ContainerElement : public IElement
     return result;
   }
 
-  void describeMyself(ComponentData* cd, std::uint8_t row, std::uint8_t column)
+  void describeMyself(ComponentData* cd, std::uint8_t row, std::uint8_t column) override
   {
     cd->vertices[1] = yLL + (SIZE_E * row);
     cd->vertices[0] = xLL + (SIZE_E * column);
@@ -150,6 +152,17 @@ struct ContainerElement : public IElement
     {
       cd->texture = texture;
     }
+  }
+
+  void getBoundaries(ElementBounds& bounds) override
+  {
+    bounds.id          = id;
+    bounds.zIndex      = zIndex;
+    bounds.xLeft       = xLL;
+    bounds.yBottom     = Config::GeneralConfig.HEIGHT - yLL;
+    float elementWidth = getElementWidth();
+    bounds.xRight      = xLL + elementWidth;
+    bounds.yTop        = Config::GeneralConfig.HEIGHT - (yLL + (rowElements * SIZE_E * stretchY));
   }
 
   void updatePositions(std::uint32_t oldPos, std::uint32_t newPos)
@@ -168,6 +181,4 @@ struct ContainerElement : public IElement
       }
     }
   }
-
-  void handler() {}
 };

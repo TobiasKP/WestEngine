@@ -9,7 +9,7 @@ struct Button : public Label
 {
   std::uint8_t eventId;
 
-  void handler()
+  void handler() override
   {
     assert(eventHandler != nullptr);
     if (eventHandler)
@@ -18,8 +18,9 @@ struct Button : public Label
     }
   };
 
-  void describeMyself(ComponentData* cd, std::uint8_t row, std::uint8_t column)
+  void describeMyself(ComponentData* cd, std::uint8_t row, std::uint8_t column) override
   {
     Label::describeMyself(cd, row, column);
   };
+
 };

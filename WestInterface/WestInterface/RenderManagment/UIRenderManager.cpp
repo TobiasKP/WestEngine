@@ -89,35 +89,15 @@ void UIRenderManager::gatherBoundaryData(std::vector<ElementBounds*>& local,
     for (IElement* el : ce->children)
     {
       ElementBounds* b = new ElementBounds();
-      b->id            = el->id;
-      b->zIndex        = el->zIndex;
-      b->xLeft         = el->xLL;
-      b->yBottom       = Config::GeneralConfig.HEIGHT - el->yLL;
-      // TODO + 15/ + 10 is for margin error, find a better solution
-      if (el->flags & 0x08)
+      b->id            = -1;
+      el->getBoundaries(*b);
+      if (b->id >= 0)
       {
-        b->xLeft += 10;
+        local.push_back(b);
       }
-
-      float elementWidth = el->getElementWidth() + 15;
-      b->xRight          = el->xLL + elementWidth;
-      b->yTop            = Config::GeneralConfig.HEIGHT - (el->yLL + (el->rowElements * SIZE_E * el->stretchY));
-      if (el->supportsEvents)
-      {
-        b->eventDriven = true;
-      }
-
-      local.push_back(b);
     }
     ElementBounds* b = new ElementBounds();
-    b->id            = ce->id;
-    b->zIndex        = ce->zIndex;
-    b->xLeft         = ce->xLL;
-    b->yBottom       = Config::GeneralConfig.HEIGHT - ce->yLL;
-
-    float elementWidth = ce->getElementWidth();
-    b->xRight          = ce->xLL + elementWidth;
-    b->yTop            = Config::GeneralConfig.HEIGHT - (ce->yLL + (ce->rowElements * SIZE_E * ce->stretchY));
+    ce->getBoundaries(*b);
     local.push_back(b);
   }
 }

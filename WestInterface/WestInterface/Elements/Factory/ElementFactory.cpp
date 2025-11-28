@@ -154,19 +154,22 @@ void ElementFactory::fillBasicInfos(ElementProxy* ep, IElement* el)
 void ElementFactory::fillDropdown(ElementProxy* ep, DropDown* d)
 {
   fillBasicInfos(ep, d);
-
   Label* l = new Label();
-  fillText(ep, l);
   fillBasicInfos(ep, l);
+  fillText(ep, l);
+  l->id             = Config::INTERNAL_UI_ID++;
+  l->parent         = d;
   l->columnElements = ep->text.length();
 
   Button* b = new Button();
-  ep->text  = std::format("{}x{}", Config::GeneralConfig.WIDTH, Config::GeneralConfig.HEIGHT);
-  fillText(ep, b);
+  ep->text  = std::format("{} x {}", Config::GeneralConfig.WIDTH, Config::GeneralConfig.HEIGHT);
   fillBasicInfos(ep, b);
-  b->xLL            = ep->xPosition + l->columnElements * SIZE_E;
+  fillText(ep, b);
+  b->id             = Config::INTERNAL_UI_ID++;
+  b->parent         = d;
+  b->xLL            = ep->xPosition + l->getElementWidth();
   b->rowElements    = 1;
-  b->columnElements = ep->text.length();
+  b->columnElements = ep->text.length() + 1;
   d->columnElements = l->columnElements + b->columnElements;
   registerElementEvent(ep, b);
 
