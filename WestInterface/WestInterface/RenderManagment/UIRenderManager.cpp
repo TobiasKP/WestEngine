@@ -63,6 +63,7 @@ void UIRenderManager::updateRenderData(std::array<ContainerElement*, 32>& interf
   {
     future.wait();
   }
+  _dirty = false;
 
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();

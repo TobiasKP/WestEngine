@@ -45,6 +45,10 @@ Container* SettingsInterface::createSettingButton()
   settingsButton->givenFlags     = 0x0100 | 0x0004;
   settingsButton->eventHandler   = [this]()
   {
+    if (_id != 0)
+    {
+      return;
+    }
     createSettingInterface();
     std::thread(
       []()
@@ -159,7 +163,7 @@ ElementProxy* SettingsInterface::createResolutionSetting()
   resolution->column         = 1;
   resolution->zIndex         = 5;
   resolution->columnElements = resolution->text.length() + 1;
-  resolution->givenFlags     = 0x0040;
+  resolution->givenFlags     = 0x0100;
   resolution->eventHandler   = [this]() {
 
   };

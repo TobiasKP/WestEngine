@@ -20,7 +20,7 @@ vec3 emerald = vec3(0.251, 0.506, 0.278);
 
 vec4 discardWhitePixels(vec4 texColor) {
     float whiteness = (texColor.r + texColor.g + texColor.b) / 3.0;
-    if (whiteness > 0.95) {
+    if (whiteness > 0.88) {
         discard;
     }
 

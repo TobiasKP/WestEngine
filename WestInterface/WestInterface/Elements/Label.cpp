@@ -4,6 +4,7 @@
 
 #include <Config.h>
 #include <format>
+#include <iostream>
 
 struct Label : public IElement
 {
@@ -42,9 +43,9 @@ struct Label : public IElement
     cd->stretchY = stretchY;
     cd->flags    = flags;
     cd->zIndex   = zIndex;
-  
+
     if ((text != nullptr && text->coordinates.size() > 4 * column) && texture == 0)
-    {  
+    {
       cd->textureCoords[0] = text->coordinates[0 + 4 * column];
       cd->textureCoords[1] = text->coordinates[1 + 4 * column];
       cd->textureCoords[2] = text->coordinates[2 + 4 * column];
@@ -54,6 +55,7 @@ struct Label : public IElement
     {
       cd->texture = texture;
     }
+    std::cout << id << "... " << xLL << ":" << yLL << std::endl;
   };
 
   void getBoundaries(ElementBounds& bounds) override
@@ -64,8 +66,8 @@ struct Label : public IElement
     }
     bounds.id      = id;
     bounds.zIndex  = zIndex;
-    bounds.xLeft   = xLL;
-    bounds.yBottom = Config::GeneralConfig.HEIGHT - yLL;
+    bounds.xLeft   = xLL * stretchX;
+    bounds.yBottom = Config::GeneralConfig.HEIGHT - yLL * stretchY;
     // TODO + 15/ + 10 is for margin error, find a better solution
     if (flags & 0x08)
     {
@@ -73,8 +75,10 @@ struct Label : public IElement
     }
 
     float elementWidth = getElementWidth() + 15;
-    bounds.xRight      = xLL + elementWidth;
-    bounds.yTop        = Config::GeneralConfig.HEIGHT - (yLL + (rowElements * SIZE_E * stretchY));
+    bounds.xRight      = (xLL + elementWidth) * stretchX;
+    bounds.yTop        = Config::GeneralConfig.HEIGHT - (yLL * stretchY + (rowElements * SIZE_E));
+    std::cout << bounds.id << "#" << bounds.xLeft << ":" << bounds.xRight << "-" << bounds.yBottom << ":" << bounds.yTop
+              << std::endl;
     bounds.eventDriven = true;
   }
 };

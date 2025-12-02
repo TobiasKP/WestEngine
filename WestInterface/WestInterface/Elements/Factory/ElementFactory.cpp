@@ -170,11 +170,11 @@ void ElementFactory::fillDropdown(ElementProxy* ep, DropDown* d)
   b->xLL            = ep->xPosition + l->getElementWidth();
   b->rowElements    = 1;
   b->columnElements = ep->text.length() + 1;
-  d->columnElements = l->columnElements + b->columnElements;
   registerElementEvent(ep, b);
 
-  d->label  = l;
-  d->button = b;
+  d->columnElements = l->columnElements + b->columnElements;
+  d->label          = l;
+  d->button         = b;
   assert(l != nullptr && b != nullptr && d != nullptr);
 }
 
