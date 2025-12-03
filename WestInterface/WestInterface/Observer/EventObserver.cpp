@@ -4,7 +4,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
 
 EventObserver::EventObserver(WestLogger& l) : IObserver(l) {}
 
@@ -31,7 +30,6 @@ bool EventObserver::handleEvent(
                            elementId));
     return false;
   }
-  std::cout << elementId << std::endl;
 
   if (event & 0x01)
   {

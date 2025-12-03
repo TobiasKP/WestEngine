@@ -20,7 +20,7 @@ vec3 emerald = vec3(0.251, 0.506, 0.278);
 
 vec4 discardWhitePixels(vec4 texColor) {
     float whiteness = (texColor.r + texColor.g + texColor.b) / 3.0;
-    if (whiteness > 0.88) {
+    if (whiteness > 0.89) {
         discard;
     }
 
@@ -61,7 +61,7 @@ void calculateGlowEffect(float intensity) {
     vec3 glowColor;
     if ((vFlags & 0x0040u) != 0u) {
         glowColor = burgundy;
-    } else if ((vFlags & 0x0008u) != 0u) {
+    } else if ((vFlags & 0x0080u) != 0u) {
         glowColor = gold;
     } else if ((vFlags & 0x0100u) != 0u) {
         glowColor = emerald;

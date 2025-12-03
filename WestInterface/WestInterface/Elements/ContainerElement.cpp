@@ -68,13 +68,11 @@ struct ContainerElement : public IElement
 
   void addChild(IElement* e, std::uint8_t gridPositionX, std::uint8_t gridPositionY)
   {
-    float width        = stretchX * SIZE_E;
-    float height       = stretchY * SIZE_E;
     float elementWidth = e->getElementWidth();
-    float elementPosX  = e->xLL + width * gridPositionX;
-    float elementPosY  = e->yLL + height * gridPositionY;
-    float maxWidth     = xLL + width * rowElements;
-    float maxHeight    = yLL + height * columnElements;
+    float elementPosX  = e->xLL + SIZE_E * gridPositionX;
+    float elementPosY  = e->yLL + SIZE_E * gridPositionY;
+    float maxWidth     = xLL + (stretchX * SIZE_E) * rowElements;
+    float maxHeight    = yLL + (stretchY * SIZE_E) * columnElements;
 #ifdef DEBUG
     _logger.log(
       Level::Info,
@@ -83,7 +81,7 @@ struct ContainerElement : public IElement
 #endif
 
     assert(elementWidth > 0.0f);
-    if (elementPosX > maxWidth || elementPosY + e->rowElements * SIZE_E * e->stretchY > maxHeight)
+    if (elementPosX > maxWidth || elementPosY > maxHeight)
     {
       _logger.log(Level::Error,
                   std::format("@@@ Added Element: {} will be too "

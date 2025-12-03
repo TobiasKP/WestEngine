@@ -4,7 +4,6 @@
 
 #include <Config.h>
 #include <format>
-#include <iostream>
 
 struct Label : public IElement
 {
@@ -55,7 +54,6 @@ struct Label : public IElement
     {
       cd->texture = texture;
     }
-    std::cout << id << "... " << xLL << ":" << yLL << std::endl;
   };
 
   void getBoundaries(ElementBounds& bounds) override
@@ -77,8 +75,6 @@ struct Label : public IElement
     float elementWidth = getElementWidth() + 15;
     bounds.xRight      = (xLL + elementWidth) * stretchX;
     bounds.yTop        = Config::GeneralConfig.HEIGHT - (yLL * stretchY + (rowElements * SIZE_E));
-    std::cout << bounds.id << "#" << bounds.xLeft << ":" << bounds.xRight << "-" << bounds.yBottom << ":" << bounds.yTop
-              << std::endl;
     bounds.eventDriven = true;
   }
 };

@@ -157,9 +157,11 @@ void ElementFactory::fillDropdown(ElementProxy* ep, DropDown* d)
   Label* l = new Label();
   fillBasicInfos(ep, l);
   fillText(ep, l);
-  l->id             = Config::INTERNAL_UI_ID++;
-  l->parent         = d;
-  l->columnElements = ep->text.length();
+  l->id              = Config::INTERNAL_UI_ID++;
+  l->yLL             = ep->yPosition + SIZE_E * ep->row;
+  l->parent          = d;
+  l->columnElements  = ep->text.length();
+  l->xLL            += SIZE_E * ep->column;
 
   Button* b = new Button();
   ep->text  = std::format("{} x {}", Config::GeneralConfig.WIDTH, Config::GeneralConfig.HEIGHT);
@@ -167,14 +169,15 @@ void ElementFactory::fillDropdown(ElementProxy* ep, DropDown* d)
   fillText(ep, b);
   b->id             = Config::INTERNAL_UI_ID++;
   b->parent         = d;
-  b->xLL            = ep->xPosition + l->getElementWidth();
+  b->xLL            = (ep->xPosition + l->getElementWidth()) + SIZE_E * ep->column;
+  b->yLL            = ep->yPosition + SIZE_E * ep->row;
   b->rowElements    = 1;
   b->columnElements = ep->text.length() + 1;
-  registerElementEvent(ep, b);
 
   d->columnElements = l->columnElements + b->columnElements;
   d->label          = l;
   d->button         = b;
+  registerElementEvent(ep, d);
   assert(l != nullptr && b != nullptr && d != nullptr);
 }
 

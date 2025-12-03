@@ -8,7 +8,7 @@
 
 SettingsInterface::SettingsInterface(InterfaceBuilder& interfaceBuilder) : _interfaceBuilder(&interfaceBuilder)
 {
-  _id = 0;
+  _id = _resolutionId = 0;
 }
 
 SettingsInterface::~SettingsInterface()
@@ -112,8 +112,8 @@ ElementProxy* SettingsInterface::createQuitSettingsButton()
   ElementProxy* quitButton   = new ElementProxy();
   quitButton->type           = BUTTON;
   quitButton->elementId      = Config::INTERNAL_UI_ID++;
-  float x                    = (float)Config::GeneralConfig.WIDTH / 4 - 1;
-  float y                    = 75;
+  float x                    = (float)Config::GeneralConfig.WIDTH / 4 - 10;
+  float y                    = 65;
   quitButton->xPosition      = x;
   quitButton->yPosition      = y;
   quitButton->colorR         = 215.0f;
@@ -148,24 +148,29 @@ ElementProxy* SettingsInterface::createResolutionSetting()
   ElementProxy* resolution   = new ElementProxy();
   resolution->type           = DROPDOWN;
   resolution->elementId      = Config::INTERNAL_UI_ID++;
-  float x                    = (float)Config::GeneralConfig.WIDTH / 4;
+  float x                    = (float)Config::GeneralConfig.WIDTH / 4 - 1;
   float y                    = 75;
   resolution->stretchX       = 0.8f;
   resolution->stretchY       = 0.8f;
-  resolution->xPosition      = x * 1.3;
-  resolution->yPosition      = y * 1.4;
+  resolution->xPosition      = x * 1.1;
+  resolution->yPosition      = y * 1.5;
   resolution->colorR         = 215.0f;
   resolution->colorG         = 207.0f;
   resolution->colorB         = 196.0f;
   resolution->colorA         = 1.0f;
   resolution->text           = "Screen Resolution";
-  resolution->row            = 1;
+  resolution->row            = 9;
   resolution->column         = 1;
   resolution->zIndex         = 5;
   resolution->columnElements = resolution->text.length() + 1;
-  resolution->givenFlags     = 0x0100;
-  resolution->eventHandler   = [this]() {
-
+  resolution->givenFlags     = 0x0080;
+  resolution->eventHandler   = [this]()
+  {
+    if (_resolutionId != 0)
+    {
+      return;
+    }
+    createResolutionOptions();
   };
   /*
    * TODO: Add proper UI Component with UI Bitmap
@@ -175,4 +180,9 @@ ElementProxy* SettingsInterface::createResolutionSetting()
   tex->wrapping_y         = GL_CLAMP_TO_BORDER;
   quitButton->texture     = tex;*/
   return resolution;
+}
+
+void SettingsInterface::createResolutionOptions()
+{
+  std::vector<ElementProxy*> e;
 }
