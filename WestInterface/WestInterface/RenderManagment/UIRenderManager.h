@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Elements/ContainerElement.cpp"
+#include "../Elements/ContainerElement.hpp"
 #include "ComponentData.h"
 
 #include <array>

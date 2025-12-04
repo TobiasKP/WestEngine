@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Label.cpp"
+#include "Label.hpp"
 
 struct DebugElement : public Label
 {

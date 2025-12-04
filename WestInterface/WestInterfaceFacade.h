@@ -11,7 +11,7 @@
 #endif
 
 #include "FacadeStructs.h"
-#include "WestInterface/Elements/ContainerElement.cpp"
+#include "WestInterface/Elements/ContainerElement.hpp"
 #include "WestInterface/InterfaceBuilder.h"
 #include "WestInterface/Observer/EventObserver.h"
 #include "WestInterface/Observer/ValueObserver.h"

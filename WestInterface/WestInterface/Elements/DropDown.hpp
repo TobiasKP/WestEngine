@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Button.cpp"
-#include "ContainerElement.cpp"
+#include "Button.hpp"
+#include "ContainerElement.hpp"
 #include "IElement.hpp"
-#include "Label.cpp"
+#include "Label.hpp"
 
 #include <iostream>
 
