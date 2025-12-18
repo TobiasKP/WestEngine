@@ -1,5 +1,7 @@
 #include "../Include/Config.h"
 
+#include <cassert>
+
 namespace WESTUTILS Config
 {
 
@@ -14,5 +16,17 @@ std::uint32_t interfaceFontTextureUniform     = -1;
 std::uint32_t interfaceTextureOneUniform      = -1;
 
 General GeneralConfig = {800, 600, 0.05f, 1e-6f, 60.0f, 64};
+
+std::uint32_t incEntityId()
+{
+  assert(std::atomic<std::uint32_t>::is_always_lock_free);
+  return INTERNAL_ENTITY_ID.fetch_add(1, std::memory_order_relaxed);
+}
+
+std::uint32_t incUiId()
+{
+  assert(std::atomic<std::uint32_t>::is_always_lock_free);
+  return INTERNAL_UI_ID.fetch_add(1, std::memory_order_relaxed);
+}
 
 }  // namespace WESTUTILS Config

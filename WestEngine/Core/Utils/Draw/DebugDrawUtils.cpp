@@ -40,12 +40,12 @@ std::uint32_t DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction, glm:
   s->shadergroup      = CoreConstants::DEBUG_SHADERGROUP;
 
   Entity e;
-  e.setId(Config::INTERNAL_ENTITY_ID++);
+  e.setId(Config::incEntityId());
   e.addComponent(BitMasks::Components::SHADER, s);
   e.addComponent(BitMasks::Components::MODEL, m);
   e.debugEntity();
- 
-  _scene->addDebugEntity(std::move(e)); 
+
+  _scene->addDebugEntity(std::move(e));
   return e.getId();
 };
 

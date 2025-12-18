@@ -69,7 +69,7 @@ std::int32_t InterfaceManager::buildTechDemoFooter()
 
   ElementProxy* redQuad   = new ElementProxy();
   redQuad->type           = DEBUG_ELEMENT;
-  redQuad->elementId      = Config::INTERNAL_UI_ID++;
+  redQuad->elementId      = Config::incUiId();
   redQuad->xPosition      = 0.0f;
   redQuad->yPosition      = 0.0f;
   redQuad->colorR         = 215.0f;
@@ -84,7 +84,7 @@ std::int32_t InterfaceManager::buildTechDemoFooter()
 
   ElementProxy* quitButton   = new ElementProxy();
   quitButton->type           = BUTTON;
-  quitButton->elementId      = Config::INTERNAL_UI_ID++;
+  quitButton->elementId      = Config::incUiId();
   quitButton->xPosition      = 700.0f;
   quitButton->yPosition      = 0.0f;
   quitButton->colorR         = 215.0f;

@@ -15,7 +15,7 @@ void EntityBuilder::createEntities()
   while (lua_next(L, -2) != 0)
   {
     Entity e;
-    e.setId(Config::INTERNAL_ENTITY_ID++);
+    e.setId(Config::incEntityId());
     lua_pushnil(L);
     while (lua_next(L, -2) != 0)
     {

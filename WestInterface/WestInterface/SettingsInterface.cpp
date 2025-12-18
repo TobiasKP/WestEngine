@@ -32,7 +32,7 @@ Container* SettingsInterface::createSettingButton()
 {
   ElementProxy* settingsButton   = new ElementProxy();
   settingsButton->type           = BUTTON;
-  settingsButton->elementId      = Config::INTERNAL_UI_ID++;
+  settingsButton->elementId      = Config::incUiId();
   settingsButton->xPosition      = Config::GeneralConfig.WIDTH - SIZE_E;
   settingsButton->yPosition      = Config::GeneralConfig.HEIGHT - SIZE_E;
   settingsButton->colorR         = 59.0f;
@@ -111,7 +111,7 @@ ElementProxy* SettingsInterface::createQuitSettingsButton()
 {
   ElementProxy* quitButton   = new ElementProxy();
   quitButton->type           = BUTTON;
-  quitButton->elementId      = Config::INTERNAL_UI_ID++;
+  quitButton->elementId      = Config::incUiId();
   float x                    = (float)Config::GeneralConfig.WIDTH / 4 - 10;
   float y                    = 65;
   quitButton->xPosition      = x;
@@ -147,7 +147,7 @@ ElementProxy* SettingsInterface::createResolutionSetting()
 {
   ElementProxy* resolution   = new ElementProxy();
   resolution->type           = DROPDOWN;
-  resolution->elementId      = Config::INTERNAL_UI_ID++;
+  resolution->elementId      = Config::incUiId();
   float x                    = (float)Config::GeneralConfig.WIDTH / 4 - 1;
   float y                    = 75;
   resolution->stretchX       = 0.8f;

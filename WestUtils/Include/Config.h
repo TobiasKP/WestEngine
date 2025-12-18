@@ -16,8 +16,6 @@ namespace WESTUTILS Config
 {
 
 extern WESTUTILS std::atomic<bool> PAUSE;
-extern WESTUTILS std::atomic<std::uint32_t> INTERNAL_ENTITY_ID;
-extern WESTUTILS std::atomic<std::uint32_t> INTERNAL_UI_ID;
 extern WESTUTILS std::atomic_size_t INTERNAL_UI_COUNT;
 extern WESTUTILS ThreadPool* THREADPOOL;
 extern WESTUTILS std::uint32_t interfaceShaderProgram;
@@ -31,6 +29,9 @@ struct General
   float SPEED, EPSILON, FPS;
   const std::uint8_t CHUNK_SIZE;
 };
+
+WESTUTILS std::uint32_t incEntityId();
+WESTUTILS std::uint32_t incUiId();
 
 extern WESTUTILS General GeneralConfig;
 
