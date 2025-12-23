@@ -5,7 +5,6 @@
 #include <chrono>
 #include <thread>
 
-
 SettingsInterface::SettingsInterface(InterfaceBuilder& interfaceBuilder) : _interfaceBuilder(&interfaceBuilder)
 {
   _id = _resolutionId = 0;
@@ -96,7 +95,7 @@ void SettingsInterface::createSettingInterface()
   c->colorR                   = 59.0f;
   c->colorG                   = 58.0f;
   c->colorB                   = 54.0f;
-  c->colorA                   = 0.7f;
+  c->colorA                   = 0.8f;
   c->hiddenContainer          = false;
   c->stretchX                 = 1.0f;
   c->stretchY                 = 1.0f;
@@ -104,6 +103,16 @@ void SettingsInterface::createSettingInterface()
   c->columns                  = 10;
   c->hiddenContainer          = false;
   assert(_id == 0);
+
+  /*
+   * TODO: Add proper UI Component with UI Bitmap
+  TextureInformation* tex = new TextureInformation();
+  tex->path               = "assets/Textures/gear.png";
+  tex->wrapping_x         = GL_CLAMP_TO_BORDER;
+  tex->wrapping_y         = GL_CLAMP_TO_BORDER;
+  quitButton->texture     = tex;*/
+
+
   _id = facade.createNewInterface(c);
 }
 
@@ -129,6 +138,11 @@ ElementProxy* SettingsInterface::createQuitSettingsButton()
   {
     WestInterfaceFacade& facade = WestInterfaceFacade::getInterfaceInstance();
     facade.destroyInterface(_id);
+    if (_resolutionId != 0)
+    {
+      facade.destroyInterface(_resolutionId);
+      _resolutionId = 0;
+    }
     _id = 0;
   };
 
@@ -148,12 +162,10 @@ ElementProxy* SettingsInterface::createResolutionSetting()
   ElementProxy* resolution   = new ElementProxy();
   resolution->type           = DROPDOWN;
   resolution->elementId      = Config::incUiId();
-  float x                    = (float)Config::GeneralConfig.WIDTH / 4 - 1;
-  float y                    = 75;
   resolution->stretchX       = 0.8f;
-  resolution->stretchY       = 0.8f;
-  resolution->xPosition      = x * 1.1;
-  resolution->yPosition      = y * 1.5;
+  resolution->stretchY       = 0.75f;
+  resolution->xPosition      = (float)Config::GeneralConfig.WIDTH / 4 - 30;
+  resolution->yPosition      = 45;
   resolution->colorR         = 215.0f;
   resolution->colorG         = 207.0f;
   resolution->colorB         = 196.0f;
@@ -168,6 +180,9 @@ ElementProxy* SettingsInterface::createResolutionSetting()
   {
     if (_resolutionId != 0)
     {
+      WestInterfaceFacade& facade = WestInterfaceFacade::getInterfaceInstance();
+      facade.destroyInterface(_resolutionId);
+      _resolutionId = 0;
       return;
     }
     createResolutionOptions();
@@ -185,4 +200,41 @@ ElementProxy* SettingsInterface::createResolutionSetting()
 void SettingsInterface::createResolutionOptions()
 {
   std::vector<ElementProxy*> e;
+  for (auto res : _supportedResolutions)
+  {
+    // e.push_back(resolutionOption(std::get<0>(res), std::get<1>(res)));
+  }
+  Container* c                 = new Container(e);
+  WestInterfaceFacade& facade  = WestInterfaceFacade::getInterfaceInstance();
+  c->xScreenPosition           = (Config::GeneralConfig.WIDTH / 4 - 1) + 2 * SIZE_E;
+  c->yScreenPosition           = 8 * SIZE_E;
+  c->colorR                    = 86.0f;
+  c->colorG                    = 81.0f;
+  c->colorB                    = 71.0f;
+  c->colorA                    = 1.0f;
+  c->hiddenContainer           = false;
+  c->stretchX                  = 2.0f;
+  c->stretchY                  = 1.0f;
+  c->rows                      = 1;
+  c->columns                   = 1;
+  c->zIndex                    = 9;
+  c->hiddenContainer           = false;
+  c->givenFlags               |= 0x01;
+  assert(_resolutionId == 0);
+
+  /*
+   * TODO: Add proper UI Component with UI Bitmap
+  TextureInformation* tex = new TextureInformation();
+  tex->path               = "assets/Textures/gear.png";
+  tex->wrapping_x         = GL_CLAMP_TO_BORDER;
+  tex->wrapping_y         = GL_CLAMP_TO_BORDER;
+  quitButton->texture     = tex;*/
+
+
+  _resolutionId = facade.createNewInterface(c);
+}
+
+ElementProxy* SettingsInterface::resolutionOption(std::uint32_t x, std::uint32_t y)
+{
+  return nullptr;
 }

@@ -115,7 +115,7 @@ std::int32_t InterfaceManager::buildTechDemoFooter()
   c->colorR          = 59.0f;
   c->colorG          = 58.0f;
   c->colorB          = 54.0f;
-  c->colorA          = 0.9f;
+  c->colorA          = 1.0f;
   c->rows            = 1;
   c->columns         = 1;
   c->hiddenContainer = false;

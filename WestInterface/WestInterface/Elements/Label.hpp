@@ -64,8 +64,8 @@ struct Label : public IElement
     }
     bounds.id      = id;
     bounds.zIndex  = zIndex;
-    bounds.xLeft   = xLL * stretchX;
-    bounds.yBottom = Config::GeneralConfig.HEIGHT - yLL * stretchY;
+    bounds.xLeft   = xLL;
+    bounds.yBottom = Config::GeneralConfig.HEIGHT - yLL;
     // TODO + 15/ + 10 is for margin error, find a better solution
     if (flags & 0x08)
     {

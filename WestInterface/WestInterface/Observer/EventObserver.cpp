@@ -26,7 +26,7 @@ bool EventObserver::handleEvent(
   if (e == nullptr)
   {
     logger.log(Level::Info,
-               std::format("@@@ --- Warning --- Element with id: {}, does not exist in EventObserver, probably deletet",
+               std::format("@@@ --- Warning --- Element with id: {}, does not exist in EventObserver, probably deletet\n",
                            elementId));
     return false;
   }

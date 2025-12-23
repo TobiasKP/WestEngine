@@ -26,42 +26,32 @@ struct IElement
   }
   ~IElement() {};
 
-  // Public identifier
-  std::uint32_t id;
-  IElement* parent = nullptr;
-
-  // zIndex
-  std::int8_t zIndex = -1;
-
-  // Sizing params: Each element has a basic size of
-  // 10*10px with xLL & yLL as the most lower left corner of the element.
-  // Size will be adjusted by different scaling given element.
   float xLL;
   float yLL;
   float stretchX;
   float stretchY;
 
-  // Color of each Element with transparancy.
   float colorR = 0.0f;
   float colorG = 0.0f;
   float colorB = 0.0f;
   float colorA = 1.0f;
 
-  // Bit flags for special behaviours
   std::uint64_t flags = 0x00;
+  std::int8_t zIndex  = -1;
+  bool changed        = true;
+  bool supportsEvents = false;
 
-  // Number of quads being next to each other
   std::uint16_t rowElements    = 0;
   std::uint16_t columnElements = 0;
 
-  std::unique_ptr<Text> text;
   GLuint texture = 0;
 
-  bool changed                = true;
-  bool supportsEvents         = false;
+  std::uint32_t id;
+
+  IElement* parent            = nullptr;
   std::uint32_t poolPosition  = 0;
   ComponentDataPool* dataPool = nullptr;
-
+  std::unique_ptr<Text> text;
   std::function<void()> eventHandler = nullptr;
 
   virtual void handler() {};

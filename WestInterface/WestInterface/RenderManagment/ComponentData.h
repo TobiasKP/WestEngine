@@ -14,25 +14,27 @@
 
 struct WEST_INTERFACE ComponentData
 {
-  std::uint32_t flags;
   float vertices[2];
-  float textureCoords[4] = {0.0f, 0.0f, 1.0f, 1.0f};
-  std::uint32_t texture  = 0;
   float stretchX;
   float stretchY;
-  std::int8_t zIndex = 0;
+  float textureCoords[4] = {0.0f, 0.0f, 1.0f, 1.0f};
 
   float colorR;
   float colorG;
   float colorB;
   float colorA;
+
+
+  std::uint32_t flags;
+  std::uint32_t texture = 0;
+  std::int8_t zIndex    = 0;
 };
 
 struct WEST_INTERFACE ElementBounds
 {
+  float xLeft, xRight, yBottom, yTop;
   std::uint32_t id;
   std::int8_t zIndex;
-  float xLeft, xRight, yBottom, yTop;
   bool eventDriven = false;
 };
 
@@ -45,8 +47,8 @@ struct WEST_INTERFACE ElementBounds
  * 0x00000010 = Border and discarded center Pixels
  * 0x00000020 = blending texture borders
  * 0x00000040 = highlight Color Burgundy
- * 0x00000080 = hightlight Color Gold 
- * 0x00000100 = highlicht Color Emerald 
+ * 0x00000080 = hightlight Color Gold
+ * 0x00000100 = highlicht Color Emerald
  * 0x00000200 = ---
  * 0x00000400 = ---
  * 0x00000800 = ---
