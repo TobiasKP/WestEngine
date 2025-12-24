@@ -127,6 +127,13 @@ void EngineManager::update()
       success = iterateQ(CYCLE::UPDATE);
       frames++;
     }
+
+    if (Config::requestedWidth > 0 && Config::requestedHeight > 0)
+    {
+      _windowManager->resizeWindow(Config::requestedWidth, Config::requestedHeight);
+      Config::requestedWidth  = -1;
+      Config::requestedHeight = -1;
+    }
   }
 }
 

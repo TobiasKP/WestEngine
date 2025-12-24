@@ -77,6 +77,10 @@ struct IElement
     if (this->text != nullptr && !this->text->plaintext.empty())
     {
       elementWidth = TextRenderManager::calculateTextWidth(this->text->plaintext, this->stretchX);
+      if (this->text->plaintext.size() == 1)
+      {
+        elementWidth += 15;
+      }
     }
     else
     {

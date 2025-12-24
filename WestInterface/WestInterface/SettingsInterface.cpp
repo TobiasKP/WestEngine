@@ -100,7 +100,7 @@ void SettingsInterface::createSettingInterface()
   c->stretchX                 = 1.0f;
   c->stretchY                 = 1.0f;
   c->rows                     = 10;
-  c->columns                  = 10;
+  c->columns                  = 11;
   c->hiddenContainer          = false;
   assert(_id == 0);
 
@@ -130,7 +130,7 @@ ElementProxy* SettingsInterface::createQuitSettingsButton()
   quitButton->colorB         = 196.0f;
   quitButton->colorA         = 1.0f;
   quitButton->row            = 9;
-  quitButton->column         = 9;
+  quitButton->column         = 10;
   quitButton->columnElements = 1;
   quitButton->givenFlags     = 0x0040;
   quitButton->text           = "X";
@@ -165,7 +165,7 @@ ElementProxy* SettingsInterface::createResolutionSetting()
   resolution->stretchX       = 0.8f;
   resolution->stretchY       = 0.75f;
   resolution->xPosition      = (float)Config::GeneralConfig.WIDTH / 4 - 30;
-  resolution->yPosition      = 45;
+  resolution->yPosition      = 35;
   resolution->colorR         = 215.0f;
   resolution->colorG         = 207.0f;
   resolution->colorB         = 196.0f;
@@ -200,26 +200,28 @@ ElementProxy* SettingsInterface::createResolutionSetting()
 void SettingsInterface::createResolutionOptions()
 {
   std::vector<ElementProxy*> e;
+  std::uint8_t row = 0;
   for (auto res : _supportedResolutions)
   {
-    // e.push_back(resolutionOption(std::get<0>(res), std::get<1>(res)));
+    e.push_back(resolutionOption(std::get<0>(res), std::get<1>(res), row));
+    row++;
   }
   Container* c                 = new Container(e);
   WestInterfaceFacade& facade  = WestInterfaceFacade::getInterfaceInstance();
-  c->xScreenPosition           = (Config::GeneralConfig.WIDTH / 4 - 1) + 2 * SIZE_E;
+  c->xScreenPosition           = (Config::GeneralConfig.WIDTH / 4 - 1) + 6 * SIZE_E;
   c->yScreenPosition           = 8 * SIZE_E;
   c->colorR                    = 86.0f;
   c->colorG                    = 81.0f;
   c->colorB                    = 71.0f;
   c->colorA                    = 1.0f;
   c->hiddenContainer           = false;
-  c->stretchX                  = 2.0f;
-  c->stretchY                  = 1.0f;
+  c->stretchX                  = 4.0f;
+  c->stretchY                  = 2.0f;
   c->rows                      = 1;
   c->columns                   = 1;
   c->zIndex                    = 9;
   c->hiddenContainer           = false;
-  c->givenFlags               |= 0x01;
+  c->givenFlags               |= 0x0010;
   assert(_resolutionId == 0);
 
   /*
@@ -234,7 +236,40 @@ void SettingsInterface::createResolutionOptions()
   _resolutionId = facade.createNewInterface(c);
 }
 
-ElementProxy* SettingsInterface::resolutionOption(std::uint32_t x, std::uint32_t y)
+ElementProxy* SettingsInterface::resolutionOption(std::uint32_t x, std::uint32_t y, std::uint8_t row)
 {
-  return nullptr;
+  ElementProxy* button   = new ElementProxy();
+  button->type           = BUTTON;
+  button->elementId      = Config::incUiId();
+  button->xPosition      = (Config::GeneralConfig.WIDTH / 4 - 1) + 6 * SIZE_E;
+  button->yPosition      = 8 * SIZE_E;
+  button->stretchY       = 0.8f;
+  button->stretchX       = 0.8f;
+  button->colorR         = 215.0f;
+  button->colorG         = 207.0f;
+  button->colorB         = 196.0f;
+  button->colorA         = 1.0f;
+  button->row            = row;
+  button->column         = 0;
+  button->givenFlags     = 0x0080;
+  button->text           = std::format("{} x {}", x, y);
+  button->columnElements = button->text.length() + 1;
+  button->eventHandler   = [this, x, y]()
+  {
+    Config::requestedWidth      = x;
+    Config::requestedHeight     = y;
+    WestInterfaceFacade& facade = WestInterfaceFacade::getInterfaceInstance();
+    facade.destroyInterface(_resolutionId);
+    _resolutionId = 0;
+  };
+
+  /*
+   * TODO: Add proper UI Component with UI Bitmap
+  TextureInformation* tex = new TextureInformation();
+  tex->path               = "assets/Textures/gear.png";
+  tex->wrapping_x         = GL_CLAMP_TO_BORDER;
+  tex->wrapping_y         = GL_CLAMP_TO_BORDER;
+  quitButton->texture     = tex;*/
+
+  return button;
 }

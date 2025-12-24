@@ -269,18 +269,16 @@ std::vector<ComponentData*>& WestInterfaceFacade::getRenderData()
   return _renderManager->getRenderData();
 };
 
-bool WestInterfaceFacade::notify(std::int16_t elementId, std::uint8_t event, std::uint16_t mouseX, std::uint16_t mouseY)
+void WestInterfaceFacade::notify(std::int16_t elementId, std::uint8_t event, std::uint16_t mouseX, std::uint16_t mouseY)
 {
-  bool evResult = _eventObserver->handleEvent(elementId, event, mouseX, mouseY, "");
+  _eventObserver->handleEvent(elementId, event, mouseX, mouseY, "");
   _renderManager->toggleDirty();
-  return evResult;
 };
 
-bool WestInterfaceFacade::notify(std::int16_t elementId, std::uint8_t event, std::string value)
+void WestInterfaceFacade::notify(std::int16_t elementId, std::uint8_t event, std::string value)
 {
-  bool evResult = _eventObserver->handleEvent(elementId, event, -1, -1, value);
+  _eventObserver->handleEvent(elementId, event, -1, -1, value);
   _renderManager->toggleDirty();
-  return false;
 };
 
 std::vector<ElementBounds*> WestInterfaceFacade::getShownElementsBoundaries()

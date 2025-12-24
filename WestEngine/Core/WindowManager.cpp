@@ -167,6 +167,8 @@ void WindowManager::resizeWindow(GLint width, GLint height)
   logDebug(std::format("{} ### Resizing window to new height: {}, {}", getName(), width, height));
 #endif
   glfwSetWindowSize(_window, width, height);
+  glViewport(0, 0, width, height);
+
   Config::GeneralConfig.HEIGHT = height;
   Config::GeneralConfig.WIDTH  = width;
 }

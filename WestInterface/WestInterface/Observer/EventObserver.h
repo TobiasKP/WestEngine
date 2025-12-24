@@ -5,10 +5,10 @@
 class EventObserver : public IObserver
 {
 public:
-  EventObserver(WestLogger &l);
+  EventObserver(WestLogger& l);
   ~EventObserver() override;
 
-  virtual bool handleEvent(std::int16_t elementId,
+  virtual void handleEvent(std::int16_t elementId,
                            std::uint16_t event,
                            std::uint16_t mouseX,
                            std::uint16_t mouseY,

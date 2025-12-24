@@ -23,7 +23,14 @@ public:
   {
     std::lock_guard<std::mutex> lock(_controlMutex);
     _controlFlags |= flag;
-    _interfaceId   = interfaceId;
+    if (flag & BitMasks::Control::UI_UNHOVERED)
+    {
+      _interfaceUnhoverId = interfaceId;
+    }
+    else
+    {
+      _interfaceHoverId = interfaceId;
+    }
   }
 
   void setControlFlag(std::uint8_t flag, float x, float y)
@@ -52,7 +59,7 @@ private:
   glm::vec3 _playerDestination;
   PlayerControl* _control;
   WestInterfaceFacade* _facade;
-  std::int16_t _interfaceId;
+  std::int16_t _interfaceHoverId, _interfaceUnhoverId = -1;
   std::mutex _controlMutex, _generalMutex;
   std::uint8_t _controlFlags{0b0000'0000}, _generalFlags{0b0000'0000};
 };

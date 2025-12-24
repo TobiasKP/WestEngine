@@ -18,10 +18,12 @@ namespace WESTUTILS Config
 extern WESTUTILS std::atomic<bool> PAUSE;
 extern WESTUTILS std::atomic_size_t INTERNAL_UI_COUNT;
 extern WESTUTILS ThreadPool* THREADPOOL;
-extern WESTUTILS std::uint32_t interfaceShaderProgram;
-extern WESTUTILS std::uint32_t interfaceOrthoUniform;
-extern WESTUTILS std::uint32_t interfaceFontTextureUniform;
-extern WESTUTILS std::uint32_t interfaceTextureOneUniform;
+extern WESTUTILS std::int32_t interfaceShaderProgram;
+extern WESTUTILS std::int32_t interfaceOrthoUniform;
+extern WESTUTILS std::int32_t interfaceFontTextureUniform;
+extern WESTUTILS std::int32_t interfaceTextureOneUniform;
+extern WESTUTILS std::int32_t requestedWidth;
+extern WESTUTILS std::int32_t requestedHeight;
 
 struct General
 {
@@ -30,8 +32,8 @@ struct General
   const std::uint8_t CHUNK_SIZE;
 };
 
-WESTUTILS std::uint32_t incEntityId();
-WESTUTILS std::uint32_t incUiId();
+extern WESTUTILS std::uint32_t incEntityId();
+extern WESTUTILS std::uint32_t incUiId();
 
 extern WESTUTILS General GeneralConfig;
 

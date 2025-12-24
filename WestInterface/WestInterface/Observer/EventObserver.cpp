@@ -1,5 +1,3 @@
-#pragma once
-
 #include "EventObserver.h"
 
 #include <algorithm>
@@ -9,7 +7,7 @@ EventObserver::EventObserver(WestLogger& l) : IObserver(l) {}
 
 EventObserver::~EventObserver() {}
 
-bool EventObserver::handleEvent(
+void EventObserver::handleEvent(
   std::int16_t elementId, std::uint16_t event, std::uint16_t mouseX, std::uint16_t mouseY, std::string value)
 {
   IElement* e = nullptr;
@@ -25,10 +23,11 @@ bool EventObserver::handleEvent(
 
   if (e == nullptr)
   {
-    logger.log(Level::Info,
-               std::format("@@@ --- Warning --- Element with id: {}, does not exist in EventObserver, probably deletet\n",
-                           elementId));
-    return false;
+    logger.log(
+      Level::Info,
+      std::format("@@@ --- Warning --- Element with id: {}, does not exist in EventObserver, probably deletet\n",
+                  elementId));
+    return;
   }
 
   if (event & 0x01)
@@ -45,8 +44,6 @@ bool EventObserver::handleEvent(
   {
     e->handler();
   }
-
-  return false;
 };
 
 void EventObserver::registerElement(IElement* e)

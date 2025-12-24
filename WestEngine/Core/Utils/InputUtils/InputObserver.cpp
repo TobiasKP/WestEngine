@@ -22,23 +22,22 @@ void InputObserver::notify()
   }
   {
     std::lock_guard<std::mutex> lock(_controlMutex);
-    // TODO check if result is necessary
-    bool result = false;
     if (static_cast<bool>(_controlFlags & BitMasks::Control::UI_CLICKED))
     {
-      assert(_interfaceId != -1);
-      result = _facade->notify(_interfaceId, 0x04, -1, -1);
+      assert(_interfaceHoverId != -1);
+      _facade->notify(_interfaceHoverId, 0x04, -1, -1);
     }
 
     if (static_cast<bool>(_controlFlags & BitMasks::Control::UI_HOVERED))
     {
-      assert(_interfaceId != -1);
-      result = _facade->notify(_interfaceId, 0x01, _x, _y);
+      assert(_interfaceHoverId != -1);
+      _facade->notify(_interfaceHoverId, 0x01, _x, _y);
     }
 
     if (static_cast<bool>(_controlFlags & BitMasks::Control::UI_UNHOVERED))
     {
-      result = _facade->notify(_interfaceId, 0x02, -1, -1);
+      assert(_interfaceUnhoverId != -1);
+      _facade->notify(_interfaceUnhoverId, 0x02, -1, -1);
     }
 
     if (static_cast<bool>(_controlFlags & BitMasks::Control::CAMERA_MOVING))
@@ -53,7 +52,7 @@ void InputObserver::notify()
       _control->setDestinationPosition(_playerDestination);
     }
 
-    _interfaceId  = -1;
+    _interfaceHoverId  = _interfaceUnhoverId = -1;
     _controlFlags = {0b0000'0000};
   }
 }

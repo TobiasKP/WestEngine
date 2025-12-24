@@ -72,9 +72,8 @@ struct Label : public IElement
       bounds.xLeft += 10;
     }
 
-    float elementWidth = getElementWidth() + 15;
-    bounds.xRight      = (xLL + elementWidth) * stretchX;
-    bounds.yTop        = Config::GeneralConfig.HEIGHT - (yLL * stretchY + (rowElements * SIZE_E));
+    bounds.xRight      = (xLL + getElementWidth());
+    bounds.yTop        = (Config::GeneralConfig.HEIGHT - (yLL + rowElements * SIZE_E * stretchY));
     bounds.eventDriven = true;
   }
 };

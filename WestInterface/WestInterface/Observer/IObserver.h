@@ -9,15 +9,11 @@
 class IObserver
 {
 public:
-  IObserver(WestLogger &l) : logger(l) {};
+  IObserver(WestLogger& l) : logger(l) {};
   virtual ~IObserver() {};
 
-  virtual bool handleEvent(
-    std::int16_t elementId, std::uint16_t event, std::uint16_t mouseX, std::uint16_t mouseY, std::string value)
-  {
-    return false;
-  };
-
+  virtual void handleEvent(
+    std::int16_t elementId, std::uint16_t event, std::uint16_t mouseX, std::uint16_t mouseY, std::string value) {};
   virtual void registerElement(IElement* e) {};
   virtual void deregisterElement(IElement* e) {};
 

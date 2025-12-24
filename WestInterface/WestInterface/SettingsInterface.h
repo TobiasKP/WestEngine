@@ -28,5 +28,5 @@ private:
   ElementProxy* createResolutionSetting();
   ElementProxy* createQuitSettingsButton();
   void createResolutionOptions();
-  ElementProxy* resolutionOption(std::uint32_t x, std::uint32_t y);
+  ElementProxy* resolutionOption(std::uint32_t x, std::uint32_t y, std::uint8_t row);
 };
