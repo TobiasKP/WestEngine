@@ -66,7 +66,7 @@ void RenderManager::update()
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
-  logCycle(std::format("{} ### {} render time for all entites in scene: {} ms.\n", getName(), getName(), res));
+  logCycle(std::format("{} ### render time for all entites in scene: {} ms.\n", getName(), res));
 #endif
 }
 

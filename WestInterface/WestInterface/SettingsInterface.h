@@ -12,12 +12,13 @@ public:
   ~SettingsInterface();
 
   ContainerElement* init();
+  void refreshInterface();
 
 private:
   WestLogger& _logger = WestLogger::getLoggerInstance();
   InterfaceBuilder* _interfaceBuilder;
   std::vector<ElementProxy*> _elements;
-  std::uint8_t _id, _resolutionId;
+  std::uint8_t _id, _settingButtonId, _resolutionId;
   std::array<std::tuple<std::uint32_t, std::uint32_t>, 2> _supportedResolutions = {
     std::make_tuple(800, 600),
     std::make_tuple(1280, 960),

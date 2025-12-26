@@ -18,7 +18,7 @@ public:
   ComponentDataPool(const ComponentDataPool&)            = delete;
   ComponentDataPool& operator=(const ComponentDataPool&) = delete;
 
-  // If you need move semantics, implement them properly
+  // If move semantics are needed, implement them properly later
   ComponentDataPool(ComponentDataPool&&)            = delete;
   ComponentDataPool& operator=(ComponentDataPool&&) = delete;
 

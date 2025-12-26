@@ -21,7 +21,7 @@ struct ContainerElement : public IElement
   ~ContainerElement()
   {
 #ifdef DEBUG
-    _logger.log(Level::Info, std::format("@@@ Deleting all children for interface: ", this->id));
+    _logger.log(Level::Info, std::format("@@@ Deleting all children for interface: {}\n", this->id));
 #endif
     assert(dataPool != nullptr);
     for (IElement* e : children)
@@ -31,6 +31,9 @@ struct ContainerElement : public IElement
       {
         dataPool->deleteRange(e->poolPosition, e->poolPosition + e->rowElements * e->columnElements - 1);
       }
+#ifdef DEBUG
+      _logger.log(Level::Info, std::format("@@@ Deleted child: {}\n", e->id));
+#endif
       delete e;
     }
     dataPool->deleteRange(poolPosition, poolPosition + rowElements * columnElements - 1);

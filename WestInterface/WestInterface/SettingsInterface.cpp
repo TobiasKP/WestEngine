@@ -2,12 +2,13 @@
 
 #include "../WestInterfaceFacade.h"
 
+#include <cassert>
 #include <chrono>
 #include <thread>
 
 SettingsInterface::SettingsInterface(InterfaceBuilder& interfaceBuilder) : _interfaceBuilder(&interfaceBuilder)
 {
-  _id = _resolutionId = 0;
+  _id = _resolutionId = _settingButtonId = 0;
 }
 
 SettingsInterface::~SettingsInterface()
@@ -24,7 +25,10 @@ ContainerElement* SettingsInterface::init()
   {
     _interfaceBuilder->addElement(element);
   }
-  return _interfaceBuilder->build();
+  ContainerElement* result = _interfaceBuilder->build();
+  assert(result->id > 0);
+  _settingButtonId = result->id;
+  return result;
 }
 
 Container* SettingsInterface::createSettingButton()
@@ -52,6 +56,7 @@ Container* SettingsInterface::createSettingButton()
     std::thread(
       []()
       {
+        // TODO Make pause work, currently buggy
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
         // Config::PAUSE.exchange(true);
       })
@@ -90,8 +95,8 @@ void SettingsInterface::createSettingInterface()
   e.push_back(createResolutionSetting());
   Container* c                = new Container(e);
   WestInterfaceFacade& facade = WestInterfaceFacade::getInterfaceInstance();
-  c->xScreenPosition          = Config::GeneralConfig.WIDTH / 4;
-  c->yScreenPosition          = 75;
+  c->xScreenPosition          = Config::GeneralConfig.WIDTH / 3;
+  c->yScreenPosition          = Config::GeneralConfig.HEIGHT / 3;
   c->colorR                   = 59.0f;
   c->colorG                   = 58.0f;
   c->colorB                   = 54.0f;
@@ -121,10 +126,8 @@ ElementProxy* SettingsInterface::createQuitSettingsButton()
   ElementProxy* quitButton   = new ElementProxy();
   quitButton->type           = BUTTON;
   quitButton->elementId      = Config::incUiId();
-  float x                    = (float)Config::GeneralConfig.WIDTH / 4 - 10;
-  float y                    = 65;
-  quitButton->xPosition      = x;
-  quitButton->yPosition      = y;
+  quitButton->xPosition      = (float)Config::GeneralConfig.WIDTH / 3 - 10;
+  quitButton->yPosition      = (float)Config::GeneralConfig.HEIGHT / 3;
   quitButton->colorR         = 215.0f;
   quitButton->colorG         = 207.0f;
   quitButton->colorB         = 196.0f;
@@ -137,6 +140,7 @@ ElementProxy* SettingsInterface::createQuitSettingsButton()
   quitButton->eventHandler   = [this]()
   {
     WestInterfaceFacade& facade = WestInterfaceFacade::getInterfaceInstance();
+    assert(_id > 0);
     facade.destroyInterface(_id);
     if (_resolutionId != 0)
     {
@@ -164,8 +168,8 @@ ElementProxy* SettingsInterface::createResolutionSetting()
   resolution->elementId      = Config::incUiId();
   resolution->stretchX       = 0.8f;
   resolution->stretchY       = 0.75f;
-  resolution->xPosition      = (float)Config::GeneralConfig.WIDTH / 4 - 30;
-  resolution->yPosition      = 35;
+  resolution->xPosition      = (float)Config::GeneralConfig.WIDTH / 3 - 30;
+  resolution->yPosition      = (float)Config::GeneralConfig.HEIGHT / 3 - 30;
   resolution->colorR         = 215.0f;
   resolution->colorG         = 207.0f;
   resolution->colorB         = 196.0f;
@@ -208,8 +212,8 @@ void SettingsInterface::createResolutionOptions()
   }
   Container* c                 = new Container(e);
   WestInterfaceFacade& facade  = WestInterfaceFacade::getInterfaceInstance();
-  c->xScreenPosition           = (Config::GeneralConfig.WIDTH / 4 - 1) + 6 * SIZE_E;
-  c->yScreenPosition           = 8 * SIZE_E;
+  c->xScreenPosition           = (Config::GeneralConfig.WIDTH / 3 - 1) + 6 * SIZE_E;
+  c->yScreenPosition           = (Config::GeneralConfig.HEIGHT / 3 - 40) + 7 * SIZE_E;
   c->colorR                    = 86.0f;
   c->colorG                    = 81.0f;
   c->colorB                    = 71.0f;
@@ -241,8 +245,8 @@ ElementProxy* SettingsInterface::resolutionOption(std::uint32_t x, std::uint32_t
   ElementProxy* button   = new ElementProxy();
   button->type           = BUTTON;
   button->elementId      = Config::incUiId();
-  button->xPosition      = (Config::GeneralConfig.WIDTH / 4 - 1) + 6 * SIZE_E;
-  button->yPosition      = 8 * SIZE_E;
+  button->xPosition      = (Config::GeneralConfig.WIDTH / 3 - 1) + 6 * SIZE_E;
+  button->yPosition      = (Config::GeneralConfig.HEIGHT / 3 - 40) + 7 * SIZE_E;
   button->stretchY       = 0.8f;
   button->stretchX       = 0.8f;
   button->colorR         = 215.0f;
@@ -272,4 +276,16 @@ ElementProxy* SettingsInterface::resolutionOption(std::uint32_t x, std::uint32_t
   quitButton->texture     = tex;*/
 
   return button;
+}
+
+void SettingsInterface::refreshInterface()
+{
+  assert(_id > 0);
+  WestInterfaceFacade& facade = WestInterfaceFacade::getInterfaceInstance();
+  facade.destroyInterface(_id);
+  facade.destroyInterface(_settingButtonId);
+  _id              = 0;
+  _settingButtonId = 0;
+  facade.createNewInterface(createSettingButton());
+  createSettingInterface();
 }

@@ -24,7 +24,7 @@ ComponentDataPool::~ComponentDataPool()
   _poolingData.clear();
   _slotUsed.clear();
 #ifdef DEBUG
-  _logger.log(Level::Info, "@@@ ComponentDataPool destroyed, cleaned up Domponent Data");
+  _logger.log(Level::Info, "@@@ ComponentDataPool destroyed, cleaned up Domponent Data\n");
 #endif
 }
 

@@ -286,11 +286,17 @@ std::vector<ElementBounds*> WestInterfaceFacade::getShownElementsBoundaries()
   return _renderManager->getBoundaries();
 }
 
+bool WestInterfaceFacade::resolutionChange(std::uint32_t width, std::uint32_t height)
+{
+  _settings->refreshInterface();
+  return true;
+}
+
 ///////////////////////////
 
-bool WestInterfaceFacade::resize(std::uint8_t interfaceId, std::uint16_t width, std::uint16_t height)
+bool WestInterfaceFacade::resize(std::int8_t interfaceId, std::uint32_t width, std::uint32_t height)
 {
-  return false;
+  return true;
 };
 
 bool WestInterfaceFacade::reposition(std::uint8_t interfaceId,

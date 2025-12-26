@@ -6,7 +6,7 @@ InterfaceManager::InterfaceManager() : IManager(nullptr)
 {
   setName(CoreConstants::INTERFACE_MANAGER);
   _facade           = nullptr;
-  _cachedInterfaces = 0;
+  _cachedInterfaces = _currentX = _currentY = 0;
 };
 
 InterfaceManager::InterfaceManager(WestLogger* logger, WindowManager* manager) : IManager(logger)
@@ -15,6 +15,8 @@ InterfaceManager::InterfaceManager(WestLogger* logger, WindowManager* manager) :
   _facade           = nullptr;
   _cachedInterfaces = 0;
   _windowManager    = manager;
+  _currentX         = Config::GeneralConfig.WIDTH;
+  _currentY         = Config::GeneralConfig.HEIGHT;
 };
 
 InterfaceManager::~InterfaceManager() {}
@@ -57,6 +59,12 @@ void InterfaceManager::update()
     std::vector<ElementBounds*> result = _facade->getShownElementsBoundaries();
     MouseCallbacks::setElementBounds(result);
     _cachedInterfaces = result.size();
+  }
+  if (_currentX != Config::GeneralConfig.WIDTH && _currentY != Config::GeneralConfig.HEIGHT)
+  {
+    _facade->resolutionChange(Config::GeneralConfig.WIDTH, Config::GeneralConfig.HEIGHT);
+    _currentX = Config::GeneralConfig.WIDTH;
+    _currentY = Config::GeneralConfig.HEIGHT;
   }
 }
 
@@ -120,7 +128,7 @@ std::int32_t InterfaceManager::buildTechDemoFooter()
   c->columns         = 1;
   c->hiddenContainer = false;
 
-  std::uint8_t footerId = _facade->createNewInterface(c); 
+  std::uint8_t footerId = _facade->createNewInterface(c);
   logDebug(std::format("{} ### Created Tech Demo footer -> {}\n", getName(), footerId));
   if (footerId >= 1)
   {
