@@ -24,7 +24,13 @@ struct IElement
   {
     text = nullptr;
   }
-  ~IElement() {};
+  ~IElement()
+  {
+    if (texture != 0)
+    {
+      glDeleteTextures(1, &texture);
+    }
+  };
 
   float xLL;
   float yLL;

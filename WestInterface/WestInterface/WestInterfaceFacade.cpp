@@ -161,10 +161,6 @@ ContainerElement* WestInterfaceFacade::findInterfaceById(std::uint8_t id)
 
 std::uint8_t WestInterfaceFacade::createNewInterface(Container* c)
 {
-#ifdef DEBUG
-  _logger.log(Level::Info, "@@@ Creating new Interface\n");
-#endif
-
   _builder->createNewInterface(c);
 
   if (c->background != nullptr)
@@ -203,7 +199,6 @@ bool WestInterfaceFacade::destroyInterface(std::uint8_t interfaceId)
     return false;
   }
 
-  _logger.log(Level::Info, std::format("@@@ Destroying interface: {}\n", interfaceId));
   ContainerElement* elementToDelete = _interfaces.at(location);
   for (IElement* child : elementToDelete->children)
   {

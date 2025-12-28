@@ -11,14 +11,12 @@ SettingsInterface::SettingsInterface(InterfaceBuilder& interfaceBuilder) : _inte
   _id = _resolutionId = _settingButtonId = 0;
 }
 
-SettingsInterface::~SettingsInterface()
-{
-  _elements.clear();
-}
+SettingsInterface::~SettingsInterface() {}
 
 ContainerElement* SettingsInterface::init()
 {
-  Container* c = createSettingButton();
+  std::vector<ElementProxy*> elements;
+  Container* c = createSettingButton(elements);
   _interfaceBuilder->createNewInterface(c);
   assert(c->elements.size() > 0);
   for (auto* element : c->elements)
@@ -31,7 +29,7 @@ ContainerElement* SettingsInterface::init()
   return result;
 }
 
-Container* SettingsInterface::createSettingButton()
+Container* SettingsInterface::createSettingButton(std::vector<ElementProxy*>& elements)
 {
   ElementProxy* settingsButton   = new ElementProxy();
   settingsButton->type           = BUTTON;
@@ -69,9 +67,9 @@ Container* SettingsInterface::createSettingButton()
   tex->wrapping_y         = GL_CLAMP_TO_BORDER;
   settingsButton->texture = tex;
 
-  _elements.push_back(settingsButton);
 
-  Container* c       = new Container(_elements);
+  elements.push_back(settingsButton);
+  Container* c       = new Container(elements);
   c->xScreenPosition = Config::GeneralConfig.WIDTH - SIZE_E;
   c->yScreenPosition = Config::GeneralConfig.HEIGHT - SIZE_E;
   c->colorR          = 59.0f;
@@ -91,6 +89,7 @@ Container* SettingsInterface::createSettingButton()
 void SettingsInterface::createSettingInterface()
 {
   std::vector<ElementProxy*> e;
+  e.reserve(2);
   e.push_back(createQuitSettingsButton());
   e.push_back(createResolutionSetting());
   Container* c                = new Container(e);
@@ -281,11 +280,16 @@ ElementProxy* SettingsInterface::resolutionOption(std::uint32_t x, std::uint32_t
 void SettingsInterface::refreshInterface()
 {
   assert(_id > 0);
+#ifdef DEBUG
+  _logger.log(Level::Info, std::format("@@@ Refreshing base Interfaces.\n", _id));
+#endif
   WestInterfaceFacade& facade = WestInterfaceFacade::getInterfaceInstance();
   facade.destroyInterface(_id);
   facade.destroyInterface(_settingButtonId);
+  std::vector<ElementProxy*> elements;
   _id              = 0;
   _settingButtonId = 0;
-  facade.createNewInterface(createSettingButton());
+  _settingButtonId = facade.createNewInterface(createSettingButton(elements));
   createSettingInterface();
+  assert(_id != 0 && _settingButtonId != 0);
 }

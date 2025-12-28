@@ -12,7 +12,10 @@ struct Label : public IElement
     flags = 0;
   }
 
-  ~Label() {}
+  ~Label()
+  {
+    IElement::~IElement();
+  }
 
   void handler() override
   {

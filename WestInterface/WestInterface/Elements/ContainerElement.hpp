@@ -8,7 +8,6 @@
 #include <format>
 #include <vector>
 
-
 struct ContainerElement : public IElement
 {
   std::vector<IElement*> children;
@@ -35,6 +34,10 @@ struct ContainerElement : public IElement
       _logger.log(Level::Info, std::format("@@@ Deleted child: {}\n", e->id));
 #endif
       delete e;
+    }
+    if (texture != 0)
+    {
+      glDeleteTextures(1, &texture);
     }
     dataPool->deleteRange(poolPosition, poolPosition + rowElements * columnElements - 1);
   }
