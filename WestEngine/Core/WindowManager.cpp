@@ -1,30 +1,34 @@
 #include "../CoreHeaders/WindowManager.h"
 
+#include "../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
+#include "../CoreHeaders/Utils/InputUtils/MouseCallbacks.h"
+
 #include <Config.h>
 #include <GLFW/glfw3.h>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/glm.hpp>
 
-#include "../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
-#include "../CoreHeaders/Utils/InputUtils/MouseCallbacks.h"
-
-WindowManager::WindowManager() : IManager(nullptr) {
+WindowManager::WindowManager() : IManager(nullptr)
+{
   setName(CoreConstants::WINDOW_MANAGER);
-  _width = 0;
+  _width  = 0;
   _height = 0;
 }
 
-WindowManager::WindowManager(WestLogger *logger) : IManager(logger) {
+WindowManager::WindowManager(WestLogger* logger) : IManager(logger)
+{
   setName(CoreConstants::WINDOW_MANAGER);
-  _width = Config::GeneralConfig.WIDTH;
+  _width  = Config::GeneralConfig.WIDTH;
   _height = Config::GeneralConfig.HEIGHT;
   assert(_width > 0 && _height > 0);
 }
 
 WindowManager::~WindowManager() {}
 
-std::int32_t WindowManager::startup() {
-  if (!glfwInit()) {
+std::int32_t WindowManager::startup()
+{
+  if (!glfwInit())
+  {
     logFailure("GLFW Init failed\n");
     glfwTerminate();
     return 1;
@@ -35,27 +39,30 @@ std::int32_t WindowManager::startup() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_MAXIMIZED, GL_FALSE);
+  glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
   std::int32_t monitorPosX, monitorPosY;
-  GLFWmonitor *primary = glfwGetPrimaryMonitor();
-  const GLFWvidmode *mode = glfwGetVideoMode(primary);
+  GLFWmonitor* primary    = glfwGetPrimaryMonitor();
+  const GLFWvidmode* mode = glfwGetVideoMode(primary);
   glfwGetMonitorPos(primary, &monitorPosX, &monitorPosY);
-  if (glfwGetError(NULL) != GLFW_NO_ERROR) {
-    logFailure(std::format(
-        "{} ### Error setting glfw specific informations, stopping startup.\n",
-        getName()));
+  if (glfwGetError(NULL) != GLFW_NO_ERROR)
+  {
+    logFailure(std::format("{} ### Error setting glfw specific informations, stopping startup.\n", getName()));
     glfwTerminate();
     return 1;
   }
 
-  logDebug(std::format(
-      "{} ### primary monitor resolution: {} x {}, setting to {} x {}\n",
-      getName(), mode->width, mode->height, _width, _height));
+  logDebug(std::format("{} ### primary monitor resolution: {} x {}, setting to {} x {}\n",
+                       getName(),
+                       mode->width,
+                       mode->height,
+                       _width,
+                       _height));
 
-  _window = glfwCreateWindow(_width, _height, CoreConstants::TITLE.c_str(),
-                             NULL, NULL);
+  _window = glfwCreateWindow(_width, _height, CoreConstants::TITLE.c_str(), NULL, NULL);
 
-  if (!_window) {
+  if (!_window)
+  {
     logFailure("Window creation failed\n");
     glfwTerminate();
     return 1;
@@ -70,11 +77,14 @@ std::int32_t WindowManager::startup() {
   glfwGetFramebufferSize(_window, &bufferWidth, &bufferHeight);
   glfwMakeContextCurrent(_window);
 
-  if (glewInit() != GLEW_OK) {
+  if (glewInit() != GLEW_OK)
+  {
     logFailure("GLEW init failed\n");
     glfwTerminate();
     return 1;
-  } else if (glfwGetError(NULL) != GLFW_NO_ERROR) {
+  }
+  else if (glfwGetError(NULL) != GLFW_NO_ERROR)
+  {
     logFailure(std::format("{} ### Error setting window specific informations, "
                            "stopping startup.\n",
                            getName()));
@@ -96,7 +106,8 @@ std::int32_t WindowManager::startup() {
   return 0;
 }
 
-void WindowManager::shutdown() {
+void WindowManager::shutdown()
+{
 #ifdef DEBUG
   logDebug(std::format("{} ### Shutting down {}...\n", getName(), getName()));
 #endif
@@ -105,8 +116,8 @@ void WindowManager::shutdown() {
   glfwTerminate();
 }
 
-std::int32_t WindowManager::init() {
-
+std::int32_t WindowManager::init()
+{
 #ifdef DEBUG
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
@@ -118,54 +129,57 @@ std::int32_t WindowManager::init() {
   glfwSetMouseButtonCallback(_window, MouseCallbacks::mouseButtonCallback);
 
 #ifdef DEBUG
-  logDebug(std::format("{}: initialized with \n\t\tWidth: {}\n\t\tHeight: {}\n",
-                       getName(), getWidth(), getHeight()));
+  logDebug(std::format("{}: initialized with \n\t\tWidth: {}\n\t\tHeight: {}\n", getName(), getWidth(), getHeight()));
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
-  logDebug(
-      std::format("{} ### WindowManager init time: {} ms.\n", getName(), res));
+  logDebug(std::format("{} ### WindowManager init time: {} ms.\n", getName(), res));
 #endif
 
   return 0;
 }
 
-void WindowManager::update() {
+void WindowManager::update()
+{
   glfwSwapBuffers(_window);
   glfwPollEvents();
 }
 
-void WindowManager::errorCallback(std::int32_t error, const char *message) {
-  WestLogger::getLoggerInstance().log(
-      Level::Error, std::format("$$$ {} thrown: {}", error, message));
+void WindowManager::errorCallback(std::int32_t error, const char* message)
+{
+  WestLogger::getLoggerInstance().log(Level::Error, std::format("$$$ {} thrown: {}", error, message));
 }
 
-void WindowManager::messageCallback(GLenum source, GLenum type, GLuint id,
-                                    GLenum severity, GLsizei length,
-                                    const GLchar *message, const void *me) {
-  WestLogger::getLoggerInstance().log(
-      Level::Info,
-      std::format(
-          "$$$ GL CALLBACK: {} type = 0x{}, severity = 0x{}, message = {}\n",
-          (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity,
-          message));
+void WindowManager::messageCallback(
+  GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* me)
+{
+  WestLogger::getLoggerInstance().log(Level::Info,
+                                      std::format("$$$ GL CALLBACK: {} type = 0x{}, severity = 0x{}, message = {}\n",
+                                                  (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+                                                  type,
+                                                  severity,
+                                                  message));
 }
 
-void WindowManager::resizeWindow(GLint width, GLint height) {
+void WindowManager::resizeWindow(GLint width, GLint height)
+{
   assert(width > 0 && height > 0);
 #ifdef DEBUG
-  logDebug(std::format("{} ### Resizing window to new height: {}, {}",
-                       getName(), width, height));
+  logDebug(std::format("{} ### Resizing window to new height: {}, {}\n", getName(), width, height));
 #endif
   glfwSetWindowSize(_window, width, height);
+  glViewport(0, 0, width, height);
+
   Config::GeneralConfig.HEIGHT = height;
-  Config::GeneralConfig.WIDTH = width;
+  Config::GeneralConfig.WIDTH  = width;
 }
 
-void WindowManager::setWindowTitle(const std::string &title) {
+void WindowManager::setWindowTitle(const std::string& title)
+{
   glfwSetWindowTitle(_window, title.c_str());
 }
 
-bool WindowManager::isKeyPressed(std::int32_t keyCode) {
+bool WindowManager::isKeyPressed(std::int32_t keyCode)
+{
   assert(keyCode > -1);
   return glfwGetKey(_window, keyCode) == GLFW_PRESS;
 }

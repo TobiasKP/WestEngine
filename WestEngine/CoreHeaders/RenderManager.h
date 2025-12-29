@@ -1,16 +1,16 @@
 #pragma once
 
+#include "Components/Umbrella.h"
+#include "Entity/Scene.h"
 #include "Interfaces/IManager.h"
 
 #include <WestInterfaceFacade.h>
 
-#include "Components/Umbrella.h"
-#include "Entity/Scene.h"
-
-class RenderManager : public IManager {
+class RenderManager : public IManager
+{
 public:
   RenderManager();
-  RenderManager(WestLogger *logger);
+  RenderManager(WestLogger* logger);
   ~RenderManager() override;
 
   // Overrides
@@ -20,15 +20,18 @@ public:
   std::int32_t init() override;
 
   // Functions
-  static GLuint getUsedShaderProgram() { return _usedShaderProgram; }
+  static GLuint getUsedShaderProgram()
+  {
+    return _usedShaderProgram;
+  }
 
 private:
   static GLuint _usedShaderProgram;
-  WestInterfaceFacade *_facade; 
-  Scene *_scene;
+  WestInterfaceFacade* _facade;
+  Scene* _scene;
 
   void clearColor();
   void renderUserInterfaces();
   void renderGameEntities();
-  void updateUniforms(Entity *e, Model *m);
+  void updateUniforms(const Entity& e, Model* m);
 };

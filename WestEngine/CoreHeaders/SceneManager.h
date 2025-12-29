@@ -1,17 +1,17 @@
 #pragma once
 
+#include "Entity/EntityBuilder.h"
+#include "Entity/Scene.h"
 #include "Interfaces/IManager.h"
+#include "Utils/DataUtils/ObjectLoader.h"
 
 #include <lua.hpp>
 
-#include "Entity/Scene.h"
-#include "Utils/DataUtils/ObjectLoader.h"
-#include "Entity/EntityBuilder.h"
-
-class SceneManager : public IManager {
+class SceneManager : public IManager
+{
 public:
   SceneManager();
-  SceneManager(WestLogger *logger);
+  SceneManager(WestLogger* logger);
   ~SceneManager() override;
 
   // Overrides
@@ -21,13 +21,13 @@ public:
   std::int32_t init() override;
 
 private:
-  Scene *_scene;
-  ObjectLoader *_loader;
-  lua_State *L;
-  EntityBuilder *_builder;
+  Scene* _scene;
+  ObjectLoader* _loader;
+  lua_State* L;
+  EntityBuilder* _builder;
 
   // Functions
-  void removeEntityFromScene(Entity *entity);
+  void removeEntityFromScene(const Entity& entity);
   void deleteScene();
   void loadNewScene() {};
 };

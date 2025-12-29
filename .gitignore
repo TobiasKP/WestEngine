@@ -18,5 +18,5 @@ compile_commands.json
 # Claude Code files and directories
 .claude/
 CLAUDE.md
-DEBUG_INSTRUCTIONS
+DEBUG_INSTRUCTIONS.md
 

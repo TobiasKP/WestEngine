@@ -1,45 +1,74 @@
-#pragma once
-
-#include <cassert>
-
 #include "EventObserver.h"
 
-EventObserver::EventObserver() {}
+#include <algorithm>
+#include <cassert>
+
+EventObserver::EventObserver(WestLogger& l) : IObserver(l) {}
 
 EventObserver::~EventObserver() {}
 
-bool EventObserver::handleEvent(std::int16_t elementId, std::uint16_t event,
-                                std::uint16_t mouseX, std::uint16_t mouseY,
-                                std::string value) {
-  IElement *e = nullptr;
+void EventObserver::handleEvent(
+  std::int16_t elementId, std::uint16_t event, std::uint16_t mouseX, std::uint16_t mouseY, std::string value)
+{
+  IElement* e = nullptr;
   assert(elementId > -1);
-  for (IElement *el : _registeredElements) {
-    if (el->id == elementId) {
+  for (IElement* el : _registeredElements)
+  {
+    if (el->id == elementId)
+    {
       e = el;
       break;
     }
   }
-  assert(e != nullptr);
 
-  if (event & 0x01) {
+  if (e == nullptr)
+  {
+    logger.log(
+      Level::Info,
+      std::format("@@@ --- Warning --- Element with id: {}, does not exist in EventObserver, probably deleted\n",
+                  elementId));
+    return;
+  }
+
+  if (event & 0x01)
+  {
     e->flags |= 0x02;
     executeElement(e);
   }
-  if (event & 0x02) {
+  if (event & 0x02)
+  {
     e->flags &= ~0x02;
     executeElement(e);
   }
-  if (event & 0x04) {
+  if (event & 0x04)
+  {
     e->handler();
   }
-
-  return false;
 };
 
-void EventObserver::registerElement(IElement *e) {
+void EventObserver::registerElement(IElement* e)
+{
   _registeredElements.push_back(e);
 }
 
-void EventObserver::executeElement(IElement *e) { e->changed = true; };
+void EventObserver::deregisterElement(IElement* e)
+{
+  auto it = std::find_if(_registeredElements.begin(),
+                         _registeredElements.end(),
+                         [e](const IElement* element) { return element->id == e->id; });
+  if (it != _registeredElements.end())
+  {
+    _registeredElements.erase(it);
+  }
+}
+
+void EventObserver::executeElement(IElement* e)
+{
+  if (e->parent != nullptr)
+  {
+    e->parent->changed = true;
+  }
+  e->changed = true;
+};
 
 void EventObserver::sort() {};

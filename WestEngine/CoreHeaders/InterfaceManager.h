@@ -5,10 +5,11 @@
 
 #include <WestInterfaceFacade.h>
 
-class InterfaceManager : public IManager {
+class InterfaceManager : public IManager
+{
 public:
   InterfaceManager();
-  InterfaceManager(WestLogger *logger, WindowManager *manager);
+  InterfaceManager(WestLogger* logger, WindowManager* manager);
   ~InterfaceManager() override;
 
   std::int32_t startup() override;
@@ -17,13 +18,15 @@ public:
   std::int32_t init() override;
 
 private:
-  std::uint8_t _interfaces;
   std::uint8_t _cachedInterfaces;
+  std::uint32_t _currentX, _currentY;
 
-  WestInterfaceFacade *_facade;
-  WindowManager *_windowManager;
+  WestInterfaceFacade* _facade;
+  WindowManager* _windowManager;
 
 #ifdef DEBUG
-  std::int32_t buildTechDemoFooter();
+  std::uint8_t _demoId;
+  std::uint8_t buildTechDemoFooter();
+  void refreshTechDemoFooter();
 #endif
 };

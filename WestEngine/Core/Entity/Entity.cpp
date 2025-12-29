@@ -1,27 +1,86 @@
 #include "../../CoreHeaders/Entity/Entity.h"
 
-PoolAllocator *Entity::_allocator = new PoolAllocator();
+PoolAllocator* Entity::_allocator = new PoolAllocator();
 
-Entity::Entity() {
-  _destroyed = false;
-  _debugEntity = false;
+Entity::Entity()
+{
+  _destroyed     = false;
+  _debugEntity   = false;
   _componentMask = {0b0000'0000'0000'0000};
 }
 
-Entity::Entity(std::uint32_t id) : _id(id) {
-  _destroyed = false;
-  _debugEntity = false;
+Entity::Entity(std::uint32_t id) : _id(id)
+{
+  _destroyed     = false;
+  _debugEntity   = false;
   _componentMask = {0b0000'0000'0000'0000};
 }
 
-Entity::~Entity() {
-  delete _allocator;
+Entity::~Entity()
+{
   _components.clear();
 }
 
-IComponent *Entity::getComponent(std::uint16_t componentMask) { 
+
+Entity::Entity(const Entity& other)
+  : _id(other._id), _name(other._name), _componentMask(other._componentMask), _destroyed(other._destroyed),
+    _debugEntity(other._debugEntity)
+{
+  _components = other._components;
+}
+
+Entity& Entity::operator=(const Entity& other)
+{ 
+  if (this != &other)
+  {
+    _id            = other._id;
+    _name          = other._name;
+    _componentMask = other._componentMask;
+    _destroyed     = other._destroyed;
+    _debugEntity   = other._debugEntity;
+    _components    = other._components;
+  }
+  return *this;
+}
+
+Entity::Entity(Entity&& other) noexcept
+  : _id(other._id), _name(other._name), _componentMask(other._componentMask), _destroyed(other._destroyed),
+    _debugEntity(other._debugEntity), _components(std::move(other._components))
+{ 
+  other._componentMask = 0;
+  other._destroyed     = false;
+  other._debugEntity   = false;
+}
+
+Entity& Entity::operator=(Entity&& other) noexcept
+{
+  if (this != &other)
+  {
+    _id            = other._id;
+    _name          = other._name;
+    _componentMask = other._componentMask;
+    _destroyed     = other._destroyed;
+    _debugEntity   = other._debugEntity;
+    _components    = other._components;
+    other._componentMask = 0;
+    other._destroyed     = false;
+    other._debugEntity   = false;
+  }
+  return *this;
+}
+
+void Entity::addComponent(std::uint16_t flag, IComponent* component)
+{
+  _componentMask |= flag;
+  _components.insert(std::make_pair(flag, component));
+}
+
+IComponent* Entity::getComponent(std::uint16_t componentMask) const
+{
   if (!static_cast<bool>(componentMask & _componentMask))
+  { 
     return nullptr;
+  }
 
   return _components.at(componentMask);
 }

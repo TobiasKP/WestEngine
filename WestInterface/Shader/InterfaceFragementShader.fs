@@ -11,16 +11,16 @@ in vec2 scale;
 out vec4 fragColor;
 
 uniform sampler2D fontTextureSampler;
-uniform sampler2DArray textureSampler;
+uniform sampler2D textureSampler;
 
 bool handled = false;
-float blendingWidth = 0.1;
+vec3 burgundy = vec3(0.557, 0.231, 0.275);
+vec3 gold = vec3(0.851, 0.643, 0.255);
+vec3 emerald = vec3(0.251, 0.506, 0.278);
 
-vec4 sampleText() {
-    vec4 texColor = texture(fontTextureSampler, TexCoord);
-
+vec4 discardWhitePixels(vec4 texColor) {
     float whiteness = (texColor.r + texColor.g + texColor.b) / 3.0;
-    if (whiteness > 0.99) {
+    if (whiteness > 0.89) {
         discard;
     }
 
@@ -28,40 +28,24 @@ vec4 sampleText() {
     return vec4(vColor.rgb, darkness);
 }
 
-void blending(vec2 coords, float z, float zn) {
-    vec2 fracCoords = vec2(fract(coords.x), coords.y);
-    vec4 texA = texture(textureSampler, vec3(fracCoords, z));
-    if ((vFlags & 0x0020u) != 0u) {
-        float cubeCount = scale.x * 0.5;
-        float cubePos = fract(TexCoord.x * cubeCount);
-        if (cubePos > (1.0 - blendingWidth) || cubePos < blendingWidth) {
-            vec4 texB = texture(textureSampler, vec3(fracCoords, zn));
-            float normalizedPos = (cubePos - (1.0 - blendingWidth)) / blendingWidth;
-            float blendFactor = smoothstep(0.0, 1.0, normalizedPos);
-            fragColor = mix(texA, texB, blendFactor);
-        } else {
-            fragColor = texA;
-        }
-    } else {
-        fragColor = texA;
-    }
+vec4 sampleText() {
+    vec4 texColor = texture(fontTextureSampler, TexCoord);
+    return discardWhitePixels(texColor);
 }
 
 void textureCheck() {
     if ((vFlags & 0x04u) != 0u) {
-        float cubeCount = scale.x * 0.5;
-        vec2 repeatedCoord = vec2(TexCoord.x * cubeCount, TexCoord.y);
-        int virtualCube = int(floor(TexCoord.x * cubeCount));
-        float z = float(virtualCube % 2);
-        float zn = float((virtualCube + 1) % 2);
-        blending(repeatedCoord, z, zn);
-    } else {
+        vec4 texColor = texture(textureSampler, TexCoord);
+        fragColor = discardWhitePixels(texColor);
+    } else if ((vFlags & 0x0010u) != 0u) {
         discard;
+    } else {
+        fragColor = vColor;
     }
 }
 
-void calculateBorderEffect(vec4 color) {
-    float borderWidth = 0.1;
+void calculateBorderEffect() {
+    float borderWidth = 0.05;
     float maxX = 1.0 - (borderWidth / scale.x);
     float minX = borderWidth / scale.x;
     float maxY = 1.0 - (borderWidth / scale.y);
@@ -69,12 +53,27 @@ void calculateBorderEffect(vec4 color) {
     if (QuadCoord.x < maxX && QuadCoord.x > minX && QuadCoord.y < maxY && QuadCoord.y > minY && !handled) {
         textureCheck();
     } else {
-        fragColor = color;
+        fragColor = vec4(vColor.rgb, 1.0);
     }
 }
 
-void calculateGlowEffect(vec3 glowColor, float intensity) {
-    vec4 baseColor = sampleText();
+void calculateGlowEffect(float intensity) {
+    vec3 glowColor;
+    if ((vFlags & 0x0040u) != 0u) {
+        glowColor = burgundy;
+    } else if ((vFlags & 0x0080u) != 0u) {
+        glowColor = gold;
+    } else if ((vFlags & 0x0100u) != 0u) {
+        glowColor = emerald;
+    } else {
+        glowColor = vec3(1.0, 0.0, 0.0);
+    }
+    vec4 baseColor = vec4(1.0, 0.0, 0.0, 1.0);
+    if ((vFlags & 0x0008u) != 0u) {
+        baseColor = sampleText();
+    } else {
+        textureCheck();
+    }
     float baseBrightness = dot(baseColor.rgb, vec3(0.299, 0.587, 0.114));
     float adjustedIntensity = baseBrightness > 0.7 ? intensity * 0.3 : intensity;
     vec3 effectColor = mix(baseColor.rgb, glowColor, adjustedIntensity);
@@ -82,15 +81,15 @@ void calculateGlowEffect(vec3 glowColor, float intensity) {
 }
 
 void main() {
-    if ((vFlags & 0x01u) != 0u) {
-        calculateBorderEffect(vec4(0.0, 0.0, 0.0, 1.0));
+    if ((vFlags & 0x0001u) != 0u || (vFlags & 0x0010u) != 0u) {
+        calculateBorderEffect();
         handled = true;
     }
 
-    if ((vFlags & 0x02u) != 0u) {
-        calculateGlowEffect(vec3(1.0, 0.5, 0.0), 0.3);
+    if ((vFlags & 0x0002u) != 0u) {
+        calculateGlowEffect(2.0);
         handled = true;
-    } else if ((vFlags & 0x08u) != 0u) {
+    } else if ((vFlags & 0x0008u) != 0u) {
         fragColor = sampleText();
         handled = true;
     }

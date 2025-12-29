@@ -19,25 +19,27 @@
 #include <string>
 #include <thread>
 
-constexpr std::string INFO_FILE_NAME = "WestLog_";
+constexpr std::string INFO_FILE_NAME  = "WestLog_";
 constexpr std::string ERROR_FILE_NAME = "WestError_";
 constexpr std::string CYCLE_FILE_NAME = "WestCyclingLog_";
-constexpr std::uint8_t CYCLE_LENGTH = 200;
-constexpr std::uint8_t BULK_SIZE = 50;
+constexpr std::uint8_t CYCLE_LENGTH   = 200;
+constexpr std::uint8_t BULK_SIZE      = 50;
 
 enum class Level : uint8_t { Info, Error, Cycle };
 
-struct Message {
-  Level mode ;
+struct Message
+{
+  Level mode;
   std::string payload;
 };
 
-class WESTUTILS WestLogger {
+class WESTUTILS WestLogger
+{
 public:
-  static WestLogger &getLoggerInstance();
+  static WestLogger& getLoggerInstance();
 
-  WestLogger(WestLogger const &) = delete;
-  void operator=(WestLogger const &) = delete;
+  WestLogger(WestLogger const&)     = delete;
+  void operator=(WestLogger const&) = delete;
 
   void log(const Level level, const std::string message);
   void closeFileStreams();
@@ -49,6 +51,7 @@ private:
   ~WestLogger();
 
   void workerThread();
+  void joinThreads();
 
   std::ofstream _logFile;
   std::ofstream _errorFile;
