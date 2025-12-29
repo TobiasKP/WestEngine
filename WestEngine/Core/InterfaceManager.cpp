@@ -7,6 +7,9 @@ InterfaceManager::InterfaceManager() : IManager(nullptr)
   setName(CoreConstants::INTERFACE_MANAGER);
   _facade           = nullptr;
   _cachedInterfaces = _currentX = _currentY = 0;
+#ifdef DEBUG
+  _demoId = 0;
+#endif
 };
 
 InterfaceManager::InterfaceManager(WestLogger* logger, WindowManager* manager) : IManager(logger)
@@ -17,6 +20,9 @@ InterfaceManager::InterfaceManager(WestLogger* logger, WindowManager* manager) :
   _windowManager    = manager;
   _currentX         = Config::GeneralConfig.WIDTH;
   _currentY         = Config::GeneralConfig.HEIGHT;
+#ifdef DEBUG
+  _demoId = 0;
+#endif
 };
 
 InterfaceManager::~InterfaceManager() {}
@@ -40,10 +46,10 @@ std::int32_t InterfaceManager::init()
 #endif
 
   std::int32_t result = 0;
-  _facade->init();
+  result              = _facade->init();
 
 #ifdef DEBUG
-  result     = buildTechDemoFooter();
+  _demoId    = buildTechDemoFooter();
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
   logDebug(std::format("{} ### {} init time: {} ms.\n", getName(), getName(), res));
@@ -62,6 +68,9 @@ void InterfaceManager::update()
   }
   if (_currentX != Config::GeneralConfig.WIDTH && _currentY != Config::GeneralConfig.HEIGHT)
   {
+#ifdef DEBUG
+    refreshTechDemoFooter();
+#endif
     _facade->resolutionChange(Config::GeneralConfig.WIDTH, Config::GeneralConfig.HEIGHT);
     _currentX = Config::GeneralConfig.WIDTH;
     _currentY = Config::GeneralConfig.HEIGHT;
@@ -70,7 +79,15 @@ void InterfaceManager::update()
 
 #ifdef DEBUG
 
-std::int32_t InterfaceManager::buildTechDemoFooter()
+void InterfaceManager::refreshTechDemoFooter()
+{
+  _facade->destroyInterface(_demoId);
+  _demoId = 0;
+  _demoId = buildTechDemoFooter();
+  assert(_demoId != 0);
+}
+
+std::uint8_t InterfaceManager::buildTechDemoFooter()
 {
   assert(_facade != nullptr);
   std::vector<ElementProxy*> elements;
@@ -93,7 +110,7 @@ std::int32_t InterfaceManager::buildTechDemoFooter()
   ElementProxy* quitButton   = new ElementProxy();
   quitButton->type           = BUTTON;
   quitButton->elementId      = Config::incUiId();
-  quitButton->xPosition      = 700.0f;
+  quitButton->xPosition      = Config::GeneralConfig.WIDTH - 100;
   quitButton->yPosition      = 0.0f;
   quitButton->colorR         = 215.0f;
   quitButton->colorG         = 207.0f;
@@ -114,11 +131,11 @@ std::int32_t InterfaceManager::buildTechDemoFooter()
 
   assert(elements.size() > 0);
   logDebug(std::format("{} ### Creating Tech Demo interface footer\n", getName()));
-  Container* c = new Container(elements);
-
+  Container* c       = new Container(elements);
+  float stretchX     = (float)Config::GeneralConfig.WIDTH / SIZE_E;
   c->xScreenPosition = 0.0f;
   c->yScreenPosition = 0.0f;
-  c->stretchX        = 20.0f;
+  c->stretchX        = stretchX;
   c->stretchY        = 1.0f;
   c->colorR          = 59.0f;
   c->colorG          = 58.0f;
@@ -130,14 +147,7 @@ std::int32_t InterfaceManager::buildTechDemoFooter()
 
   std::uint8_t footerId = _facade->createNewInterface(c);
   logDebug(std::format("{} ### Created Tech Demo footer -> {}\n", getName(), footerId));
-  if (footerId >= 1)
-  {
-    return 0;
-  }
-  else
-  {
-    return -1;
-  }
+  return footerId;
 }
 
 #endif

@@ -25,7 +25,7 @@ void EventObserver::handleEvent(
   {
     logger.log(
       Level::Info,
-      std::format("@@@ --- Warning --- Element with id: {}, does not exist in EventObserver, probably deletet\n",
+      std::format("@@@ --- Warning --- Element with id: {}, does not exist in EventObserver, probably deleted\n",
                   elementId));
     return;
   }

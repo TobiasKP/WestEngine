@@ -41,7 +41,7 @@ void WestInterfaceFacade::shutdown()
   delete _textManager;
 }
 
-void WestInterfaceFacade::init()
+std::int32_t WestInterfaceFacade::init()
 {
   glGenVertexArrays(1, &_interfaceVAO);
 
@@ -59,7 +59,7 @@ void WestInterfaceFacade::init()
     if (i == -1)
     {
       _logger.log(Level::Error, "--- Error generating Buffers, check OpenGL error logs.\n");
-      return;
+      return -1;
     }
   }
 
@@ -103,6 +103,7 @@ void WestInterfaceFacade::init()
   if (getcwd(cwd, sizeof(cwd)) == NULL)
   {
     _logger.log(Level::Error, "---Error getting current working directory!\n");
+    return -1;
   }
 
   snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", textureFile);
@@ -113,6 +114,7 @@ void WestInterfaceFacade::init()
     _logger.log(
       Level::Error,
       std::format("---No Imagedata loaded for texture: {} - STBI Error: {}\n", filePath, stbi_failure_reason()));
+    return -1;
   }
 
   glBindTexture(GL_TEXTURE_2D, _interfaceFONT_TEXTURE_ID);
@@ -126,6 +128,7 @@ void WestInterfaceFacade::init()
   _interfaces.at(Config::INTERNAL_UI_COUNT) = tmp;
   Config::INTERNAL_UI_COUNT++;
   _renderManager->toggleDirty();
+  return 0;
 }
 
 void WestInterfaceFacade::setupInstancedAttribute(GLuint buffer, GLuint index, GLint size, bool withDivisor)

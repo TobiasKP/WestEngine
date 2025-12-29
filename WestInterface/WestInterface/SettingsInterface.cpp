@@ -212,14 +212,14 @@ void SettingsInterface::createResolutionOptions()
   Container* c                 = new Container(e);
   WestInterfaceFacade& facade  = WestInterfaceFacade::getInterfaceInstance();
   c->xScreenPosition           = (Config::GeneralConfig.WIDTH / 3 - 1) + 6 * SIZE_E;
-  c->yScreenPosition           = (Config::GeneralConfig.HEIGHT / 3 - 40) + 7 * SIZE_E;
+  c->yScreenPosition           = (Config::GeneralConfig.HEIGHT / 3 - 40) + (7 - row + 2) * SIZE_E;
   c->colorR                    = 86.0f;
   c->colorG                    = 81.0f;
   c->colorB                    = 71.0f;
   c->colorA                    = 1.0f;
   c->hiddenContainer           = false;
   c->stretchX                  = 4.0f;
-  c->stretchY                  = 2.0f;
+  c->stretchY                  = row * 1.0f;
   c->rows                      = 1;
   c->columns                   = 1;
   c->zIndex                    = 9;
@@ -245,7 +245,7 @@ ElementProxy* SettingsInterface::resolutionOption(std::uint32_t x, std::uint32_t
   button->type           = BUTTON;
   button->elementId      = Config::incUiId();
   button->xPosition      = (Config::GeneralConfig.WIDTH / 3 - 1) + 6 * SIZE_E;
-  button->yPosition      = (Config::GeneralConfig.HEIGHT / 3 - 40) + 7 * SIZE_E;
+  button->yPosition      = (Config::GeneralConfig.HEIGHT / 3 - 40) + 5 * SIZE_E;
   button->stretchY       = 0.8f;
   button->stretchX       = 0.8f;
   button->colorR         = 215.0f;

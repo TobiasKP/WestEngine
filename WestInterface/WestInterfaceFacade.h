@@ -30,7 +30,7 @@ class WEST_INTERFACE WestInterfaceFacade
 {
 public:
   static WestInterfaceFacade& getInterfaceInstance();
-  void init();
+  std::int32_t init();
   void shutdown();
 
   // Managing Interfaces

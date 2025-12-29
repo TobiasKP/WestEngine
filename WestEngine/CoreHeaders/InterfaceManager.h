@@ -25,6 +25,8 @@ private:
   WindowManager* _windowManager;
 
 #ifdef DEBUG
-  std::int32_t buildTechDemoFooter();
+  std::uint8_t _demoId;
+  std::uint8_t buildTechDemoFooter();
+  void refreshTechDemoFooter();
 #endif
 };
