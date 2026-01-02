@@ -1,29 +1,19 @@
 #pragma once
 
-#if defined(_WIN32) || defined(_WIN64)
-#if defined(WESTUTILS_BUILDING_DLL)
-#define WESTUTILS __declspec(dllexport)
-#else
-#define WESTUTILS __declspec(dllimport)
-#endif
-#else
-#define WESTUTILS __attribute__((visibility("default")))
-#endif
-
 #include "ThreadPool.h"
 
-namespace WESTUTILS Config
+namespace Config
 {
 
-extern WESTUTILS std::atomic<bool> PAUSE;
-extern WESTUTILS std::atomic_size_t INTERNAL_UI_COUNT;
-extern WESTUTILS ThreadPool* THREADPOOL;
-extern WESTUTILS std::int32_t interfaceShaderProgram;
-extern WESTUTILS std::int32_t interfaceOrthoUniform;
-extern WESTUTILS std::int32_t interfaceFontTextureUniform;
-extern WESTUTILS std::int32_t interfaceTextureOneUniform;
-extern WESTUTILS std::int32_t requestedWidth;
-extern WESTUTILS std::int32_t requestedHeight;
+extern std::atomic<bool> PAUSE;
+extern std::atomic_size_t INTERNAL_UI_COUNT;
+extern ThreadPool* THREADPOOL;
+extern std::int32_t interfaceShaderProgram;
+extern std::int32_t interfaceOrthoUniform;
+extern std::int32_t interfaceFontTextureUniform;
+extern std::int32_t interfaceTextureOneUniform;
+extern std::int32_t requestedWidth;
+extern std::int32_t requestedHeight;
 
 struct General
 {
@@ -32,9 +22,9 @@ struct General
   const std::uint8_t CHUNK_SIZE;
 };
 
-extern WESTUTILS std::uint32_t incEntityId();
-extern WESTUTILS std::uint32_t incUiId();
+extern std::uint32_t incEntityId();
+extern std::uint32_t incUiId();
 
-extern WESTUTILS General GeneralConfig;
+extern General GeneralConfig;
 
-}  // namespace WESTUTILS Config
+}  // namespace Config

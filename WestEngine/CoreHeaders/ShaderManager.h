@@ -27,7 +27,7 @@ public:
 private:
   std::map<std::int32_t, GLuint> _programList;
   std::int32_t _lastEntityCount;
-  WestInterfaceFacade* _facade;
+  WestInterface::WestInterfaceFacade* _facade;
   Scene* _scene;
 
   GLuint initInterfaceShader();

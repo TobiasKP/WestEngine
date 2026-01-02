@@ -27,7 +27,7 @@ public:
 
 private:
   static GLuint _usedShaderProgram;
-  WestInterfaceFacade* _facade;
+  WestInterface::WestInterfaceFacade* _facade;
   Scene* _scene;
 
   void clearColor();

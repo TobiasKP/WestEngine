@@ -58,7 +58,7 @@ private:
   float _x, _y;
   glm::vec3 _playerDestination;
   PlayerControl* _control;
-  WestInterfaceFacade* _facade;
+  WestInterface::WestInterfaceFacade* _facade;
   std::int16_t _interfaceHoverId, _interfaceUnhoverId = -1;
   std::mutex _controlMutex, _generalMutex;
   std::uint8_t _controlFlags{0b0000'0000}, _generalFlags{0b0000'0000};

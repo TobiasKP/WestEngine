@@ -1,15 +1,5 @@
 #pragma once
 
-#if defined(_WIN32) || defined(_WIN64)
-#if defined(WESTUTILS_BUILDING_DLL)
-#define WESTUTILS __declspec(dllexport)
-#else
-#define WESTUTILS __declspec(dllimport)
-#endif
-#else
-#define WESTUTILS __attribute__((visibility("default")))
-#endif
-
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
@@ -33,7 +23,7 @@ struct Message
   std::string payload;
 };
 
-class WESTUTILS WestLogger
+class WestLogger
 {
 public:
   static WestLogger& getLoggerInstance();

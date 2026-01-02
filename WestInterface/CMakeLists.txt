@@ -16,17 +16,13 @@ file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS
 # ─────────────────────────────────────────────────────────────
 # Building shared Library
 # ─────────────────────────────────────────────────────────────
-add_library(WestInterface SHARED ${LIB_SOURCES})
+add_library(WestInterface STATIC ${LIB_SOURCES})
 target_include_directories(WestInterface PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(WestInterface PUBLIC 
     GLEW::GLEW
     glfw
     WestUtils
 )
-
-if(WIN32)
-    target_compile_definitions(WestInterface PRIVATE WEST_INTERFACE_EXPORTS)
-endif()
 
 target_compile_definitions(WestInterface PRIVATE
     $<$<CONFIG:DEBUG>:DEBUG>

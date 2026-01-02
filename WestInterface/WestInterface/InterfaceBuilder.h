@@ -15,11 +15,11 @@ public:
   InterfaceBuilder();
   ~InterfaceBuilder();
 
-  void createNewInterface(Container* c);
-  void createBackground(TextureInformation* t);
-  void addElement(ElementProxy* e);
+  void createNewInterface(WestInterface::Container* c);
+  void createBackground(WestInterface::TextureInformation* t);
+  void addElement(WestInterface::ElementProxy* e);
   ContainerElement* build();
-  IElement* transform(ElementProxy* e);
+  IElement* transform(WestInterface::ElementProxy* e);
 
 private:
   ContainerElement* _current   = nullptr;

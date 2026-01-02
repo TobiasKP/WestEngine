@@ -41,9 +41,6 @@ endif()
 # Link Directories and Targets
 # ─────────────────────────────────────────────────────────────
 message(STATUS "Linking libraries for platform: ${PLATFORM}")
-link_directories(
-    #${CMAKE_SOURCE_DIR}/Libs/WEST_INTERFACE/${PLATFORM}/lib
-)
 
 file(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 

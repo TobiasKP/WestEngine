@@ -7,6 +7,8 @@
 #include <stb_image.h>
 #include <unordered_map>
 
+using namespace WestInterface;
+
 IElement* ElementFactory::createElementInternal(ElementProxy* e)
 {
   ElementType type = e->type;

@@ -3,6 +3,8 @@
 #include "../../../Constants/Systems.hpp"
 #include "../../../CoreHeaders/SystemManager.h"
 
+using namespace WestInterface;
+
 InputObserver::InputObserver()
 {
   _control = (PlayerControl*)SystemManager::getSystemByName(Systems::PLAYER_CONTROL);
