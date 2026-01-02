@@ -17,6 +17,8 @@
 #include <unistd.h>
 #endif
 
+using namespace WestInterface;
+
 ShaderManager::ShaderManager()
   : IManager(nullptr)
 {

@@ -2,6 +2,8 @@
 
 #include "Utils/InputUtils/MouseCallbacks.h"
 
+using namespace WestInterface;
+
 InterfaceManager::InterfaceManager() : IManager(nullptr)
 {
   setName(CoreConstants::INTERFACE_MANAGER);

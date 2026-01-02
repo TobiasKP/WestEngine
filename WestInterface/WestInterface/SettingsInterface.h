@@ -25,10 +25,10 @@ private:
     std::make_tuple(2560, 1440)
   };
 
-  Container* createSettingButton(std::vector<ElementProxy*>& elements);
+  WestInterface::Container* createSettingButton(std::vector<WestInterface::ElementProxy*>& elements);
   void createSettingInterface();
-  ElementProxy* createResolutionSetting();
-  ElementProxy* createQuitSettingsButton();
+  WestInterface::ElementProxy* createResolutionSetting();
+  WestInterface::ElementProxy* createQuitSettingsButton();
   void createResolutionOptions();
-  ElementProxy* resolutionOption(std::uint32_t x, std::uint32_t y, std::uint8_t row);
+  WestInterface::ElementProxy* resolutionOption(std::uint32_t x, std::uint32_t y, std::uint8_t row);
 };

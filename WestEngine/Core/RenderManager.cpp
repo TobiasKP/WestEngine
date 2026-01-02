@@ -6,6 +6,8 @@
 #include <Config.h>
 #include <glm/ext/matrix_clip_space.hpp>
 
+using namespace WestInterface;
+
 GLuint RenderManager::_usedShaderProgram = 0;
 
 RenderManager::RenderManager() : IManager(nullptr)

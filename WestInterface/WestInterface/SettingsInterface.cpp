@@ -6,6 +6,8 @@
 #include <chrono>
 #include <thread>
 
+using namespace WestInterface;
+
 SettingsInterface::SettingsInterface(InterfaceBuilder& interfaceBuilder) : _interfaceBuilder(&interfaceBuilder)
 {
   _id = _resolutionId = _settingButtonId = 0;

@@ -21,7 +21,7 @@ private:
   std::uint8_t _cachedInterfaces;
   std::uint32_t _currentX, _currentY;
 
-  WestInterfaceFacade* _facade;
+  WestInterface::WestInterfaceFacade* _facade;
   WindowManager* _windowManager;
 
 #ifdef DEBUG
