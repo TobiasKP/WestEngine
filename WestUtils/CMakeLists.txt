@@ -12,16 +12,10 @@ file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
 # ─────────────────────────────────────────────────────────────
 # Building shared Library
 # ─────────────────────────────────────────────────────────────
-add_library(WestUtils SHARED ${SOURCE_FILES}) 
+add_library(WestUtils STATIC ${SOURCE_FILES}) 
 
 target_include_directories(WestUtils
   PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Include>"
     "$<INSTALL_INTERFACE:Include>"
 )
-
-if(NOT WIN32)
-  target_compile_options(WestUtils PRIVATE -fvisibility=hidden)
-endif()
-
-target_compile_definitions(WestUtils PRIVATE WESTUTILS_BUILDING_DLL)

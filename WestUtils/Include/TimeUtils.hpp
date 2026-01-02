@@ -1,19 +1,9 @@
 #pragma once
 
-#if defined(_WIN32) || defined(_WIN64)
-#if defined(WESTUTILS_BUILDING_DLL)
-#define WESTUTILS __declspec(dllexport)
-#else
-#define WESTUTILS __declspec(dllimport)
-#endif
-#else
-#define WESTUTILS __attribute__((visibility("default")))
-#endif
-
 #include <chrono>
 #include <string>
 
-namespace WESTUTILS TimeUtils
+namespace TimeUtils
 {
 static double getCurrentTimeAsTime()
 {
@@ -48,4 +38,4 @@ static std::string getCurrentTimeAsDate()
          + "_" + std::to_string(static_cast<int>(ymd.year()));
 }
 
-};  // namespace WESTUTILS TimeUtils
+};  // namespace TimeUtils

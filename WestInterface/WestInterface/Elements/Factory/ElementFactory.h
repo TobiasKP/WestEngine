@@ -8,6 +8,8 @@
 
 #include <array>
 
+using namespace WestInterface;
+
 class ElementFactory
 {
 public:

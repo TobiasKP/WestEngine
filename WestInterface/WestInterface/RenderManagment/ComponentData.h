@@ -2,17 +2,7 @@
 
 #include <cstdint>
 
-#if defined(_WIN32) || defined(_WIN64)
-#ifdef WEST_INTERFACE_EXPORTS
-#define WEST_INTERFACE __declspec(dllexport)
-#else
-#define WEST_INTERFACE __declspec(dllimport)
-#endif
-#else
-#define WEST_INTERFACE __attribute__((visibility("default")))
-#endif
-
-struct WEST_INTERFACE ComponentData
+struct ComponentData
 {
   float vertices[2];
   float stretchX;
@@ -30,7 +20,7 @@ struct WEST_INTERFACE ComponentData
   std::int8_t zIndex    = 0;
 };
 
-struct WEST_INTERFACE ElementBounds
+struct ElementBounds
 {
   float xLeft, xRight, yBottom, yTop;
   std::uint32_t id;

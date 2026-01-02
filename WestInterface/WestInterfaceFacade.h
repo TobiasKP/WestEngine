@@ -1,15 +1,4 @@
 #pragma once
-
-#if defined(_WIN32) || defined(_WIN64)
-#ifdef WEST_INTERFACE_EXPORTS
-#define WEST_INTERFACE __declspec(dllexport)
-#else
-#define WEST_INTERFACE __declspec(dllimport)
-#endif
-#else
-#define WEST_INTERFACE __attribute__((visibility("default")))
-#endif
-
 #include "FacadeStructs.h"
 #include "WestInterface/Elements/ContainerElement.hpp"
 #include "WestInterface/InterfaceBuilder.h"
@@ -26,7 +15,10 @@
 #include <string>
 #include <WestLogger.h>
 
-class WEST_INTERFACE WestInterfaceFacade
+namespace WestInterface
+{
+
+class WestInterfaceFacade
 {
 public:
   static WestInterfaceFacade& getInterfaceInstance();
@@ -52,7 +44,7 @@ public:
   // Changes to Interface
   bool resize(std::int8_t interfaceId, std::uint32_t width, std::uint32_t height);
   bool reposition(std::uint8_t interfaceId, std::uint16_t xScreenPosition, std::uint16_t yScreenPosition);
-  bool resolutionChange(std::uint32_t width, std::uint32_t height); 
+  bool resolutionChange(std::uint32_t width, std::uint32_t height);
 
   // Get Resources TODO: reallobrate
   const char* getResource(std::string resource);
@@ -87,5 +79,6 @@ private:
   WestLogger& _logger             = WestLogger::getLoggerInstance();
 
   ContainerElement* findInterfaceById(std::uint8_t id);
-  void setupInstancedAttribute(GLuint buffer, GLuint index, GLint size, bool withDivisor); 
+  void setupInstancedAttribute(GLuint buffer, GLuint index, GLint size, bool withDivisor);
 };
+};  // namespace WestInterface

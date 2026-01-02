@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-namespace WESTUTILS Config
+namespace Config
 {
 
 std::atomic<bool> PAUSE                       = false;
@@ -10,12 +10,12 @@ std::atomic<std::uint32_t> INTERNAL_ENTITY_ID = 1;
 std::atomic<std::uint32_t> INTERNAL_UI_ID     = 1;
 std::atomic_size_t INTERNAL_UI_COUNT          = 0;
 ThreadPool* THREADPOOL                        = new ThreadPool(4);
-std::int32_t interfaceShaderProgram          = -1;
-std::int32_t interfaceOrthoUniform           = -1;
-std::int32_t interfaceFontTextureUniform     = -1;
-std::int32_t interfaceTextureOneUniform      = -1;
-std::int32_t requestedWidth                  = -1;
-std::int32_t requestedHeight                 = -1;
+std::int32_t interfaceShaderProgram           = -1;
+std::int32_t interfaceOrthoUniform            = -1;
+std::int32_t interfaceFontTextureUniform      = -1;
+std::int32_t interfaceTextureOneUniform       = -1;
+std::int32_t requestedWidth                   = -1;
+std::int32_t requestedHeight                  = -1;
 
 General GeneralConfig = {800, 600, 0.05f, 1e-6f, 60.0f, 64};
 
@@ -31,4 +31,4 @@ std::uint32_t incUiId()
   return INTERNAL_UI_ID.fetch_add(1, std::memory_order_relaxed);
 }
 
-}  // namespace WESTUTILS Config
+}  // namespace Config

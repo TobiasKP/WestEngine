@@ -1,15 +1,5 @@
 #pragma once
 
-#if defined(_WIN32) || defined(_WIN64)
-#if defined(WESTUTILS_BUILDING_DLL)
-#define WESTUTILS __declspec(dllexport)
-#else
-#define WESTUTILS __declspec(dllimport)
-#endif
-#else
-#define WESTUTILS __attribute__((visibility("default")))
-#endif
-
 #include <functional>
 #include <future>
 #include <mutex>
@@ -17,7 +7,7 @@
 #include <thread>
 #include <WestLogger.h>
 
-class WESTUTILS ThreadPool
+class ThreadPool
 {
 public:
   ThreadPool(size_t numThreads = std::thread::hardware_concurrency());

@@ -1,22 +1,15 @@
 #pragma once
 
-#if defined(_WIN32) || defined(_WIN64)
-#ifdef WEST_INTERFACE_EXPORTS
-#define WEST_INTERFACE __declspec(dllexport)
-#else
-#define WEST_INTERFACE __declspec(dllimport)
-#endif
-#else
-#define WEST_INTERFACE __attribute__((visibility("default")))
-#endif
-
 #include <cstdint>
 #include <functional>
 #include <string>
 
+namespace WestInterface
+{
+
 enum ElementType { LABEL, BUTTON, CONTAINER, ICON, DEBUG_ELEMENT, DROPDOWN };
 
-struct WEST_INTERFACE TextureInformation
+struct TextureInformation
 {
   bool mipmap;
   std::int32_t wrapping_x;
@@ -24,7 +17,7 @@ struct WEST_INTERFACE TextureInformation
   const char* path;
 };
 
-struct WEST_INTERFACE ElementProxy
+struct ElementProxy
 {
   ElementType type;
   std::uint32_t elementId;
@@ -53,7 +46,7 @@ struct WEST_INTERFACE ElementProxy
   TextureInformation* texture = nullptr;
 };
 
-struct WEST_INTERFACE Container : ElementProxy
+struct Container : ElementProxy
 {
   std::uint16_t xScreenPosition;
   std::uint16_t yScreenPosition;
@@ -67,3 +60,4 @@ struct WEST_INTERFACE Container : ElementProxy
 
   Container(std::vector<ElementProxy*>& vec) : elements(vec) {};
 };
+};  // namespace WestInterface

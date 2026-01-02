@@ -3,6 +3,8 @@
 #include <stb_image.h>
 #include <Config.h>
 
+using namespace WestInterface;
+
 InterfaceBuilder::InterfaceBuilder()
 {
   _factory  = nullptr;
