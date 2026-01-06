@@ -3,13 +3,12 @@
 #include "../WestInterfaceFacade.h"
 
 #include <cassert>
-#include <chrono>
 #include <CoreConstants.hpp>
 #include <cstring>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <thread>
+
 
 #ifdef _WIN32
 <include> direct.h
@@ -254,8 +253,8 @@ ElementProxy* SettingsInterface::resolutionOption(std::uint32_t x, std::uint32_t
   ElementProxy* button   = new ElementProxy();
   button->type           = BUTTON;
   button->elementId      = Config::incUiId();
-  button->xPosition      = (Config::GeneralConfig.WIDTH / 3 - 1) + 6 * SIZE_E;
-  button->yPosition      = (Config::GeneralConfig.HEIGHT / 3 - 40) + 5 * SIZE_E;
+  button->xPosition      = ((float)Config::GeneralConfig.WIDTH / 3 - 1) + 6 * SIZE_E;
+  button->yPosition      = ((float)Config::GeneralConfig.HEIGHT / 3 - 40) + 5 * SIZE_E;
   button->stretchY       = 0.8f;
   button->stretchX       = 0.8f;
   button->colorR         = 215.0f;
