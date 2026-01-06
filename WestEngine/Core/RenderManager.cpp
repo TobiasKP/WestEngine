@@ -79,6 +79,11 @@ void RenderManager::clearColor()
 
 void RenderManager::renderGameEntities()
 {
+  if (!Config::PAUSE)
+  {
+    _scene->getCamera()->update();
+  }
+
   for (const Entity& entity : _scene->getEntities())
   {
     Shader* s = (Shader*)entity.getComponent(BitMasks::Components::SHADER);
@@ -109,7 +114,6 @@ void RenderManager::renderGameEntities()
     assert(model != nullptr);
     if (!Config::PAUSE)
     {
-      _scene->getCamera()->update();
       updateUniforms(entity, model);
     }
 
