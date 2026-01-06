@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../Constants/CoreConstants.hpp"
 #include "Camera.h"
 #include "Entity.h"
 
+#include <CoreConstants.hpp>
 #include <mutex>
 #include <vector>
 

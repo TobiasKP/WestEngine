@@ -2,9 +2,9 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 
-#include "../../Constants/CoreConstants.hpp"
 #include "../Entity/Entity.h"
 
+#include <CoreConstants.hpp>
 #include <glm/gtc/epsilon.hpp>
 #include <glm/gtx/norm.hpp>
 #include <vector>

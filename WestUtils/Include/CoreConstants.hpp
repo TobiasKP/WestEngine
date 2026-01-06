@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <GL/glew.h>
 #include <string>
 
 namespace CoreConstants
@@ -10,6 +9,7 @@ inline constexpr std::string TITLE            = "Test Title";
 inline constexpr std::string UNDEFINED_STRING = "";
 
 inline constexpr char INPUT_CONFIG_FILE_NAME[]     = "/config/Game.ini";
+inline constexpr char SETTING_FILE_NAME[]          = "/config/Settings.cfg";
 inline constexpr char AVAILABLE_INPUTS_FILE_NAME[] = "/engine/AvailableInputCommands.cfg";
 inline constexpr char DEBUG_V_SHADER[]             = "/shader/Debug/DebugVShader.vs";
 inline constexpr char DEBUG_F_SHADER[]             = "/shader/Debug/DebugFShader.fs";

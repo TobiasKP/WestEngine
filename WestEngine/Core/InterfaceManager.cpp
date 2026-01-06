@@ -20,8 +20,6 @@ InterfaceManager::InterfaceManager(WestLogger* logger, WindowManager* manager) :
   _facade           = nullptr;
   _cachedInterfaces = 0;
   _windowManager    = manager;
-  _currentX         = Config::GeneralConfig.WIDTH;
-  _currentY         = Config::GeneralConfig.HEIGHT;
 #ifdef DEBUG
   _demoId = 0;
 #endif
@@ -31,7 +29,9 @@ InterfaceManager::~InterfaceManager() {}
 
 std::int32_t InterfaceManager::startup()
 {
-  _facade = &WestInterfaceFacade::getInterfaceInstance();
+  _currentX = Config::GeneralConfig.WIDTH;
+  _currentY = Config::GeneralConfig.HEIGHT;
+  _facade   = &WestInterfaceFacade::getInterfaceInstance();
   assert(_facade != nullptr);
   return 0;
 }

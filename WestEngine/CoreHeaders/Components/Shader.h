@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../Constants/CoreConstants.hpp"
 #include "../Interfaces/IComponent.h"
 
+#include <CoreConstants.hpp>
 #include <GL/glew.h>
 #include <string>
 
