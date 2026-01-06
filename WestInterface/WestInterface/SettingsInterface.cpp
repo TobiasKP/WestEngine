@@ -69,14 +69,6 @@ Container* SettingsInterface::createSettingButton(std::vector<ElementProxy*>& el
       return;
     }
     createSettingInterface();
-    std::thread(
-      []()
-      {
-        // TODO Make pause work, currently buggy
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        // Config::PAUSE.exchange(true);
-      })
-      .detach();
   };
 
   TextureInformation* tex = new TextureInformation();
@@ -279,10 +271,14 @@ ElementProxy* SettingsInterface::resolutionOption(std::uint32_t x, std::uint32_t
   {
     Config::requestedWidth  = x;
     Config::requestedHeight = y;
-    std::unordered_map<std::string, std::int32_t> map;
-    map.insert({"width", x});
-    map.insert({"height", y});
-    writeSetting(map);
+    Config::THREADPOOL->fireAndForget(
+      [x, y, this]
+      {
+        std::unordered_map<std::string, std::int32_t> map;
+        map.insert({"width", x});
+        map.insert({"height", y});
+        writeSetting(map);
+      });
     WestInterfaceFacade& facade = WestInterfaceFacade::getInterfaceInstance();
     facade.destroyInterface(_resolutionId);
     _resolutionId = 0;
@@ -359,9 +355,9 @@ std::int32_t SettingsInterface::writeSetting(std::unordered_map<std::string, std
 
     if (equalSign)
     {
-      *equalSign        = '\0';
-      const char* key   = strdup(inbuf);
-      const char* value = strdup(equalSign + 1);
+      *equalSign = '\0';
+      std::string key(inbuf);
+      std::string value(equalSign + 1);
       if (values.find(key) != values.end())
       {
 #ifdef DEBUG
@@ -378,6 +374,7 @@ std::int32_t SettingsInterface::writeSetting(std::unordered_map<std::string, std
 
   fclose(out);
   fclose(Config::GeneralConfig.SETTINGS);
+  // TODO keep an eye out bc of possible data race condition
   Config::GeneralConfig.SETTINGS = nullptr;
   std::remove(filePath);
   std::rename(newFilePath, filePath);

@@ -175,7 +175,7 @@ void PlayerControl::updateDebuggingInfo()
   if (_debugEntityId != 0)
   {
 #ifdef DEBUG
-    _logger->log(Level::Info, std::format("{} *** Retreiving debug entity.\n", getName()));
+    _logger->log(Level::Cycle, std::format("{} *** Retreiving debug entity.\n", getName()));
 #endif
     Entity* debugEntity = Scene::getSceneInstance().getEntityById(_debugEntityId);
     if (debugEntity != nullptr && debugEntity->isDestroyed())

@@ -282,10 +282,10 @@ std::int32_t EngineManager::initializeSettings()
 #endif
     if (equalSign)
     {
-      *equalSign        = '\0';
-      const char* key   = strdup(inbuf);
-      const char* value = strdup(equalSign + 1);
-      success           = fillSettings(key, value);
+      *equalSign = '\0';
+      std::string key(inbuf);
+      std::string value(equalSign + 1);
+      success = fillSettings(key, value);
       if (success != 0)
       {
         break;
@@ -298,22 +298,22 @@ std::int32_t EngineManager::initializeSettings()
   return success;
 }
 
-std::int32_t EngineManager::fillSettings(const char* key, const char* value)
+std::int32_t EngineManager::fillSettings(std::string key, std::string value)
 {
   std::int32_t success = 1;
-  if (strcmp(key, "width") == 0)
+  if (key.compare("width") == 0)
   {
-    Config::GeneralConfig.WIDTH = atoi(value);
+    Config::GeneralConfig.WIDTH = stoi(value);
     success                     = 0;
   }
-  else if (strcmp(key, "height") == 0)
+  else if (key.compare("height") == 0)
   {
-    Config::GeneralConfig.HEIGHT = atoi(value);
+    Config::GeneralConfig.HEIGHT = stoi(value);
     success                      = 0;
   }
-  else if (strcmp(key, "fps") == 0)
+  else if (key.compare("fps") == 0)
   {
-    Config::GeneralConfig.FPS = atof(value);
+    Config::GeneralConfig.FPS = stof(value);
     success                   = 0;
   }
   return success;

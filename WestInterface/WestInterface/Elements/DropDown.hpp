@@ -19,8 +19,8 @@ struct DropDown : public IElement
 
   ~DropDown()
   {
-    delete label;
-    delete button;
+    label->~Label();
+    button->~Button();
   }
 
   void handler() override
