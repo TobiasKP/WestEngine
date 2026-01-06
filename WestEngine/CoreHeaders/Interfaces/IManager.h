@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../../Constants/CoreConstants.hpp"
-
+#include <CoreConstants.hpp>
 #include <cassert>
 #include <cstdint>
 #include <format>

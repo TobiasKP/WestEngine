@@ -37,7 +37,7 @@ private:
                    size_t indiceLength,
                    float* textureCoords,
                    size_t textureCoordLength);
-  Model* loadModel(const char* path);
-  Shader* loadShader(const char* vertexShaderFile, const char* fragShaderFile, std::int32_t shaderGroup);
-  Texture* loadTexture(const char* textureFile);
+  Model* loadModel(std::string path);
+  Shader* loadShader(std::string vertexShaderFile, std::string fragShaderFile, std::int32_t shaderGroup);
+  Texture* loadTexture(std::string textureFile);
 };

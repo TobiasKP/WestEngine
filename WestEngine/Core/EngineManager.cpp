@@ -7,7 +7,25 @@
 #include "../CoreHeaders/SystemManager.h"
 #include "../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
 
-EngineManager::EngineManager() : IManager(nullptr)
+#include <cstring>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#ifdef _WIN32
+<include> direct.h
+#define getcwd _getcwd
+#define PATH_MAX MAX_PATH
+#else
+#include <limits.h>
+#include <unistd.h>
+#endif
+
+#define SH_DENYNO 0x40
+
+
+EngineManager::EngineManager()
+  : IManager(nullptr)
 {
   setName(CoreConstants::ENGINE_MANAGER);
   _exitEngine    = true;
@@ -219,7 +237,86 @@ std::int32_t EngineManager::executeCycle(CYCLE code, IManager* item)
 
 std::int32_t EngineManager::initializeSettings()
 {
-  return 0;
+#ifdef DEBUG
+  logDebug(std::format("{} ### Initialized Settings from saved Configuration file.", getName()));
+#endif
+  std::int32_t success = 0;
+  char cwd[PATH_MAX];
+  char filePath[PATH_MAX];
+  if (getcwd(cwd, sizeof(cwd)) == NULL)
+  {
+    return 1;
+  }
+
+#ifdef DEBUG
+  snprintf(filePath, sizeof(filePath), "%s\n", cwd);
+  logDebug(std::format("{} ### Current working dir: {}", getName(), filePath));
+#endif
+
+  std::int32_t fd;
+  snprintf(filePath, sizeof(filePath), "%s%s", cwd, CoreConstants::SETTING_FILE_NAME);
+  if ((fd = open(filePath, O_RDONLY)) == -1)
+  {
+    logFailure(std::format("{} ### Error opening Settings file: {}\n {}\n", getName(), filePath, std::strerror(errno)));
+    return 1;
+  }
+
+  if ((Config::GeneralConfig.SETTINGS = fdopen(fd, "r")) == NULL)
+  {
+    logFailure(std::format("{} ### Error opening Setting filestream\n", getName()));
+    return 1;
+  }
+
+  char inbuf[128];
+  while (fgets(inbuf, 128, Config::GeneralConfig.SETTINGS) != NULL)
+  {
+    if (inbuf[0] == '#' || inbuf[0] == '\n')
+    {
+      continue;
+    }
+
+    inbuf[strcspn(inbuf, "\n")] = 0;
+    char* equalSign             = strchr(inbuf, '=');
+#ifdef DEBUG
+    logDebug(std::format("{} ### Reading Setting: {}\n", getName(), inbuf));
+#endif
+    if (equalSign)
+    {
+      *equalSign = '\0';
+      std::string key(inbuf);
+      std::string value(equalSign + 1);
+      success = fillSettings(key, value);
+      if (success != 0)
+      {
+        break;
+      }
+    }
+  }
+
+  fclose(Config::GeneralConfig.SETTINGS);
+  Config::GeneralConfig.SETTINGS = nullptr;
+  return success;
+}
+
+std::int32_t EngineManager::fillSettings(std::string key, std::string value)
+{
+  std::int32_t success = 1;
+  if (key.compare("width") == 0)
+  {
+    Config::GeneralConfig.WIDTH = stoi(value);
+    success                     = 0;
+  }
+  else if (key.compare("height") == 0)
+  {
+    Config::GeneralConfig.HEIGHT = stoi(value);
+    success                      = 0;
+  }
+  else if (key.compare("fps") == 0)
+  {
+    Config::GeneralConfig.FPS = stof(value);
+    success                   = 0;
+  }
+  return success;
 }
 
 bool EngineManager::isPauseCycle(CYCLE code, IManager* item)

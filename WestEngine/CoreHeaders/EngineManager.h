@@ -49,5 +49,6 @@ private:
   std::int32_t iterateQ(CYCLE code);
   std::int32_t executeCycle(CYCLE code, IManager* item);
   std::int32_t initializeSettings();
+  std::int32_t fillSettings(std::string key, std::string value);
   bool isPauseCycle(CYCLE code, IManager* item);
 };

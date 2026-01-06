@@ -55,7 +55,7 @@
   return m;
 }
 
-Model* ObjectLoader::loadModel(const char* path)
+Model* ObjectLoader::loadModel(std::string path)
 {
   char cwd[PATH_MAX];
   char filePath[PATH_MAX];
@@ -66,7 +66,7 @@ Model* ObjectLoader::loadModel(const char* path)
 
   std::int32_t fd;
   FILE* file;
-  snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", path);
+  snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", path.c_str());
   if ((fd = open(filePath, O_RDONLY)) == -1)
   {
     _logger->log(Level::Error, std::format("---Error opening File!\n Path: {}\n", filePath));
@@ -218,7 +218,7 @@ Model* ObjectLoader::loadOBJModel(FILE* file)
                    normals.size() * sizeof(float));
 }
 
-GLuint ObjectLoader::loadTexture(const char* textureFile)
+GLuint ObjectLoader::loadTexture(std::string textureFile)
 {
   assert(_logger != nullptr);
   std::int32_t width, height, numComponents;
@@ -231,7 +231,7 @@ GLuint ObjectLoader::loadTexture(const char* textureFile)
     return -1;
   }
 
-  snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", textureFile);
+  snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", textureFile.c_str());
 #ifdef DEBUG
   _logger->log(Level::Info, std::format("---Loading Texture: {}\n", filePath));
 #endif

@@ -22,9 +22,9 @@ public:
                    size_t textureLength,
                    float* normals,
                    size_t normalsLength);
-  Model* loadModel(const char* path);
+  Model* loadModel(std::string path);
   void unloadModel(Model* model);
-  GLuint loadTexture(const char* textureFile);
+  GLuint loadTexture(std::string textureFile);
   void cleanup();
 
 private:

@@ -22,16 +22,16 @@ public:
   std::int32_t init() override;
 
   // Functions
-  void setKey(std::int32_t key, const char* command);
-  std::int32_t findByOperation(const char* command);
+  void setKey(std::int32_t key, std::string command);
+  std::int32_t findByOperation(std::string command);
   const std::string findByKey(std::int32_t key);
 
 private:
-  std::map<std::int32_t, const char*> _inputMap;
+  std::map<std::int32_t, std::string> _inputMap;
   InputObserver* _observer;
   FILE* _inputConfig;
   FILE* _availableCommands;
 
   // Functions
-  std::int32_t checkInputConfigLineForErrors(const char* key, const char* value, std::list<const char*> _commandList);
+  std::int32_t checkInputConfigLineForErrors(std::string key, std::string value, std::list<std::string> _commandList);
 };

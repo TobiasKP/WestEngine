@@ -104,11 +104,7 @@ void EntityBuilder::basicInfo(const char* key, Entity& e)
 
 void EntityBuilder::modelInfo(Entity& e)
 {
-  char meshPath[256] = {0};
-  char texPath[256]  = {0};
-
-  strcpy(meshPath, "/assets/Models/");
-  strcpy(texPath, "/assets/Textures/");
+  std::string meshPath, texPath;
 
   lua_pushnil(L);
   while (lua_next(L, -2) != 0)
@@ -116,15 +112,15 @@ void EntityBuilder::modelInfo(Entity& e)
     const char* key = lua_tostring(L, -2);
     if (strcmp(key, "mesh") == 0)
     {
-      const char* mesh = lua_tostring(L, -1);
-      strcat(meshPath, mesh);
+      std::string mesh = lua_tostring(L, -1);
+      meshPath         = std::format("/assets/Models/{}", mesh);
     }
     if (strcmp(key, "texture") == 0)
     {
-      const char* tex = lua_tostring(L, -1);
-      if (strlen(tex) > 0)
+      std::string tex = lua_tostring(L, -1);
+      if (tex.length() > 0)
       {
-        strcat(texPath, tex);
+        texPath = std::format("/assets/Models/{}", tex);
       }
       else
       {
@@ -138,10 +134,10 @@ void EntityBuilder::modelInfo(Entity& e)
   WestLogger::getLoggerInstance().log(Level::Info, std::format("Loading Model: {}\n", meshPath));
 #endif
 
-  Model* m = loadModel(strdup(meshPath));
-  if (strlen(texPath) > 0)
+  Model* m = loadModel(meshPath);
+  if (texPath.length() > 0)
   {
-    Texture* t = loadTexture(strdup(texPath));
+    Texture* t = loadTexture(texPath);
     m->texture = t;
   }
 
@@ -150,13 +146,9 @@ void EntityBuilder::modelInfo(Entity& e)
 
 void EntityBuilder::shaderInfo(Entity& e)
 {
-  char vertexPath[256]   = {0};
-  char fragmentPath[256] = {0};
-
-  strncpy(vertexPath, "/shader/", sizeof(vertexPath));
-  strncpy(fragmentPath, "/shader/", sizeof(fragmentPath));
-
+  std::string vertexPath, fragmentPath;
   std::int32_t group;
+
   lua_pushnil(L);
   while (lua_next(L, -2) != 0)
   {
@@ -169,13 +161,13 @@ void EntityBuilder::shaderInfo(Entity& e)
     const char* key = lua_tostring(L, -2);
     if (strcmp(key, "v") == 0)
     {
-      const char* vertex = lua_tostring(L, -1);
-      strncat(vertexPath, vertex, sizeof(vertexPath) - strlen(vertexPath) - 1);
+      std::string vertex = lua_tostring(L, -1);
+      vertexPath         = std::format("/shader/{}", vertex);
     }
     else if (strcmp(key, "f") == 0)
     {
-      const char* frag = lua_tostring(L, -1);
-      strncat(fragmentPath, frag, sizeof(fragmentPath) - strlen(fragmentPath) - 1);
+      std::string frag = lua_tostring(L, -1);
+      fragmentPath     = std::format("/shader/{}", frag);
     }
     lua_pop(L, 1);
   }
@@ -185,7 +177,7 @@ void EntityBuilder::shaderInfo(Entity& e)
                                       std::format("Loading Shader:\n\t{}\n\t{}\n", vertexPath, fragmentPath));
 #endif
 
-  Shader* s = loadShader(strdup(vertexPath), strdup(fragmentPath), group);
+  Shader* s = loadShader(vertexPath, fragmentPath, group);
   e.addComponent(BitMasks::Components::SHADER, s);
 }
 
@@ -199,12 +191,12 @@ Model* EntityBuilder::loadModel(float* vertices,
   return _loader->loadModel(vertices, verticeLength, indices, indiceLength, textureCoords, textureCoordLength, 0, 0);
 }
 
-Model* EntityBuilder::loadModel(const char* path)
+Model* EntityBuilder::loadModel(std::string path)
 {
   return _loader->loadModel(path);
 }
 
-Texture* EntityBuilder::loadTexture(const char* textureFile)
+Texture* EntityBuilder::loadTexture(std::string textureFile)
 {
   GLuint id  = _loader->loadTexture(textureFile);
   Texture* t = new Texture();
@@ -213,11 +205,11 @@ Texture* EntityBuilder::loadTexture(const char* textureFile)
 }
 
 Shader*
-EntityBuilder::loadShader(const char* vertexShaderFile, const char* fragmentShaderFile, std::int32_t shaderGroup)
+EntityBuilder::loadShader(std::string vertexShaderFile, std::string fragmentShaderFile, std::int32_t shaderGroup)
 {
   Shader* s           = new Shader();
-  s->vertexShaderFile = (char*)vertexShaderFile;
-  s->fragShaderFile   = (char*)fragmentShaderFile;
+  s->vertexShaderFile = vertexShaderFile;
+  s->fragShaderFile   = fragmentShaderFile;
   s->shadergroup      = shaderGroup;
   return s;
 }

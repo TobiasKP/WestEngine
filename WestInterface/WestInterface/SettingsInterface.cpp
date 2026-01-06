@@ -4,9 +4,25 @@
 
 #include <cassert>
 #include <chrono>
+#include <CoreConstants.hpp>
+#include <cstring>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <thread>
 
-using namespace WestInterface;
+#ifdef _WIN32
+<include> direct.h
+#define getcwd _getcwd
+#define PATH_MAX MAX_PATH
+#else
+#include <limits.h>
+#include <unistd.h>
+#endif
+
+#define SH_DENYNO 0x40
+
+  using namespace WestInterface;
 
 SettingsInterface::SettingsInterface(InterfaceBuilder& interfaceBuilder) : _interfaceBuilder(&interfaceBuilder)
 {
@@ -53,14 +69,6 @@ Container* SettingsInterface::createSettingButton(std::vector<ElementProxy*>& el
       return;
     }
     createSettingInterface();
-    std::thread(
-      []()
-      {
-        // TODO Make pause work, currently buggy
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        // Config::PAUSE.exchange(true);
-      })
-      .detach();
   };
 
   TextureInformation* tex = new TextureInformation();
@@ -261,8 +269,16 @@ ElementProxy* SettingsInterface::resolutionOption(std::uint32_t x, std::uint32_t
   button->columnElements = button->text.length() + 1;
   button->eventHandler   = [this, x, y]()
   {
-    Config::requestedWidth      = x;
-    Config::requestedHeight     = y;
+    Config::requestedWidth  = x;
+    Config::requestedHeight = y;
+    Config::THREADPOOL->fireAndForget(
+      [x, y, this]
+      {
+        std::unordered_map<std::string, std::int32_t> map;
+        map.insert({"width", x});
+        map.insert({"height", y});
+        writeSetting(map);
+      });
     WestInterfaceFacade& facade = WestInterfaceFacade::getInterfaceInstance();
     facade.destroyInterface(_resolutionId);
     _resolutionId = 0;
@@ -294,4 +310,76 @@ void SettingsInterface::refreshInterface()
   _settingButtonId = facade.createNewInterface(createSettingButton(elements));
   createSettingInterface();
   assert(_id != 0 && _settingButtonId != 0);
+}
+
+std::int32_t SettingsInterface::writeSetting(std::unordered_map<std::string, std::int32_t> values)
+{
+  char cwd[PATH_MAX];
+  char filePath[PATH_MAX];
+  char newFilePath[PATH_MAX];
+  if (getcwd(cwd, sizeof(cwd)) == NULL)
+  {
+    return 1;
+  }
+
+  std::int32_t fd;
+  snprintf(filePath, sizeof(filePath), "%s%s", cwd, CoreConstants::SETTING_FILE_NAME);
+  if ((fd = open(filePath, O_RDONLY)) == -1)
+  {
+    _logger.log(Level::Error,
+                std::format("@@@ Error opening Settings file: {}\n {}\n", filePath, std::strerror(errno)));
+    return 1;
+  }
+
+  if ((Config::GeneralConfig.SETTINGS = fdopen(fd, "r")) == NULL)
+  {
+    _logger.log(Level::Error, "@@@ ### Error opening Setting filestream\n");
+    return 1;
+  }
+
+  FILE* out;
+  snprintf(newFilePath, sizeof(newFilePath), "%s%s", cwd, "temp.cfg");
+  if ((out = fopen(newFilePath, "w")) == NULL)
+  {
+    _logger.log(Level::Error, "@@@ ### Error opening Setting filestream\n");
+    fclose(Config::GeneralConfig.SETTINGS);
+    Config::GeneralConfig.SETTINGS = nullptr;
+    return 1;
+  }
+
+  char inbuf[128];
+  while (fgets(inbuf, sizeof(inbuf), Config::GeneralConfig.SETTINGS))
+  {
+    inbuf[strcspn(inbuf, "\n")] = 0;
+    char* equalSign             = strchr(inbuf, '=');
+
+    if (equalSign)
+    {
+      *equalSign = '\0';
+      std::string key(inbuf);
+      std::string value(equalSign + 1);
+      if (values.find(key) != values.end())
+      {
+#ifdef DEBUG
+        _logger.log(Level::Info, std::format("@@@ updating Setting: {} with: {}\n", key, values.at(key)));
+#endif
+        fputs(std::format("{}={}\n", key, values.at(key)).c_str(), out);
+      }
+    }
+    else
+    {
+      fputs(inbuf, out);
+    }
+  }
+
+  fclose(out);
+  fclose(Config::GeneralConfig.SETTINGS);
+  // TODO keep an eye out bc of possible data race condition
+  Config::GeneralConfig.SETTINGS = nullptr;
+  std::remove(filePath);
+  std::rename(newFilePath, filePath);
+#ifdef DEBUG
+  _logger.log(Level::Info, "@@@ updated settings.cfg\n");
+#endif
+  return 0;
 }

@@ -101,7 +101,7 @@ std::int32_t InputManager::init()
 #endif
 
   std::int32_t success = 0;
-  std::list<const char*> _commandList;
+  std::list<std::string> _commandList;
   char inbuf[128];
 
   while (fgets(inbuf, 128, _availableCommands) != NULL)
@@ -112,7 +112,7 @@ std::int32_t InputManager::init()
     }
 
     inbuf[strcspn(inbuf, "\n")] = 0;
-    _commandList.emplace_back(strdup(inbuf));
+    _commandList.emplace_back(inbuf);
   }
 
   while (fgets(inbuf, 128, _inputConfig) != NULL)
@@ -129,10 +129,10 @@ std::int32_t InputManager::init()
 #endif
     if (equalSign)
     {
-      *equalSign        = '\0';
-      const char* key   = strdup(inbuf);
-      const char* value = strdup(equalSign + 1);
-      success           = checkInputConfigLineForErrors(key, value, _commandList);
+      *equalSign = '\0';
+      std::string key(inbuf);
+      std::string value(equalSign + 1);
+      success = checkInputConfigLineForErrors(key, value, _commandList);
       if (success != 0)
       {
         break;
@@ -160,25 +160,25 @@ void InputManager::update()
 {
   for (const auto& entry : _inputMap)
   {
-    assert(entry.first > -1 && entry.second != nullptr);
+    assert(entry.first > -1 && entry.second.length() > 0);
     KeyboardCallbacks::executeBoundOperation(entry.first, entry.second);
   }
   _observer->notify();
 }
 
-void InputManager::setKey(std::int32_t key, const char* command)
+void InputManager::setKey(std::int32_t key, std::string command)
 {
   _inputMap[key] = command;
 }
 
-std::int32_t InputManager::findByOperation(const char* command)
+std::int32_t InputManager::findByOperation(std::string command)
 {
 #ifdef DEBUG
   logDebug(std::format("{} ### Searching for command {}.\n", getName(), command));
 #endif
   for (const auto& entry : _inputMap)
   {
-    if (strcmp(entry.second, command) == 0)
+    if (entry.second.compare(command) == 0)
     {
       return entry.first;
     }
@@ -202,17 +202,17 @@ const std::string InputManager::findByKey(std::int32_t key)
 }
 
 std::int32_t
-InputManager::checkInputConfigLineForErrors(const char* key, const char* value, std::list<const char*> _commandList)
+InputManager::checkInputConfigLineForErrors(std::string key, std::string value, std::list<std::string> _commandList)
 {
-  if (strlen(value) == 0)
+  if (value.length() == 0)
   {
     return 0;
   }
 
   bool found = false;
-  for (const char* command : _commandList)
+  for (std::string command : _commandList)
   {
-    if (strcmp(command, value) == 0)
+    if (value.compare(command) == 0)
     {
       found = true;
     }
@@ -224,13 +224,13 @@ InputManager::checkInputConfigLineForErrors(const char* key, const char* value, 
     return 1;
   }
 
-  if (strlen(key) == 1)
+  if (key.length() == 1)
   {
-    _inputMap[static_cast<int>(key[0])] = strdup(value);
+    _inputMap[static_cast<int>(key[0])] = value;
   }
-  else if (strcmp(key, "ESC") == 0)
+  else if (key.compare("ESC") == 0)
   {
-    _inputMap[GLFW_KEY_ESCAPE] = strdup(value);
+    _inputMap[GLFW_KEY_ESCAPE] = value;
   }
   else
   {

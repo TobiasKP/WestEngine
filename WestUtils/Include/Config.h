@@ -17,9 +17,11 @@ extern std::int32_t requestedHeight;
 
 struct General
 {
+  FILE* SETTINGS;
   std::uint32_t WIDTH, HEIGHT;
   float SPEED, EPSILON, FPS;
   const std::uint8_t CHUNK_SIZE;
+  const std::uint8_t THREAD_COUNT;
 };
 
 extern std::uint32_t incEntityId();

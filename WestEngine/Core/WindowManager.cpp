@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/glm.hpp>
+#include <CoreConstants.hpp>
 
 WindowManager::WindowManager() : IManager(nullptr)
 {
@@ -18,15 +19,18 @@ WindowManager::WindowManager() : IManager(nullptr)
 WindowManager::WindowManager(WestLogger* logger) : IManager(logger)
 {
   setName(CoreConstants::WINDOW_MANAGER);
-  _width  = Config::GeneralConfig.WIDTH;
-  _height = Config::GeneralConfig.HEIGHT;
-  assert(_width > 0 && _height > 0);
+  _width  = 0;
+  _height = 0;
 }
 
 WindowManager::~WindowManager() {}
 
 std::int32_t WindowManager::startup()
 {
+  _width  = Config::GeneralConfig.WIDTH;
+  _height = Config::GeneralConfig.HEIGHT;
+  assert(_width > 0 && _height > 0);
+
   if (!glfwInit())
   {
     logFailure("GLFW Init failed\n");
