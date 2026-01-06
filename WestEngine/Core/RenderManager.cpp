@@ -97,13 +97,12 @@ void RenderManager::renderGameEntities()
     {
       glUseProgram(shaderProgramId);
       _usedShaderProgram = shaderProgramId;
-    }
-
 #ifdef DEBUG
-    GLint linked;
-    glGetProgramiv(shaderProgramId, GL_LINK_STATUS, &linked);
-    assert(linked == GL_TRUE);
+      GLint linked;
+      glGetProgramiv(shaderProgramId, GL_LINK_STATUS, &linked);
+      assert(linked == GL_TRUE);
 #endif
+    }
 
     Model* model = (Model*)entity.getComponent(BitMasks::Components::MODEL);
     assert(model != nullptr);

@@ -86,11 +86,6 @@ would be.
   reserve().
   Impact: 5-10% FPS improvement in UI-heavy scenarios.
 
-  3. Redundant OpenGL Blending State - RenderManager.cpp:190-194
-
-  Issue: glBlendFunc() called twice with identical parameters.
-  Fix: Remove duplicate glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) on line 193.
-  Impact: 2-3% FPS improvement (minor but free optimization).
 
   4. Debug-Only Uniform Validation - RenderManager.cpp:103-106
 
