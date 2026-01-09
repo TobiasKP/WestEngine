@@ -1,10 +1,10 @@
 #pragma once
 
-#include "DataStructure/WestQ.h"
 #include "Interfaces/IManager.h"
 #include "WindowManager.h"
 
 #include <Config.h>
+#include <memory>
 
 class EngineManager : public IManager
 {
@@ -40,15 +40,15 @@ private:
 
   bool _exitEngine;
   std::int32_t _fps;
-  WestQ* _engineQ;
+  std::array<IManager*, CoreConstants::MAX_Q_SIZE> _manager;
   WindowManager* _windowManager;
   const long _NANOSECOND = 1000000000;
   const float _FRAMERATE = Config::GeneralConfig.FPS;
   const float _FRAMETIME = 1.0f / _FRAMERATE;
 
   std::int32_t iterateQ(CYCLE code);
-  std::int32_t executeCycle(CYCLE code, IManager* item);
+  std::int32_t executeCycle(CYCLE code, IManager& item);
   std::int32_t initializeSettings();
   std::int32_t fillSettings(std::string key, std::string value);
-  bool isPauseCycle(CYCLE code, IManager* item);
+  bool isPauseCycle(CYCLE code, IManager& item);
 };

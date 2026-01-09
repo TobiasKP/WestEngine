@@ -174,7 +174,7 @@ void InputManager::setKey(std::int32_t key, std::string command)
 std::int32_t InputManager::findByOperation(std::string command)
 {
 #ifdef DEBUG
-  logDebug(std::format("{} ### Searching for command {}.\n", getName(), command));
+  logCycle(std::format("{} ### Searching for command {}.\n", getName(), command));
 #endif
   for (const auto& entry : _inputMap)
   {
@@ -189,7 +189,7 @@ std::int32_t InputManager::findByOperation(std::string command)
 const std::string InputManager::findByKey(std::int32_t key)
 {
 #ifdef DEBUG
-  logDebug(std::format("{} ### Searching for Key {}.\n", getName(), key));
+  logCycle(std::format("{} ### Searching for Key {}.\n", getName(), key));
 #endif
   for (const auto& entry : _inputMap)
   {
@@ -198,6 +198,9 @@ const std::string InputManager::findByKey(std::int32_t key)
       return entry.second;
     }
   }
+#ifdef DEBUG
+  logDebug(std::format("{} ### No Key: {} found in input map.\n", getName(), key));
+#endif
   return CoreConstants::UNDEFINED_STRING;
 }
 

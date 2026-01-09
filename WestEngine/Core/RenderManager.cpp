@@ -79,6 +79,11 @@ void RenderManager::clearColor()
 
 void RenderManager::renderGameEntities()
 {
+  if (!Config::PAUSE)
+  {
+    _scene->getCamera()->update();
+  }
+
   for (const Entity& entity : _scene->getEntities())
   {
     Shader* s = (Shader*)entity.getComponent(BitMasks::Components::SHADER);
@@ -97,19 +102,18 @@ void RenderManager::renderGameEntities()
     {
       glUseProgram(shaderProgramId);
       _usedShaderProgram = shaderProgramId;
+#ifdef DEBUG
+      GLint linked;
+      glGetProgramiv(shaderProgramId, GL_LINK_STATUS, &linked);
+      assert(linked == GL_TRUE);
+#endif
     }
 
-#ifdef DEBUG
-    GLint linked;
-    glGetProgramiv(shaderProgramId, GL_LINK_STATUS, &linked);
-    assert(linked == GL_TRUE);
-#endif
 
     Model* model = (Model*)entity.getComponent(BitMasks::Components::MODEL);
     assert(model != nullptr);
     if (!Config::PAUSE)
     {
-      _scene->getCamera()->update();
       updateUniforms(entity, model);
     }
 
@@ -190,7 +194,6 @@ void RenderManager::renderUserInterfaces()
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_BLEND);
   glEnable(GL_DEPTH_TEST);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glBindVertexArray(_facade->_interfaceVAO);
 
   glBindBuffer(GL_ARRAY_BUFFER, _facade->_interfaceCOL);

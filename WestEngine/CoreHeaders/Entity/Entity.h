@@ -82,8 +82,8 @@ private:
   static PoolAllocator* _allocator;
 
   std::uint32_t _id = 0;
-  char* _name;
   std::uint16_t _componentMask;
-  std::unordered_map<std::uint16_t, IComponent*> _components;
   bool _destroyed, _debugEntity;
+  char* _name;
+  std::unordered_map<std::uint16_t, IComponent*> _components;
 };

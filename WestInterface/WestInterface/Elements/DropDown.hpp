@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Button.hpp"
-#include "ContainerElement.hpp"
 #include "IElement.hpp"
 #include "Label.hpp"
 
@@ -9,8 +8,8 @@
 
 struct DropDown : public IElement
 {
-  Label* label                = nullptr;
-  Button* button              = nullptr; 
+  Label* label   = nullptr;
+  Button* button = nullptr;
 
   DropDown()
   {
