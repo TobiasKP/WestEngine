@@ -72,33 +72,6 @@ would be.
 
 ● Step 1: FPS Improvement Opportunities (Small Changes)
 
-  1. Redundant OpenGL State Changes - RenderManager.cpp:96-100
-
-  Issue: Shader program switching happens every entity even when unnecessary.
-  Fix: Cache current shader program and only switch when needed (already partially
-  implemented).
-  Impact: 15-25% FPS improvement for scenes with many entities using same shader.
-
-  2. UI Rendering Vector Reallocations - RenderManager.cpp:139-147
-
-  Issue: Vectors are reserved but not optimally sized, causing reallocations.
-  Fix: Pre-calculate exact sizes or use member variables with resize() instead of
-  reserve().
-  Impact: 5-10% FPS improvement in UI-heavy scenarios.
-
-
-  4. Debug-Only Uniform Validation - RenderManager.cpp:103-106
-
-  Issue: OpenGL program validation in debug mode inside render loop.
-  Fix: Move validation outside render loop or cache validation results.
-  Impact: 20-30% FPS improvement in debug builds.
-
-  5. Frame Time Calculation Overhead - EngineManager.cpp:115-141
-
-  Issue: Multiple time calculations and string formatting every frame.
-  Fix: Calculate FPS only once per second, cache window title string.
-  Impact: 3-5% FPS improvement.
-
   ---
   Now let me examine hotpaths and loops for Step 2:
 
@@ -134,14 +107,11 @@ would be.
 
   Hotpath: for (const Entity& entity : _scene->getEntities())
   Issues:
-  - Camera update called for every entity (line 112) instead of once per frame
   - Component lookup using unordered_map for each entity (lines 84, 108)
-  - Debug validation in render loop (lines 103-106)
+
 
   Optimizations:
-  - Move camera update outside entity loop
   - Cache component pointers in Entity or use ECS arrays
-  - Remove debug validation from hot path
   Impact: 40-60% FPS improvement for scenes with 100+ entities.
 
   2. UI Threading Bottleneck - UIRenderManager.cpp:43-66
@@ -201,18 +171,6 @@ would be.
 
   Memory Allocation Issues:
 
-  1. Frequent Heap Allocations in UI Rendering - UIRenderManager.cpp:92,100 & 
-  ComponentDataPool.cpp:48
-
-  Issue:
-  - new ElementBounds() and new ComponentData() called every frame
-  - ~2048 ComponentData objects allocated individually
-
-  Optimization:
-  - Use stack-allocated arrays or preallocated pools
-  - Implement object pooling for ElementBounds
-  Impact: 30-50% reduction in memory allocations, 15-25% FPS improvement.
-
   2. Vector Reallocations in Render Loop - RenderManager.cpp:139-147
 
   Current Layout:
@@ -261,17 +219,6 @@ would be.
   - Pack texture coords as uint16_t normalized (16→8 bytes)
   - Reorder to minimize padding
   Impact: 40-50% reduction (80→40 bytes), significant cache improvements.
-
-  5. WestQ Inefficient Memory Pattern - WestQ.h:42-44
-
-  Issue:
-  - Queue uses array of pointers instead of contiguous objects
-  - Frequent dequeue/enqueue causes pointer chasing
-
-  Optimization:
-  - Use ring buffer with indices instead of pointer array
-  - Consider virtual function table caching
-  Impact: 15-20% improvement in manager iteration performance.
 
   ---
   Summary of Performance Improvements
