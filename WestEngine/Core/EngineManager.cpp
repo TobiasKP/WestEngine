@@ -28,8 +28,7 @@ EngineManager::EngineManager()
   : IManager(nullptr)
 {
   setName(CoreConstants::ENGINE_MANAGER);
-  _exitEngine    = true;
-  _engineQ       = nullptr;
+  _exitEngine    = true; 
   _windowManager = nullptr;
 }
 
@@ -39,15 +38,14 @@ EngineManager::EngineManager(WestLogger* logger) : IManager(logger)
   _exitEngine    = false;
   _windowManager = new WindowManager(logger);
 
-  _engineQ = new WestQ(CoreConstants::MAX_Q_SIZE, logger);
-  _engineQ->enqueue(new InputManager(logger));
-  _engineQ->enqueue(_windowManager);
-  _engineQ->enqueue(new ShaderManager(logger));
-  _engineQ->enqueue(new SystemManager(logger));
-  _engineQ->enqueue(new InterfaceManager(logger, _windowManager));
-  _engineQ->enqueue(new RenderManager(logger));
-  _engineQ->enqueue(new SceneManager(logger));
-  assert(_engineQ->getSize() == _engineQ->getCapacity());
+  _manager[0] = *new InputManager(logger);
+  _manager[1] = *_windowManager;
+  _manager[2] = *new ShaderManager(logger);
+  _manager[3] = *new SystemManager(logger);
+  _manager[4] = *new InterfaceManager(logger, _windowManager);
+  _manager[5] = *new RenderManager(logger);
+  _manager[6] = *new SceneManager(logger);
+  assert(_manager.size() == CoreConstants::MAX_Q_SIZE);
 }
 
 EngineManager::~EngineManager() {}
@@ -81,15 +79,11 @@ void EngineManager::shutdown()
 #ifdef DEBUG
   logDebug(std::format("{} ### Shutting down {}...\n", getName(), getName()));
 #endif
-  assert(_engineQ != nullptr && _engineQ->getSize() > 0);
-  while (!_engineQ->isEmpty())
+  for (auto item : _manager)
   {
-    IManager* item = _engineQ->dequeue();
-    assert(item != nullptr);
-    item->shutdown();
+    item->get().shutdown();
   }
   KeyboardCallbacks::shutdown();
-  _engineQ->~WestQ();
 }
 
 void EngineManager::update()
@@ -174,42 +168,43 @@ std::int32_t EngineManager::init()
 std::int32_t EngineManager::iterateQ(CYCLE code)
 {
   assert(typeid(code) == typeid(EngineManager::CYCLE));
-  assert(_engineQ->getSize() == _engineQ->getCapacity());
   std::int32_t success = 0;
 
-  for (std::int32_t i = 0; i < _engineQ->getSize(); i++)
+  for (std::int32_t i = 0; i < CoreConstants::MAX_Q_SIZE; i++)
   {
 #ifdef DEBUG
     double start = TimeUtils::getCurrentTimeAsTime();
 #endif
-    IManager* item = _engineQ->dequeue();
-    assert(item != nullptr);
-
-    if (isPauseCycle(code, item))
+    auto item = _manager[i];
+    if (item == std::nullopt)
     {
-      _engineQ->enqueue(item);
+      logFailure(std::format("{} ### Item not retreivable something went horribly wrong!", getName()));
+      return 1;
+    }
+
+    if (isPauseCycle(code, item->get()))
+    {
       continue;
     }
 
-    success = executeCycle(code, item);
+    success = executeCycle(code, item->get());
 
     if (success != 0)
     {
 #ifdef DEBUG
       int enumCode = code;
-      logFailure(std::format("{} ### Failure in {} for cycle: {}\n", getName(), item->getName(), enumCode));
+      logFailure(std::format("{} ### Failure in {} for cycle: {}\n", getName(), item->get().getName(), enumCode));
 #endif
       break;
     }
 
-    _engineQ->enqueue(item);
 
 #ifdef DEBUG
     if (code == CYCLE::UPDATE)
     {
       double end = TimeUtils::getCurrentTimeAsTime();
       double res = TimeUtils::getDuration(start, end);
-      logCycle(std::format("{} ### Queue time: {} ms. for: {} \n", getName(), res, item->getName()));
+      logCycle(std::format("{} ### Queue time: {} ms. for: {} \n", getName(), res, item->get().getName()));
     }
 #endif
   }
@@ -217,17 +212,17 @@ std::int32_t EngineManager::iterateQ(CYCLE code)
   return success;
 }
 
-std::int32_t EngineManager::executeCycle(CYCLE code, IManager* item)
+std::int32_t EngineManager::executeCycle(CYCLE code, IManager& item)
 {
   switch (code)
   {
     case CYCLE::STARTUP:
-      return item->startup();
+      return item.startup();
     case CYCLE::INIT:
-      return item->init();
+      return item.init();
     case CYCLE::UPDATE:
     case CYCLE::PAUSE:
-      item->update();
+      item.update();
       return 0;
     default:
       logFailure(std::format("{} ### unknown territory ... code: {}\n", getName(), (int)code));
@@ -319,12 +314,12 @@ std::int32_t EngineManager::fillSettings(std::string key, std::string value)
   return success;
 }
 
-bool EngineManager::isPauseCycle(CYCLE code, IManager* item)
+bool EngineManager::isPauseCycle(CYCLE code, IManager& item)
 {
   bool pauseExecute = code == CYCLE::PAUSE;
-  bool isManager    = CoreConstants::INPUT_MANAGER.compare(item->getName()) == 0
-                   || CoreConstants::WINDOW_MANAGER.compare(item->getName()) == 0
-                   || CoreConstants::INTERFACE_MANAGER.compare(item->getName()) == 0;
+  bool isManager    = CoreConstants::INPUT_MANAGER.compare(item.getName()) == 0
+                   || CoreConstants::WINDOW_MANAGER.compare(item.getName()) == 0
+                   || CoreConstants::INTERFACE_MANAGER.compare(item.getName()) == 0;
 
   return pauseExecute && !isManager;
 }
