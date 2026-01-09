@@ -4,6 +4,7 @@
 #include "WindowManager.h"
 
 #include <Config.h>
+#include <memory>
 
 class EngineManager : public IManager
 {
@@ -39,7 +40,7 @@ private:
 
   bool _exitEngine;
   std::int32_t _fps;
-  std::array<std::optional<std::reference_wrapper<IManager>>, CoreConstants::MAX_Q_SIZE> _manager{std::nullopt};
+  std::array<IManager*, CoreConstants::MAX_Q_SIZE> _manager;
   WindowManager* _windowManager;
   const long _NANOSECOND = 1000000000;
   const float _FRAMERATE = Config::GeneralConfig.FPS;

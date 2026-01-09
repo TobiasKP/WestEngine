@@ -38,17 +38,27 @@ EngineManager::EngineManager(WestLogger* logger) : IManager(logger)
   _exitEngine    = false;
   _windowManager = new WindowManager(logger);
 
-  _manager[0] = *new InputManager(logger);
-  _manager[1] = *_windowManager;
-  _manager[2] = *new ShaderManager(logger);
-  _manager[3] = *new SystemManager(logger);
-  _manager[4] = *new InterfaceManager(logger, _windowManager);
-  _manager[5] = *new RenderManager(logger);
-  _manager[6] = *new SceneManager(logger);
+  _manager[0] = new InputManager(logger);
+  _manager[1] = _windowManager;
+  _manager[2] = new ShaderManager(logger);
+  _manager[3] = new SystemManager(logger);
+  _manager[4] = new InterfaceManager(logger, _windowManager);
+  _manager[5] = new RenderManager(logger);
+  _manager[6] = new SceneManager(logger);
   assert(_manager.size() == CoreConstants::MAX_Q_SIZE);
 }
 
-EngineManager::~EngineManager() {}
+EngineManager::~EngineManager()
+{
+  for (auto* manager : _manager)
+  {
+    if (manager && manager != _windowManager)
+    {
+      delete manager;
+    }
+  }
+  delete _windowManager;
+}
 
 std::int32_t EngineManager::startup()
 {
@@ -79,9 +89,12 @@ void EngineManager::shutdown()
 #ifdef DEBUG
   logDebug(std::format("{} ### Shutting down {}...\n", getName(), getName()));
 #endif
-  for (auto item : _manager)
+  for (auto* item : _manager)
   {
-    item->get().shutdown();
+    if (item)
+    {
+      item->shutdown();
+    }
   }
   KeyboardCallbacks::shutdown();
 }
@@ -175,25 +188,25 @@ std::int32_t EngineManager::iterateQ(CYCLE code)
 #ifdef DEBUG
     double start = TimeUtils::getCurrentTimeAsTime();
 #endif
-    auto item = _manager[i];
-    if (item == std::nullopt)
+    auto* item = _manager[i];
+    if (!item)
     {
       logFailure(std::format("{} ### Item not retreivable something went horribly wrong!", getName()));
       return 1;
     }
 
-    if (isPauseCycle(code, item->get()))
+    if (isPauseCycle(code, *item))
     {
       continue;
     }
 
-    success = executeCycle(code, item->get());
+    success = executeCycle(code, *item);
 
     if (success != 0)
     {
 #ifdef DEBUG
       int enumCode = code;
-      logFailure(std::format("{} ### Failure in {} for cycle: {}\n", getName(), item->get().getName(), enumCode));
+      logFailure(std::format("{} ### Failure in {} for cycle: {}\n", getName(), item->getName(), enumCode));
 #endif
       break;
     }
@@ -204,7 +217,7 @@ std::int32_t EngineManager::iterateQ(CYCLE code)
     {
       double end = TimeUtils::getCurrentTimeAsTime();
       double res = TimeUtils::getDuration(start, end);
-      logCycle(std::format("{} ### Queue time: {} ms. for: {} \n", getName(), res, item->get().getName()));
+      logCycle(std::format("{} ### Queue time: {} ms. for: {} \n", getName(), res, item->getName()));
     }
 #endif
   }
