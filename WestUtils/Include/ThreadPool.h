@@ -10,8 +10,13 @@
 class ThreadPool
 {
 public:
-  ThreadPool(size_t numThreads = std::thread::hardware_concurrency()
-                                 - 2);  // -1 for main running thread and -1 for available fireAndForget Thread
+  static std::size_t getDefaultThreadCount()
+  {
+    std::size_t hwThreads = std::thread::hardware_concurrency();
+    return hwThreads > 3 ? hwThreads - 2 : 1;
+  }
+
+  ThreadPool(size_t numThreads = getDefaultThreadCount());
   ~ThreadPool();
 
   void fireAndForget(std::function<void()> task);
