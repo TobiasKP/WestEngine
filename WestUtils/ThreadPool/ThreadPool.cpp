@@ -1,9 +1,10 @@
 #include "../Include/ThreadPool.h"
 
-ThreadPool::ThreadPool(size_t numThreads)
+ThreadPool::ThreadPool()
 {
   _logger->log(Level::Info, "--- Creating worker threads for engine\n");
 
+  std::size_t numThreads = getDefaultThreadCount();
   for (size_t i = 0; i < numThreads; ++i)
   {
     _threads.emplace_back(
