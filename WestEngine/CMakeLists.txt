@@ -91,7 +91,7 @@ add_custom_target(copy_compile_commands ALL
 set(RESOURCE_BASE "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
 set(ENGINE_DIR "${RESOURCE_BASE}/engine")
 
-file(GLOB CONFIG_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Game/Config/*")
+file(GLOB CONFIG_FILES "${CMAKE_SOURCE_DIR}/WestGame/Config/*")
 
 # General file copy post-build
 foreach(FOLDER lua assets shader engine config libs libs/STB libs/GLM)
@@ -123,11 +123,11 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 )
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Game/Scripts" "${RESOURCE_BASE}/lua"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/WestGame/Scripts" "${RESOURCE_BASE}/lua"
 )
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Game/Assets" "${RESOURCE_BASE}/assets"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/WestGame/Assets" "${RESOURCE_BASE}/assets"
 )
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
