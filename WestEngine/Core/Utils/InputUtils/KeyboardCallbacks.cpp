@@ -46,10 +46,6 @@ void KeyboardCallbacks::executeBoundOperation(std::int32_t key, const std::strin
     return;
   }
 
-  std::cout << key << ":" << boundOperation << std::endl;
-  std::cout << boundOperation.length() << ":" << std::string("CameraUp").length() <<std::endl;
-  WestLogger* logger = &WestLogger::getLoggerInstance();
-  logger->log(Level::Cycle, std::format("--- Executing Bound Operation for Key:{}\n", key));
   std::int32_t x = 0, y = 0;
   bool updateCam = false;
   if (boundOperation.compare("CameraUp") == 0)
@@ -75,7 +71,6 @@ void KeyboardCallbacks::executeBoundOperation(std::int32_t key, const std::strin
 
   if (updateCam)
   {
-    std::cout << "uopdate" << std::endl;
     _iObserver->setControlFlag(BitMasks::Control::CAMERA_MOVING, x, y);
   }
 }

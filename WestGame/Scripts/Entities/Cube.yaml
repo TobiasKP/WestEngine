@@ -1,5 +1,5 @@
-name: "bunny"
-model: { mesh: "bunny.obj", texture: "" }
+name: "cube"
+model: { mesh: "Cube.obj", texture: "" }
 shader: { v: "Vertex.vs", f: "Fragment.fs" , group: 0 }
 components: 
   - { name: "Position", x: 0, y: 0, z: 0 }

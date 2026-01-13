@@ -120,9 +120,13 @@ Model* ObjectLoader::loadOBJModel(FILE* file)
     }
     else if (strncmp(line, "f ", 2) == 0)
     {
-      std::int32_t vertexIndex[3], textureIndex[3] = {0}, normalIndex[3] = {0};
+      std::int32_t vertexIndex[4], textureIndex[4] = {0}, normalIndex[4] = {0};
+      int faceVertices = 0;
+      int format       = 0; // 0 = unknown, 1 = v/vt/vn, 2 = v/vt, 3 = v//vn, 4 = v only
+
+      // Try format: v/vt/vn (full format with 4 vertices - quad)
       int matches = sscanf(line + 2,
-                           "%d/%d/%d %d/%d/%d %d/%d/%d",
+                           "%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d",
                            &vertexIndex[0],
                            &textureIndex[0],
                            &normalIndex[0],
@@ -131,9 +135,97 @@ Model* ObjectLoader::loadOBJModel(FILE* file)
                            &normalIndex[1],
                            &vertexIndex[2],
                            &textureIndex[2],
-                           &normalIndex[2]);
+                           &normalIndex[2],
+                           &vertexIndex[3],
+                           &textureIndex[3],
+                           &normalIndex[3]);
+      if (matches == 12)
+      {
+        faceVertices = 4;
+        format       = 1;
+      }
 
-      if (matches != 9)
+      // Try format: v/vt/vn (full format with 3 vertices - triangle)
+      if (faceVertices == 0)
+      {
+        matches = sscanf(line + 2,
+                         "%d/%d/%d %d/%d/%d %d/%d/%d",
+                         &vertexIndex[0],
+                         &textureIndex[0],
+                         &normalIndex[0],
+                         &vertexIndex[1],
+                         &textureIndex[1],
+                         &normalIndex[1],
+                         &vertexIndex[2],
+                         &textureIndex[2],
+                         &normalIndex[2]);
+        if (matches == 9)
+        {
+          faceVertices = 3;
+          format       = 1;
+        }
+      }
+
+      // Try format: v//vn (no texture, 4 vertices - quad)
+      if (faceVertices == 0)
+      {
+        matches = sscanf(line + 2,
+                         "%d//%d %d//%d %d//%d %d//%d",
+                         &vertexIndex[0],
+                         &normalIndex[0],
+                         &vertexIndex[1],
+                         &normalIndex[1],
+                         &vertexIndex[2],
+                         &normalIndex[2],
+                         &vertexIndex[3],
+                         &normalIndex[3]);
+        if (matches == 8)
+        {
+          faceVertices = 4;
+          format       = 3;
+        }
+      }
+
+      // Try format: v//vn (no texture, 3 vertices - triangle)
+      if (faceVertices == 0)
+      {
+        matches = sscanf(line + 2,
+                         "%d//%d %d//%d %d//%d",
+                         &vertexIndex[0],
+                         &normalIndex[0],
+                         &vertexIndex[1],
+                         &normalIndex[1],
+                         &vertexIndex[2],
+                         &normalIndex[2]);
+        if (matches == 6)
+        {
+          faceVertices = 3;
+          format       = 3;
+        }
+      }
+
+      // Try format: v/vt (no normals, 4 vertices - quad)
+      if (faceVertices == 0)
+      {
+        matches = sscanf(line + 2,
+                         "%d/%d %d/%d %d/%d %d/%d",
+                         &vertexIndex[0],
+                         &textureIndex[0],
+                         &vertexIndex[1],
+                         &textureIndex[1],
+                         &vertexIndex[2],
+                         &textureIndex[2],
+                         &vertexIndex[3],
+                         &textureIndex[3]);
+        if (matches == 8)
+        {
+          faceVertices = 4;
+          format       = 2;
+        }
+      }
+
+      // Try format: v/vt (no normals, 3 vertices - triangle)
+      if (faceVertices == 0)
       {
         matches = sscanf(line + 2,
                          "%d/%d %d/%d %d/%d",
@@ -143,44 +235,82 @@ Model* ObjectLoader::loadOBJModel(FILE* file)
                          &textureIndex[1],
                          &vertexIndex[2],
                          &textureIndex[2]);
+        if (matches == 6)
+        {
+          faceVertices = 3;
+          format       = 2;
+        }
       }
 
-      if (matches != 6)
+      // Try format: v only (4 vertices - quad)
+      if (faceVertices == 0)
+      {
+        matches = sscanf(
+          line + 2, "%d %d %d %d", &vertexIndex[0], &vertexIndex[1], &vertexIndex[2], &vertexIndex[3]);
+        if (matches == 4)
+        {
+          faceVertices = 4;
+          format       = 4;
+        }
+      }
+
+      // Try format: v only (3 vertices - triangle)
+      if (faceVertices == 0)
       {
         matches = sscanf(line + 2, "%d %d %d", &vertexIndex[0], &vertexIndex[1], &vertexIndex[2]);
+        if (matches == 3)
+        {
+          faceVertices = 3;
+          format       = 4;
+        }
       }
 
-      if (matches >= 3)
+      if (faceVertices >= 3)
       {
-        indices.push_back(vertexIndex[0] - 1);
-        indices.push_back(vertexIndex[1] - 1);
-        indices.push_back(vertexIndex[2] - 1);
-
-        if (matches >= 6)
+        // Helper lambda to process a single triangle
+        auto processTriangle = [&](int i0, int i1, int i2)
         {
-          for (int i = 0; i < 3; i++)
+          indices.push_back(vertexIndex[i0] - 1);
+          indices.push_back(vertexIndex[i1] - 1);
+          indices.push_back(vertexIndex[i2] - 1);
+
+          if (format == 1 || format == 2) // Has texture coords
           {
-            int texIndex = textureIndex[i] - 1;
-            if (texIndex >= 0 && texIndex < textures.size() / 2)
+            int triIndices[3] = {i0, i1, i2};
+            for (int i = 0; i < 3; i++)
             {
-              mappedTextures.push_back(textures[texIndex * 2]);
-              mappedTextures.push_back(textures[texIndex * 2 + 1]);
+              int texIndex = textureIndex[triIndices[i]] - 1;
+              if (texIndex >= 0 && static_cast<size_t>(texIndex) < textures.size() / 2)
+              {
+                mappedTextures.push_back(textures[texIndex * 2]);
+                mappedTextures.push_back(textures[texIndex * 2 + 1]);
+              }
             }
           }
-        }
 
-        if (matches == 9)
-        {
-          for (int i = 0; i < 3; i++)
+          if (format == 1 || format == 3) // Has normals
           {
-            int normIndex = normalIndex[i] - 1;
-            if (normIndex >= 0 && normIndex < normals.size() / 3)
+            int triIndices[3] = {i0, i1, i2};
+            for (int i = 0; i < 3; i++)
             {
-              mappedNormals.push_back(normals[normIndex * 3]);
-              mappedNormals.push_back(normals[normIndex * 3 + 1]);
-              mappedNormals.push_back(normals[normIndex * 3 + 2]);
+              int normIndex = normalIndex[triIndices[i]] - 1;
+              if (normIndex >= 0 && static_cast<size_t>(normIndex) < normals.size() / 3)
+              {
+                mappedNormals.push_back(normals[normIndex * 3]);
+                mappedNormals.push_back(normals[normIndex * 3 + 1]);
+                mappedNormals.push_back(normals[normIndex * 3 + 2]);
+              }
             }
           }
+        };
+
+        // Process first triangle (vertices 0, 1, 2)
+        processTriangle(0, 1, 2);
+
+        // If quad, process second triangle (vertices 0, 2, 3)
+        if (faceVertices == 4)
+        {
+          processTriangle(0, 2, 3);
         }
       }
       else
