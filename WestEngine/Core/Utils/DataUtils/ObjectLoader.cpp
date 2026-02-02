@@ -6,6 +6,7 @@
 #include <format>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/gtc/type_ptr.hpp>
 #include <stb_image.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,7 +20,7 @@
 #include <unistd.h>
 #endif
 
-  Model*
+  std::tuple<Model*, Material*>
   ObjectLoader::loadModel(float* vertices,
                           size_t verticesLength,
                           std::int32_t* indices,
@@ -27,7 +28,8 @@
                           float* texture,
                           size_t textureLength,
                           float* normals,
-                          size_t normalsLength)
+                          size_t normalsLength,
+                          std::string mat)
 {
   assert(vertices != nullptr && verticesLength > 0 && indices != nullptr && indicesLength > 0 && _logger != nullptr);
 
@@ -48,20 +50,30 @@
 #ifdef DEBUG
   _logger->log(Level::Info, "---Loaded Model, stored Data in vbo and vao\n");
 #endif
+  Material* material = nullptr;
+  if (mat.size() == 0)
+  {
+#ifdef DEBUG
+    _logger->log(Level::Info, "---Falling back to Debug-Material\n");
+#endif
+    material               = new Material();
+    material->diffuseColor = glm::vec3(1, 0, 0);
+  }
 
   Model* m       = new Model();
   m->id          = id;
   m->vertexCount = indicesLength / sizeof(std::int32_t);
-  return m;
+  assert(material != nullptr);
+  return std::make_tuple(m, material);
 }
 
-Model* ObjectLoader::loadModel(std::string path)
+std::tuple<Model*, Material*> ObjectLoader::loadModel(std::string path)
 {
   char cwd[PATH_MAX];
   char filePath[PATH_MAX];
   if (getcwd(cwd, sizeof(cwd)) == NULL)
   {
-    return nullptr;
+    return std::make_tuple(nullptr, nullptr);
   }
 
   std::int32_t fd;
@@ -71,19 +83,19 @@ Model* ObjectLoader::loadModel(std::string path)
   {
     _logger->log(Level::Error, std::format("---Error opening File!\n Path: {}\n", filePath));
     // TODO return drawdebug Cube
-    return nullptr;
+    return std::make_tuple(nullptr, nullptr);
   }
 
   if ((file = fdopen(fd, "r")) == NULL)
   {
     _logger->log(Level::Error, "---Error opening File!\n");
-    return nullptr;
+    return std::make_tuple(nullptr, nullptr);
   }
 
   return loadOBJModel(file);
 }
 
-Model* ObjectLoader::loadOBJModel(FILE* file)
+std::tuple<Model*, Material*> ObjectLoader::loadOBJModel(FILE* file)
 {
   std::vector<float> vertices;
   std::vector<std::int32_t> indices;
@@ -122,7 +134,7 @@ Model* ObjectLoader::loadOBJModel(FILE* file)
     {
       std::int32_t vertexIndex[4], textureIndex[4] = {0}, normalIndex[4] = {0};
       int faceVertices = 0;
-      int format       = 0; // 0 = unknown, 1 = v/vt/vn, 2 = v/vt, 3 = v//vn, 4 = v only
+      int format       = 0;  // 0 = unknown, 1 = v/vt/vn, 2 = v/vt, 3 = v//vn, 4 = v only
 
       // Try format: v/vt/vn (full format with 4 vertices - quad)
       int matches = sscanf(line + 2,
@@ -245,8 +257,7 @@ Model* ObjectLoader::loadOBJModel(FILE* file)
       // Try format: v only (4 vertices - quad)
       if (faceVertices == 0)
       {
-        matches = sscanf(
-          line + 2, "%d %d %d %d", &vertexIndex[0], &vertexIndex[1], &vertexIndex[2], &vertexIndex[3]);
+        matches = sscanf(line + 2, "%d %d %d %d", &vertexIndex[0], &vertexIndex[1], &vertexIndex[2], &vertexIndex[3]);
         if (matches == 4)
         {
           faceVertices = 4;
@@ -274,7 +285,7 @@ Model* ObjectLoader::loadOBJModel(FILE* file)
           indices.push_back(vertexIndex[i1] - 1);
           indices.push_back(vertexIndex[i2] - 1);
 
-          if (format == 1 || format == 2) // Has texture coords
+          if (format == 1 || format == 2)  // Has texture coords
           {
             int triIndices[3] = {i0, i1, i2};
             for (int i = 0; i < 3; i++)
@@ -288,7 +299,7 @@ Model* ObjectLoader::loadOBJModel(FILE* file)
             }
           }
 
-          if (format == 1 || format == 3) // Has normals
+          if (format == 1 || format == 3)  // Has normals
           {
             int triIndices[3] = {i0, i1, i2};
             for (int i = 0; i < 3; i++)
@@ -316,7 +327,7 @@ Model* ObjectLoader::loadOBJModel(FILE* file)
       else
       {
         _logger->log(Level::Error, "---Error parsing OBJ face data!");
-        return nullptr;
+        return std::make_tuple(nullptr, nullptr);
       }
     }
   }
@@ -345,7 +356,8 @@ Model* ObjectLoader::loadOBJModel(FILE* file)
                    textureArray,
                    mappedTextures.size() * sizeof(float),
                    normalArray,
-                   normals.size() * sizeof(float));
+                   normals.size() * sizeof(float),
+                   "");
 }
 
 GLuint ObjectLoader::loadTexture(std::string textureFile)
@@ -429,7 +441,7 @@ void ObjectLoader::unbind()
   glBindVertexArray(0);
 }
 
-void ObjectLoader::unloadModel(Model* model)
+void ObjectLoader::unloadModel(Model* model, Material* material)
 {
   assert(_logger != nullptr);
   if (!model)
@@ -439,9 +451,9 @@ void ObjectLoader::unloadModel(Model* model)
 
   GLuint vaoId     = model->id;
   GLuint textureId = 0;
-  if (model->texture != nullptr)
+  if (material->diffuseTexture != nullptr)
   {
-    textureId = model->texture->id;
+    textureId = material->diffuseTexture->id;
   }
 
   auto vaoIt   = std::find(_vaos.begin(), _vaos.end(), vaoId);

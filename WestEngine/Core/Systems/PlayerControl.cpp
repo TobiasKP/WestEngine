@@ -226,8 +226,7 @@ void PlayerControl::updateDebuggingInfo()
                            posComp->position.x,
                            posComp->position.y,
                            posComp->position.z));
-
-  glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0f);
-  _debugEntityId  = _debugDrawUtils->addLine(posComp->position, direction, color);
+ 
+  _debugEntityId  = _debugDrawUtils->addLine(posComp->position, direction);
   _drawn          = true;
 }

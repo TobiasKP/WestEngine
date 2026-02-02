@@ -5,6 +5,9 @@
 
 void ComponentFactory::createComponent(std::map<std::string, std::int32_t> infos, std::string name, Entity& e)
 {
+#ifdef DEBUG
+  WestLogger::getLoggerInstance().log(Level::Info, std::format("Adding component: {} to: {}\n", name, e.getId()));
+#endif
   if (Components::POSITION.compare(name) == 0)
   {
     // TODO: Add rotation and scale
@@ -29,6 +32,6 @@ void ComponentFactory::createComponent(std::map<std::string, std::int32_t> infos
     p->position = pos;
     p->scale    = 1.0f;
     p->rotation = glm::vec3(1.0f);
-    e.addComponent(BitMasks::Components::POSITION, p); 
+    e.addComponent(BitMasks::Components::POSITION, p);
   }
 }

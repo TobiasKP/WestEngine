@@ -130,7 +130,7 @@ void SceneManager::removeEntityFromScene(const Entity& entity)
   _scene->removeEntity(entity);
   if (!entity.isDebugEntity())
   {
-    _loader->unloadModel((Model*)entity.getComponent(BitMasks::Components::MODEL));
+    _loader->unloadModel((Model*)entity.getComponent(BitMasks::Components::MODEL), (Material*)entity.getComponent(BitMasks::Components::MATERIAL));
   }
 }
 

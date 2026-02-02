@@ -1,7 +1,7 @@
 name: "cube"
-model: { mesh: "Cube.obj", texture: "" }
+model: "Cube.obj"
 shader: { v: "Vertex.vs", f: "Fragment.fs" , group: 0 }
 components: 
-  - { name: "Position", x: 0, y: 0, z: 0 }
+  - { name: "position", x: 0, y: 0, z: 0 }
 systems:
   - { name: "PlayerControl" }

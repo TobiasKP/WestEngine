@@ -26,18 +26,10 @@ private:
   SystemFactory* _sFac;
   ComponentFactory* _cFac;
 
-  void basicInfo(const char* name, Entity& e);
-  void modelInfo(Entity& e);
+  void basicInfo(const char* name, Entity& e); 
   void createProperties(Entity& e);
   void shaderInfo(Entity& e);
   void parseInfos(std::map<std::string, std::int32_t>& infos, std::string& name);
-  Model* loadModel(float* vertices,
-                   size_t verticeLength,
-                   std::int32_t* indices,
-                   size_t indiceLength,
-                   float* textureCoords,
-                   size_t textureCoordLength);
-  Model* loadModel(std::string path);
+  std::tuple<Model*, Material*> loadModel(std::string path);
   Shader* loadShader(std::string vertexShaderFile, std::string fragShaderFile, std::int32_t shaderGroup);
-  Texture* loadTexture(std::string textureFile);
 };

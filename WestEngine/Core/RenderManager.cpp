@@ -110,11 +110,12 @@ void RenderManager::renderGameEntities()
     }
 
 
-    Model* model = (Model*)entity.getComponent(BitMasks::Components::MODEL);
-    assert(model != nullptr);
+    Model* model       = (Model*)entity.getComponent(BitMasks::Components::MODEL);
+    Material* material = (Material*)entity.getComponent(BitMasks::Components::MATERIAL);
+    assert(model != nullptr && material != nullptr);
     if (!Config::PAUSE)
     {
-      updateUniforms(entity, model);
+      updateUniforms(entity, model, material);
     }
 
     glBindVertexArray(model->id);
@@ -226,17 +227,22 @@ void RenderManager::renderUserInterfaces()
   glUseProgram(_usedShaderProgram);
 }
 
-void RenderManager::updateUniforms(const Entity& e, Model* model)
+void RenderManager::updateUniforms(const Entity& e, Model* model, Material* material)
 {
 #ifdef DEBUG
   if (e.isDebugEntity())
   {
-    UniformUtils::setUniform(model->debugColorUniform, model->color);
+    UniformUtils::setUniform(model->debugColorUniform, material->diffuseColor);
     assert(model->debugColorUniform != -1);
   }
 #endif
 
-  Texture* t = model->texture;
+  if (!e.isDebugEntity() && material != nullptr && material->diffuseColorUniform > -1)
+  {
+    UniformUtils::setUniform(material->diffuseColorUniform, material->diffuseColor);
+  }
+
+  Texture* t = material->diffuseTexture;
   if (t != nullptr)
   {
     UniformUtils::setUniform(t->uniform, 0);

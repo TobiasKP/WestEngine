@@ -3,20 +3,13 @@
 #include "../Interfaces/IComponent.h"
 
 #include <cstdint>
-#include <GL/glew.h>
 #include <PoolAllocator.h>
-
-struct Texture
-{
-  std::int32_t id = -1;
-  GLuint uniform  = -1;
-};
+#include <GL/glew.h>
 
 struct Model : public IComponent
 {
   std::int32_t id;
-  std::int32_t vertexCount;
-  Texture* texture = nullptr;
+  std::int32_t vertexCount; 
 
   // Overrides
   static void* operator new(size_t size)
@@ -29,8 +22,8 @@ struct Model : public IComponent
   }
 
   // Debug fields
-  GLuint debugColorUniform;
-  glm::vec3 color;
+  GLint debugColorUniform;
+
 
 private:
   static inline PoolAllocator* _allocator = new PoolAllocator();

@@ -14,16 +14,17 @@ public:
   ObjectLoader() : _logger(nullptr) {};
   ObjectLoader(WestLogger* logger) : _logger(logger) {};
 
-  Model* loadModel(float* vertices,
-                   size_t verticeLength,
-                   std::int32_t* indices,
-                   size_t indiceLength,
-                   float* textureCoords,
-                   size_t textureLength,
-                   float* normals,
-                   size_t normalsLength);
-  Model* loadModel(std::string path);
-  void unloadModel(Model* model);
+  std::tuple<Model*, Material*> loadModel(float* vertices,
+                                          size_t verticeLength,
+                                          std::int32_t* indices,
+                                          size_t indiceLength,
+                                          float* textureCoords,
+                                          size_t textureLength,
+                                          float* normals,
+                                          size_t normalsLength,
+                                          std::string mat);
+  std::tuple<Model*, Material*> loadModel(std::string path);
+  void unloadModel(Model* model, Material* material);
   GLuint loadTexture(std::string textureFile);
   void cleanup();
 
@@ -33,7 +34,7 @@ private:
   std::vector<GLuint> _textures;
   WestLogger* _logger;
 
-  Model* loadOBJModel(FILE* file);
+  std::tuple<Model*, Material*> loadOBJModel(FILE* file);
   GLuint createVAO();
   void storeIndicesBuffer(std::int32_t* data, size_t dataLength);
   void storeDataInAttribList(std::int32_t attribNo, std::int32_t vertexCount, float* data, size_t dataLength);

@@ -17,10 +17,9 @@
 #include <unistd.h>
 #endif
 
-using namespace WestInterface;
+  using namespace WestInterface;
 
-ShaderManager::ShaderManager()
-  : IManager(nullptr)
+ShaderManager::ShaderManager() : IManager(nullptr)
 {
   setName(CoreConstants::SHADER_MANAGER);
   _facade = nullptr;
@@ -222,16 +221,22 @@ GLuint ShaderManager::initShader(Shader* s, const Entity& entity)
 // TODO make switch case
 void ShaderManager::addUniforms(GLuint programId, const Entity& entity)
 {
-  Model* m = (Model*)entity.getComponent(BitMasks::Components::MODEL);
-  if (m != nullptr && m->texture != nullptr)
+  Model* m     = (Model*)entity.getComponent(BitMasks::Components::MODEL);
+  Material* m2 = (Material*)entity.getComponent(BitMasks::Components::MATERIAL);
+  if (m2 != nullptr && m2->diffuseTexture != nullptr)
   {
-    m->texture->uniform = UniformUtils::createUniform(UniformConstants::TEXTURE_SAMPLER, programId);
+    m2->diffuseTexture->uniform = UniformUtils::createUniform(UniformConstants::TEXTURE_SAMPLER, programId);
+  }
+
+  if (m != nullptr && !entity.isDebugEntity() && m2 != nullptr)
+  {
+    m2->diffuseColorUniform = UniformUtils::createUniform(UniformConstants::COLOR, programId);
   }
 
 #ifdef DEBUG
   if (m != nullptr && entity.isDebugEntity())
   {
-    m->debugColorUniform = UniformUtils::createUniform(UniformConstants::COLOR, programId);
+    m->debugColorUniform = UniformUtils::createUniform(UniformConstants::DCOLOR, programId);
   }
 #endif
 

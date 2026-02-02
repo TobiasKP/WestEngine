@@ -4,6 +4,7 @@ local yaml = require("yaml")
 
 local function interpreteData(data)
   local Entity = {
+    name = data.name,
     model = data.model,
     shader = data.shader,
     components = {},
