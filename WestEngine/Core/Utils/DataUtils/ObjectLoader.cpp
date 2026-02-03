@@ -59,6 +59,10 @@
     material               = new Material();
     material->diffuseColor = glm::vec3(1, 0, 0);
   }
+  else
+  {
+    material = generateMaterialFromMTL(mat);
+  }
 
   Model* m       = new Model();
   m->id          = id;
@@ -69,11 +73,21 @@
 
 std::tuple<Model*, Material*> ObjectLoader::loadModel(std::string path)
 {
+  FILE* file = openFile(path);
+  if (file == nullptr)
+  {
+    return std::make_tuple(nullptr, nullptr);
+  }
+  return loadOBJModel(file);
+}
+
+FILE* ObjectLoader::openFile(const std::string& path)
+{
   char cwd[PATH_MAX];
   char filePath[PATH_MAX];
   if (getcwd(cwd, sizeof(cwd)) == NULL)
   {
-    return std::make_tuple(nullptr, nullptr);
+    return nullptr;
   }
 
   std::int32_t fd;
@@ -83,16 +97,16 @@ std::tuple<Model*, Material*> ObjectLoader::loadModel(std::string path)
   {
     _logger->log(Level::Error, std::format("---Error opening File!\n Path: {}\n", filePath));
     // TODO return drawdebug Cube
-    return std::make_tuple(nullptr, nullptr);
+    return nullptr;
   }
 
   if ((file = fdopen(fd, "r")) == NULL)
   {
     _logger->log(Level::Error, "---Error opening File!\n");
-    return std::make_tuple(nullptr, nullptr);
+    return nullptr;
   }
 
-  return loadOBJModel(file);
+  return file;
 }
 
 std::tuple<Model*, Material*> ObjectLoader::loadOBJModel(FILE* file)
@@ -103,11 +117,18 @@ std::tuple<Model*, Material*> ObjectLoader::loadOBJModel(FILE* file)
   std::vector<float> normals;
   std::vector<float> mappedNormals;
   std::vector<float> mappedTextures;
+  std::string material;
 
   char line[256];
   while (fgets(line, sizeof(line), file))
   {
-    if (strncmp(line, "v ", 2) == 0)
+    if (strncmp(line, "mtllib ", 7) == 0)
+    {
+      char mat[16];
+      sscanf(line + 7, "%s", mat);
+      material = std::string(mat);
+    }
+    else if (strncmp(line, "v ", 2) == 0)
     {
       float x, y, z;
       sscanf(line + 2, "%f %f %f", &x, &y, &z);
@@ -357,7 +378,23 @@ std::tuple<Model*, Material*> ObjectLoader::loadOBJModel(FILE* file)
                    mappedTextures.size() * sizeof(float),
                    normalArray,
                    normals.size() * sizeof(float),
-                   "");
+                   material);
+}
+
+Material* ObjectLoader::generateMaterialFromMTL(const std::string& path)
+{
+  FILE* file       = openFile(path);
+  Material* result = new Material();
+  if (file == nullptr)
+  {
+    return result;
+  }
+  char line[256];
+  while (fgets(line, sizeof(line), file))
+  {}
+
+
+  return result;
 }
 
 GLuint ObjectLoader::loadTexture(std::string textureFile)

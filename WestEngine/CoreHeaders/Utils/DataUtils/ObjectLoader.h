@@ -33,11 +33,13 @@ private:
   std::vector<GLuint> _vbos;
   std::vector<GLuint> _textures;
   WestLogger* _logger;
-
+  
+  FILE* openFile(const std::string &path);
   std::tuple<Model*, Material*> loadOBJModel(FILE* file);
   GLuint createVAO();
   void storeIndicesBuffer(std::int32_t* data, size_t dataLength);
   void storeDataInAttribList(std::int32_t attribNo, std::int32_t vertexCount, float* data, size_t dataLength);
   void unbind();
   std::vector<float> generatePlanarUV(const std::vector<float>& vertices);
+  Material* generateMaterialFromMTL(const std::string& path);
 };
