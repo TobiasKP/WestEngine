@@ -1,5 +1,0 @@
-name: "plane"
-model: "Plane.obj"
-shader: { v: "Vertex.vs", f: "Fragment.fs" , group: 0 }
-components: 
-  - { name: "position", x: 0, y: 0, z: 0 }

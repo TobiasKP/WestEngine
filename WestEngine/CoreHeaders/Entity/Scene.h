@@ -2,6 +2,7 @@
 
 #include "Camera.h"
 #include "Entity.h"
+#include "World.hpp"
 
 #include <CoreConstants.hpp>
 #include <mutex>
@@ -20,6 +21,7 @@ public:
   void addEntity(Entity&& entity);
   void addDebugEntity(Entity&& entity);
   void addCamera(Camera* cam);
+  void addWorld(World* world);
   void removeEntity(const Entity& entity);
   void deleteScene();
 
@@ -42,6 +44,7 @@ private:
   static std::mutex _mutex;
 
   static Camera* _camera;
+  static World* _world;
   std::vector<Entity> _entities;
   std::vector<Entity> _debugEntities;
   std::string _sceneName = CoreConstants::UNDEFINED_STRING;

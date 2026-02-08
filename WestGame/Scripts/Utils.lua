@@ -9,6 +9,7 @@ local function interpreteData(data)
     shader = data.shader,
     components = {},
     systems = {},
+    world = {},
   }
 
   -- Process components
@@ -31,6 +32,11 @@ local function interpreteData(data)
       end
       table.insert(Entity.systems, systemData)
     end
+  end
+
+  -- Process World
+  if type(data.world) == "table" then
+    Entity.world = data.world
   end
 
   return Entity

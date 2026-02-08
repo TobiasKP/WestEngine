@@ -6,6 +6,7 @@
 
 #include <Config.h>
 #include <format>
+#include <iostream>
 #include <string.h>
 
 void EntityBuilder::createEntities()
@@ -22,6 +23,14 @@ void EntityBuilder::createEntities()
       if (strcmp(key, "shader") == 0)
       {
         shaderInfo(e);
+      }
+      else if (strcmp(key, "world") == 0)
+      {
+        World w;
+        createWorld(w);
+        lua_pop(L, 1);
+        Scene::getSceneInstance().addWorld(&w);
+        break;
       }
       else if (lua_istable(L, -1))
       {
@@ -148,6 +157,50 @@ void EntityBuilder::shaderInfo(Entity& e)
 
   Shader* s = loadShader(vertexPath, fragmentPath, group);
   e.addComponent(BitMasks::Components::SHADER, s);
+}
+
+void EntityBuilder::createWorld(Entity& e)
+{
+#ifdef DEBUG
+  WestLogger::getLoggerInstance().log(Level::Info, std::format("Loading World\n"));
+#endif
+  std::string vertexPath = "/shader/worldshader.vs", fragmentPath = "/shader/worldshader.fs";
+  std::int32_t group = 1000;
+  std::cout << "x" << std::endl;
+  lua_getfield(L, -1, "grid");
+  if (!lua_istable(L, -1))
+  {
+    std::cout << "blub" << std::endl;
+    lua_pop(L, 1);
+    return;
+  }
+  std::int32_t numRows = luaL_len(L, -1);
+  std::cout << numRows << std::endl;
+  for (std::int32_t row = 1; row <= numRows; row++)
+  {
+    lua_rawgeti(L, -1, row);
+    if (!lua_istable(L, -1))
+    {
+      lua_pop(L, 1);
+      std::cout << "blab" << std::endl;
+      continue;
+    }
+    std::int32_t numCols = luaL_len(L, -1);
+    std::cout << numCols << std::endl;
+    for (std::int32_t col = 1; col <= numCols; col++)
+    {
+      lua_rawgeti(L, -1, col);
+      std::int32_t cellValue = lua_tointeger(L, -1);
+      std::cout << cellValue << std::endl;
+      lua_pop(L, 1);
+    }
+    lua_pop(L, 1);
+  }
+
+  std::tuple<Model*, Material*> m = _loader->loadModel("");
+  Shader* s                       = loadShader(vertexPath, fragmentPath, group);
+  e.addComponent(BitMasks::Components::SHADER, s);
+  e.addComponent(BitMasks::Components::MODEL, std::get<0>(m));
 }
 
 std::tuple<Model*, Material*> EntityBuilder::loadModel(std::string path)

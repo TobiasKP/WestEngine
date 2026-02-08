@@ -5,6 +5,7 @@
 Scene Scene::_sceneInstance;
 std::mutex Scene::_mutex;
 Camera* Scene::_camera;
+World* Scene::_world;
 
 Scene& Scene::getSceneInstance()
 {
@@ -14,14 +15,21 @@ Scene& Scene::getSceneInstance()
   return _sceneInstance;
 }
 
-Scene::Scene() {}
+Scene::Scene()
+{
+  _camera = nullptr;
+  _world  = nullptr;
+}
 
 Scene::~Scene() {}
 
 void Scene::deleteScene()
 {
+  delete _world;
   delete _camera;
   _entities.clear();
+  _world  = nullptr;
+  _camera = nullptr;
 }
 
 void Scene::init()
@@ -51,17 +59,16 @@ std::vector<Entity> Scene::getEntities()
 
 Entity* Scene::getEntityById(std::uint32_t id)
 {
-  std::lock_guard<std::mutex> lock(_mutex); 
-  auto entityIt = std::find_if(_entities.begin(), _entities.end(),
-                               [id](const Entity& en) { return en.getId() == id; });
+  std::lock_guard<std::mutex> lock(_mutex);
+  auto entityIt = std::find_if(_entities.begin(), _entities.end(), [id](const Entity& en) { return en.getId() == id; });
   if (entityIt != _entities.end())
   {
     return &(*entityIt);
   }
 
 #ifdef DEBUG
-  auto debugEntityIt = std::find_if(_debugEntities.begin(), _debugEntities.end(),
-                                    [id](const Entity& en) { return en.getId() == id; });
+  auto debugEntityIt =
+    std::find_if(_debugEntities.begin(), _debugEntities.end(), [id](const Entity& en) { return en.getId() == id; });
   if (debugEntityIt != _debugEntities.end())
   {
     return &(*debugEntityIt);
@@ -79,7 +86,7 @@ void Scene::addEntity(Entity&& entity)
 }
 
 void Scene::addDebugEntity(Entity&& entity)
-{ 
+{
   std::lock_guard<std::mutex> lock(_mutex);
   _debugEntities.emplace_back(std::move(entity));
 }
@@ -89,6 +96,13 @@ void Scene::addCamera(Camera* cam)
   assert(cam != nullptr);
   std::lock_guard<std::mutex> lock(_mutex);
   _camera = cam;
+}
+
+void Scene::addWorld(World* world)
+{
+  assert(world != nullptr);
+  std::lock_guard<std::mutex> lock(_mutex);
+  _world = std::move(world);
 }
 
 void Scene::removeEntity(const Entity& entity)

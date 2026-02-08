@@ -126,7 +126,7 @@ std::tuple<Model*, Material*> ObjectLoader::loadOBJModel(FILE* file)
     {
       char mat[16];
       sscanf(line + 7, "%s", mat);
-      material = std::string(mat);
+      material = std::string(std::format("/assets/Models/{}", mat));
     }
     else if (strncmp(line, "v ", 2) == 0)
     {
@@ -391,7 +391,14 @@ Material* ObjectLoader::generateMaterialFromMTL(const std::string& path)
   }
   char line[256];
   while (fgets(line, sizeof(line), file))
-  {}
+  {
+    if (strncmp(line, "Kd ", 3) == 0)
+    {
+      float u, v, z;
+      sscanf(line + 3, "%f %f", &u, &v);
+      result->diffuseColor = glm::vec3(u, v, z);  
+    }
+  }
 
 
   return result;

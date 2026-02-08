@@ -30,6 +30,7 @@ private:
   void createProperties(Entity& e);
   void shaderInfo(Entity& e);
   void parseInfos(std::map<std::string, std::int32_t>& infos, std::string& name);
+  void createWorld(Entity& e);
   std::tuple<Model*, Material*> loadModel(std::string path);
   Shader* loadShader(std::string vertexShaderFile, std::string fragShaderFile, std::int32_t shaderGroup);
 };

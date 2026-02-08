@@ -33,5 +33,6 @@ private:
   void clearColor();
   void renderUserInterfaces();
   void renderGameEntities();
+  void renderWorld();
   void updateUniforms(const Entity& e, Model* m, Material* m2);
 };

@@ -64,6 +64,7 @@ void RenderManager::update()
 #endif
   clearColor();
   renderUserInterfaces();
+  renderWorld();
   renderGameEntities();
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
@@ -121,7 +122,9 @@ void RenderManager::renderGameEntities()
     glBindVertexArray(model->id);
     if (entity.isDebugEntity())
     {
+      glDisable(GL_DEPTH_TEST);
       glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, 0);
+      glEnable(GL_DEPTH_TEST);
     }
     else
     {
@@ -129,6 +132,8 @@ void RenderManager::renderGameEntities()
     }
   }
 }
+
+void RenderManager::renderWorld() {}
 
 void RenderManager::renderUserInterfaces()
 {
@@ -194,7 +199,7 @@ void RenderManager::renderUserInterfaces()
   glUseProgram(Config::interfaceShaderProgram);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_BLEND);
-  glEnable(GL_DEPTH_TEST);
+  glDisable(GL_DEPTH_TEST);
   glBindVertexArray(_facade->_interfaceVAO);
 
   glBindBuffer(GL_ARRAY_BUFFER, _facade->_interfaceCOL);
@@ -223,7 +228,7 @@ void RenderManager::renderUserInterfaces()
   UniformUtils::setUniform(Config::interfaceOrthoUniform, ortho);
   glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, renderData.size());
   glDisable(GL_BLEND);
-  glDisable(GL_DEPTH_TEST);
+  glEnable(GL_DEPTH_TEST);
   glUseProgram(_usedShaderProgram);
 }
 

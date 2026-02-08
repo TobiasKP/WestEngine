@@ -42,8 +42,8 @@ std::uint32_t DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction)
   Entity e;
   e.setId(Config::incEntityId());
   e.addComponent(BitMasks::Components::SHADER, s);
-  e.addComponent(BitMasks::Components::MODEL, std::get<0>(m));
-  e.addComponent(BitMasks::Components::MATERIAL, std::get<1>(m));
+  e.addComponent(BitMasks::Components::MODEL, std::move(std::get<0>(m)));
+  e.addComponent(BitMasks::Components::MATERIAL, std::move(std::get<1>(m)));
   e.debugEntity();
 
   _scene->addDebugEntity(std::move(e));

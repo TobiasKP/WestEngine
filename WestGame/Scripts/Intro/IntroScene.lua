@@ -1,4 +1,4 @@
-local entitiyList = { "Cube", "Plane" }
+local entitiyList = { "Cube", "DemoWorld" }
 
 local Entities = {}
 
