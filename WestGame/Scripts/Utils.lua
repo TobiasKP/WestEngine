@@ -9,7 +9,6 @@ local function interpreteData(data)
     shader = data.shader,
     components = {},
     systems = {},
-    world = {},
   }
 
   -- Process components
@@ -35,8 +34,16 @@ local function interpreteData(data)
   end
 
   -- Process World
-  if type(data.world) == "table" then
-    Entity.world = data.world
+  if type(data.world) == "table" and #data.world > 0 then
+    Entity.world = {}
+    for _, details in ipairs(data.world) do
+      local detailData = {}
+      for key, value in pairs(details) do
+        print("adding " .. tostring(key) .. " with " .. tostring(value))
+        detailData[key] = value
+      end
+      table.insert(Entity.world, detailData)
+    end
   end
 
   return Entity
@@ -62,6 +69,14 @@ function LoadEntity(entity)
   if data == nil then
     return 1
   end
+
+  print("=== YAML parsed for " .. entity .. " ===")
+  yaml.dump(data)
+  print("world type: " .. type(data.world))
+  if type(data.world) == "table" then
+    print("world length: " .. #data.world)
+  end
+  print("=== END ===")
 
   return interpreteData(data)
 end

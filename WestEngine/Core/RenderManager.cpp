@@ -120,6 +120,7 @@ void RenderManager::renderGameEntities()
     }
 
     glBindVertexArray(model->id);
+#ifdef DEBUG
     if (entity.isDebugEntity())
     {
       glDisable(GL_DEPTH_TEST);
@@ -130,10 +131,16 @@ void RenderManager::renderGameEntities()
     {
       glDrawElements(GL_TRIANGLES, model->vertexCount, GL_UNSIGNED_INT, 0);
     }
+#else
+    glDrawElements(GL_TRIANGLES, model->vertexCount, GL_UNSIGNED_INT, 0);
+#endif
   }
 }
 
-void RenderManager::renderWorld() {}
+void RenderManager::renderWorld()
+{
+  glEnable(GL_DEPTH_TEST);
+}
 
 void RenderManager::renderUserInterfaces()
 {
@@ -228,7 +235,6 @@ void RenderManager::renderUserInterfaces()
   UniformUtils::setUniform(Config::interfaceOrthoUniform, ortho);
   glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, renderData.size());
   glDisable(GL_BLEND);
-  glEnable(GL_DEPTH_TEST);
   glUseProgram(_usedShaderProgram);
 }
 

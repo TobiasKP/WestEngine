@@ -167,35 +167,24 @@ void EntityBuilder::createWorld(Entity& e)
   std::string vertexPath = "/shader/worldshader.vs", fragmentPath = "/shader/worldshader.fs";
   std::int32_t group = 1000;
   std::cout << "x" << std::endl;
-  lua_getfield(L, -1, "grid");
-  if (!lua_istable(L, -1))
+  std::cout << lua_typename(L, lua_type(L, -1)) << std::endl;
+  std::cout << lua_tostring(L, -2) << std::endl;
+  lua_pushnil(L);
+  if (lua_istable(L, -2))
   {
-    std::cout << "blub" << std::endl;
-    lua_pop(L, 1);
-    return;
+    std::cout << "yikes" << std::endl;
   }
-  std::int32_t numRows = luaL_len(L, -1);
-  std::cout << numRows << std::endl;
-  for (std::int32_t row = 1; row <= numRows; row++)
+  while (lua_next(L, -2) != 0)
   {
-    lua_rawgeti(L, -1, row);
-    if (!lua_istable(L, -1))
-    {
-      lua_pop(L, 1);
-      std::cout << "blab" << std::endl;
-      continue;
-    }
-    std::int32_t numCols = luaL_len(L, -1);
-    std::cout << numCols << std::endl;
-    for (std::int32_t col = 1; col <= numCols; col++)
-    {
-      lua_rawgeti(L, -1, col);
-      std::int32_t cellValue = lua_tointeger(L, -1);
-      std::cout << cellValue << std::endl;
-      lua_pop(L, 1);
-    }
-    lua_pop(L, 1);
+    std::cout << "QQ" << std::endl;
   }
+
+
+  std::cout << "y" << std::endl;
+  std::cout << lua_tostring(L, -2) << std::endl;
+  std::cout << lua_typename(L, lua_type(L, -1)) << std::endl;
+  std::cout << "z" << std::endl;
+
 
   std::tuple<Model*, Material*> m = _loader->loadModel("");
   Shader* s                       = loadShader(vertexPath, fragmentPath, group);
