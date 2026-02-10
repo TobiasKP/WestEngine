@@ -31,6 +31,7 @@ private:
   Scene* _scene;
 
   GLuint initInterfaceShader();
+  void initWorldShader();
   GLuint initShader(Shader* s, const Entity& entity);
   GLuint createShader(const std::string shaderFile, std::int32_t shaderTyp, GLuint programId);
   GLchar* readShaderSource(const std::string shaderFile);

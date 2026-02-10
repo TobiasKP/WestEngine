@@ -27,7 +27,6 @@ private:
   ComponentFactory* _cFac;
   static constexpr std::uint32_t indices[6] = {0, 1, 3, 1, 2, 3};
   static constexpr float baseQuad[]         = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f};
-  static constexpr float baseTex[]          = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f};
 
 
   void basicInfo(const char* name, Entity& e);
@@ -35,6 +34,7 @@ private:
   void shaderInfo(Entity& e);
   void parseInfos(std::map<std::string, std::int32_t>& infos, std::string& name);
   void createWorld(Entity& e);
+  std::tuple<Model*, Material*> buildWorldMesh(const std::vector<std::uint8_t>& map, std::int32_t sqmap);
   std::tuple<Model*, Material*> loadModel(std::string path);
   Shader* loadShader(std::string vertexShaderFile, std::string fragShaderFile, std::int32_t shaderGroup);
 };

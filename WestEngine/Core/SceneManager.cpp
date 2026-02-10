@@ -39,7 +39,7 @@ std::int32_t SceneManager::startup()
 {
   _loader     = new ObjectLoader(getLogger());
   _scene      = &Scene::getSceneInstance();
-  Camera* cam = new Camera(glm::vec3(0.0, 0.0, 5.0), glm::vec3(0));
+  Camera* cam = new Camera(glm::vec3(0.0, 3.0, 5.0), glm::vec3(25.0f, 0, 0));
   _scene->addCamera(cam);
   L = luaL_newstate();
   luaL_openlibs(L);
@@ -130,7 +130,8 @@ void SceneManager::removeEntityFromScene(const Entity& entity)
   _scene->removeEntity(entity);
   if (!entity.isDebugEntity())
   {
-    _loader->unloadModel((Model*)entity.getComponent(BitMasks::Components::MODEL), (Material*)entity.getComponent(BitMasks::Components::MATERIAL));
+    _loader->unloadModel((Model*)entity.getComponent(BitMasks::Components::MODEL),
+                         (Material*)entity.getComponent(BitMasks::Components::MATERIAL));
   }
 }
 

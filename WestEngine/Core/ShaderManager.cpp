@@ -127,6 +127,58 @@ void ShaderManager::update()
     s->initialized = true;
     addUniforms(programId, entity);
   }
+
+  initWorldShader();
+}
+
+void ShaderManager::initWorldShader()
+{
+  World* world = _scene->getWorld();
+  if (world == nullptr)
+  {
+    return;
+  }
+
+  Shader* ws = (Shader*)world->getComponent(BitMasks::Components::SHADER);
+  if (ws == nullptr || ws->initialized)
+  {
+    return;
+  }
+
+#ifdef DEBUG
+  logDebug(std::format("{} ### Initializing world shader for group: {}.\n", getName(), ws->shadergroup));
+#endif
+
+  GLuint programId = -1;
+  if (_programList.find(ws->shadergroup) != _programList.end())
+  {
+    programId = _programList[ws->shadergroup];
+  }
+  else
+  {
+    programId = initShader(ws, *world);
+  }
+
+  if (programId == -1)
+  {
+    logFailure(std::format("{} ### Could not create world shader.\n", getName()));
+    return;
+  }
+
+  ws->programId   = programId;
+  ws->initialized = true;
+#ifdef DEBUG
+  logDebug(std::format("{} ### World shader initialized. ProgramID: {}.\n", getName(), programId));
+#endif
+
+  Material* mat = (Material*)world->getComponent(BitMasks::Components::MATERIAL);
+  if (mat != nullptr)
+  {
+    mat->diffuseColorUniform = UniformUtils::createUniform("ddColor", programId);
+#ifdef DEBUG
+    logDebug(std::format("{} ### World color uniform location: {}.\n", getName(), mat->diffuseColorUniform));
+#endif
+  }
 }
 
 GLuint ShaderManager::initInterfaceShader()

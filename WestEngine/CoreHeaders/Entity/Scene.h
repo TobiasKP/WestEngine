@@ -27,7 +27,7 @@ public:
 
   // Getter
   std::vector<Entity> getEntities();
-  //TODO: register ID in hashmap saving index in vector to have faster access if a specific Entity is searched
+  // TODO: register ID in hashmap saving index in vector to have faster access if a specific Entity is searched
   Entity* getEntityById(std::uint32_t id);
 
   inline std::string getSceneName()
@@ -37,6 +37,10 @@ public:
   inline Camera* getCamera()
   {
     return _camera;
+  }
+  inline World* getWorld()
+  {
+    return _world;
   }
 
 private:

@@ -63,9 +63,9 @@ void RenderManager::update()
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
   clearColor();
-  renderUserInterfaces();
   renderWorld();
   renderGameEntities();
+  renderUserInterfaces();
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
@@ -140,6 +140,51 @@ void RenderManager::renderGameEntities()
 void RenderManager::renderWorld()
 {
   glEnable(GL_DEPTH_TEST);
+
+  World* world = _scene->getWorld();
+  if (world == nullptr)
+  {
+    return;
+  }
+
+  Shader* s = (Shader*)world->getComponent(BitMasks::Components::SHADER);
+  if (s == nullptr || !s->initialized)
+  {
+#ifdef DEBUG
+    logCycle(std::format("{} ### World shader not yet initialized, skipping world render.\n", getName()));
+#endif
+    return;
+  }
+
+  GLuint shaderProgramId = s->programId;
+  glUseProgram(shaderProgramId);
+
+  Material* mat = (Material*)world->getComponent(BitMasks::Components::MATERIAL);
+  if (mat != nullptr && mat->diffuseColorUniform > -1)
+  {
+    UniformUtils::setUniform(mat->diffuseColorUniform, mat->diffuseColor);
+  }
+
+  Model* model = (Model*)world->getComponent(BitMasks::Components::MODEL);
+  if (model == nullptr)
+  {
+#ifdef DEBUG
+    logFailure(std::format("{} ### World model is null, skipping world render.\n", getName()));
+#endif
+    return;
+  }
+
+#ifdef DEBUG
+  std::uint8_t cycle = getLogger()->getCycleLength();
+  if (cycle == 0)
+  {
+    logCycle(std::format("{} ### Rendering world. VAO: {}, vertices: {}.\n", getName(), model->id, model->vertexCount));
+  }
+#endif
+
+  glBindVertexArray(model->id);
+  glDrawElements(GL_TRIANGLES, model->vertexCount, GL_UNSIGNED_INT, 0);
+  glUseProgram(_usedShaderProgram);
 }
 
 void RenderManager::renderUserInterfaces()

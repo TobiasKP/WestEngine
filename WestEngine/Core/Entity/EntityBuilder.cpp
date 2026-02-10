@@ -6,33 +6,31 @@
 
 #include <Config.h>
 #include <format>
-#include <iostream>
 #include <string.h>
 
 void EntityBuilder::createEntities()
 {
   lua_pushnil(L);
-  while (lua_next(L, -2) != 0)
+  while (lua_next(L, -2) > 0)
   {
     Entity e;
     e.setId(Config::incEntityId());
     lua_pushnil(L);
     bool toAdd = true;
-    while (lua_next(L, -2) != 0)
+    while (lua_next(L, -2) > 0)
     {
       const char* key = lua_tostring(L, -2);
-      std::cout << key << std::endl;
       if (strcmp(key, "shader") == 0)
       {
         shaderInfo(e);
       }
       else if (strcmp(key, "world") == 0)
       {
-        std::cout << e.getId() << std::endl;
-        World w;
-        w.setId(e.getId());
-        createWorld(w);
-        Scene::getSceneInstance().addWorld(&w);
+        World* w = new World();
+        w->setId(e.getId());
+        createWorld(*w);
+        Scene::getSceneInstance().addWorld(w);
+        lua_pop(L, 2);
         toAdd = false;
         break;
       }
@@ -188,7 +186,7 @@ void EntityBuilder::createWorld(Entity& e)
 #endif
     return;
   }
-  while (lua_next(L, -2) != 0)
+  while (lua_next(L, -2) > 0)
   {
     if (!strcmp(lua_tostring(L, 0), "grid"))
     {
@@ -197,12 +195,11 @@ void EntityBuilder::createWorld(Entity& e)
 #endif
     }
     lua_pushnil(L);
-    while (lua_next(L, -2) != 0)
+    while (lua_next(L, -2) > 0)
     {
-      std::cout << lua_tonumber(L, -1) << std::endl;
       lua_pushnil(L);
-      while (lua_next(L, -2) != 0)
-      { 
+      while (lua_next(L, -2) > 0)
+      {
         map.push_back(lua_tonumber(L, -1));
         lua_pop(L, 1);
       }
@@ -212,11 +209,52 @@ void EntityBuilder::createWorld(Entity& e)
   }
 
   sqmap = sqrt(map.size());
-  std::cout << sqmap << ":" << map.size() << std::endl;
-  std::tuple<Model*, Material*> m = _loader->loadModel("");
-  Shader* s                       = loadShader(vertexPath, fragmentPath, group);
+
+  std::tuple<Model*, Material*> m = buildWorldMesh(map, sqmap);
+  Material* mat                   = std::get<1>(m);
+  mat->diffuseColor               = glm::vec3(0.2f, 0.6f, 0.2f);
+
+  Shader* s = loadShader(vertexPath, fragmentPath, group);
   e.addComponent(BitMasks::Components::SHADER, s);
   e.addComponent(BitMasks::Components::MODEL, std::get<0>(m));
+  e.addComponent(BitMasks::Components::MATERIAL, mat);
+}
+
+std::tuple<Model*, Material*> EntityBuilder::buildWorldMesh(const std::vector<std::uint8_t>& map, std::int32_t sqmap)
+{
+  std::vector<float> vertices;
+  std::vector<std::int32_t> idx;
+
+  for (std::int32_t row = 0; row < sqmap; ++row)
+  {
+    for (std::int32_t col = 0; col < sqmap; ++col)
+    {
+      std::int32_t base = static_cast<std::int32_t>(vertices.size() / 3);
+      float height      = static_cast<float>(map[row * sqmap + col]);
+
+      for (int v = 0; v < 4; ++v)
+      {
+        vertices.push_back(baseQuad[v * 2] + static_cast<float>(col));
+        vertices.push_back(height);
+        vertices.push_back(baseQuad[v * 2 + 1] + static_cast<float>(row));
+      }
+
+      for (int i = 0; i < 6; ++i)
+      {
+        idx.push_back(base + static_cast<std::int32_t>(indices[i]));
+      }
+    }
+  }
+
+  return _loader->loadModel(vertices.data(),
+                            vertices.size() * sizeof(float),
+                            idx.data(),
+                            idx.size() * sizeof(std::int32_t),
+                            nullptr,
+                            0,
+                            nullptr,
+                            0,
+                            "");
 }
 
 std::tuple<Model*, Material*> EntityBuilder::loadModel(std::string path)
