@@ -85,6 +85,7 @@ void RenderManager::renderGameEntities()
     _scene->getCamera()->update();
   }
 
+  // TODO: entities not sorted by shader group, causes redundant glUseProgram switches
   for (const Entity& entity : _scene->getEntities())
   {
     Shader* s = (Shader*)entity.getComponent(BitMasks::Components::SHADER);
@@ -114,6 +115,7 @@ void RenderManager::renderGameEntities()
     Model* model       = (Model*)entity.getComponent(BitMasks::Components::MODEL);
     Material* material = (Material*)entity.getComponent(BitMasks::Components::MATERIAL);
     assert(model != nullptr && material != nullptr);
+    // TODO: uniforms re-uploaded every frame even if unchanged, add dirty flags to Position/Material
     if (!Config::PAUSE)
     {
       updateUniforms(entity, model, material);
@@ -197,6 +199,7 @@ void RenderManager::renderUserInterfaces()
     return;
   }
 
+  // TODO: 4 vectors recreated per frame, use GL_STREAM_DRAW or persistent mapped buffers
   const size_t dataSize = renderData.size();
   std::vector<float> instanceOffsets;
   std::vector<float> colors;

@@ -112,6 +112,7 @@ void EngineManager::update()
 
   while (!_exitEngine)
   {
+    // TODO: busy-wait loop burns 100% CPU, add sleep or wait on condition variable
     while (Config::PAUSE)
     {
       iterateQ(CYCLE::PAUSE);
@@ -178,6 +179,7 @@ std::int32_t EngineManager::init()
   return success;
 }
 
+// TODO: all managers execute sequentially, independent ones (Input, System, Interface) could run in parallel
 std::int32_t EngineManager::iterateQ(CYCLE code)
 {
   assert(typeid(code) == typeid(EngineManager::CYCLE));

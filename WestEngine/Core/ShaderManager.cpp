@@ -270,7 +270,7 @@ GLuint ShaderManager::initShader(Shader* s, const Entity& entity)
   return programId;
 }
 
-// TODO make switch case
+// TODO: make switch case, also uniform locations queried per entity even when sharing the same shader program - cache per program
 void ShaderManager::addUniforms(GLuint programId, const Entity& entity)
 {
   Model* m     = (Model*)entity.getComponent(BitMasks::Components::MODEL);

@@ -41,6 +41,7 @@ void Scene::init()
 #endif
 }
 
+// TODO: full vector copy per frame, debug entities accessed outside lock (race condition)
 std::vector<Entity> Scene::getEntities()
 {
   std::vector<Entity> entities;

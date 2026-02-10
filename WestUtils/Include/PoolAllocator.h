@@ -9,6 +9,7 @@ struct Chunk
   Chunk* next;
 };
 
+// TODO: allocate/deallocate are not thread-safe, add mutex or use thread-local allocators
 class PoolAllocator
 {
 public:

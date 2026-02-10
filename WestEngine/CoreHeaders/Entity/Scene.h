@@ -26,6 +26,7 @@ public:
   void deleteScene();
 
   // Getter
+  // TODO: getEntities() copies the entire entity vector every frame, return const reference or provide iterator access
   std::vector<Entity> getEntities();
   // TODO: register ID in hashmap saving index in vector to have faster access if a specific Entity is searched
   Entity* getEntityById(std::uint32_t id);
