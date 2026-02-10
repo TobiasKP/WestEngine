@@ -25,8 +25,12 @@ private:
   ObjectLoader* _loader;
   SystemFactory* _sFac;
   ComponentFactory* _cFac;
+  static constexpr std::uint32_t indices[6] = {0, 1, 3, 1, 2, 3};
+  static constexpr float baseQuad[]         = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f};
+  static constexpr float baseTex[]          = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f};
 
-  void basicInfo(const char* name, Entity& e); 
+
+  void basicInfo(const char* name, Entity& e);
   void createProperties(Entity& e);
   void shaderInfo(Entity& e);
   void parseInfos(std::map<std::string, std::int32_t>& infos, std::string& name);

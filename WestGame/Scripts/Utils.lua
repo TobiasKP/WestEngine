@@ -2,7 +2,8 @@ Utils = {}
 
 local yaml = require("yaml")
 
-local function interpreteData(data)
+local function interpreteData(data, source)
+  local log = "YAML parsed for " .. tostring(source)
   local Entity = {
     name = data.name,
     model = data.model,
@@ -39,12 +40,16 @@ local function interpreteData(data)
     for _, details in ipairs(data.world) do
       local detailData = {}
       for key, value in pairs(details) do
-        print("adding " .. tostring(key) .. " with " .. tostring(value))
         detailData[key] = value
+        log = log .. " | " .. tostring(key) .. "=" .. type(value)
       end
       table.insert(Entity.world, detailData)
     end
+    log = log .. " | world entries: " .. #Entity.world
   end
+
+  log = log .. " | components: " .. #Entity.components .. " | systems: " .. #Entity.systems
+  Entity._parseLog = log
 
   return Entity
 end
@@ -70,15 +75,7 @@ function LoadEntity(entity)
     return 1
   end
 
-  print("=== YAML parsed for " .. entity .. " ===")
-  yaml.dump(data)
-  print("world type: " .. type(data.world))
-  if type(data.world) == "table" then
-    print("world length: " .. #data.world)
-  end
-  print("=== END ===")
-
-  return interpreteData(data)
+  return interpreteData(data, entity)
 end
 
 Utils.LoadEntity = LoadEntity

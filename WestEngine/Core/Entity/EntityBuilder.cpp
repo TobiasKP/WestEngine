@@ -17,20 +17,30 @@ void EntityBuilder::createEntities()
     Entity e;
     e.setId(Config::incEntityId());
     lua_pushnil(L);
+    bool toAdd = true;
     while (lua_next(L, -2) != 0)
     {
       const char* key = lua_tostring(L, -2);
+      std::cout << key << std::endl;
       if (strcmp(key, "shader") == 0)
       {
         shaderInfo(e);
       }
       else if (strcmp(key, "world") == 0)
       {
+        std::cout << e.getId() << std::endl;
         World w;
+        w.setId(e.getId());
         createWorld(w);
-        lua_pop(L, 1);
         Scene::getSceneInstance().addWorld(&w);
+        toAdd = false;
         break;
+      }
+      else if (strcmp(key, "_parseLog") == 0)
+      {
+#ifdef DEBUG
+        WestLogger::getLoggerInstance().log(Level::Info, std::format("{}\n", lua_tostring(L, -1)));
+#endif
       }
       else if (lua_istable(L, -1))
       {
@@ -52,7 +62,10 @@ void EntityBuilder::createEntities()
 #ifdef DEBUG
     WestLogger::getLoggerInstance().log(Level::Info, std::format("Adding new Entity to Scene:{}\n", e.getId()));
 #endif
-    Scene::getSceneInstance().addEntity(std::move(e));
+    if (toAdd)
+    {
+      Scene::getSceneInstance().addEntity(std::move(e));
+    }
   }
 }
 
@@ -165,27 +178,41 @@ void EntityBuilder::createWorld(Entity& e)
   WestLogger::getLoggerInstance().log(Level::Info, std::format("Loading World\n"));
 #endif
   std::string vertexPath = "/shader/worldshader.vs", fragmentPath = "/shader/worldshader.fs";
-  std::int32_t group = 1000;
-  std::cout << "x" << std::endl;
-  std::cout << lua_typename(L, lua_type(L, -1)) << std::endl;
-  std::cout << lua_tostring(L, -2) << std::endl;
+  std::int32_t group = 1000, sqmap;
+  std::vector<std::uint8_t> map;
   lua_pushnil(L);
-  if (lua_istable(L, -2))
+  if (!lua_istable(L, -2))
   {
-    std::cout << "yikes" << std::endl;
+#ifdef DEBUG
+    WestLogger::getLoggerInstance().log(Level::Error, std::format("Error loading World, expected a table...\n"));
+#endif
+    return;
   }
   while (lua_next(L, -2) != 0)
   {
-    std::cout << "QQ" << std::endl;
+    if (!strcmp(lua_tostring(L, 0), "grid"))
+    {
+#ifdef DEBUG
+      WestLogger::getLoggerInstance().log(Level::Error, std::format("Error loading World, expected a grid...\n"));
+#endif
+    }
+    lua_pushnil(L);
+    while (lua_next(L, -2) != 0)
+    {
+      std::cout << lua_tonumber(L, -1) << std::endl;
+      lua_pushnil(L);
+      while (lua_next(L, -2) != 0)
+      { 
+        map.push_back(lua_tonumber(L, -1));
+        lua_pop(L, 1);
+      }
+      lua_pop(L, 1);
+    }
+    lua_pop(L, 1);
   }
 
-
-  std::cout << "y" << std::endl;
-  std::cout << lua_tostring(L, -2) << std::endl;
-  std::cout << lua_typename(L, lua_type(L, -1)) << std::endl;
-  std::cout << "z" << std::endl;
-
-
+  sqmap = sqrt(map.size());
+  std::cout << sqmap << ":" << map.size() << std::endl;
   std::tuple<Model*, Material*> m = _loader->loadModel("");
   Shader* s                       = loadShader(vertexPath, fragmentPath, group);
   e.addComponent(BitMasks::Components::SHADER, s);

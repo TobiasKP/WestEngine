@@ -396,7 +396,7 @@ Material* ObjectLoader::generateMaterialFromMTL(const std::string& path)
     {
       float u, v, z;
       sscanf(line + 3, "%f %f", &u, &v);
-      result->diffuseColor = glm::vec3(u, v, z);  
+      result->diffuseColor = glm::vec3(u, v, z);
     }
   }
 
