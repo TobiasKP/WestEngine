@@ -13,7 +13,7 @@
 #include <stdlib.h>
 
 #ifdef _WIN32
-<include> direct.h
+#include <direct.h>
 #define getcwd _getcwd
 #define PATH_MAX MAX_PATH
 #else
