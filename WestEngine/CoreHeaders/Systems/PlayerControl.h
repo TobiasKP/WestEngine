@@ -16,6 +16,7 @@ public:
 
   void update() override;
   void updateDebuggingInfo() override;
+  void init() override;
   void setCameraMovement(glm::vec3 move);
   void setDestinationPosition(glm::vec3 dest);
   bool destinationReached(Position* posComp);
@@ -25,11 +26,13 @@ private:
   std::mutex _CameraMutex, _MovementMutex;
 
   glm::vec3 _moveToDestination = glm::vec3(0.0f);
-  glm::vec3 _moveCamera        = glm::vec3(0.0f);
+  glm::vec3 _moveCamera        = glm::vec3(0.0f); 
   std::atomic<bool> _cameraPending, _movementPending;
 
   void updateCamera(glm::vec3 local);
   void updatePosition(glm::vec3 local, Position* posComp);
+
+  static int movePlayerUnit(lua_State*);
 
   // Debug fields
   DebugDrawUtils* _debugDrawUtils;

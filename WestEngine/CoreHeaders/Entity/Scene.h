@@ -45,7 +45,6 @@ public:
   }
 
 private:
-  static Scene _sceneInstance;
   static std::mutex _mutex;
 
   static Camera* _camera;

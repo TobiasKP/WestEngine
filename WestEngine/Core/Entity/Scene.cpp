@@ -2,7 +2,6 @@
 
 #include <algorithm>
 
-Scene Scene::_sceneInstance;
 std::mutex Scene::_mutex;
 Camera* Scene::_camera;
 World* Scene::_world;
@@ -12,7 +11,7 @@ Scene& Scene::getSceneInstance()
   std::lock_guard<std::mutex> lock(_mutex);
 
   static Scene instance;
-  return _sceneInstance;
+  return instance;
 }
 
 Scene::Scene()
@@ -41,14 +40,10 @@ void Scene::init()
 #endif
 }
 
-// TODO: full vector copy per frame, debug entities accessed outside lock (race condition)
 std::vector<Entity> Scene::getEntities()
 {
-  std::vector<Entity> entities;
-  {
-    std::lock_guard<std::mutex> lock(_mutex);
-    entities = _entities;
-  }
+  std::lock_guard<std::mutex> lock(_mutex);
+  std::vector<Entity> entities = _entities;
 #ifdef DEBUG
   if (_debugEntities.size() > 0)
   {
@@ -108,25 +103,25 @@ void Scene::addWorld(World* world)
 
 void Scene::removeEntity(const Entity& entity)
 {
+  std::lock_guard<std::mutex> lock(_mutex);
+
   auto entityIt =
     std::find_if(_entities.begin(), _entities.end(), [&](const Entity& en) { return en.getId() == entity.getId(); });
 
   if (entityIt != _entities.end())
   {
-    std::lock_guard<std::mutex> lock(_mutex);
     _entities.erase(entityIt);
   }
 
 #ifdef DEBUG
   if (entity.isDebugEntity())
   {
-    auto entityIt = std::find_if(
+    auto debugIt = std::find_if(
       _debugEntities.begin(), _debugEntities.end(), [&](const Entity& en) { return en.getId() == entity.getId(); });
 
-    if (entityIt != _debugEntities.end())
+    if (debugIt != _debugEntities.end())
     {
-      std::lock_guard<std::mutex> lock(_mutex);
-      _debugEntities.erase(entityIt);
+      _debugEntities.erase(debugIt);
     }
   }
 #endif

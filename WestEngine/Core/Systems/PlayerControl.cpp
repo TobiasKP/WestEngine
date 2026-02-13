@@ -1,5 +1,6 @@
 #include "../../CoreHeaders/Systems/PlayerControl.h"
 
+#include "../../Constants/LuaAPI.hpp"
 #include "../../Constants/Systems.hpp"
 #include "../CoreHeaders/Entity/Scene.h"
 
@@ -18,6 +19,11 @@ PlayerControl::PlayerControl(WestLogger* logger) : ISystem(), _logger(logger), _
 };
 
 PlayerControl::~PlayerControl() {}
+
+void PlayerControl::init()
+{
+  LuaFacade::getLuaFacadeInstance().registerCFunction(movePlayerUnit, LuaAPI::C_MOVE_PLAYER, this);
+}
 
 void PlayerControl::update()
 {
@@ -63,7 +69,12 @@ void PlayerControl::update()
     posComp          = (Position*)e->getComponent(BitMasks::Components::POSITION);
     assert(posComp != nullptr);
   }
-  if (pending || !destinationReached(posComp))
+  if (pending)
+  {
+    LuaFacade::getLuaFacadeInstance().onTileClicked(
+      ids.front(), LuaFacade::MouseAction::LMOUSE_CLICK, _moveToDestination);
+  }
+  if (!destinationReached(posComp))
   {
     glm::vec3 localDest;
 #ifdef DEBUG
@@ -121,13 +132,11 @@ void PlayerControl::updatePosition(glm::vec3 local, Position* posComp)
 {
   assert(posComp != nullptr);
   glm::vec3 direction = local - posComp->position;
-
   if (glm::length2(direction) <= Config::GeneralConfig.SPEED * Config::GeneralConfig.SPEED)
   {
     posComp->position = local;
     return;
   }
-
   direction          = glm::normalize(direction) * Config::GeneralConfig.SPEED;
   posComp->position += direction;
 }
@@ -199,7 +208,7 @@ void PlayerControl::updateDebuggingInfo()
   std::uint32_t id = ids.front();
   Entity* e        = Scene::getSceneInstance().getEntityById(id);
   assert(e != nullptr);
-  Position* posComp = (Position*)e->getComponent(BitMasks::Components::POSITION); 
+  Position* posComp = (Position*)e->getComponent(BitMasks::Components::POSITION);
   assert(posComp != nullptr);
 #ifdef DEBUG
   if (posComp == nullptr)
@@ -226,7 +235,20 @@ void PlayerControl::updateDebuggingInfo()
                            posComp->position.x,
                            posComp->position.y,
                            posComp->position.z));
- 
-  _debugEntityId  = _debugDrawUtils->addLine(posComp->position, direction);
-  _drawn          = true;
+
+  _debugEntityId = _debugDrawUtils->addLine(posComp->position, direction);
+  _drawn         = true;
+}
+
+int PlayerControl::movePlayerUnit(lua_State* L)
+{
+  std::int32_t n = lua_gettop(L);
+  assert(n == 4);
+  Entity* e = Scene::getSceneInstance().getEntityById(lua_tonumber(L, 1));
+  assert(e != nullptr);
+  Position* posComp = (Position*)e->getComponent(BitMasks::Components::POSITION);
+  assert(posComp != nullptr);
+  PlayerControl* me      = (PlayerControl*)lua_touserdata(L, lua_upvalueindex(1));
+  me->_moveToDestination = glm::vec3(lua_tonumber(L, 2), lua_tonumber(L, 3), lua_tonumber(L, 4));
+  return 0;
 }

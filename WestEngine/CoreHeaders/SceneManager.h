@@ -4,6 +4,7 @@
 #include "Entity/Scene.h"
 #include "Interfaces/IManager.h"
 #include "Utils/DataUtils/ObjectLoader.h"
+#include "../Core/Scripting/LuaFacade.hpp"
 
 #include <lua.hpp>
 
@@ -21,6 +22,7 @@ public:
   std::int32_t init() override;
 
 private:
+  LuaFacade* _facade;
   Scene* _scene;
   ObjectLoader* _loader;
   lua_State* L;

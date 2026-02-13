@@ -14,8 +14,7 @@
 
 #include "../CoreHeaders/Entity/Camera.h"
 
-SceneManager::SceneManager()
-  : IManager(nullptr)
+SceneManager::SceneManager() : IManager(nullptr)
 {
   setName(CoreConstants::SCENE_MANAGER);
   _scene   = nullptr;
@@ -41,8 +40,10 @@ std::int32_t SceneManager::startup()
   _scene      = &Scene::getSceneInstance();
   Camera* cam = new Camera(glm::vec3(0.0, 3.0, 5.0), glm::vec3(25.0f, 0, 0));
   _scene->addCamera(cam);
-  L = luaL_newstate();
-  luaL_openlibs(L);
+  _facade = &LuaFacade::getLuaFacadeInstance();
+  _facade->startup(getLogger());
+  L = _facade->getLuaState();
+
   _builder = new EntityBuilder(L, _loader);
   assert(_loader != nullptr && _scene != nullptr && L != nullptr && _builder != nullptr);
 #ifdef DEBUG
@@ -56,7 +57,7 @@ void SceneManager::shutdown()
 #ifdef DEBUG
   logDebug(std::format("{} ### Shutting down {}...\n", getName(), getName()));
 #endif
-  lua_close(L);
+  _facade->shutdown();
   deleteScene();
 }
 

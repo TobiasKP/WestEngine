@@ -43,6 +43,10 @@ std::int32_t SystemManager::init()
 #endif
 
   _scene = &Scene::getSceneInstance();
+  for (ISystem* sys : _systems)
+  {
+    sys->init();
+  }
 
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();

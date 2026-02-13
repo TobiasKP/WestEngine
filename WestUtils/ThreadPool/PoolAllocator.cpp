@@ -23,6 +23,8 @@ Chunk* PoolAllocator::allocateBlock(size_t chunkSize)
 
 void* PoolAllocator::allocate(size_t size)
 {
+  std::lock_guard<std::mutex> lock(_mutex);
+
   if (_allocationPointer == nullptr)
   {
     _allocationPointer = allocateBlock(size);
@@ -39,6 +41,7 @@ void* PoolAllocator::allocate(size_t size)
 
 void PoolAllocator::deallocate(void* chunk, size_t size)
 {
+  std::lock_guard<std::mutex> lock(_mutex);
   reinterpret_cast<Chunk*>(chunk)->next = _allocationPointer;
   _allocationPointer                    = reinterpret_cast<Chunk*>(chunk);
 }
