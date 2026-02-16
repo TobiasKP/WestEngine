@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../CoreHeaders/Entity/Entity.h"
+#include "../../CoreHeaders/Entity/World.hpp"
 #include "../Components/ComponentFactory.h"
 #include "../Systems/SystemFactory.h"
 #include "../Utils/DataUtils/ObjectLoader.h"
@@ -33,7 +34,7 @@ private:
   void createProperties(Entity& e);
   void shaderInfo(Entity& e);
   void parseInfos(std::map<std::string, std::int32_t>& infos, std::string& name);
-  void createWorld(Entity& e);
+  void createWorld(World& e);
   std::tuple<Model*, Material*> buildWorldMesh(const std::vector<std::uint8_t>& map, std::int32_t sqmap);
   std::tuple<Model*, Material*> loadModel(std::string path);
   Shader* loadShader(std::string vertexShaderFile, std::string fragShaderFile, std::int32_t shaderGroup);

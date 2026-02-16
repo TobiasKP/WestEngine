@@ -184,6 +184,12 @@ void RenderManager::renderWorld()
   }
 #endif
 
+  std::vector<std::uint32_t> flags = world->getFlagData();
+  std::int32_t dimension          = world->getGridSize();
+  UniformUtils::setUniform(world->getFlagUniform(), flags);
+  UniformUtils::setUniform(world->getGridUniform(), dimension);
+
+
   glBindVertexArray(model->id);
   glDrawElements(GL_TRIANGLES, model->vertexCount, GL_UNSIGNED_INT, 0);
   glUseProgram(_usedShaderProgram);
@@ -258,16 +264,16 @@ void RenderManager::renderUserInterfaces()
   glBindVertexArray(_facade->_interfaceVAO);
 
   glBindBuffer(GL_ARRAY_BUFFER, _facade->_interfaceCOL);
-  glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_DYNAMIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, _facade->_interfaceOFFSET);
-  glBufferData(GL_ARRAY_BUFFER, instanceOffsets.size() * sizeof(float), instanceOffsets.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, instanceOffsets.size() * sizeof(float), instanceOffsets.data(), GL_DYNAMIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, _facade->_interfaceFLAGS);
-  glBufferData(GL_ARRAY_BUFFER, flags.size() * sizeof(std::uint32_t), flags.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, flags.size() * sizeof(std::uint32_t), flags.data(), GL_DYNAMIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, _facade->_interfaceUV);
-  glBufferData(GL_ARRAY_BUFFER, textCoords.size() * sizeof(float), textCoords.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, textCoords.size() * sizeof(float), textCoords.data(), GL_DYNAMIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 

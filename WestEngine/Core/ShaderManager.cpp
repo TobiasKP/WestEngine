@@ -17,7 +17,7 @@
 #include <unistd.h>
 #endif
 
-  using namespace WestInterface;
+using namespace WestInterface;
 
 ShaderManager::ShaderManager() : IManager(nullptr)
 {
@@ -174,11 +174,13 @@ void ShaderManager::initWorldShader()
   Material* mat = (Material*)world->getComponent(BitMasks::Components::MATERIAL);
   if (mat != nullptr)
   {
-    mat->diffuseColorUniform = UniformUtils::createUniform("ddColor", programId);
+    mat->diffuseColorUniform = UniformUtils::createUniform(UniformConstants::DCOLOR, programId);
 #ifdef DEBUG
     logDebug(std::format("{} ### World color uniform location: {}.\n", getName(), mat->diffuseColorUniform));
 #endif
   }
+  world->setFlagUniform(UniformUtils::createUniform(UniformConstants::WORLD_TILEARRAY, programId));
+  world->setGridUniform(UniformUtils::createUniform(UniformConstants::WORLD_GRIDSIZE, programId));
 }
 
 GLuint ShaderManager::initInterfaceShader()
@@ -270,7 +272,8 @@ GLuint ShaderManager::initShader(Shader* s, const Entity& entity)
   return programId;
 }
 
-// TODO: make switch case, also uniform locations queried per entity even when sharing the same shader program - cache per program
+// TODO: make switch case, also uniform locations queried per entity even when sharing the same shader program - cache
+// per program
 void ShaderManager::addUniforms(GLuint programId, const Entity& entity)
 {
   Model* m     = (Model*)entity.getComponent(BitMasks::Components::MODEL);

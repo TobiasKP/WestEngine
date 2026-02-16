@@ -24,7 +24,7 @@ void MouseCallbacks::mouseCallback(GLFWwindow* window, double x, double y)
 
   std::tuple<std::int16_t, bool> hover = isInterfaceHovered();
   if (std::get<0>(hover) != std::get<0>(_currentHover))
-  { 
+  {
     if (std::get<0>(_currentHover) != -1 && std::get<1>(_currentHover))
     {
       _iObserver->setControlFlag(BitMasks::Control::UI_UNHOVERED, std::get<0>(_currentHover));
@@ -35,6 +35,8 @@ void MouseCallbacks::mouseCallback(GLFWwindow* window, double x, double y)
       _iObserver->setControlFlag(BitMasks::Control::UI_HOVERED, std::get<0>(hover));
     }
   }
+  glm::vec3 hoverPosition = PositionCalculation::getWorldPosition(_currentPos, Scene::getSceneInstance().getCamera());
+  Scene::getSceneInstance().getWorld()->worldPosToTile(hoverPosition.x, hoverPosition.z);
 
   _currentHover = hover;
 }

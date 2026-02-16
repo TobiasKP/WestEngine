@@ -13,11 +13,11 @@ glm::vec3 PositionCalculation::getWorldPosition(glm::vec2 screenPosition, Camera
   glm::vec4 worldPos   = inverseVP * screenPos;
   worldPos            /= worldPos.w;
 
-  float planeZ          = 0.0f;
-  float t               = (planeZ - camera->getPosition().z) / (worldPos.z - camera->getPosition().z);
+  float planeY          = 0.0f;
+  float t               = (planeY - camera->getPosition().y) / (worldPos.y - camera->getPosition().y);
   glm::vec3 destination = glm::vec3(camera->getPosition().x + t * (worldPos.x - camera->getPosition().x),
-                                    camera->getPosition().y + t * (worldPos.y - camera->getPosition().y),
-                                    planeZ);
+                                    planeY,
+                                    camera->getPosition().z + t * (worldPos.z - camera->getPosition().z));
 
   return destination;
 }

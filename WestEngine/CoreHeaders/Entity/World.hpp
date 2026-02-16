@@ -3,4 +3,53 @@
 #include "Entity.h"
 
 class World : public Entity
-{};
+{
+public:
+  World();
+  ~World();
+
+  void worldPosToTile(double x, double y);
+
+  inline GLuint getFlagUniform()
+  {
+    return _utileFlags;
+  }
+  inline GLuint getGridUniform()
+  {
+    return _ugridSize;
+  }
+  inline std::int32_t getGridSize()
+  {
+    return _dimension;
+  }
+  std::vector<std::uint32_t> getFlagData()
+  {
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _vflags;
+  }
+
+  void setCreationInformation(std::uint32_t d, std::uint32_t s, glm::vec2 o)
+  {
+    _dimension = d;
+    _tileSize  = s;
+    _origin    = o;
+    _vflags.resize(_dimension * _dimension);
+    std::fill(_vflags.begin(), _vflags.end(), 0);
+  };
+  inline void setFlagUniform(GLuint u)
+  {
+    _utileFlags = u;
+  }
+  inline void setGridUniform(GLuint u)
+  {
+    _ugridSize = u;
+  }
+
+
+private:
+  std::mutex _mutex;
+  std::uint32_t _dimension, _tileSize;
+  glm::vec2 _origin;
+  std::vector<std::uint32_t> _vflags;
+  GLuint _ugridSize, _utileFlags;
+};

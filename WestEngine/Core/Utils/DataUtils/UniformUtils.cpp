@@ -18,9 +18,19 @@ GLuint UniformUtils::createUniform(const char* name, GLuint programId)
   return location;
 }
 
+void UniformUtils::setUniform(GLuint location, const std::vector<uint32_t>& value)
+{
+  glUniform1uiv(location, value.size(), value.data());
+}
+
 void UniformUtils::setUniform(GLuint location, std::int32_t value)
 {
   glUniform1i(location, value);
+}
+
+void UniformUtils::setUniform(GLuint location, std::uint32_t value)
+{
+  glUniform1ui(location, value);
 }
 
 void UniformUtils::setUniform(GLuint location, bool value)

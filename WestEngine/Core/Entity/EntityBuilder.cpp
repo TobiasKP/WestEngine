@@ -170,7 +170,7 @@ void EntityBuilder::shaderInfo(Entity& e)
   e.addComponent(BitMasks::Components::SHADER, s);
 }
 
-void EntityBuilder::createWorld(Entity& e)
+void EntityBuilder::createWorld(World& e)
 {
 #ifdef DEBUG
   WestLogger::getLoggerInstance().log(Level::Info, std::format("Loading World\n"));
@@ -209,6 +209,7 @@ void EntityBuilder::createWorld(Entity& e)
   }
 
   sqmap = sqrt(map.size());
+  e.setCreationInformation(sqmap, 1, glm::vec2(0, 0));
 
   std::tuple<Model*, Material*> m = buildWorldMesh(map, sqmap);
   Material* mat                   = std::get<1>(m);
@@ -223,6 +224,7 @@ void EntityBuilder::createWorld(Entity& e)
 std::tuple<Model*, Material*> EntityBuilder::buildWorldMesh(const std::vector<std::uint8_t>& map, std::int32_t sqmap)
 {
   std::vector<float> vertices;
+  std::vector<float> texCoords;
   std::vector<std::int32_t> idx;
 
   for (std::int32_t row = 0; row < sqmap; ++row)
@@ -237,6 +239,9 @@ std::tuple<Model*, Material*> EntityBuilder::buildWorldMesh(const std::vector<st
         vertices.push_back(baseQuad[v * 2] + static_cast<float>(col));
         vertices.push_back(height);
         vertices.push_back(baseQuad[v * 2 + 1] + static_cast<float>(row));
+
+        texCoords.push_back(baseQuad[v * 2]);
+        texCoords.push_back(baseQuad[v * 2 + 1]);
       }
 
       for (int i = 0; i < 6; ++i)
@@ -250,8 +255,8 @@ std::tuple<Model*, Material*> EntityBuilder::buildWorldMesh(const std::vector<st
                             vertices.size() * sizeof(float),
                             idx.data(),
                             idx.size() * sizeof(std::int32_t),
-                            nullptr,
-                            0,
+                            texCoords.data(),
+                            texCoords.size() * sizeof(float),
                             nullptr,
                             0,
                             "");
