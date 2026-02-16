@@ -8,7 +8,8 @@ public:
   World();
   ~World();
 
-  void worldPosToTile(double x, double y);
+  std::int32_t worldPosToTile(double x, double y);
+  std::optional<glm::vec3> tileToWorldPos(std::int32_t idx);
   std::int32_t calculateIndex(double x, double y);
 
   inline GLuint getFlagUniform()

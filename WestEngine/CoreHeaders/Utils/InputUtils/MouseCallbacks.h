@@ -27,8 +27,8 @@ private:
 
   static std::vector<ElementBounds*> _elements;
 
-  static glm::vec2 _currentPos;
+  static glm::vec2 _currentPos; 
   static std::tuple<std::int16_t, bool> _currentHover;
-  static std::int32_t _inWindow, _leftButtonPress, _rightButtonPress;
+  static std::int32_t _inWindow, _leftButtonPress, _rightButtonPress, _tileIdx;
   static InputObserver* _iObserver;
 };

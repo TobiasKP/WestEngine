@@ -8,6 +8,7 @@ glm::vec2 MouseCallbacks::_currentPos = glm::vec2(0.0f);
 std::int32_t MouseCallbacks::_inWindow                       = 0;
 std::int32_t MouseCallbacks::_leftButtonPress                = 0;
 std::int32_t MouseCallbacks::_rightButtonPress               = 0;
+std::int32_t MouseCallbacks::_tileIdx                        = -1;
 std::tuple<std::int16_t, bool> MouseCallbacks::_currentHover = std::make_tuple(-1, false);
 std::vector<ElementBounds*> MouseCallbacks::_elements;
 
@@ -36,7 +37,7 @@ void MouseCallbacks::mouseCallback(GLFWwindow* window, double x, double y)
     }
   }
   glm::vec3 hoverPosition = PositionCalculation::getWorldPosition(_currentPos, Scene::getSceneInstance().getCamera());
-  Scene::getSceneInstance().getWorld()->worldPosToTile(hoverPosition.x, hoverPosition.z);
+  _tileIdx                = Scene::getSceneInstance().getWorld()->worldPosToTile(hoverPosition.x, hoverPosition.z);
 
   _currentHover = hover;
 }
@@ -67,7 +68,12 @@ void MouseCallbacks::mouseButtonCallback(GLFWwindow* window,
     else if (std::get<0>(hover) == -1)
     {
       glm::vec3 destination = PositionCalculation::getWorldPosition(_currentPos, Scene::getSceneInstance().getCamera());
-      _iObserver->setControlFlag(BitMasks::Control::PLAYER_MOVING, destination);
+      std::optional<glm::vec3> res = Scene::getSceneInstance().getWorld()->tileToWorldPos(_tileIdx);
+      if (!res.has_value())
+      {
+        return;
+      }
+      _iObserver->setControlFlag(BitMasks::Control::PLAYER_MOVING, res.value());
     }
   }
   if (button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS)
