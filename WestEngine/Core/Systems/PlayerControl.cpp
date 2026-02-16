@@ -71,8 +71,21 @@ void PlayerControl::update()
   }
   if (pending)
   {
-    LuaFacade::getLuaFacadeInstance().onTileClicked(
+    bool result = LuaFacade::getLuaFacadeInstance().onTileClicked(
       ids.front(), LuaFacade::MouseAction::LMOUSE_CLICK, _moveToDestination);
+    if (result)
+    {
+      _logger->log(Level::Info,
+                   std::format("{} *** Error calling lua function: {}\n",
+                               getName(),
+                               (std::int32_t)LuaFacade::MouseAction::LMOUSE_CLICK));
+      return;
+    }
+    _moving = true;
+  }
+  if (!_moving)
+  {
+    return;
   }
   if (!destinationReached(posComp))
   {
@@ -112,11 +125,32 @@ void PlayerControl::update()
 #endif
     updatePosition(localDest, posComp);
   }
-
 #ifdef DEBUG
   else
   {
+    _moving     = false;
+    bool result = LuaFacade::getLuaFacadeInstance().onStateChange(ids.front(), LuaFacade::LuaStates::IDLE);
+    if (result)
+    {
+      _logger->log(Level::Info,
+                   std::format("{} *** Error calling lua function state change with state: {}\n",
+                               getName(),
+                               (std::int32_t)LuaFacade::LuaStates::IDLE));
+    }
     _posLog = true;
+  }
+#else
+  else
+  {
+    _moving = false;
+    LuaFacade::getLuaFacadeInstance().onStateChange(ids.front(), LuaFacade::LuaStates::IDLE);
+    if (result)
+    {
+      _logger->log(Level::Info,
+                   std::format("{} *** Error calling lua function state change with state: {}\n",
+                               getName(),
+                               (std::int32_t)LuaFacade::LuaStates::IDLE));
+    }
   }
 #endif
 }

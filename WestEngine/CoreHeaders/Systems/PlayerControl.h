@@ -26,7 +26,7 @@ private:
   std::mutex _CameraMutex, _MovementMutex;
 
   glm::vec3 _moveToDestination = glm::vec3(0.0f);
-  glm::vec3 _moveCamera        = glm::vec3(0.0f); 
+  glm::vec3 _moveCamera        = glm::vec3(0.0f);
   std::atomic<bool> _cameraPending, _movementPending;
 
   void updateCamera(glm::vec3 local);
@@ -36,6 +36,6 @@ private:
 
   // Debug fields
   DebugDrawUtils* _debugDrawUtils;
-  bool _drawn, _camLog, _posLog;
+  bool _drawn, _camLog, _posLog, _moving;
   std::uint32_t _debugEntityId;
 };

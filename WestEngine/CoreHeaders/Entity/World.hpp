@@ -9,6 +9,7 @@ public:
   ~World();
 
   void worldPosToTile(double x, double y);
+  std::int32_t calculateIndex(double x, double y);
 
   inline GLuint getFlagUniform()
   {
@@ -49,6 +50,7 @@ public:
 private:
   std::mutex _mutex;
   std::uint32_t _dimension, _tileSize;
+  std::int32_t _lastIdx;
   glm::vec2 _origin;
   std::vector<std::uint32_t> _vflags;
   GLuint _ugridSize, _utileFlags;

@@ -46,16 +46,16 @@ void KeyboardCallbacks::executeBoundOperation(std::int32_t key, const std::strin
     return;
   }
 
-  std::int32_t x = 0, y = 0;
+  std::int32_t x = 0, z = 0;
   bool updateCam = false;
   if (boundOperation.compare("CameraUp") == 0)
   {
-    y         = 1;
+    z         = -1;
     updateCam = true;
   }
   else if (boundOperation.compare("CameraDown") == 0)
   {
-    y         = -1;
+    z         = 1;
     updateCam = true;
   }
   else if (boundOperation.compare("CameraLeft") == 0)
@@ -71,6 +71,6 @@ void KeyboardCallbacks::executeBoundOperation(std::int32_t key, const std::strin
 
   if (updateCam)
   {
-    _iObserver->setControlFlag(BitMasks::Control::CAMERA_MOVING, x, y);
+    _iObserver->setControlFlag(BitMasks::Control::CAMERA_MOVING, x, z);
   }
 }

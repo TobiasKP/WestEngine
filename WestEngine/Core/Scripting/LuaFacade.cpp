@@ -100,6 +100,21 @@ bool LuaFacade::onEntityClicked(std::int32_t calleeId, MouseAction m, std::int32
   return 0;
 }
 
+bool LuaFacade::onStateChange(std::int32_t calleeId, std::int32_t state)
+{
+  lua_getglobal(L, LuaAPI::STATE_CHANGE.c_str());
+  lua_pushinteger(L, calleeId);
+  lua_pushinteger(L, state);
+  std::int32_t status = lua_pcall(L, 2, 0, 0);
+  if (status != 0)
+  {
+    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}", lua_tostring(L, -1)));
+    lua_pop(L, 1);
+    return 1;
+  }
+  return 0;
+}
+
 bool LuaFacade::loadAPI()
 {
   char cwd[PATH_MAX];
@@ -116,5 +131,7 @@ bool LuaFacade::loadAPI()
     return 1;
   }
   luaL_dofile(L, filePath);
+  lua_getglobal(L, "Init");
+  lua_call(L, 0, 0);
   return 0;
 }
