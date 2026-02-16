@@ -206,7 +206,7 @@ void PlayerControl::setCameraMovement(glm::vec3 move)
 void PlayerControl::setDestinationPosition(glm::vec3 dest)
 {
   std::unique_lock<std::mutex> lock(_MovementMutex, std::try_to_lock);
-  if (lock.owns_lock())
+  if (lock.owns_lock() && !_moving)
   {
     _moveToDestination = dest;
     _movementPending.store(true);
