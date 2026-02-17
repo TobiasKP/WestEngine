@@ -51,7 +51,7 @@ void InputObserver::notify()
 
     if (static_cast<bool>(_controlFlags & BitMasks::Control::PLAYER_MOVING))
     {
-      _control->setDestinationPosition(_playerDestination);
+      _control->passDestinationPosition(_playerDestination);
     }
 
     _interfaceHoverId = _interfaceUnhoverId = -1;

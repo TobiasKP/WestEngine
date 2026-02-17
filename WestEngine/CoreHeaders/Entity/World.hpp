@@ -2,6 +2,8 @@
 
 #include "Entity.h"
 
+#include "../Components/Movement.hpp"
+
 class World : public Entity
 {
 public:
@@ -11,6 +13,7 @@ public:
   std::int32_t worldPosToTile(double x, double y);
   std::optional<glm::vec3> tileToWorldPos(std::int32_t idx);
   std::int32_t calculateIndex(double x, double y);
+  std::optional<std::vector<std::int32_t>> getReachableTiles(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a);
 
   inline GLuint getFlagUniform()
   {

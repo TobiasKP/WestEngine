@@ -6,3 +6,4 @@ components:
   - { name: "movement", r: 2, a: 0 }
 systems:
   - { name: "PlayerControl" }
+  - { name: "Movement" }

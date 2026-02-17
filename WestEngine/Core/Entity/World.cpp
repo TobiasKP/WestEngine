@@ -36,11 +36,12 @@ std::int32_t World::worldPosToTile(double x, double y)
 
 std::optional<glm::vec3> World::tileToWorldPos(std::int32_t idx)
 {
-  if(idx == -1) {
+  if (idx == -1)
+  {
     return {};
   }
-  int column = idx % _dimension;
-  int row    = idx / _dimension;
+  std::int32_t column = idx % _dimension;
+  std::int32_t row    = idx / _dimension;
   return glm::vec3(column + 0.5, 0, row + 0.5);
 }
 
@@ -54,4 +55,25 @@ std::int32_t World::calculateIndex(double x, double y)
   {
     return std::int32_t(std::floor(x) + std::floor(y) * _dimension);
   }
+}
+
+std::optional<std::vector<std::int32_t>>
+World::getReachableTiles(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a)
+{
+  std::vector<std::int32_t> result;
+  if (static_cast<std::int32_t>(a) == static_cast<std::int32_t>(algorithm::MANHATTAN))
+  {
+    for (std::int32_t r = std::max(0, row - range); r <= std::min(_dimension - 1, std::uint32_t(row + range)); r++)
+    {
+      for (std::int32_t c = std::max(0, col - range); c <= std::min(_dimension - 1, std::uint32_t(col + range)); c++)
+      {
+        std::int32_t sum = abs(r - row) + abs(c - col);
+        if (sum <= range)
+        {
+          result.push_back(r * _dimension + c);
+        }
+      }
+    }
+  }
+  return result;
 }

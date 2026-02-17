@@ -3,6 +3,7 @@
 #include "Entity/Scene.h"
 #include "Interfaces/IManager.h"
 #include "Systems/Umbrella.h"
+#include "Components/Umbrella.h"
 
 #include <map>
 #include <WestInterfaceFacade.h>

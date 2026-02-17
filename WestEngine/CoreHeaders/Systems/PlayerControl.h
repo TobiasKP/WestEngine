@@ -1,11 +1,12 @@
 #pragma once
 
+#include "../Components/Position.h"
 #include "../Interfaces/ISystem.h"
-#include "../Utils/Draw/DebugDrawUtils.h"
 
 #include <atomic>
 #include <mutex>
 #include <WestLogger.h>
+
 
 class PlayerControl : public ISystem
 {
@@ -18,8 +19,7 @@ public:
   void updateDebuggingInfo() override;
   void init() override;
   void setCameraMovement(glm::vec3 move);
-  void setDestinationPosition(glm::vec3 dest);
-  bool destinationReached(Position* posComp);
+  void passDestinationPosition(glm::vec3 dest);
 
 private:
   WestLogger* _logger;
@@ -27,15 +27,15 @@ private:
 
   glm::vec3 _moveToDestination = glm::vec3(0.0f);
   glm::vec3 _moveCamera        = glm::vec3(0.0f);
-  std::atomic<bool> _cameraPending, _movementPending;
+  std::atomic<bool> _cameraPending, _movementInitiated;
 
   void updateCamera(glm::vec3 local);
   void updatePosition(glm::vec3 local, Position* posComp);
 
   static int movePlayerUnit(lua_State*);
+  static int actionFinished(lua_State*);
 
   // Debug fields
-  DebugDrawUtils* _debugDrawUtils;
-  bool _drawn, _camLog, _posLog, _moving;
-  std::uint32_t _debugEntityId;
+
+  bool _camLog;
 };
