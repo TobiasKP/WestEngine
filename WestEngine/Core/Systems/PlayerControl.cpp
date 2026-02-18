@@ -12,6 +12,7 @@ PlayerControl::PlayerControl(WestLogger* logger) : ISystem(), _logger(logger), _
 {
   setName(Systems::PLAYER_CONTROL);
   _movementInitiated.store(false);
+  _cleared = false;
 #ifdef DEBUG
   _logger->log(Level::Info, std::format("{} *** Initialized debug information", getName()));
   _camLog = true;
@@ -63,16 +64,18 @@ void PlayerControl::update()
     assert(movComp != nullptr);
     Position* posComp = (Position*)e->getComponent(BitMasks::Components::POSITION);
     assert(posComp != nullptr);
-    World* w                                     = Scene::getSceneInstance().getWorld();
-    std::int32_t tileIdx                         = w->calculateIndex(posComp->position.x, posComp->position.z);
-    std::int32_t dimension                       = w->getGridSize();
-    std::int32_t column                          = tileIdx % dimension;
-    std::int32_t row                             = tileIdx / dimension;
-    std::optional<std::vector<std::int32_t>> res = w->getReachableTiles(row, column, movComp->range, movComp->a);
-    if (res.has_value())
-    {
-      movComp->reachableTiles = res.value();
-    }
+    World* w                      = Scene::getSceneInstance().getWorld();
+    std::int32_t tileIdx          = w->calculateIndex(posComp->position.x, posComp->position.z);
+    std::int32_t dimension        = w->getGridSize();
+    std::int32_t column           = tileIdx % dimension;
+    std::int32_t row              = tileIdx / dimension;
+    std::vector<std::int32_t> res = w->getReachableTiles(row, column, movComp->range, movComp->a, this);
+    movComp->reachableTiles       = res;
+  }
+  if (!_cleared.exchange(true))
+  {
+    World* w = Scene::getSceneInstance().getWorld();
+    w->clearFlag(0x0002u);
   }
 }
 
@@ -102,8 +105,11 @@ void PlayerControl::passDestinationPosition(glm::vec3 dest)
   Entity* e                 = Scene::getSceneInstance().getEntityById(id);
   Movement* movComp         = (Movement*)e->getComponent(BitMasks::Components::MOVEMENT);
   assert(movComp != nullptr);
-  if (!_movementInitiated.load())
-  { 
+  std::int32_t tile = Scene::getSceneInstance().getWorld()->calculateIndex(dest.x, dest.z);
+  bool inRange =
+    std::find(movComp->reachableTiles.begin(), movComp->reachableTiles.end(), tile) != movComp->reachableTiles.end();
+  if (!_movementInitiated.load() && inRange)
+  {
     movComp->destination = dest;
     movComp->movementPending.store(true);
   }
@@ -115,6 +121,7 @@ int PlayerControl::movePlayerUnit(lua_State* L)
   assert(n == 1);
   PlayerControl* me = (PlayerControl*)lua_touserdata(L, lua_upvalueindex(1));
   me->_movementInitiated.store(true);
+  me->_cleared.store(false);
   return 0;
 }
 

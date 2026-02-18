@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Entity.h"
-
 #include "../Components/Movement.hpp"
+#include "Entity.h"
 
 class World : public Entity
 {
@@ -13,7 +12,10 @@ public:
   std::int32_t worldPosToTile(double x, double y);
   std::optional<glm::vec3> tileToWorldPos(std::int32_t idx);
   std::int32_t calculateIndex(double x, double y);
-  std::optional<std::vector<std::int32_t>> getReachableTiles(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a);
+  std::vector<std::int32_t>
+  getReachableTiles(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a, void* callee);
+  void clearFlag(std::uint32_t flag);
+  void setFlag(std::uint32_t flag, std::int32_t idx);
 
   inline GLuint getFlagUniform()
   {

@@ -6,8 +6,6 @@
 glm::vec2 MouseCallbacks::_currentPos = glm::vec2(0.0f);
 
 std::int32_t MouseCallbacks::_inWindow                       = 0;
-std::int32_t MouseCallbacks::_leftButtonPress                = 0;
-std::int32_t MouseCallbacks::_rightButtonPress               = 0;
 std::int32_t MouseCallbacks::_tileIdx                        = -1;
 std::tuple<std::int16_t, bool> MouseCallbacks::_currentHover = std::make_tuple(-1, false);
 std::vector<ElementBounds*> MouseCallbacks::_elements;
@@ -67,7 +65,6 @@ void MouseCallbacks::mouseButtonCallback(GLFWwindow* window,
     }
     else if (std::get<0>(hover) == -1)
     {
-      glm::vec3 destination = PositionCalculation::getWorldPosition(_currentPos, Scene::getSceneInstance().getCamera());
       std::optional<glm::vec3> res = Scene::getSceneInstance().getWorld()->tileToWorldPos(_tileIdx);
       if (!res.has_value())
       {

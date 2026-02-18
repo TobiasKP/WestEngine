@@ -1,5 +1,7 @@
 #include "../../CoreHeaders/Entity/World.hpp"
 
+#include "../../Constants/Systems.hpp"
+#include "../../CoreHeaders/Interfaces/ISystem.h"
 
 World::World()
 {
@@ -57,8 +59,21 @@ std::int32_t World::calculateIndex(double x, double y)
   }
 }
 
-std::optional<std::vector<std::int32_t>>
-World::getReachableTiles(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a)
+void World::clearFlag(std::uint32_t flag)
+{
+  for (std::int32_t i = 0; i < _vflags.size(); i++)
+  {
+    _vflags[i] &= ~flag;
+  }
+}
+
+void World::setFlag(std::uint32_t flag, std::int32_t idx)
+{
+  _vflags[idx] |= flag;
+}
+
+std::vector<std::int32_t>
+World::getReachableTiles(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a, void* callee)
 {
   std::vector<std::int32_t> result;
   if (static_cast<std::int32_t>(a) == static_cast<std::int32_t>(algorithm::MANHATTAN))
@@ -70,7 +85,13 @@ World::getReachableTiles(std::int32_t row, std::int32_t col, std::int32_t range,
         std::int32_t sum = abs(r - row) + abs(c - col);
         if (sum <= range)
         {
-          result.push_back(r * _dimension + c);
+          std::int32_t idx = r * _dimension + c;
+          result.push_back(idx);
+          ISystem* c = (ISystem*)callee;
+          if (c->getName() == Systems::PLAYER_CONTROL)
+          {
+            setFlag(0x0002u, idx);
+          }
         }
       }
     }

@@ -23,14 +23,12 @@ public:
 
 private:
   WestLogger* _logger;
-  std::mutex _CameraMutex, _MovementMutex;
+  std::mutex _CameraMutex; 
 
-  glm::vec3 _moveToDestination = glm::vec3(0.0f);
   glm::vec3 _moveCamera        = glm::vec3(0.0f);
-  std::atomic<bool> _cameraPending, _movementInitiated;
+  std::atomic<bool> _cameraPending, _movementInitiated, _cleared;
 
-  void updateCamera(glm::vec3 local);
-  void updatePosition(glm::vec3 local, Position* posComp);
+  void updateCamera(glm::vec3 local); 
 
   static int movePlayerUnit(lua_State*);
   static int actionFinished(lua_State*);
