@@ -34,5 +34,6 @@ private:
   void renderUserInterfaces();
   void renderGameEntities();
   void renderWorld();
+  void renderMainLoop(const Entity& e);
   void updateUniforms(const Entity& e, Model* m, Material* m2);
 };

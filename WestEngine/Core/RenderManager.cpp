@@ -88,56 +88,68 @@ void RenderManager::renderGameEntities()
   // TODO: entities not sorted by shader group, causes redundant glUseProgram switches
   for (const Entity& entity : _scene->getEntities())
   {
-    Shader* s = (Shader*)entity.getComponent(BitMasks::Components::SHADER);
-    if (!s->initialized)
-    {
+    renderMainLoop(entity);
+  }
 #ifdef DEBUG
-      logDebug(std::format("!!! Entity shader not initialized! Entity: {}\n", entity.getId()));
+  for (const Entity& entity : _scene->getDebugEntities())
+  {
+    renderMainLoop(entity);
+  }
 #endif
-      glUseProgram(0);
-      _usedShaderProgram = 0;
-      continue;
-    }
+}
 
-    GLuint shaderProgramId = s->programId;
-    if (_usedShaderProgram != shaderProgramId)
-    {
-      glUseProgram(shaderProgramId);
-      _usedShaderProgram = shaderProgramId;
+void RenderManager::renderMainLoop(const Entity& entity)
+{
+  Shader* s = (Shader*)entity.getComponent(BitMasks::Components::SHADER);
+  if (!s->initialized)
+  {
 #ifdef DEBUG
-      GLint linked;
-      glGetProgramiv(shaderProgramId, GL_LINK_STATUS, &linked);
-      assert(linked == GL_TRUE);
+    logDebug(std::format("!!! Entity shader not initialized! Entity: {}\n", entity.getId()));
 #endif
-    }
+    glUseProgram(0);
+    _usedShaderProgram = 0;
+    return;
+  }
 
-
-    Model* model       = (Model*)entity.getComponent(BitMasks::Components::MODEL);
-    Material* material = (Material*)entity.getComponent(BitMasks::Components::MATERIAL);
-    assert(model != nullptr && material != nullptr);
-    // TODO: uniforms re-uploaded every frame even if unchanged, add dirty flags to Position/Material
-    if (!Config::PAUSE)
-    {
-      updateUniforms(entity, model, material);
-    }
-
-    glBindVertexArray(model->id);
+  GLuint shaderProgramId = s->programId;
+  if (_usedShaderProgram != shaderProgramId)
+  {
+    glUseProgram(shaderProgramId);
+    _usedShaderProgram = shaderProgramId;
 #ifdef DEBUG
-    if (entity.isDebugEntity())
-    {
-      glDisable(GL_DEPTH_TEST);
-      glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, 0);
-      glEnable(GL_DEPTH_TEST);
-    }
-    else
-    {
-      glDrawElements(GL_TRIANGLES, model->vertexCount, GL_UNSIGNED_INT, 0);
-    }
-#else
-    glDrawElements(GL_TRIANGLES, model->vertexCount, GL_UNSIGNED_INT, 0);
+    GLint linked;
+    glGetProgramiv(shaderProgramId, GL_LINK_STATUS, &linked);
+    assert(linked == GL_TRUE);
 #endif
   }
+
+
+  Model* model       = (Model*)entity.getComponent(BitMasks::Components::MODEL);
+  Material* material = (Material*)entity.getComponent(BitMasks::Components::MATERIAL);
+  assert(model != nullptr && material != nullptr);
+  // TODO: uniforms re-uploaded every frame even if unchanged, add dirty flags to Position/Material
+  if (!Config::PAUSE)
+  {
+    updateUniforms(entity, model, material);
+  }
+
+  glBindVertexArray(model->id);
+#ifdef DEBUG
+  if (entity.isDebugEntity())
+  {
+    glDisable(GL_DEPTH_TEST);
+    glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, 0);
+    glEnable(GL_DEPTH_TEST);
+  }
+  else
+  {
+    glDrawElements(GL_TRIANGLES, model->vertexCount, GL_UNSIGNED_INT, 0);
+  }
+#else
+  glDrawElements(GL_TRIANGLES, model->vertexCount, GL_UNSIGNED_INT, 0);
+#endif
 }
+
 
 void RenderManager::renderWorld()
 {
@@ -185,7 +197,7 @@ void RenderManager::renderWorld()
 #endif
 
   std::vector<std::uint32_t> flags = world->getFlagData();
-  std::int32_t dimension          = world->getGridSize();
+  std::int32_t dimension           = world->getGridSize();
   UniformUtils::setUniform(world->getFlagUniform(), flags);
   UniformUtils::setUniform(world->getGridUniform(), dimension);
 

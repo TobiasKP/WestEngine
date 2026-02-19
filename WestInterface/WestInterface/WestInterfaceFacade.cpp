@@ -264,7 +264,7 @@ void WestInterfaceFacade::updateRenderData()
   _renderManager->updateRenderData(_interfaces, Config::INTERNAL_UI_COUNT);
 };
 
-std::vector<ComponentData*>& WestInterfaceFacade::getRenderData()
+const std::vector<ComponentData*>& WestInterfaceFacade::getRenderData() const
 {
   return _renderManager->getRenderData();
 };
@@ -281,7 +281,7 @@ void WestInterfaceFacade::notify(std::int16_t elementId, std::uint8_t event, std
   _renderManager->toggleDirty();
 };
 
-std::vector<ElementBounds*> WestInterfaceFacade::getShownElementsBoundaries()
+const std::vector<ElementBounds*>& WestInterfaceFacade::getShownElementsBoundaries() const
 {
   return _renderManager->getBoundaries();
 }

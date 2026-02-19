@@ -27,7 +27,10 @@ public:
 
   // Getter
   // TODO: getEntities() copies the entire entity vector every frame, return const reference or provide iterator access
-  std::vector<Entity> getEntities();
+  const std::vector<Entity>& getEntities() const;
+#ifdef DEBUG
+  const std::vector<Entity>& getDebugEntities() const;
+#endif
   // TODO: register ID in hashmap saving index in vector to have faster access if a specific Entity is searched
   Entity* getEntityById(std::uint32_t id);
 

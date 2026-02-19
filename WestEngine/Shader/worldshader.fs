@@ -29,10 +29,10 @@ void getNeighbours(int row, int col, vec3 color) {
     if (QuadCoord.x > 1.0 - borderWidth && col < gridSize - 1) {
         n = n || isNeighbour(index + 1);
     }
-    if (QuadCoord.y < borderWidth && row < gridSize - 1) {
+    if (QuadCoord.y < borderWidth && row != 0) {
         n = n || isNeighbour(index - gridSize);
     }
-    if (QuadCoord.y > 1.0 - borderWidth && row != 0) {
+    if (QuadCoord.y > 1.0 - borderWidth && row < gridSize - 1) {
         n = n || isNeighbour(index + gridSize);
     }
     if (n) {

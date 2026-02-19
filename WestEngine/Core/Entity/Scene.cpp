@@ -40,18 +40,17 @@ void Scene::init()
 #endif
 }
 
-std::vector<Entity> Scene::getEntities()
+const std::vector<Entity>& Scene::getEntities() const
 {
-  std::lock_guard<std::mutex> lock(_mutex);
-  std::vector<Entity> entities = _entities;
-#ifdef DEBUG
-  if (_debugEntities.size() > 0)
-  {
-    entities.insert(entities.end(), _debugEntities.begin(), _debugEntities.end());
-  }
-#endif
-  return entities;
+  return _entities;
 }
+
+#ifdef DEBUG
+const std::vector<Entity>& Scene::getDebugEntities() const
+{ 
+  return _debugEntities;
+}
+#endif
 
 Entity* Scene::getEntityById(std::uint32_t id)
 {

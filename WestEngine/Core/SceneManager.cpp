@@ -114,12 +114,18 @@ std::int32_t SceneManager::init()
 
 void SceneManager::update()
 {
+  std::vector<std::uint32_t> removedEntities;
   for (auto& entity : _scene->getEntities())
   {
     if (entity.isDestroyed())
     {
-      removeEntityFromScene(entity);
+      removedEntities.push_back(entity.getId());
     }
+  }
+  for (std::uint32_t id : removedEntities)
+  {
+    Entity* e = _scene->getEntityById(id);
+    removeEntityFromScene(*e);
   }
 }
 

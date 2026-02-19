@@ -35,7 +35,7 @@ public:
 
   // RenderLoop
   void updateRenderData();
-  std::vector<ComponentData*>& getRenderData();
+  const std::vector<ComponentData*>& getRenderData() const;
 
   // Events
   void notify(std::int16_t elementId, std::uint8_t event, std::uint16_t mouseX, std::uint16_t mouseY);
@@ -49,7 +49,7 @@ public:
   // Get Resources TODO: reallobrate
   const char* getResource(std::string resource);
 
-  std::vector<ElementBounds*> getShownElementsBoundaries();
+  const std::vector<ElementBounds*>& getShownElementsBoundaries() const;
 
   static constexpr std::string_view interfaceVertexShader    = "shader/InterfaceVertexShader.vs";
   static constexpr std::string_view interfaceFragementShader = "shader/InterfaceFragementShader.fs";

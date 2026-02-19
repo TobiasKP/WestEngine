@@ -62,20 +62,23 @@ std::int32_t InterfaceManager::init()
 void InterfaceManager::update()
 {
   _facade->updateRenderData();
-  if (Config::INTERNAL_UI_COUNT != _cachedInterfaces)
-  {
-    std::vector<ElementBounds*> result = _facade->getShownElementsBoundaries();
-    MouseCallbacks::setElementBounds(result);
-    _cachedInterfaces = result.size();
-  }
+  bool dirty = Config::INTERNAL_UI_COUNT != _cachedInterfaces;
   if (_currentX != Config::GeneralConfig.WIDTH && _currentY != Config::GeneralConfig.HEIGHT)
   {
 #ifdef DEBUG
     refreshTechDemoFooter();
 #endif
     _facade->resolutionChange(Config::GeneralConfig.WIDTH, Config::GeneralConfig.HEIGHT);
+    _facade->updateRenderData();
     _currentX = Config::GeneralConfig.WIDTH;
     _currentY = Config::GeneralConfig.HEIGHT;
+    dirty     = true;
+  }
+  if (dirty)
+  {
+    std::vector<ElementBounds*> result = _facade->getShownElementsBoundaries();
+    MouseCallbacks::setElementBounds(result);
+    _cachedInterfaces = Config::INTERNAL_UI_COUNT;
   }
 }
 

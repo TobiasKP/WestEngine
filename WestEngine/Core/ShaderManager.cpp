@@ -53,6 +53,14 @@ void ShaderManager::shutdown()
     GLuint programId = s->programId;
     glDeleteProgram(programId);
   }
+#ifdef DEBUG
+  for (auto& entity : _scene->getDebugEntities())
+  {
+    Shader* s        = (Shader*)entity.getComponent(BitMasks::Components::SHADER);
+    GLuint programId = s->programId;
+    glDeleteProgram(programId);
+  }
+#endif
 }
 
 std::int32_t ShaderManager::init()
@@ -83,52 +91,64 @@ std::int32_t ShaderManager::init()
 
 void ShaderManager::update()
 {
-  for (auto& entity : _scene->getEntities())
+  for (const Entity& entity : _scene->getEntities())
   {
-    Shader* s = (Shader*)entity.getComponent(BitMasks::Components::SHADER);
-    assert(s != nullptr);
-    if (s->initialized)
-    {
-      continue;
-    }
-
-#ifdef DEBUG
-    logDebug(std::format("{} ### Initializing shader for Entity: {}.\n", getName(), entity.getId()));
-#endif
-
-    GLuint programId = -1;
-    if (_programList.find(s->shadergroup) != _programList.end())
-    {
-#ifdef DEBUG
-      std::uint8_t cycle = getLogger()->getCycleLength();
-      if (cycle == 0)
-      {
-        logCycle(std::format("{} ### Shader already created setting programId: {} "
-                             "for group: {}.\n",
-                             getName(),
-                             _programList[s->shadergroup],
-                             s->shadergroup));
-      }
-#endif
-      programId = _programList[s->shadergroup];
-    }
-    else
-    {
-      programId = initShader(s, entity);
-    }
-
-    if (programId == -1)
-    {
-      logFailure(std::format("{} ### Could not create Shader for entity: {}.\n", getName(), entity.getId()));
-      return;
-    }
-
-    s->programId   = programId;
-    s->initialized = true;
-    addUniforms(programId, entity);
+    initEntityShader(entity);
   }
 
+#ifdef DEBUG
+  for (const Entity& entity : _scene->getDebugEntities())
+  {
+    initEntityShader(entity);
+  }
+#endif
+
   initWorldShader();
+}
+
+void ShaderManager::initEntityShader(const Entity& entity)
+{
+  Shader* s = (Shader*)entity.getComponent(BitMasks::Components::SHADER);
+  assert(s != nullptr);
+  if (s->initialized)
+  {
+    return;
+  }
+
+#ifdef DEBUG
+  logDebug(std::format("{} ### Initializing shader for Entity: {}.\n", getName(), entity.getId()));
+#endif
+
+  GLuint programId = -1;
+  if (_programList.find(s->shadergroup) != _programList.end())
+  {
+#ifdef DEBUG
+    std::uint8_t cycle = getLogger()->getCycleLength();
+    if (cycle == 0)
+    {
+      logCycle(std::format("{} ### Shader already created setting programId: {} "
+                           "for group: {}.\n",
+                           getName(),
+                           _programList[s->shadergroup],
+                           s->shadergroup));
+    }
+#endif
+    programId = _programList[s->shadergroup];
+  }
+  else
+  {
+    programId = initShader(s, entity);
+  }
+
+  if (programId == -1)
+  {
+    logFailure(std::format("{} ### Could not create Shader for entity: {}.\n", getName(), entity.getId()));
+    return;
+  }
+
+  s->programId   = programId;
+  s->initialized = true;
+  addUniforms(programId, entity);
 }
 
 void ShaderManager::initWorldShader()

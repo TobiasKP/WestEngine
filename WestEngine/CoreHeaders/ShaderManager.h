@@ -33,6 +33,7 @@ private:
 
   GLuint initInterfaceShader();
   void initWorldShader();
+  void initEntityShader(const Entity& entity);
   GLuint initShader(Shader* s, const Entity& entity);
   GLuint createShader(const std::string shaderFile, std::int32_t shaderTyp, GLuint programId);
   GLchar* readShaderSource(const std::string shaderFile);

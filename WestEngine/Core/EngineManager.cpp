@@ -24,11 +24,10 @@
 #define SH_DENYNO 0x40
 
 
-EngineManager::EngineManager()
-  : IManager(nullptr)
+EngineManager::EngineManager() : IManager(nullptr)
 {
   setName(CoreConstants::ENGINE_MANAGER);
-  _exitEngine    = true; 
+  _exitEngine    = true;
   _windowManager = nullptr;
 }
 
@@ -111,8 +110,7 @@ void EngineManager::update()
 #endif
 
   while (!_exitEngine)
-  {
-    // TODO: busy-wait loop burns 100% CPU, add sleep or wait on condition variable
+  { 
     while (Config::PAUSE)
     {
       iterateQ(CYCLE::PAUSE);
@@ -152,6 +150,18 @@ void EngineManager::update()
     {
       success = iterateQ(CYCLE::UPDATE);
       frames++;
+    }
+    else
+    {
+      double remainingTime = _FRAMETIME - delta;
+      if (remainingTime >= Config::GeneralConfig.EPSILON)
+      {
+        std::int32_t sleepMs = static_cast<std::int32_t>(remainingTime * 1000) - 1;
+        if (sleepMs > 0)
+        {
+          std::this_thread::sleep_for(std::chrono::milliseconds(sleepMs));
+        }
+      }
     }
 
     if (Config::requestedWidth > 0 && Config::requestedHeight > 0)
