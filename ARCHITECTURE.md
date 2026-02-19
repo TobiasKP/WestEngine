@@ -1,0 +1,174 @@
+# Architecture
+
+This document describes the architectural decisions behind WestEngine and the reasoning that shaped them.
+
+## Overview
+
+WestEngine is a C++23 game engine built around a modular manager architecture with an Entity-Component-System (ECS) core. It targets tile-based, turn-style games and provides rendering (OpenGL), scripting (Lua), a custom UI framework, and multi-threaded task execution.
+
+```
+                         ┌──────────────────┐
+                         │   WestEngine.cpp  │
+                         │   (Entry Point)   │
+                         └────────┬─────────┘
+                                  │
+                         ┌────────▼─────────┐
+                         │  EngineManager    │
+                         │  (Orchestrator)   │
+                         └────────┬─────────┘
+                                  │
+          ┌───────────────────────┼───────────────────────┐
+          │                       │                       │
+  ┌───────▼───────┐     ┌────────▼────────┐    ┌─────────▼────────┐
+  │  WestEngine   │     │  WestInterface  │    │    WestUtils      │
+  │  (Core)       │     │  (UI)           │    │    (Shared Libs)  │
+  │               │     │                 │    │                   │
+  │ - ECS         │     │ - Elements      │    │ - ThreadPool      │
+  │ - Managers    │     │ - Observer      │    │ - PoolAllocator   │
+  │ - Systems     │     │ - Rendering     │    │ - Logging         │
+  │ - Scripting   │     │ - Facade        │    │ - Config          │
+  │ - Rendering   │     │                 │    │                   │
+  └───────────────┘     └─────────────────┘    └───────────────────┘
+          │                                              │
+          └──────────────────────┬───────────────────────┘
+                                 │
+                        ┌────────▼─────────┐
+                        │    WestGame      │
+                        │  (Game Content)  │
+                        │                  │
+                        │ - Lua Scripts    │
+                        │ - Assets         │
+                        │ - Config         │
+                        └──────────────────┘
+```
+
+## Module Boundaries
+
+The codebase is split into four modules. The separation follows a dependency rule: modules only depend downward, never upward or sideways without going through a defined interface.
+
+**WestUtils** is the foundation layer. It provides infrastructure that any module may need: thread pool, pool allocator, logging, configuration, and shared constants. It has zero dependencies on the other modules.
+
+**WestEngine (Core)** contains the engine itself: the ECS, all managers, game systems, rendering pipeline, input handling, and the Lua scripting bridge. It depends on WestUtils.
+
+**WestInterface** is the UI framework. It manages its own rendering pipeline (separate shaders, separate VAO/VBO), UI elements (buttons, labels, dropdowns), and an observer-based event system. It is accessed through a facade so the core engine does not depend on UI internals.
+
+**WestGame** is the game content layer. It contains Lua scripts, assets, and configuration files. It is not compiled — it is copied into the build output at post-build time. This keeps game-specific content fully outside the engine source.
+
+The reason for this split rather than a monolithic structure: each module can be built and reasoned about independently. The UI framework, for example, could be replaced without touching the ECS or rendering core.
+
+## Why ECS Over Inheritance Hierarchies
+
+A traditional deep inheritance tree (e.g. `GameObject → Character → Player`) creates rigid coupling. Adding a new behavior means modifying the hierarchy or using multiple inheritance, both of which scale poorly.
+
+The component approach used here keeps entities as lightweight containers. An `Entity` holds an ID, a component bitmask (`uint16_t`), and a map of components. Behavior is defined by which components are attached, not by class lineage. Systems iterate over entities that match their required component mask.
+
+This makes it straightforward to define new entity types entirely in Lua without touching C++ code. A "player" and a "decoration" are the same `Entity` class — they differ only in their component set.
+
+The bitmask approach was chosen over a full archetype-based ECS (like EnTT) to keep the implementation transparent and debuggable at the cost of a 16-component limit.
+
+## Why Lua for Scripting
+
+The engine uses Lua as its scripting layer, accessed through `LuaFacade`. The choice came down to three factors:
+
+1. **Embeddability**: Lua is designed to be embedded in C/C++ applications. The entire runtime is a single library with a clean C API. There is no heavy runtime to initialize or manage.
+2. **Game industry precedent**: Lua is widely used in game engines (World of Warcraft, Roblox, CryEngine). Using it signals familiarity with industry tooling.
+3. **Lightweight footprint**: For a solo-developed engine, a scripting layer needs to be simple enough to integrate and maintain alone. Python or C# would require significantly more bridging infrastructure.
+
+Game entities are defined in YAML files, loaded by Lua scripts, and instantiated as C++ `Entity` objects. Game logic (state changes, click handlers, movement triggers) lives in Lua. Core systems (rendering, physics, input) stay in C++.
+
+## Why OpenGL Over Vulkan
+
+OpenGL was chosen as the graphics API for practical reasons:
+
+- **Scope management**: Vulkan requires significantly more boilerplate (pipeline state objects, command buffers, synchronization primitives). For a solo project focused on demonstrating architecture rather than cutting-edge graphics, that complexity does not pay off.
+- **Cross-platform simplicity**: OpenGL with GLFW provides a working rendering context on Windows, macOS, and Linux with minimal platform-specific code.
+- **Iteration speed**: OpenGL allows faster prototyping of rendering features, which matters when the primary goal is the engine architecture, not the renderer.
+
+The rendering pipeline uses separate shader programs for world geometry, game entities, UI elements, and debug visualization. Shader management is centralized in `ShaderManager`, which handles compilation, linking, and uniform management.
+
+## Manager Lifecycle
+
+All engine subsystems implement the `IManager` interface and follow a four-phase lifecycle:
+
+```
+startup()  →  init()  →  update() (per frame)  →  shutdown()
+```
+
+- **startup()**: Load configuration, allocate resources, set up prerequisites. No cross-manager dependencies at this stage.
+- **init()**: Initialize state that depends on other managers being started. This is where cross-system wiring happens.
+- **update()**: Called every frame. Each manager performs its per-frame work.
+- **shutdown()**: Release resources in reverse order.
+
+The `EngineManager` holds all seven managers in a fixed-order array and iterates them sequentially:
+
+```
+InputManager → WindowManager → ShaderManager → SystemManager
+    → InterfaceManager → RenderManager → SceneManager
+```
+
+This order is intentional: input must be polled before systems process it, shaders must be compiled before rendering uses them, and scene changes happen last to avoid mid-frame inconsistency.
+
+## Game Loop and Timing
+
+The main loop uses a fixed-timestep model with delta-time accumulation:
+
+```cpp
+while (delta > FRAMETIME) {
+    delta -= FRAMETIME;
+    iterateQ(CYCLE::UPDATE);
+}
+```
+
+This ensures deterministic system updates regardless of actual frame rate. The target FPS is configurable via `Settings.cfg`. A pause state selectively updates only the managers that need to remain responsive (UI, input) while freezing game systems.
+
+## Threading Model
+
+The engine uses a `ThreadPool` (in WestUtils) sized to `hardware_concurrency - 2` worker threads. Game systems registered with `SystemManager` are dispatched to the thread pool during the update phase, allowing independent systems to run in parallel.
+
+Thread safety is handled through:
+- `std::mutex` on shared state (`Scene`, `World` tile flags, system entity lists)
+- `std::atomic<bool>` for lightweight cross-thread signals (e.g. `Movement::moving`, `PlayerControl::_cameraPending`)
+- The thread pool uses `std::condition_variable` for task scheduling
+
+The UI module runs its rendering on the main thread (OpenGL requirement), while game logic systems can execute concurrently.
+
+## Entity Data Flow
+
+An entity's journey from definition to screen:
+
+1. **Definition** (Lua/YAML): Entity described in YAML, loaded by a Lua script specifying components and their initial values
+2. **Creation** (`SceneManager` + `EntityBuilder`): Lua calls into C++ via `LuaFacade`. `EntityBuilder` parses the Lua table and constructs an `Entity` with the appropriate components via `ComponentFactory`
+3. **Registration** (`Scene`): Entity added to the scene's entity vector. Systems that match its component mask pick it up
+4. **Processing** (`SystemManager`): Each frame, systems iterate their registered entities and update component data (e.g. `MovementSystem` updates `Position` based on `Movement` data)
+5. **Rendering** (`RenderManager`): Entities are iterated, their `Model`, `Material`, `Shader`, and `Position` components are read, and draw calls are issued
+
+Memory for entities comes from a `PoolAllocator` with overloaded `new`/`delete` on the `Entity` class, reducing allocation overhead for frequent entity creation/destruction.
+
+## World and Tile System
+
+The `World` class (introduced in Project-60) extends `Entity` to represent a tile-based game plane. It manages:
+
+- A flat grid of tile flags (`std::vector<uint32_t>`)
+- Coordinate conversion between world-space positions and tile indices
+- Reachable tile calculation using Manhattan distance
+- Direct GPU integration via OpenGL uniforms for tile data and grid dimensions
+
+The world plane is rendered with a dedicated shader that reads tile flags from a uniform buffer, allowing the GPU to handle tile visualization without per-tile draw calls.
+
+## Known Limitations
+
+These are deliberate scope boundaries, not oversights:
+
+- **No physics engine**: The engine targets turn-based tile games where collision detection and rigid body dynamics are unnecessary. Movement is discrete (tile-to-tile), not continuous.
+- **No audio system**: Not yet implemented. Would integrate via a lightweight library (e.g. miniaudio or OpenAL).
+- **No skeletal animation**: Current entities use static meshes. Animation support would require a bone/keyframe system.
+- **16-component limit**: The bitmask approach caps component types at 16. Sufficient for current scope, but would need migration to a bitset or archetype system for larger projects.
+- **Single-scene model**: One active scene at a time. Scene transitions require full unload/reload.
+- **No asset pipeline**: Models are loaded from OBJ files at startup. A production engine would need streaming, caching, and format optimization.
+
+## What I Would Change With Hindsight
+
+- **Smart pointers over raw `new`/`delete`**: The codebase uses manual memory management in several places. `std::unique_ptr` for manager ownership and component storage would make lifetime guarantees explicit.
+- **Type-safe component access**: The current C-style casts for component retrieval (`(Position*)getComponent(POSITION)`) work but bypass the type system. A template-based accessor (`getComponent<Position>()`) would be safer.
+- **Consistent header extensions**: The mix of `.h` and `.hpp` is unintentional. A single convention would be cleaner.
+- **Result types over integer error codes**: `startup()` returns `int32_t` for success/failure. A proper `Result<T, Error>` type would make error handling more expressive.

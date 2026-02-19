@@ -1,3 +1,9 @@
+-- lua-yaml: YAML parser for Lua
+-- Version 1.2
+-- Copyright (c) 2017 Dominic Letz
+-- Source: https://github.com/exosite/lua-yaml
+-- License: MIT (https://opensource.org/licenses/MIT)
+
 local table_print_value
 table_print_value = function(value, indent, done)
   indent = indent or 0
