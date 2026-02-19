@@ -1,3 +1,8 @@
+// Thread pool implementation based on the standard C++ producer-consumer pattern
+// using std::condition_variable and std::mutex for task scheduling.
+// Reference: https://en.cppreference.com/w/cpp/thread/condition_variable
+// Extended with a fire-and-forget queue and hardware-aware thread count sizing.
+
 #pragma once
 
 #include <functional>
