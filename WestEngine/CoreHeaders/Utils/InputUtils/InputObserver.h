@@ -33,12 +33,12 @@ public:
     }
   }
 
-  void setControlFlag(std::uint8_t flag, float x, float y)
+  void setControlFlag(std::uint8_t flag, float x, float z)
   {
     std::lock_guard<std::mutex> lock(_controlMutex);
     _controlFlags |= flag;
     _x             = x;
-    _y             = y;
+    _z             = z;
   }
 
   void setControlFlag(std::uint8_t flag, glm::vec3 dest)
@@ -55,7 +55,7 @@ public:
   }
 
 private:
-  float _x, _y;
+  float _x, _z;
   glm::vec3 _playerDestination;
   PlayerControl* _control;
   WestInterface::WestInterfaceFacade* _facade;

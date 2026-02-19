@@ -19,6 +19,7 @@ include_directories(
     ${LUA_INCLUDE_DIR}
     ${Stb_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/CoreHeaders
+    ${CMAKE_CURRENT_SOURCE_DIR}/Core
     ${CMAKE_CURRENT_SOURCE_DIR}/Libs/WEST_INTERFACE
 )
 

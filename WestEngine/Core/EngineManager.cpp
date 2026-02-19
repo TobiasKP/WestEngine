@@ -13,7 +13,7 @@
 #include <stdlib.h>
 
 #ifdef _WIN32
-<include> direct.h
+#include <direct.h>
 #define getcwd _getcwd
 #define PATH_MAX MAX_PATH
 #else
@@ -24,11 +24,10 @@
 #define SH_DENYNO 0x40
 
 
-EngineManager::EngineManager()
-  : IManager(nullptr)
+EngineManager::EngineManager() : IManager(nullptr)
 {
   setName(CoreConstants::ENGINE_MANAGER);
-  _exitEngine    = true; 
+  _exitEngine    = true;
   _windowManager = nullptr;
 }
 
@@ -111,7 +110,7 @@ void EngineManager::update()
 #endif
 
   while (!_exitEngine)
-  {
+  { 
     while (Config::PAUSE)
     {
       iterateQ(CYCLE::PAUSE);
@@ -152,6 +151,18 @@ void EngineManager::update()
       success = iterateQ(CYCLE::UPDATE);
       frames++;
     }
+    else
+    {
+      double remainingTime = _FRAMETIME - delta;
+      if (remainingTime >= Config::GeneralConfig.EPSILON)
+      {
+        std::int32_t sleepMs = static_cast<std::int32_t>(remainingTime * 1000) - 1;
+        if (sleepMs > 0)
+        {
+          std::this_thread::sleep_for(std::chrono::milliseconds(sleepMs));
+        }
+      }
+    }
 
     if (Config::requestedWidth > 0 && Config::requestedHeight > 0)
     {
@@ -178,6 +189,7 @@ std::int32_t EngineManager::init()
   return success;
 }
 
+// TODO: all managers execute sequentially, independent ones (Input, System, Interface) could run in parallel
 std::int32_t EngineManager::iterateQ(CYCLE code)
 {
   assert(typeid(code) == typeid(EngineManager::CYCLE));

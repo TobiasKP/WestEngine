@@ -3,6 +3,7 @@
 #include "Entity/Scene.h"
 #include "Interfaces/IManager.h"
 #include "Systems/Umbrella.h"
+#include "Components/Umbrella.h"
 
 #include <map>
 #include <WestInterfaceFacade.h>
@@ -31,6 +32,8 @@ private:
   Scene* _scene;
 
   GLuint initInterfaceShader();
+  void initWorldShader();
+  void initEntityShader(const Entity& entity);
   GLuint initShader(Shader* s, const Entity& entity);
   GLuint createShader(const std::string shaderFile, std::int32_t shaderTyp, GLuint programId);
   GLchar* readShaderSource(const std::string shaderFile);

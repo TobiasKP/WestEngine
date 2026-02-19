@@ -9,7 +9,7 @@
 #include <stdlib.h>
 
 #ifdef _WIN32
-<include> direct.h
+#include <direct.h>
 #define getcwd _getcwd
 #define PATH_MAX MAX_PATH
 #else
@@ -19,8 +19,7 @@
 
 using namespace WestInterface;
 
-ShaderManager::ShaderManager()
-  : IManager(nullptr)
+ShaderManager::ShaderManager() : IManager(nullptr)
 {
   setName(CoreConstants::SHADER_MANAGER);
   _facade = nullptr;
@@ -54,6 +53,14 @@ void ShaderManager::shutdown()
     GLuint programId = s->programId;
     glDeleteProgram(programId);
   }
+#ifdef DEBUG
+  for (auto& entity : _scene->getDebugEntities())
+  {
+    Shader* s        = (Shader*)entity.getComponent(BitMasks::Components::SHADER);
+    GLuint programId = s->programId;
+    glDeleteProgram(programId);
+  }
+#endif
 }
 
 std::int32_t ShaderManager::init()
@@ -84,50 +91,116 @@ std::int32_t ShaderManager::init()
 
 void ShaderManager::update()
 {
-  for (auto& entity : _scene->getEntities())
+  for (const Entity& entity : _scene->getEntities())
   {
-    Shader* s = (Shader*)entity.getComponent(BitMasks::Components::SHADER);
-    assert(s != nullptr);
-    if (s->initialized)
-    {
-      continue;
-    }
-
-#ifdef DEBUG
-    logDebug(std::format("{} ### Initializing shader for Entity: {}.\n", getName(), entity.getId()));
-#endif
-
-    GLuint programId = -1;
-    if (_programList.find(s->shadergroup) != _programList.end())
-    {
-#ifdef DEBUG
-      std::uint8_t cycle = getLogger()->getCycleLength();
-      if (cycle == 0)
-      {
-        logCycle(std::format("{} ### Shader already created setting programId: {} "
-                             "for group: {}.\n",
-                             getName(),
-                             _programList[s->shadergroup],
-                             s->shadergroup));
-      }
-#endif
-      programId = _programList[s->shadergroup];
-    }
-    else
-    {
-      programId = initShader(s, entity);
-    }
-
-    if (programId == -1)
-    {
-      logFailure(std::format("{} ### Could not create Shader for entity: {}.\n", getName(), entity.getId()));
-      return;
-    }
-
-    s->programId   = programId;
-    s->initialized = true;
-    addUniforms(programId, entity);
+    initEntityShader(entity);
   }
+
+#ifdef DEBUG
+  for (const Entity& entity : _scene->getDebugEntities())
+  {
+    initEntityShader(entity);
+  }
+#endif
+
+  initWorldShader();
+}
+
+void ShaderManager::initEntityShader(const Entity& entity)
+{
+  Shader* s = (Shader*)entity.getComponent(BitMasks::Components::SHADER);
+  assert(s != nullptr);
+  if (s->initialized)
+  {
+    return;
+  }
+
+#ifdef DEBUG
+  logDebug(std::format("{} ### Initializing shader for Entity: {}.\n", getName(), entity.getId()));
+#endif
+
+  GLuint programId = -1;
+  if (_programList.find(s->shadergroup) != _programList.end())
+  {
+#ifdef DEBUG
+    std::uint8_t cycle = getLogger()->getCycleLength();
+    if (cycle == 0)
+    {
+      logCycle(std::format("{} ### Shader already created setting programId: {} "
+                           "for group: {}.\n",
+                           getName(),
+                           _programList[s->shadergroup],
+                           s->shadergroup));
+    }
+#endif
+    programId = _programList[s->shadergroup];
+  }
+  else
+  {
+    programId = initShader(s, entity);
+  }
+
+  if (programId == -1)
+  {
+    logFailure(std::format("{} ### Could not create Shader for entity: {}.\n", getName(), entity.getId()));
+    return;
+  }
+
+  s->programId   = programId;
+  s->initialized = true;
+  addUniforms(programId, entity);
+}
+
+void ShaderManager::initWorldShader()
+{
+  World* world = _scene->getWorld();
+  if (world == nullptr)
+  {
+    return;
+  }
+
+  Shader* ws = (Shader*)world->getComponent(BitMasks::Components::SHADER);
+  if (ws == nullptr || ws->initialized)
+  {
+    return;
+  }
+
+#ifdef DEBUG
+  logDebug(std::format("{} ### Initializing world shader for group: {}.\n", getName(), ws->shadergroup));
+#endif
+
+  GLuint programId = -1;
+  if (_programList.find(ws->shadergroup) != _programList.end())
+  {
+    programId = _programList[ws->shadergroup];
+  }
+  else
+  {
+    programId = initShader(ws, *world);
+  }
+
+  if (programId == -1)
+  {
+    logFailure(std::format("{} ### Could not create world shader.\n", getName()));
+    return;
+  }
+
+  ws->programId   = programId;
+  ws->initialized = true;
+#ifdef DEBUG
+  logDebug(std::format("{} ### World shader initialized. ProgramID: {}.\n", getName(), programId));
+#endif
+
+  Material* mat = (Material*)world->getComponent(BitMasks::Components::MATERIAL);
+  if (mat != nullptr)
+  {
+    mat->diffuseColorUniform = UniformUtils::createUniform(UniformConstants::DCOLOR, programId);
+#ifdef DEBUG
+    logDebug(std::format("{} ### World color uniform location: {}.\n", getName(), mat->diffuseColorUniform));
+#endif
+  }
+  world->setFlagUniform(UniformUtils::createUniform(UniformConstants::WORLD_TILEARRAY, programId));
+  world->setGridUniform(UniformUtils::createUniform(UniformConstants::WORLD_GRIDSIZE, programId));
 }
 
 GLuint ShaderManager::initInterfaceShader()
@@ -219,19 +292,26 @@ GLuint ShaderManager::initShader(Shader* s, const Entity& entity)
   return programId;
 }
 
-// TODO make switch case
+// TODO: make switch case, also uniform locations queried per entity even when sharing the same shader program - cache
+// per program
 void ShaderManager::addUniforms(GLuint programId, const Entity& entity)
 {
-  Model* m = (Model*)entity.getComponent(BitMasks::Components::MODEL);
-  if (m != nullptr && m->texture != nullptr)
+  Model* m     = (Model*)entity.getComponent(BitMasks::Components::MODEL);
+  Material* m2 = (Material*)entity.getComponent(BitMasks::Components::MATERIAL);
+  if (m2 != nullptr && m2->diffuseTexture != nullptr)
   {
-    m->texture->uniform = UniformUtils::createUniform(UniformConstants::TEXTURE_SAMPLER, programId);
+    m2->diffuseTexture->uniform = UniformUtils::createUniform(UniformConstants::TEXTURE_SAMPLER, programId);
+  }
+
+  if (m != nullptr && !entity.isDebugEntity() && m2 != nullptr)
+  {
+    m2->diffuseColorUniform = UniformUtils::createUniform(UniformConstants::COLOR, programId);
   }
 
 #ifdef DEBUG
   if (m != nullptr && entity.isDebugEntity())
   {
-    m->debugColorUniform = UniformUtils::createUniform(UniformConstants::COLOR, programId);
+    m->debugColorUniform = UniformUtils::createUniform(UniformConstants::DCOLOR, programId);
   }
 #endif
 

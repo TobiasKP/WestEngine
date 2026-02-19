@@ -18,7 +18,7 @@ public:
   std::int32_t init() override;
 
 private:
-  std::uint8_t _cachedInterfaces;
+  std::uint32_t _cachedInterfaces;
   std::uint32_t _currentX, _currentY;
 
   WestInterface::WestInterfaceFacade* _facade;

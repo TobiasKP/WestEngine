@@ -9,7 +9,7 @@
 #include <stdlib.h>
 
 #ifdef _WIN32
-<include> direct.h
+#include <direct.h>
 #define getcwd _getcwd
 #define PATH_MAX MAX_PATH
 #else
@@ -106,24 +106,24 @@ std::int32_t InputManager::init()
 
   while (fgets(inbuf, 128, _availableCommands) != NULL)
   {
-    if (inbuf[0] == '#' || inbuf[0] == '\n')
+    if (inbuf[0] == '#' || inbuf[0] == '\n' || inbuf[0] == '\r')
     {
       continue;
     }
 
-    inbuf[strcspn(inbuf, "\n")] = 0;
+    inbuf[strcspn(inbuf, "\r\n")] = 0;
     _commandList.emplace_back(inbuf);
   }
 
   while (fgets(inbuf, 128, _inputConfig) != NULL)
   {
-    if (inbuf[0] == '#' || inbuf[0] == '\n')
+    if (inbuf[0] == '#' || inbuf[0] == '\n' || inbuf[0] == '\r')
     {
       continue;
     }
 
-    inbuf[strcspn(inbuf, "\n")] = 0;
-    char* equalSign             = strchr(inbuf, '=');
+    inbuf[strcspn(inbuf, "\r\n")] = 0;
+    char* equalSign              = strchr(inbuf, '=');
 #ifdef DEBUG
     logDebug(std::format("{} ### Reading input from cfg: {}\n", getName(), inbuf));
 #endif

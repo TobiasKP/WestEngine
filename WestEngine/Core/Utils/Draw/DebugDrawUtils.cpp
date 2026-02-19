@@ -1,7 +1,7 @@
 #include "../../../CoreHeaders/Utils/Draw/DebugDrawUtils.h"
 
 #ifdef _WIN32
-<include> direct.h
+#include <direct.h>
 #define getcwd _getcwd
 #define PATH_MAX MAX_PATH
 #else
@@ -19,13 +19,13 @@ DebugDrawUtils::DebugDrawUtils(WestLogger* logger)
   _scene  = &Scene::getSceneInstance();
 }
 
-std::uint32_t DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction, glm::vec3 color)
+std::uint32_t DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction)
 {
   glm::vec3 end          = start + direction;
   GLfloat vertices[]     = {start.x, start.y, start.z, end.x, end.y, end.z};
   std::int32_t indices[] = {0, 1};
-  Model* m               = _loader->loadModel(vertices, sizeof(vertices), indices, sizeof(indices), 0, 0, 0, 0);
-  m->color               = (color);
+  std::tuple<Model*, Material*> m =
+    _loader->loadModel(vertices, sizeof(vertices), indices, sizeof(indices), 0, 0, 0, 0, "");
 
   char cwd[PATH_MAX];
   char filePath[PATH_MAX];
@@ -42,7 +42,8 @@ std::uint32_t DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction, glm:
   Entity e;
   e.setId(Config::incEntityId());
   e.addComponent(BitMasks::Components::SHADER, s);
-  e.addComponent(BitMasks::Components::MODEL, m);
+  e.addComponent(BitMasks::Components::MODEL, std::move(std::get<0>(m)));
+  e.addComponent(BitMasks::Components::MATERIAL, std::move(std::get<1>(m)));
   e.debugEntity();
 
   _scene->addDebugEntity(std::move(e));
@@ -51,5 +52,6 @@ std::uint32_t DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction, glm:
 
 void DebugDrawUtils::unloadModel(const Entity& entity)
 {
-  _loader->unloadModel((Model*)entity.getComponent(BitMasks::Components::MODEL));
+  _loader->unloadModel((Model*)entity.getComponent(BitMasks::Components::MODEL),
+                       (Material*)entity.getComponent(BitMasks::Components::MATERIAL));
 }

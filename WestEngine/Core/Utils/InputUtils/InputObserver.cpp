@@ -33,7 +33,7 @@ void InputObserver::notify()
     if (static_cast<bool>(_controlFlags & BitMasks::Control::UI_HOVERED))
     {
       assert(_interfaceHoverId != -1);
-      _facade->notify(_interfaceHoverId, 0x01, _x, _y);
+      _facade->notify(_interfaceHoverId, 0x01, _x, _z);
     }
 
     if (static_cast<bool>(_controlFlags & BitMasks::Control::UI_UNHOVERED))
@@ -44,17 +44,17 @@ void InputObserver::notify()
 
     if (static_cast<bool>(_controlFlags & BitMasks::Control::CAMERA_MOVING))
     {
-      _control->setCameraMovement(glm::vec3(_x, _y, 0));
+      _control->setCameraMovement(glm::vec3(_x, 0, _z));
       _x = 0;
-      _y = 0;
+      _z = 0;
     }
 
     if (static_cast<bool>(_controlFlags & BitMasks::Control::PLAYER_MOVING))
     {
-      _control->setDestinationPosition(_playerDestination);
+      _control->passDestinationPosition(_playerDestination);
     }
 
-    _interfaceHoverId  = _interfaceUnhoverId = -1;
-    _controlFlags = {0b0000'0000};
+    _interfaceHoverId = _interfaceUnhoverId = -1;
+    _controlFlags                           = {0b0000'0000};
   }
 }

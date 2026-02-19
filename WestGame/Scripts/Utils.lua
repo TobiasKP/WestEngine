@@ -2,8 +2,10 @@ Utils = {}
 
 local yaml = require("yaml")
 
-local function interpreteData(data)
+local function interpreteData(data, source)
+  local log = "YAML parsed for " .. tostring(source)
   local Entity = {
+    name = data.name,
     model = data.model,
     shader = data.shader,
     components = {},
@@ -32,6 +34,23 @@ local function interpreteData(data)
     end
   end
 
+  -- Process World
+  if type(data.world) == "table" and #data.world > 0 then
+    Entity.world = {}
+    for _, details in ipairs(data.world) do
+      local detailData = {}
+      for key, value in pairs(details) do
+        detailData[key] = value
+        log = log .. " | " .. tostring(key) .. "=" .. type(value)
+      end
+      table.insert(Entity.world, detailData)
+    end
+    log = log .. " | world entries: " .. #Entity.world
+  end
+
+  log = log .. " | components: " .. #Entity.components .. " | systems: " .. #Entity.systems
+  Entity._parseLog = log
+
   return Entity
 end
 
@@ -56,7 +75,7 @@ function LoadEntity(entity)
     return 1
   end
 
-  return interpreteData(data)
+  return interpreteData(data, entity)
 end
 
 Utils.LoadEntity = LoadEntity

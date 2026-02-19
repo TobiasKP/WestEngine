@@ -1,0 +1,9 @@
+name: "cube"
+model: "Cube.obj"
+shader: { v: "Vertex.vs", f: "Fragment.fs" , group: 0 }
+components: 
+  - { name: "position", x: 0, y: 0, z: 0 }
+  - { name: "movement", r: 2, a: 0 }
+systems:
+  - { name: "PlayerControl" }
+  - { name: "Movement" }

@@ -4,7 +4,7 @@
 #include <lua.hpp>
 
 #ifdef _WIN32
-<include> direct.h
+#include <direct.h>
 #define getcwd _getcwd
 #define PATH_MAX MAX_PATH
 #else
@@ -14,8 +14,7 @@
 
 #include "../CoreHeaders/Entity/Camera.h"
 
-SceneManager::SceneManager()
-  : IManager(nullptr)
+SceneManager::SceneManager() : IManager(nullptr)
 {
   setName(CoreConstants::SCENE_MANAGER);
   _scene   = nullptr;
@@ -39,10 +38,12 @@ std::int32_t SceneManager::startup()
 {
   _loader     = new ObjectLoader(getLogger());
   _scene      = &Scene::getSceneInstance();
-  Camera* cam = new Camera(glm::vec3(0.0, 0.0, 5.0), glm::vec3(0));
+  Camera* cam = new Camera(glm::vec3(0.0, 3.0, 5.0), glm::vec3(25.0f, 0, 0));
   _scene->addCamera(cam);
-  L = luaL_newstate();
-  luaL_openlibs(L);
+  _facade = &LuaFacade::getLuaFacadeInstance();
+  _facade->startup(getLogger());
+  L = _facade->getLuaState();
+
   _builder = new EntityBuilder(L, _loader);
   assert(_loader != nullptr && _scene != nullptr && L != nullptr && _builder != nullptr);
 #ifdef DEBUG
@@ -56,7 +57,7 @@ void SceneManager::shutdown()
 #ifdef DEBUG
   logDebug(std::format("{} ### Shutting down {}...\n", getName(), getName()));
 #endif
-  lua_close(L);
+  _facade->shutdown();
   deleteScene();
 }
 
@@ -113,12 +114,18 @@ std::int32_t SceneManager::init()
 
 void SceneManager::update()
 {
+  std::vector<std::uint32_t> removedEntities;
   for (auto& entity : _scene->getEntities())
   {
     if (entity.isDestroyed())
     {
-      removeEntityFromScene(entity);
+      removedEntities.push_back(entity.getId());
     }
+  }
+  for (std::uint32_t id : removedEntities)
+  {
+    Entity* e = _scene->getEntityById(id);
+    removeEntityFromScene(*e);
   }
 }
 
@@ -130,7 +137,8 @@ void SceneManager::removeEntityFromScene(const Entity& entity)
   _scene->removeEntity(entity);
   if (!entity.isDebugEntity())
   {
-    _loader->unloadModel((Model*)entity.getComponent(BitMasks::Components::MODEL));
+    _loader->unloadModel((Model*)entity.getComponent(BitMasks::Components::MODEL),
+                         (Material*)entity.getComponent(BitMasks::Components::MATERIAL));
   }
 }
 

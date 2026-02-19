@@ -3,6 +3,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 
 #include "../Entity/Entity.h"
+#include "../../Core/Scripting/LuaFacade.hpp"
 
 #include <CoreConstants.hpp>
 #include <glm/gtc/epsilon.hpp>
@@ -40,9 +41,11 @@ public:
   }
   virtual void update()              = 0;
   virtual void updateDebuggingInfo() = 0;
+  virtual void init()                = 0;
 
 protected:
   std::mutex _mutex;
+  LuaFacade* _facade;
 
 private:
   std::string _name = CoreConstants::UNDEFINED_STRING;

@@ -4,6 +4,8 @@
 
 #include <WestLogger.h>
 
+#include <mutex>
+
 struct Chunk
 {
   Chunk* next;
@@ -19,6 +21,7 @@ public:
   void deallocate(void* ptr, size_t size);
 
 private:
+  std::mutex _mutex;
   size_t _numberOfChunks    = Config::GeneralConfig.CHUNK_SIZE;
   Chunk* _allocationPointer = nullptr;
   WestLogger* _logger       = &WestLogger::getLoggerInstance();

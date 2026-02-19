@@ -1,5 +1,7 @@
 #include "../../CoreHeaders/Entity/Entity.h"
 
+#include <bitset>
+
 PoolAllocator* Entity::_allocator = new PoolAllocator();
 
 Entity::Entity()
@@ -30,7 +32,7 @@ Entity::Entity(const Entity& other)
 }
 
 Entity& Entity::operator=(const Entity& other)
-{ 
+{
   if (this != &other)
   {
     _id            = other._id;
@@ -46,7 +48,7 @@ Entity& Entity::operator=(const Entity& other)
 Entity::Entity(Entity&& other) noexcept
   : _id(other._id), _name(other._name), _componentMask(other._componentMask), _destroyed(other._destroyed),
     _debugEntity(other._debugEntity), _components(std::move(other._components))
-{ 
+{
   other._componentMask = 0;
   other._destroyed     = false;
   other._debugEntity   = false;
@@ -56,12 +58,12 @@ Entity& Entity::operator=(Entity&& other) noexcept
 {
   if (this != &other)
   {
-    _id            = other._id;
-    _name          = other._name;
-    _componentMask = other._componentMask;
-    _destroyed     = other._destroyed;
-    _debugEntity   = other._debugEntity;
-    _components    = other._components;
+    _id                  = other._id;
+    _name                = other._name;
+    _componentMask       = other._componentMask;
+    _destroyed           = other._destroyed;
+    _debugEntity         = other._debugEntity;
+    _components          = other._components;
     other._componentMask = 0;
     other._destroyed     = false;
     other._debugEntity   = false;
@@ -78,7 +80,18 @@ void Entity::addComponent(std::uint16_t flag, IComponent* component)
 IComponent* Entity::getComponent(std::uint16_t componentMask) const
 {
   if (!static_cast<bool>(componentMask & _componentMask))
-  { 
+  {
+#ifdef DEBUG
+    if (!_debugEntity)
+    {
+      WestLogger::getLoggerInstance().log(
+        Level::Error,
+        std::format("Error retrieveng component: 0b{} from entity: {}, given components: 0b{}\n",
+                    std::bitset<16>(componentMask).to_string(),
+                    _id,
+                    std::bitset<16>(_componentMask).to_string()));
+    }
+#endif
     return nullptr;
   }
 

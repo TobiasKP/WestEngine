@@ -16,7 +16,7 @@ public:
   {
     return _data;
   }
-  inline std::vector<ElementBounds*>& getBoundaries()
+  inline const std::vector<ElementBounds*>& getBoundaries() const
   {
     return _boundaryData;
   }

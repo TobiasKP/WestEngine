@@ -11,7 +11,7 @@
 
 
 #ifdef _WIN32
-<include> direct.h
+#include <direct.h>
 #define getcwd _getcwd
 #define PATH_MAX MAX_PATH
 #else
@@ -22,7 +22,6 @@
 #define SH_DENYNO 0x40
 
   using namespace WestInterface;
-
 SettingsInterface::SettingsInterface(InterfaceBuilder& interfaceBuilder) : _interfaceBuilder(&interfaceBuilder)
 {
   _id = _resolutionId = _settingButtonId = 0;

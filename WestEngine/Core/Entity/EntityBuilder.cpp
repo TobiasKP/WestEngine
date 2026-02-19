@@ -6,27 +6,39 @@
 
 #include <Config.h>
 #include <format>
-#include <stdio.h>
 #include <string.h>
 
 void EntityBuilder::createEntities()
 {
   lua_pushnil(L);
-  while (lua_next(L, -2) != 0)
+  while (lua_next(L, -2) > 0)
   {
     Entity e;
     e.setId(Config::incEntityId());
     lua_pushnil(L);
-    while (lua_next(L, -2) != 0)
+    bool toAdd = true;
+    while (lua_next(L, -2) > 0)
     {
       const char* key = lua_tostring(L, -2);
-      if (strcmp(key, "model") == 0)
-      {
-        modelInfo(e);
-      }
-      else if (strcmp(key, "shader") == 0)
+      if (strcmp(key, "shader") == 0)
       {
         shaderInfo(e);
+      }
+      else if (strcmp(key, "world") == 0)
+      {
+        World* w = new World();
+        w->setId(e.getId());
+        createWorld(*w);
+        Scene::getSceneInstance().addWorld(w);
+        lua_pop(L, 2);
+        toAdd = false;
+        break;
+      }
+      else if (strcmp(key, "_parseLog") == 0)
+      {
+#ifdef DEBUG
+        WestLogger::getLoggerInstance().log(Level::Info, std::format("{}\n", lua_tostring(L, -1)));
+#endif
       }
       else if (lua_istable(L, -1))
       {
@@ -34,6 +46,9 @@ void EntityBuilder::createEntities()
       }
       else
       {
+#ifdef DEBUG
+        WestLogger::getLoggerInstance().log(Level::Cycle, std::format("Adding new Info: {} to:{}\n", key, e.getId()));
+#endif
         basicInfo(key, e);
       }
 
@@ -45,7 +60,10 @@ void EntityBuilder::createEntities()
 #ifdef DEBUG
     WestLogger::getLoggerInstance().log(Level::Info, std::format("Adding new Entity to Scene:{}\n", e.getId()));
 #endif
-    Scene::getSceneInstance().addEntity(std::move(e));
+    if (toAdd)
+    {
+      Scene::getSceneInstance().addEntity(std::move(e));
+    }
   }
 }
 
@@ -100,48 +118,19 @@ void EntityBuilder::basicInfo(const char* key, Entity& e)
   {
     e.setName((char*)lua_tostring(L, -1));
   }
-}
-
-void EntityBuilder::modelInfo(Entity& e)
-{
-  std::string meshPath, texPath;
-
-  lua_pushnil(L);
-  while (lua_next(L, -2) != 0)
+  else if (strcmp(key, "model") == 0)
   {
-    const char* key = lua_tostring(L, -2);
-    if (strcmp(key, "mesh") == 0)
-    {
-      std::string mesh = lua_tostring(L, -1);
-      meshPath         = std::format("/assets/Models/{}", mesh);
-    }
-    if (strcmp(key, "texture") == 0)
-    {
-      std::string tex = lua_tostring(L, -1);
-      if (tex.length() > 0)
-      {
-        texPath = std::format("/assets/Models/{}", tex);
-      }
-      else
-      {
-        texPath[0] = '\0';
-      }
-    }
-    lua_pop(L, 1);
-  }
+    std::string mesh     = lua_tostring(L, -1);
+    std::string meshPath = std::format("/assets/Models/{}", mesh);
 
 #ifdef DEBUG
-  WestLogger::getLoggerInstance().log(Level::Info, std::format("Loading Model: {}\n", meshPath));
+    WestLogger::getLoggerInstance().log(Level::Info, std::format("Loading Model: {}\n", meshPath));
 #endif
-
-  Model* m = loadModel(meshPath);
-  if (texPath.length() > 0)
-  {
-    Texture* t = loadTexture(texPath);
-    m->texture = t;
+    std::tuple<Model*, Material*> m = loadModel(meshPath);
+    assert(std::get<0>(m) != nullptr);
+    e.addComponent(BitMasks::Components::MODEL, std::move(std::get<0>(m)));
+    e.addComponent(BitMasks::Components::MATERIAL, std::move(std::get<1>(m)));
   }
-
-  e.addComponent(BitMasks::Components::MODEL, m);
 }
 
 void EntityBuilder::shaderInfo(Entity& e)
@@ -181,27 +170,101 @@ void EntityBuilder::shaderInfo(Entity& e)
   e.addComponent(BitMasks::Components::SHADER, s);
 }
 
-Model* EntityBuilder::loadModel(float* vertices,
-                                size_t verticeLength,
-                                std::int32_t* indices,
-                                size_t indiceLength,
-                                float* textureCoords,
-                                size_t textureCoordLength)
+void EntityBuilder::createWorld(World& e)
 {
-  return _loader->loadModel(vertices, verticeLength, indices, indiceLength, textureCoords, textureCoordLength, 0, 0);
+#ifdef DEBUG
+  WestLogger::getLoggerInstance().log(Level::Info, std::format("Loading World\n"));
+#endif
+  std::string vertexPath = "/shader/worldshader.vs", fragmentPath = "/shader/worldshader.fs";
+  std::int32_t group = 1000, sqmap;
+  std::vector<std::uint8_t> map;
+  lua_pushnil(L);
+  if (!lua_istable(L, -2))
+  {
+#ifdef DEBUG
+    WestLogger::getLoggerInstance().log(Level::Error, std::format("Error loading World, expected a table...\n"));
+#endif
+    return;
+  }
+  while (lua_next(L, -2) > 0)
+  {
+    if (!strcmp(lua_tostring(L, 0), "grid"))
+    {
+#ifdef DEBUG
+      WestLogger::getLoggerInstance().log(Level::Error, std::format("Error loading World, expected a grid...\n"));
+#endif
+    }
+    lua_pushnil(L);
+    while (lua_next(L, -2) > 0)
+    {
+      lua_pushnil(L);
+      while (lua_next(L, -2) > 0)
+      {
+        map.push_back(lua_tonumber(L, -1));
+        lua_pop(L, 1);
+      }
+      lua_pop(L, 1);
+    }
+    lua_pop(L, 1);
+  }
+
+  sqmap = sqrt(map.size());
+  e.setCreationInformation(sqmap, 1, glm::vec2(0, 0));
+
+  std::tuple<Model*, Material*> m = buildWorldMesh(map, sqmap);
+  Material* mat                   = std::get<1>(m);
+  mat->diffuseColor               = glm::vec3(0.2f, 0.6f, 0.2f);
+
+  Shader* s = loadShader(vertexPath, fragmentPath, group);
+  e.addComponent(BitMasks::Components::SHADER, s);
+  e.addComponent(BitMasks::Components::MODEL, std::get<0>(m));
+  e.addComponent(BitMasks::Components::MATERIAL, mat);
 }
 
-Model* EntityBuilder::loadModel(std::string path)
+std::tuple<Model*, Material*> EntityBuilder::buildWorldMesh(const std::vector<std::uint8_t>& map, std::int32_t sqmap)
+{
+  std::vector<float> vertices;
+  std::vector<float> texCoords;
+  std::vector<std::int32_t> idx;
+
+  for (std::int32_t row = 0; row < sqmap; ++row)
+  {
+    for (std::int32_t col = 0; col < sqmap; ++col)
+    {
+      std::int32_t base = static_cast<std::int32_t>(vertices.size() / 3);
+      float height      = static_cast<float>(map[row * sqmap + col]);
+
+      for (int v = 0; v < 4; ++v)
+      {
+        vertices.push_back(baseQuad[v * 2] + static_cast<float>(col));
+        vertices.push_back(height);
+        vertices.push_back(baseQuad[v * 2 + 1] + static_cast<float>(row));
+
+        texCoords.push_back(baseQuad[v * 2]);
+        texCoords.push_back(baseQuad[v * 2 + 1]);
+      }
+
+      for (int i = 0; i < 6; ++i)
+      {
+        idx.push_back(base + static_cast<std::int32_t>(indices[i]));
+      }
+    }
+  }
+
+  return _loader->loadModel(vertices.data(),
+                            vertices.size() * sizeof(float),
+                            idx.data(),
+                            idx.size() * sizeof(std::int32_t),
+                            texCoords.data(),
+                            texCoords.size() * sizeof(float),
+                            nullptr,
+                            0,
+                            "");
+}
+
+std::tuple<Model*, Material*> EntityBuilder::loadModel(std::string path)
 {
   return _loader->loadModel(path);
-}
-
-Texture* EntityBuilder::loadTexture(std::string textureFile)
-{
-  GLuint id  = _loader->loadTexture(textureFile);
-  Texture* t = new Texture();
-  t->id      = id;
-  return t;
 }
 
 Shader*

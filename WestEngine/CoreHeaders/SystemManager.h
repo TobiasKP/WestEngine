@@ -25,7 +25,7 @@ public:
 
 private:
   Scene* _scene;
-  static std::array<ISystem*, 1> _systems;
+  static std::array<ISystem*, 2> _systems;
 
 #ifdef DEBUG
   std::int32_t _loggingFrequence = 0;

@@ -1,6 +1,8 @@
 #include "../../CoreHeaders/Systems/PlayerControl.h"
 
+#include "../../Constants/LuaAPI.hpp"
 #include "../../Constants/Systems.hpp"
+#include "../CoreHeaders/Components/Movement.hpp"
 #include "../CoreHeaders/Entity/Scene.h"
 
 #include <Config.h>
@@ -9,15 +11,21 @@
 PlayerControl::PlayerControl(WestLogger* logger) : ISystem(), _logger(logger), _cameraPending(false)
 {
   setName(Systems::PLAYER_CONTROL);
+  _movementInitiated.store(false);
+  _cleared = false;
 #ifdef DEBUG
   _logger->log(Level::Info, std::format("{} *** Initialized debug information", getName()));
-  _debugDrawUtils = new DebugDrawUtils(_logger);
-  _debugEntityId  = 0;
-  _drawn = false, _camLog = true, _posLog = true;
+  _camLog = true;
 #endif
 };
 
 PlayerControl::~PlayerControl() {}
+
+void PlayerControl::init()
+{
+  LuaFacade::getLuaFacadeInstance().registerCFunction(movePlayerUnit, LuaAPI::C_MOVE_PLAYER, this);
+  LuaFacade::getLuaFacadeInstance().registerCFunction(actionFinished, LuaAPI::C_ACTIONF_PLAYER, this);
+}
 
 void PlayerControl::update()
 {
@@ -49,65 +57,26 @@ void PlayerControl::update()
   }
 #endif
 
-  bool pending      = _movementPending.exchange(false);
-  Position* posComp = nullptr;
+  if (!_movementInitiated.load())
   {
-    std::lock_guard<std::mutex> lock(_mutex);
-    if (ids.empty())
-    {
-      _logger->log(Level::Info, std::format("{} *** No entitie for updating Entite in Player Control\n", getName()));
-      return;
-    }
-    std::uint32_t id = ids.front();
-    Entity* e        = Scene::getSceneInstance().getEntityById(id);
-    posComp          = (Position*)e->getComponent(BitMasks::Components::POSITION);
+    Entity* e         = Scene::getSceneInstance().getEntityById(ids.front());
+    Movement* movComp = (Movement*)e->getComponent(BitMasks::Components::MOVEMENT);
+    assert(movComp != nullptr);
+    Position* posComp = (Position*)e->getComponent(BitMasks::Components::POSITION);
     assert(posComp != nullptr);
+    World* w                      = Scene::getSceneInstance().getWorld();
+    std::int32_t tileIdx          = w->calculateIndex(posComp->position.x, posComp->position.z);
+    std::int32_t dimension        = w->getGridSize();
+    std::int32_t column           = tileIdx % dimension;
+    std::int32_t row              = tileIdx / dimension;
+    std::vector<std::int32_t> res = w->getReachableTiles(row, column, movComp->range, movComp->a, this);
+    movComp->reachableTiles       = res;
   }
-  if (pending || !destinationReached(posComp))
+  if (!_cleared.exchange(true))
   {
-    glm::vec3 localDest;
-#ifdef DEBUG
-    if (_debugEntityId != 0 && pending)
-    {
-      Entity* debugEntity = Scene::getSceneInstance().getEntityById(_debugEntityId);
-      if (debugEntity != nullptr && !debugEntity->isDestroyed())
-      {
-        _logger->log(Level::Info, std::format("{} *** Destroying destination Debug Line\n", getName()));
-        debugEntity->destroy();
-        _drawn = false;
-      }
-    }
-#endif
-    {
-      std::lock_guard<std::mutex> lock(_MovementMutex);
-      localDest = _moveToDestination;
-    }
-#ifdef DEBUG
-    if (_posLog)
-    {
-      glm::vec3 currentPos = posComp->position;
-      _logger->log(Level::Info,
-                   std::format("{} *** Moving entity at position: ({}, {}, {}) - to "
-                               "position: ({}, {}, {})\n",
-                               getName(),
-                               currentPos.x,
-                               currentPos.y,
-                               currentPos.z,
-                               _moveToDestination.x,
-                               _moveToDestination.y,
-                               _moveToDestination.z));
-      _posLog = false;
-    }
-#endif
-    updatePosition(localDest, posComp);
+    World* w = Scene::getSceneInstance().getWorld();
+    w->clearFlag(0x0002u);
   }
-
-#ifdef DEBUG
-  else
-  {
-    _posLog = true;
-  }
-#endif
 }
 
 void PlayerControl::updateCamera(glm::vec3 local)
@@ -115,39 +84,6 @@ void PlayerControl::updateCamera(glm::vec3 local)
   Camera* camera = Scene::getSceneInstance().getCamera();
   assert(camera != nullptr);
   camera->movePosition(local.x, local.y, local.z);
-}
-
-void PlayerControl::updatePosition(glm::vec3 local, Position* posComp)
-{
-  assert(posComp != nullptr);
-  glm::vec3 direction = local - posComp->position;
-
-  if (glm::length2(direction) <= Config::GeneralConfig.SPEED * Config::GeneralConfig.SPEED)
-  {
-    posComp->position = local;
-    return;
-  }
-
-  direction          = glm::normalize(direction) * Config::GeneralConfig.SPEED;
-  posComp->position += direction;
-}
-
-bool PlayerControl::destinationReached(Position* posComp)
-{
-  bool reached = glm::all(glm::epsilonEqual(posComp->position, _moveToDestination, Config::GeneralConfig.EPSILON));
-#ifdef DEBUG
-  if (_debugEntityId != 0 && reached)
-  {
-    Entity* debugEntity = Scene::getSceneInstance().getEntityById(_debugEntityId);
-    if (debugEntity != nullptr && !debugEntity->isDestroyed())
-    {
-      _logger->log(Level::Info, std::format("{} *** Destroying destination Debug Line\n", getName()));
-      debugEntity->destroy();
-      _drawn = false;
-    }
-  }
-#endif
-  return reached;
 }
 
 void PlayerControl::setCameraMovement(glm::vec3 move)
@@ -160,74 +96,40 @@ void PlayerControl::setCameraMovement(glm::vec3 move)
   }
 }
 
-void PlayerControl::setDestinationPosition(glm::vec3 dest)
+void PlayerControl::updateDebuggingInfo() {}
+
+void PlayerControl::passDestinationPosition(glm::vec3 dest)
 {
-  std::unique_lock<std::mutex> lock(_MovementMutex, std::try_to_lock);
-  if (lock.owns_lock())
+  std::vector<uint32_t> ids = getEntitieIds();
+  std::int32_t id           = ids.front();
+  Entity* e                 = Scene::getSceneInstance().getEntityById(id);
+  Movement* movComp         = (Movement*)e->getComponent(BitMasks::Components::MOVEMENT);
+  assert(movComp != nullptr);
+  std::int32_t tile = Scene::getSceneInstance().getWorld()->calculateIndex(dest.x, dest.z);
+  bool inRange =
+    std::find(movComp->reachableTiles.begin(), movComp->reachableTiles.end(), tile) != movComp->reachableTiles.end();
+  if (!_movementInitiated.load() && inRange)
   {
-    _moveToDestination = dest;
-    _movementPending.store(true);
+    movComp->destination = dest;
+    movComp->movementPending.store(true);
   }
 }
 
-void PlayerControl::updateDebuggingInfo()
+int PlayerControl::movePlayerUnit(lua_State* L)
 {
-  if (_debugEntityId != 0)
-  {
-#ifdef DEBUG
-    _logger->log(Level::Cycle, std::format("{} *** Retreiving debug entity.\n", getName()));
-#endif
-    Entity* debugEntity = Scene::getSceneInstance().getEntityById(_debugEntityId);
-    if (debugEntity != nullptr && debugEntity->isDestroyed())
-    {
-      _debugDrawUtils->unloadModel(*debugEntity);
-    }
-  }
+  std::int32_t n = lua_gettop(L);
+  assert(n == 1);
+  PlayerControl* me = (PlayerControl*)lua_touserdata(L, lua_upvalueindex(1));
+  me->_movementInitiated.store(true);
+  me->_cleared.store(false);
+  return 0;
+}
 
-  if (_drawn)
-  {
-    return;
-  }
-
-  std::vector<std::uint32_t> ids = getEntitieIds();
-  if (ids.empty())
-  {
-    _logger->log(Level::Info, std::format("{} *** No entitie for updating Debugging Info\n", getName()));
-    return;
-  }
-
-  std::uint32_t id = ids.front();
-  Entity* e        = Scene::getSceneInstance().getEntityById(id);
-  assert(e != nullptr);
-  Position* posComp = (Position*)e->getComponent(BitMasks::Components::POSITION); 
-  assert(posComp != nullptr);
-#ifdef DEBUG
-  if (posComp == nullptr)
-  {
-    _logger->log(
-      Level::Error,
-      std::format("{} *** updateDebuggingInfo: Entity {} has no Position component!\n", getName(), e->getId()));
-    return;
-  }
-#endif
-  if (posComp == nullptr)
-  {
-    return;
-  }
-  glm::vec3 direction = _moveToDestination - posComp->position;
-  if (glm::length2(direction) <= Config::GeneralConfig.SPEED * Config::GeneralConfig.SPEED)
-  {
-    return;
-  }
-
-  _logger->log(Level::Info,
-               std::format("{} *** Drawing destination Debug Line from: {}, {}, {}\n",
-                           getName(),
-                           posComp->position.x,
-                           posComp->position.y,
-                           posComp->position.z));
-
-  glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0f);
-  _debugEntityId  = _debugDrawUtils->addLine(posComp->position, direction, color);
-  _drawn          = true;
+int PlayerControl::actionFinished(lua_State* L)
+{
+  std::int32_t n = lua_gettop(L);
+  assert(n == 1);
+  PlayerControl* me = (PlayerControl*)lua_touserdata(L, lua_upvalueindex(1));
+  me->_movementInitiated.store(false);
+  return 0;
 }
