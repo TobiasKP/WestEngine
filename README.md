@@ -22,6 +22,8 @@ Windows: Tested with the latest installation of Visual Studio Community 2026 v18
 
 ## Building
 
+**Note:** Simply cloning the repo into VS Community will be enough to run the project, just be aware that MSVC v143 is needed. 
+
 Clone with submodules (vcpkg is included as a submodule for dependency management):
 
 ```bash
@@ -52,8 +54,6 @@ Module-specific debug builds are also available (e.g. `linux-debug-core`, `windo
 The executable `WestCore` will be located in the projects root folder following the path: `build/<preset>/WestEngine/`. 
 
 **Note:** Write access is required in the application directory for log file generation, not having read/write rights may lead to undefined behaviour. 
-
-**Note:** Simply cloning the repo into VS Community will be enough to run the project, just be aware that MSVC v143 is needed. 
 
 ## Dependencies
 
