@@ -1,6 +1,7 @@
 #include "../../CoreHeaders/Entity/Entity.h"
 
 #include <bitset>
+#include <format>
 
 PoolAllocator* Entity::_allocator = new PoolAllocator();
 

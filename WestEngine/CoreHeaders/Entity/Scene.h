@@ -54,7 +54,7 @@ private:
   static World* _world;
   std::vector<Entity> _entities;
   std::vector<Entity> _debugEntities;
-  std::string _sceneName = CoreConstants::UNDEFINED_STRING;
+  std::string _sceneName = CoreConstants::UNDEFINED_STRING.data();
 
   Scene();
   ~Scene();

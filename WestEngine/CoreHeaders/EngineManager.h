@@ -4,6 +4,7 @@
 #include "WindowManager.h"
 
 #include <Config.h>
+#include <array>
 #include <memory>
 
 class EngineManager : public IManager

@@ -4,6 +4,7 @@
 #include "../CoreHeaders/Utils/Math/PositionCalculation.h"
 
 #include <Config.h>
+#include <format>
 #include <glm/ext/matrix_clip_space.hpp>
 
 using namespace WestInterface;

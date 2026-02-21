@@ -9,9 +9,9 @@
 #include <string>
 #include <thread>
 
-constexpr std::string INFO_FILE_NAME  = "WestLog_";
-constexpr std::string ERROR_FILE_NAME = "WestError_";
-constexpr std::string CYCLE_FILE_NAME = "WestCyclingLog_";
+constexpr std::string_view INFO_FILE_NAME  = "WestLog_";
+constexpr std::string_view ERROR_FILE_NAME = "WestError_";
+constexpr std::string_view CYCLE_FILE_NAME = "WestCyclingLog_";
 constexpr std::uint8_t CYCLE_LENGTH   = 200;
 constexpr std::uint8_t BULK_SIZE      = 50;
 

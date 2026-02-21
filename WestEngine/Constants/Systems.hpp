@@ -1,11 +1,11 @@
 #pragma once
 
-#include <string>
+#include <string_view>
 
 namespace Systems
 {
 
-inline constexpr std::string SYSTEMS        = "systems";
-inline constexpr std::string PLAYER_CONTROL = "PlayerControl";
-inline constexpr std::string MOVEMENT       = "Movement";
+inline constexpr std::string_view SYSTEMS        = "systems";
+inline constexpr std::string_view PLAYER_CONTROL = "PlayerControl";
+inline constexpr std::string_view MOVEMENT       = "Movement";
 }  // namespace Systems

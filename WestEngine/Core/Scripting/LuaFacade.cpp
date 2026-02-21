@@ -4,17 +4,11 @@
 
 #include <cassert>
 #include <CoreConstants.hpp>
+#include <PathUtils.h>
+
+#include <algorithm>
 #include <filesystem>
-
-
-#ifdef _WIN32
-#include <direct.h>
-#define getcwd _getcwd
-#define PATH_MAX MAX_PATH
-#else
-#include <limits.h>
-#include <unistd.h>
-#endif
+#include <format>
 
 
 LuaFacade& LuaFacade::getLuaFacadeInstance()
@@ -58,7 +52,7 @@ bool LuaFacade::registerCFunction(int (*f)(lua_State*), std::string name, void* 
   }
   lua_pushlightuserdata(L, me);
   lua_pushcclosure(L, f, 1);
-  lua_setglobal(L, name.c_str());
+  lua_setglobal(L, name.data());
   return 0;
 }
 
@@ -68,11 +62,11 @@ bool LuaFacade::onTileClicked(std::int32_t calleeId, MouseAction m, glm::vec3 de
   assert(calleeId > -1);
   if (m == LMOUSE_CLICK)
   {
-    lua_getglobal(L, LuaAPI::WORLD_POS_LCLICK.c_str());
+    lua_getglobal(L, LuaAPI::WORLD_POS_LCLICK.data());
   }
   else if (m == RMOUSE_CLICK)
   {
-    lua_getglobal(L, LuaAPI::WORLD_POS_RCLICK.c_str());
+    lua_getglobal(L, LuaAPI::WORLD_POS_RCLICK.data());
   }
   if (!lua_isfunction(L, -1))
   {
@@ -102,7 +96,7 @@ bool LuaFacade::onEntityClicked(std::int32_t calleeId, MouseAction m, std::int32
 
 bool LuaFacade::onStateChange(std::int32_t calleeId, std::int32_t state)
 {
-  lua_getglobal(L, LuaAPI::STATE_CHANGE.c_str());
+  lua_getglobal(L, LuaAPI::STATE_CHANGE.data());
   lua_pushinteger(L, calleeId);
   lua_pushinteger(L, state);
   std::int32_t status = lua_pcall(L, 2, 0, 0);
@@ -117,21 +111,30 @@ bool LuaFacade::onStateChange(std::int32_t calleeId, std::int32_t state)
 
 bool LuaFacade::loadAPI()
 {
-  char cwd[PATH_MAX];
-  char filePath[PATH_MAX];
-  if (getcwd(cwd, sizeof(cwd)) == NULL)
-  {
-    return 1;
-  }
+  std::string luaDir = PathUtils::getExecutableDir() + "/lua/";
+  std::replace(luaDir.begin(), luaDir.end(), '\\', '/');
+  std::string luaPath = luaDir + "?.lua;" + luaDir + "?/init.lua";
+  luaL_dostring(L, std::format("package.path = '{}' .. ';' .. package.path", luaPath).c_str());
 
-  snprintf(filePath, sizeof(filePath), "%s%s", cwd, CoreConstants::LUA_API_FILE);
+  std::string filePath = PathUtils::resolve(CoreConstants::LUA_API_FILE);
   if (!std::filesystem::exists(filePath))
   {
     _logger->log(Level::Error, std::format("Lua State error ::: Lua API file: {} - not found!", filePath));
     return 1;
   }
-  luaL_dofile(L, filePath);
+  if (luaL_dofile(L, filePath.data()) != 0)
+  {
+    _logger->log(Level::Error, std::format("Lua State error ::: Loading API file: {}", lua_tostring(L, -1)));
+    lua_pop(L, 1);
+    return 1;
+  }
   lua_getglobal(L, "Init");
-  lua_call(L, 0, 0);
+  std::int32_t status = lua_pcall(L, 0, 0, 0);
+  if (status != 0)
+  {
+    _logger->log(Level::Error, std::format("Lua State error ::: Calling Init: {}", lua_tostring(L, -1)));
+    lua_pop(L, 1);
+    return 1;
+  }
   return 0;
 }

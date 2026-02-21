@@ -1,44 +1,10 @@
 # WestEngine
 
-A C++23 game engine built from scratch, designed for tile-based, turn-style games. It features an Entity-Component-System architecture, OpenGL 3D rendering, Lua scripting, a custom UI framework, and multi-threaded task execution.
+A early verion of a C++23 game engine built from scratch, designed for tile-based, turn-style games. It features an Entity-Component-System architecture, OpenGL 3D rendering, Lua scripting, a custom UI framework, and multi-threaded task execution.
 
-This is a personal project developed to explore game engine architecture and low-level systems programming.
+This is a personal project developed to explore system architecture, system design, parallel computing and low-level systems programming. 
 
-## Features
-
-| System | Status | Description |
-|--------|--------|-------------|
-| ECS (Entity-Component-System) | Implemented | Bitmask-based component storage, entity pooling, system dispatch |
-| OpenGL Rendering | Implemented | Shader management, instanced UI rendering, debug visualization |
-| Lua Scripting | Implemented | Bidirectional C++/Lua bridge for game logic and entity definitions |
-| UI Framework | Implemented | Buttons, labels, dropdowns, observer-based events, settings interface |
-| Tile-Based World | Implemented | Grid coordinate system, Manhattan distance pathfinding, GPU-driven tile rendering |
-| Input System | Implemented | Configurable keybindings, keyboard/mouse callbacks, observer pattern |
-| Threading | Implemented | Thread pool, fire-and-forget tasks, hardware-aware thread count |
-| Memory Pooling | Implemented | Custom pool allocator for entities with free-list management |
-| Logging | Implemented | Multi-stream logger (info, error, cycle) with thread-safe writes |
-| Cross-Platform Build | Implemented | CMake + vcpkg, presets for Windows, macOS, Linux |
-| Audio | Planned | Not yet implemented |
-| Physics/Collision | Not applicable | Engine targets discrete tile-based movement |
-
-## Architecture
-
-The engine is organized into four modules with a strict dependency hierarchy:
-
-```
-WestEngine (Core)  ──►  WestUtils (Shared Infrastructure)
-       │                         ▲
-WestInterface (UI) ──────────────┘
-
-WestGame (Content) ── copied into build output, not compiled
-```
-
-- **WestEngine**: ECS, managers, systems, rendering, scripting
-- **WestInterface**: UI elements, event/value observers, UI rendering pipeline
-- **WestUtils**: Thread pool, pool allocator, logging, configuration
-- **WestGame**: Lua scripts, assets, configuration (game content)
-
-For detailed architectural decisions and rationale, see [ARCHITECTURE.md](ARCHITECTURE.md).
+The project is activly developed further privately. Issues active by the time of creation were transfered into @TODO statements in the code to keep the display repository clean. 
 
 ## Requirements
 
@@ -48,7 +14,11 @@ For detailed architectural decisions and rationale, see [ARCHITECTURE.md](ARCHIT
 - CMake 3.10+
 - OpenGL compatible graphics driver ([Getting Started](https://www.khronos.org/opengl/wiki/Getting_Started))
 
-**Platforms:** Windows, macOS, Linux
+**Platforms:** 
+
+Linux: Arch v6.15.2, tested both release and debug build sucessfully, with cmake v4.1.1, gcc v15.1.1, nvidia driver v575.57.08, lua v5.4.8. 
+
+Windows:
 
 ## Building
 
@@ -70,7 +40,6 @@ Configure and build using CMake presets:
 # Configure (pick your platform)
 cmake --preset linux-debug      # or linux-release
 cmake --preset windows-debug    # or windows-release
-cmake --preset macos-debug      # or macos-release
 
 # Build
 cmake --build --preset <your-preset>
@@ -78,9 +47,11 @@ cmake --build --preset <your-preset>
 
 Module-specific debug builds are also available (e.g. `linux-debug-core`, `windows-debug-ui`). See `CMakePresets.json` for all options.
 
-The executable `WestCore` will be located in `build/<preset>/WestEngine/WestCore/`.
+**Note:** You may find MacOs build presets in the CMakePresets. MacOS is currently NOT supported since MacOs stopped OpenGL support after v4.1, future support is planned but not yet implemented or tested, so runconfigs will not work.
 
-**Note (Linux):** Write access is required in the application directory for log file generation.
+The executable `WestCore` will be located in the projects root folder following the path: `build/<preset>/WestEngine/`. 
+
+**Note:** Write access is required in the application directory for log file generation, not having read/write rights may lead to undefined behaviour. 
 
 ## Dependencies
 
@@ -94,28 +65,40 @@ Managed via [vcpkg](https://learn.microsoft.com/en-us/vcpkg):
 | GLM | Mathematics (vectors, matrices, transforms) |
 | STB | Image loading |
 
-## Project Structure
+## Features
+
+| System | Status | Description |
+|--------|--------|-------------|
+| ECS (Entity-Component-System) | Implemented | Bitmask-based component storage, entity pooling, system dispatch |
+| OpenGL Rendering | Implemented | Shader management, instanced UI rendering, debug visualization |
+| Lua Scripting | Implemented | Bidirectional C++/Lua bridge for game logic and entity definitions |
+| UI Framework | Implemented | Buttons, labels, dropdowns, observer-based events, settings interface |
+| Tile-Based World | Implemented | Grid coordinate system, Manhattan distance pathfinding, GPU-driven tile rendering |
+| Input System | Implemented | Configurable keybindings, keyboard/mouse callbacks, observer pattern |
+| Threading | Implemented | Thread pool, fire-and-forget tasks, hardware-aware thread count |
+| Memory Pooling | Implemented | Custom pool allocator for entities with free-list management |
+| Logging | Implemented | Multi-stream logger (info, error, cycle) with thread-safe writes |
+| Cross-Platform Build | Implemented | CMake + vcpkg, presets for Windows and Linux |
+
+
+## Architecture
+
+The engine is organized into four modules with a strict dependency hierarchy:
 
 ```
-WestEngine/
-├── WestEngine/          # Core engine (ECS, managers, rendering, scripting)
-│   ├── Core/            # Implementation files
-│   ├── CoreHeaders/     # Header files
-│   ├── Constants/       # Engine configuration
-│   └── Shader/          # GLSL shaders (vertex, fragment, world)
-├── WestInterface/       # UI framework (elements, observers, rendering)
-│   ├── WestInterface/   # Source and headers
-│   ├── Shader/          # UI-specific shaders
-│   └── Resources/       # Fonts and icons
-├── WestUtils/           # Shared utilities (threading, memory, logging)
-│   └── Include/         # Public headers
-├── WestGame/            # Game content (not compiled)
-│   ├── Scripts/         # Lua game scripts
-│   ├── Assets/          # Models and textures
-│   └── Config/          # Game settings and keybindings
-├── CMakeLists.txt       # Root build configuration
-└── CMakePresets.json    # Platform-specific build presets
+WestEngine (Core)  ──►  WestUtils (Shared Infrastructure)
+       │                         ▲
+WestInterface (UI) ──────────────┘
+
+WestGame (Content) ── copied into build output, not compiled
 ```
+
+- **WestEngine**: ECS, managers, systems, rendering, scripting
+- **WestInterface**: UI elements, event/value observers, UI rendering pipeline
+- **WestUtils**: Thread pool, pool allocator, logging, configuration
+- **WestGame**: Lua scripts, assets, configuration (game content)
+
+For some architectural decisions, rationale, known limitations and a more technical discussion, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## License
 

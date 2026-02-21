@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <format>
 #include <string>
+#include <string_view>
 #include <TimeUtils.hpp>
 #include <WestLogger.h>
 
@@ -19,7 +20,7 @@ public:
   virtual void update()          = 0;
   virtual std::int32_t init()    = 0;
 
-  inline void setName(const std::string& name)
+  inline void setName(std::string_view name)
   {
     this->_name = name;
   }
@@ -49,5 +50,5 @@ protected:
 
 private:
   WestLogger* _logger = nullptr;
-  std::string _name   = CoreConstants::UNDEFINED_STRING;
+  std::string _name   = CoreConstants::UNDEFINED_STRING.data();
 };

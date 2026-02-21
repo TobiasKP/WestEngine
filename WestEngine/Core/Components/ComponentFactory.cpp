@@ -3,6 +3,8 @@
 #include "../../Constants/Components.hpp"
 #include "../../CoreHeaders/Components/Umbrella.h"
 
+#include <format>
+
 void ComponentFactory::createComponent(std::map<std::string, std::int32_t> infos, std::string name, Entity& e)
 {
 #ifdef DEBUG

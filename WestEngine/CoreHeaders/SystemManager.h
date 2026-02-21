@@ -21,7 +21,7 @@ public:
   void update() override;
   std::int32_t init() override;
 
-  static ISystem* getSystemByName(const std::string name);
+  static ISystem* getSystemByName(const std::string_view name);
 
 private:
   Scene* _scene;

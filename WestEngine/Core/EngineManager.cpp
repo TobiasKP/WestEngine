@@ -8,17 +8,13 @@
 #include "../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
 
 #include <cstring>
-#include <fcntl.h>
+#include <format>
+#include <PathUtils.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef _WIN32
-#include <direct.h>
-#define getcwd _getcwd
-#define PATH_MAX MAX_PATH
-#else
+#ifndef _WIN32
 #include <limits.h>
-#include <unistd.h>
 #endif
 
 #define SH_DENYNO 0x40
@@ -110,7 +106,7 @@ void EngineManager::update()
 #endif
 
   while (!_exitEngine)
-  { 
+  {
     while (Config::PAUSE)
     {
       iterateQ(CYCLE::PAUSE);
@@ -261,32 +257,12 @@ std::int32_t EngineManager::initializeSettings()
   logDebug(std::format("{} ### Initialized Settings from saved Configuration file.", getName()));
 #endif
   std::int32_t success = 0;
-  char cwd[PATH_MAX];
-  char filePath[PATH_MAX];
-  if (getcwd(cwd, sizeof(cwd)) == NULL)
-  {
-    return 1;
-  }
 
 #ifdef DEBUG
-  snprintf(filePath, sizeof(filePath), "%s\n", cwd);
-  logDebug(std::format("{} ### Current working dir: {}", getName(), filePath));
+  logDebug(std::format("{} ### Executable dir: {}", getName(), PathUtils::getExecutableDir()));
 #endif
 
-  std::int32_t fd;
-  snprintf(filePath, sizeof(filePath), "%s%s", cwd, CoreConstants::SETTING_FILE_NAME);
-  if ((fd = open(filePath, O_RDONLY)) == -1)
-  {
-    logFailure(std::format("{} ### Error opening Settings file: {}\n {}\n", getName(), filePath, std::strerror(errno)));
-    return 1;
-  }
-
-  if ((Config::GeneralConfig.SETTINGS = fdopen(fd, "r")) == NULL)
-  {
-    logFailure(std::format("{} ### Error opening Setting filestream\n", getName()));
-    return 1;
-  }
-
+  Config::GeneralConfig.SETTINGS = PathUtils::openFile(CoreConstants::SETTING_FILE_NAME, true);
   char inbuf[128];
   while (fgets(inbuf, 128, Config::GeneralConfig.SETTINGS) != NULL)
   {

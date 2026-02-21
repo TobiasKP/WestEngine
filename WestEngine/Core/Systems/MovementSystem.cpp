@@ -3,6 +3,8 @@
 #include "../../Constants/Systems.hpp"
 #include "../CoreHeaders/Entity/Scene.h"
 
+#include <format>
+
 MovementSystem::MovementSystem(WestLogger* logger) : ISystem(), _logger(logger)
 {
   setName(Systems::MOVEMENT);

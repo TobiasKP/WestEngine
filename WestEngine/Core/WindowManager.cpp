@@ -4,6 +4,7 @@
 #include "../CoreHeaders/Utils/InputUtils/MouseCallbacks.h"
 
 #include <Config.h>
+#include <format>
 #include <GLFW/glfw3.h>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/glm.hpp>
@@ -63,7 +64,7 @@ std::int32_t WindowManager::startup()
                        _width,
                        _height));
 
-  _window = glfwCreateWindow(_width, _height, CoreConstants::TITLE.c_str(), NULL, NULL);
+  _window = glfwCreateWindow(_width, _height, CoreConstants::TITLE.data(), NULL, NULL);
 
   if (!_window)
   {

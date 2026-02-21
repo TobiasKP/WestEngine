@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <Config.h>
+#include <format>
 
 std::array<ISystem*, 2> SystemManager::_systems = {};
 
@@ -110,7 +111,7 @@ void SystemManager::update()
 }
 
 // TODO Change to IndexBased or BitBased lookup
-ISystem* SystemManager::getSystemByName(const std::string name)
+ISystem* SystemManager::getSystemByName(const std::string_view name)
 {
   auto it = std::find_if(_systems.begin(),
                          _systems.end(),

@@ -34,7 +34,7 @@ private:
   std::vector<GLuint> _textures;
   WestLogger* _logger;
   
-  FILE* openFile(const std::string &path);
+ 
   std::tuple<Model*, Material*> loadOBJModel(FILE* file);
   GLuint createVAO();
   void storeIndicesBuffer(std::int32_t* data, size_t dataLength);

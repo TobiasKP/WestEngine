@@ -4,17 +4,13 @@
 #include "../CoreHeaders/Utils/DataUtils/UniformUtils.h"
 
 #include <Config.h>
-#include <fcntl.h>
+#include <format>
+#include <PathUtils.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef _WIN32
-#include <direct.h>
-#define getcwd _getcwd
-#define PATH_MAX MAX_PATH
-#else
+#ifndef _WIN32
 #include <limits.h>
-#include <unistd.h>
 #endif
 
 using namespace WestInterface;
@@ -390,28 +386,7 @@ void ShaderManager::link(GLuint programId, GLuint vertexId, GLuint fragmentId)
 
 GLchar* ShaderManager::readShaderSource(const std::string shaderFile)
 {
-  char cwd[PATH_MAX];
-  char filePath[PATH_MAX];
-  if (getcwd(cwd, sizeof(cwd)) == NULL)
-  {
-    return nullptr;
-  }
-
-  std::int32_t fd;
-  snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", shaderFile.c_str());
-  if ((fd = open(filePath, O_RDONLY)) == -1)
-  {
-    logFailure(std::format("Error opening shader File. Path: {}\n", filePath));
-    return nullptr;
-  }
-
-  FILE* file = fdopen(fd, "rb");
-  if (file == NULL)
-  {
-    logFailure(std::format("Error opening File. Path: {}\n", filePath));
-    return nullptr;
-  }
-
+  FILE* file = PathUtils::openFile(shaderFile, true);
   fseek(file, 0, SEEK_END);
   long fileSize = ftell(file);
   rewind(file);

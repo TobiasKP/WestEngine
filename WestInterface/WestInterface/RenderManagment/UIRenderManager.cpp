@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <Config.h>
+#include <format>
 #include <future>
 #include <TimeUtils.hpp>
 #include <vector>

@@ -10,6 +10,6 @@ struct Shader : public IComponent
 {
   bool initialized = false;
   GLuint programId, shadergroup;
-  std::string vertexShaderFile = CoreConstants::UNDEFINED_STRING;
-  std::string fragShaderFile   = CoreConstants::UNDEFINED_STRING;
+  std::string vertexShaderFile = CoreConstants::UNDEFINED_STRING.data();
+  std::string fragShaderFile   = CoreConstants::UNDEFINED_STRING.data();
 };

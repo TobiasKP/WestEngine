@@ -2,6 +2,8 @@
 
 #include "RenderManagment/TextRenderManager.h"
 
+#include <PathUtils.h>
+
 #include <format>
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
@@ -99,18 +101,9 @@ std::int32_t WestInterfaceFacade::init()
   glBindVertexArray(0);
 
   std::int32_t width, height, numComponents;
-  const char* textureFile = "/assets/Textures/courier.bmp";
-  char cwd[128];
-  char filePath[PATH_MAX];
-  if (getcwd(cwd, sizeof(cwd)) == NULL)
-  {
-    _logger.log(Level::Error, "---Error getting current working directory!\n");
-    return -1;
-  }
+  std::string filePath = PathUtils::resolve("/assets/Textures/courier.bmp");
 
-  snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", textureFile);
-
-  unsigned char* imgData = stbi_load(filePath, &width, &height, &numComponents, 0);
+  unsigned char* imgData = stbi_load(filePath.c_str(), &width, &height, &numComponents, 0);
   if (imgData == NULL)
   {
     _logger.log(

@@ -1,14 +1,5 @@
 #include "../../../CoreHeaders/Utils/Draw/DebugDrawUtils.h"
 
-#ifdef _WIN32
-#include <direct.h>
-#define getcwd _getcwd
-#define PATH_MAX MAX_PATH
-#else
-#include <limits.h>
-#include <unistd.h>
-#endif
-
 #include "../../../CoreHeaders/Entity/Entity.h"
 
 #include <Config.h>
@@ -26,13 +17,6 @@ std::uint32_t DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction)
   std::int32_t indices[] = {0, 1};
   std::tuple<Model*, Material*> m =
     _loader->loadModel(vertices, sizeof(vertices), indices, sizeof(indices), 0, 0, 0, 0, "");
-
-  char cwd[PATH_MAX];
-  char filePath[PATH_MAX];
-  if (getcwd(cwd, sizeof(cwd)) == NULL)
-  {
-    return -1;
-  }
 
   Shader* s           = new Shader();
   s->vertexShaderFile = CoreConstants::DEBUG_V_SHADER;

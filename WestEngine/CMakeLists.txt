@@ -27,7 +27,7 @@ include_directories(
 # Platform-specific configuration
 # ─────────────────────────────────────────────────────────────
 if (WIN32)
-    set(PLATFORM "windows")    
+    set(PLATFORM "windows")
     set(OPENGL_LIB opengl32)
     add_definitions(-DGLEW_STATIC -DLUA_STATIC) 
 elseif(APPLE)
@@ -76,7 +76,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
-    $<$<CONFIG:DEBUG>:DEBUG>
+    $<$<CONFIG:Debug>:DEBUG>
 )
 
 # ─────────────────────────────────────────────────────────────

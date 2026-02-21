@@ -2,34 +2,28 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <algorithm>
-#include <fcntl.h>
 #include <format>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <PathUtils.h>
 #include <stb_image.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef _WIN32
-#include <direct.h>
-#define getcwd _getcwd
-#define PATH_MAX MAX_PATH
-#else
+#ifndef _WIN32
 #include <limits.h>
-#include <unistd.h>
 #endif
 
-  std::tuple<Model*, Material*>
-  ObjectLoader::loadModel(float* vertices,
-                          size_t verticesLength,
-                          std::int32_t* indices,
-                          size_t indicesLength,
-                          float* texture,
-                          size_t textureLength,
-                          float* normals,
-                          size_t normalsLength,
-                          std::string mat)
+std::tuple<Model*, Material*> ObjectLoader::loadModel(float* vertices,
+                                                      size_t verticesLength,
+                                                      std::int32_t* indices,
+                                                      size_t indicesLength,
+                                                      float* texture,
+                                                      size_t textureLength,
+                                                      float* normals,
+                                                      size_t normalsLength,
+                                                      std::string mat)
 {
   assert(vertices != nullptr && verticesLength > 0 && indices != nullptr && indicesLength > 0 && _logger != nullptr);
 
@@ -73,40 +67,12 @@
 
 std::tuple<Model*, Material*> ObjectLoader::loadModel(std::string path)
 {
-  FILE* file = openFile(path);
+  FILE* file = PathUtils::openFile(path, true);
   if (file == nullptr)
   {
     return std::make_tuple(nullptr, nullptr);
   }
   return loadOBJModel(file);
-}
-
-FILE* ObjectLoader::openFile(const std::string& path)
-{
-  char cwd[PATH_MAX];
-  char filePath[PATH_MAX];
-  if (getcwd(cwd, sizeof(cwd)) == NULL)
-  {
-    return nullptr;
-  }
-
-  std::int32_t fd;
-  FILE* file;
-  snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", path.c_str());
-  if ((fd = open(filePath, O_RDONLY)) == -1)
-  {
-    _logger->log(Level::Error, std::format("---Error opening File!\n Path: {}\n", filePath));
-    // TODO return drawdebug Cube
-    return nullptr;
-  }
-
-  if ((file = fdopen(fd, "r")) == NULL)
-  {
-    _logger->log(Level::Error, "---Error opening File!\n");
-    return nullptr;
-  }
-
-  return file;
 }
 
 std::tuple<Model*, Material*> ObjectLoader::loadOBJModel(FILE* file)
@@ -383,7 +349,7 @@ std::tuple<Model*, Material*> ObjectLoader::loadOBJModel(FILE* file)
 
 Material* ObjectLoader::generateMaterialFromMTL(const std::string& path)
 {
-  FILE* file       = openFile(path);
+  FILE* file       = PathUtils::openFile(path, true);
   Material* result = new Material();
   if (file == nullptr)
   {
@@ -395,7 +361,7 @@ Material* ObjectLoader::generateMaterialFromMTL(const std::string& path)
     if (strncmp(line, "Kd ", 3) == 0)
     {
       float u, v, z;
-      sscanf(line + 3, "%f %f", &u, &v);
+      sscanf(line + 3, "%f %f %f", &u, &v, &z);
       result->diffuseColor = glm::vec3(u, v, z);
     }
   }
@@ -409,19 +375,11 @@ GLuint ObjectLoader::loadTexture(std::string textureFile)
   assert(_logger != nullptr);
   std::int32_t width, height, numComponents;
 
-  char cwd[128];
-  char filePath[PATH_MAX];
-  if (getcwd(cwd, sizeof(cwd)) == NULL)
-  {
-    _logger->log(Level::Error, "---Error getting current working directory!\n");
-    return -1;
-  }
-
-  snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", textureFile.c_str());
+  std::string filePath = PathUtils::resolve("/" + textureFile);
 #ifdef DEBUG
   _logger->log(Level::Info, std::format("---Loading Texture: {}\n", filePath));
 #endif
-  unsigned char* imgData = stbi_load(filePath, &width, &height, &numComponents, 0);
+  unsigned char* imgData = stbi_load(filePath.c_str(), &width, &height, &numComponents, 0);
   if (imgData == NULL)
   {
     _logger->log(

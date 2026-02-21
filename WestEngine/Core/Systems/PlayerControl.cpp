@@ -23,8 +23,8 @@ PlayerControl::~PlayerControl() {}
 
 void PlayerControl::init()
 {
-  LuaFacade::getLuaFacadeInstance().registerCFunction(movePlayerUnit, LuaAPI::C_MOVE_PLAYER, this);
-  LuaFacade::getLuaFacadeInstance().registerCFunction(actionFinished, LuaAPI::C_ACTIONF_PLAYER, this);
+  LuaFacade::getLuaFacadeInstance().registerCFunction(movePlayerUnit, LuaAPI::C_MOVE_PLAYER.data(), this);
+  LuaFacade::getLuaFacadeInstance().registerCFunction(actionFinished, LuaAPI::C_ACTIONF_PLAYER.data(), this);
 }
 
 void PlayerControl::update()

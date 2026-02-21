@@ -1,6 +1,7 @@
 Utils = {}
 
 local yaml = require("yaml")
+local root = debug.getinfo(1, 'S').source:sub(2):gsub("[^/]+$", "")
 
 local function interpreteData(data, source)
   local log = "YAML parsed for " .. tostring(source)
@@ -59,7 +60,7 @@ function LoadEntity(entity)
 
   local file = nil
 
-  file = io.open("lua/Entities/" .. entity .. ".yaml")
+  file = io.open(root .. "Entities/" .. entity .. ".yaml")
 
 
   if file == nil then

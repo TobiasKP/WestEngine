@@ -1,7 +1,9 @@
 #include "InterfaceBuilder.h"
 
-#include <stb_image.h>
 #include <Config.h>
+#include <format>
+#include <PathUtils.h>
+#include <stb_image.h>
 
 using namespace WestInterface;
 
@@ -64,18 +66,9 @@ void InterfaceBuilder::createBackground(TextureInformation* t)
   glGenTextures(1, &texture);
 
   std::int32_t width, height, numComponents;
-  const char* textureFile = t->path;
-  char cwd[128];
-  char filePath[PATH_MAX];
-  if (getcwd(cwd, sizeof(cwd)) == NULL)
-  {
-    _logger.log(Level::Error, "@@@ GNU.\n");
-    return;
-  }
-
-  snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", textureFile);
+  std::string filePath = PathUtils::resolve(std::string("/") + t->path);
   stbi_set_flip_vertically_on_load(true);
-  unsigned char* imgData = stbi_load(filePath, &width, &height, &numComponents, 0);
+  unsigned char* imgData = stbi_load(filePath.c_str(), &width, &height, &numComponents, 0);
   if (imgData == NULL)
   {
     _logger.log(Level::Error, "@@@ GNA.\n");

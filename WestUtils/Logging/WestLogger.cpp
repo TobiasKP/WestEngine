@@ -13,9 +13,9 @@ WestLogger& WestLogger::getLoggerInstance()
 WestLogger::WestLogger()
 {
   std::string currentDate = TimeUtils::getCurrentTimeAsDate() + ".log";
-  _logFile.open(INFO_FILE_NAME + currentDate, std::ios::out | std::ios::app);
-  _errorFile.open(ERROR_FILE_NAME + currentDate, std::ios::out | std::ios::app);
-  _cycleFile.open(CYCLE_FILE_NAME + currentDate, std::ios::out);
+  _logFile.open(std::string(INFO_FILE_NAME) + currentDate, std::ios::out | std::ios::app);
+  _errorFile.open(std::string(ERROR_FILE_NAME) + currentDate, std::ios::out | std::ios::app);
+  _cycleFile.open(std::string(CYCLE_FILE_NAME) + currentDate, std::ios::out);
   _cycleLength = 100;
 
   if (!_logFile.is_open() || !_logFile.good())

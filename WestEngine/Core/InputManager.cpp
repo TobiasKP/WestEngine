@@ -4,23 +4,18 @@
 #include "../CoreHeaders/Utils/InputUtils/MouseCallbacks.h"
 
 #include <cstring>
-#include <fcntl.h>
+#include <format>
+#include <PathUtils.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef _WIN32
-#include <direct.h>
-#define getcwd _getcwd
-#define PATH_MAX MAX_PATH
-#else
+#ifndef _WIN32
 #include <limits.h>
-#include <unistd.h>
 #endif
 
 #define SH_DENYNO 0x40
 
-InputManager::InputManager()
-  : IManager(nullptr)
+InputManager::InputManager() : IManager(nullptr)
 {
   setName(CoreConstants::INPUT_MANAGER);
 }
@@ -34,46 +29,13 @@ InputManager::~InputManager() {}
 
 std::int32_t InputManager::startup()
 {
-  char cwd[PATH_MAX];
-  char filePath[PATH_MAX];
-  if (getcwd(cwd, sizeof(cwd)) == NULL)
-  {
-    return 1;
-  }
-
 #ifdef DEBUG
-  snprintf(filePath, sizeof(filePath), "%s\n", cwd);
-  logDebug(std::format("{} ### Current working dir: {}", getName(), filePath));
+  logDebug(std::format("{} ### Executable dir: {}", getName(), PathUtils::getExecutableDir()));
 #endif
 
   std::int32_t fd;
-  snprintf(filePath, sizeof(filePath), "%s%s", cwd, CoreConstants::INPUT_CONFIG_FILE_NAME);
-  if ((fd = open(filePath, O_RDONLY)) == -1)
-  {
-    logFailure(
-      std::format("{} ### Error opening Input Config file: {}\n {}\n", getName(), filePath, std::strerror(errno)));
-    return 1;
-  }
-
-  if ((_inputConfig = fdopen(fd, "r")) == NULL)
-  {
-    logFailure(std::format("{} ### Error opening Input Config filestream\n", getName()));
-    return 1;
-  }
-
-  snprintf(filePath, sizeof(filePath), "%s%s", cwd, CoreConstants::AVAILABLE_INPUTS_FILE_NAME);
-  if ((fd = open(filePath, O_RDONLY)) == -1)
-  {
-    logFailure(
-      std::format("{} ### Error opening avialable Inputs file: {}\n {}\n", getName(), filePath, std::strerror(errno)));
-    return 1;
-  }
-
-  if ((_availableCommands = fdopen(fd, "r")) == NULL)
-  {
-    logFailure(std::format("{} ### Error opening avialable Inputs filestream\n", getName()));
-    return 1;
-  }
+  _inputConfig       = PathUtils::openFile(CoreConstants::INPUT_CONFIG_FILE_NAME, true);
+  _availableCommands = PathUtils::openFile(CoreConstants::AVAILABLE_INPUTS_FILE_NAME, true);
 
   assert(_inputConfig != NULL && _availableCommands != NULL);
   KeyboardCallbacks::setInputManager(this);
@@ -123,7 +85,7 @@ std::int32_t InputManager::init()
     }
 
     inbuf[strcspn(inbuf, "\r\n")] = 0;
-    char* equalSign              = strchr(inbuf, '=');
+    char* equalSign               = strchr(inbuf, '=');
 #ifdef DEBUG
     logDebug(std::format("{} ### Reading input from cfg: {}\n", getName(), inbuf));
 #endif
@@ -201,7 +163,7 @@ const std::string InputManager::findByKey(std::int32_t key)
 #ifdef DEBUG
   logDebug(std::format("{} ### No Key: {} found in input map.\n", getName(), key));
 #endif
-  return CoreConstants::UNDEFINED_STRING;
+  return CoreConstants::UNDEFINED_STRING.data();
 }
 
 std::int32_t

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <format>
 
 EventObserver::EventObserver(WestLogger& l) : IObserver(l) {}
 

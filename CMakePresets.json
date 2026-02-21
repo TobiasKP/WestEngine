@@ -157,19 +157,15 @@
     {
       "name": "windows-base",
       "inherits": "base",
-      "hidden": true,
-      "generator": "Visual Studio 17 2022",
-      "architecture": {
-        "value": "x64",
-        "strategy": "set"
-      },
+      "hidden": true,  
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
         "rhs": "Windows"
       },
       "cacheVariables": {
-        "BUILD_UTILS": "ON"
+        "BUILD_UTILS": "ON",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static"
       }
     },
     {
@@ -190,9 +186,10 @@
       "binaryDir": "${sourceDir}/build/windows-debug",
       "hidden": false,
       "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
         "BUILD_CORE": "ON",
         "BUILD_UI": "ON",
-        "CMAKE_CXX_FLAGS": "-Wpedantic"
+        "CMAKE_CXX_FLAGS": "/W4 /Zi"
       }
     },
     {
@@ -204,7 +201,7 @@
       "cacheVariables": {
         "BUILD_CORE": "ON",
         "BUILD_UI": "OFF",
-        "CMAKE_CXX_FLAGS": "-Wpedantic"
+        "CMAKE_CXX_FLAGS": "/W4"
       }
     },
     {
@@ -216,7 +213,7 @@
       "cacheVariables": {
         "BUILD_CORE": "OFF",
         "BUILD_UI": "ON",
-        "CMAKE_CXX_FLAGS": "-Wpedantic"
+        "CMAKE_CXX_FLAGS": "/W4"
       }
     }
   ],

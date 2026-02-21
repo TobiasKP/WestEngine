@@ -5,23 +5,14 @@
 #include <cassert>
 #include <CoreConstants.hpp>
 #include <cstring>
-#include <fcntl.h>
+#include <format>
+#include <PathUtils.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-
-#ifdef _WIN32
-#include <direct.h>
-#define getcwd _getcwd
-#define PATH_MAX MAX_PATH
-#else
-#include <limits.h>
-#include <unistd.h>
-#endif
-
 #define SH_DENYNO 0x40
 
-  using namespace WestInterface;
+using namespace WestInterface;
 SettingsInterface::SettingsInterface(InterfaceBuilder& interfaceBuilder) : _interfaceBuilder(&interfaceBuilder)
 {
   _id = _resolutionId = _settingButtonId = 0;
@@ -148,13 +139,15 @@ ElementProxy* SettingsInterface::createQuitSettingsButton()
   {
     WestInterfaceFacade& facade = WestInterfaceFacade::getInterfaceInstance();
     assert(_id > 0);
-    facade.destroyInterface(_id);
-    if (_resolutionId != 0)
+    std::uint32_t mainId = _id;
+    std::uint32_t resId  = _resolutionId;
+    _id           = 0;
+    _resolutionId = 0;
+    if (resId != 0)
     {
-      facade.destroyInterface(_resolutionId);
-      _resolutionId = 0;
+      facade.destroyInterface(resId);
     }
-    _id = 0;
+    facade.destroyInterface(mainId);
   };
 
   /*
@@ -277,9 +270,10 @@ ElementProxy* SettingsInterface::resolutionOption(std::uint32_t x, std::uint32_t
         map.insert({"height", y});
         writeSetting(map);
       });
-    WestInterfaceFacade& facade = WestInterfaceFacade::getInterfaceInstance();
-    facade.destroyInterface(_resolutionId);
+    std::uint32_t resId = _resolutionId;
     _resolutionId = 0;
+    WestInterfaceFacade& facade = WestInterfaceFacade::getInterfaceInstance();
+    facade.destroyInterface(resId);
   };
 
   /*
@@ -312,38 +306,10 @@ void SettingsInterface::refreshInterface()
 
 std::int32_t SettingsInterface::writeSetting(std::unordered_map<std::string, std::int32_t> values)
 {
-  char cwd[PATH_MAX];
-  char filePath[PATH_MAX];
-  char newFilePath[PATH_MAX];
-  if (getcwd(cwd, sizeof(cwd)) == NULL)
-  {
-    return 1;
-  }
-
-  std::int32_t fd;
-  snprintf(filePath, sizeof(filePath), "%s%s", cwd, CoreConstants::SETTING_FILE_NAME);
-  if ((fd = open(filePath, O_RDONLY)) == -1)
-  {
-    _logger.log(Level::Error,
-                std::format("@@@ Error opening Settings file: {}\n {}\n", filePath, std::strerror(errno)));
-    return 1;
-  }
-
-  if ((Config::GeneralConfig.SETTINGS = fdopen(fd, "r")) == NULL)
-  {
-    _logger.log(Level::Error, "@@@ ### Error opening Setting filestream\n");
-    return 1;
-  }
-
-  FILE* out;
-  snprintf(newFilePath, sizeof(newFilePath), "%s%s", cwd, "temp.cfg");
-  if ((out = fopen(newFilePath, "w")) == NULL)
-  {
-    _logger.log(Level::Error, "@@@ ### Error opening Setting filestream\n");
-    fclose(Config::GeneralConfig.SETTINGS);
-    Config::GeneralConfig.SETTINGS = nullptr;
-    return 1;
-  }
+  std::string filePath           = PathUtils::resolve(CoreConstants::SETTING_FILE_NAME);
+  Config::GeneralConfig.SETTINGS = PathUtils::openFile(CoreConstants::SETTING_FILE_NAME, true);
+  std::string newFilePath        = PathUtils::resolve("/temp.cfg");
+  FILE* out                      = PathUtils::openFile("temp.cfg", false);
 
   char inbuf[128];
   while (fgets(inbuf, sizeof(inbuf), Config::GeneralConfig.SETTINGS))
@@ -374,8 +340,8 @@ std::int32_t SettingsInterface::writeSetting(std::unordered_map<std::string, std
   fclose(Config::GeneralConfig.SETTINGS);
   // TODO keep an eye out bc of possible data race condition
   Config::GeneralConfig.SETTINGS = nullptr;
-  std::remove(filePath);
-  std::rename(newFilePath, filePath);
+  std::remove(filePath.c_str());
+  std::rename(newFilePath.c_str(), filePath.c_str());
 #ifdef DEBUG
   _logger.log(Level::Info, "@@@ updated settings.cfg\n");
 #endif

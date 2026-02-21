@@ -4,6 +4,8 @@
 #include "../Umbrella.hpp"
 
 #include <Config.h>
+#include <format>
+#include <PathUtils.h>
 #include <stb_image.h>
 #include <unordered_map>
 
@@ -69,17 +71,9 @@ void ElementFactory::fillTexture(ElementProxy* ep, IElement* el)
   glGenTextures(1, &texture);
 
   std::int32_t width, height, numComponents;
-  const char* textureFile = ep->texture->path;
-  char cwd[128];
-  char filePath[PATH_MAX];
-  if (getcwd(cwd, sizeof(cwd)) == NULL)
-  {
-    return;
-  }
+  std::string filePath = PathUtils::resolve(std::string("/") + ep->texture->path);
 
-  snprintf(filePath, sizeof(filePath), "%s%s%s", cwd, "/", textureFile);
-
-  unsigned char* imgData = stbi_load(filePath, &width, &height, &numComponents, 0);
+  unsigned char* imgData = stbi_load(filePath.c_str(), &width, &height, &numComponents, 0);
   if (imgData == NULL)
   {
     return;

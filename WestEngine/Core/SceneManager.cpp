@@ -1,16 +1,10 @@
 #include "../CoreHeaders/SceneManager.h"
 
-#include <filesystem>
-#include <lua.hpp>
+#include <PathUtils.h>
 
-#ifdef _WIN32
-#include <direct.h>
-#define getcwd _getcwd
-#define PATH_MAX MAX_PATH
-#else
-#include <limits.h>
-#include <unistd.h>
-#endif
+#include <filesystem>
+#include <format>
+#include <lua.hpp>
 
 #include "../CoreHeaders/Entity/Camera.h"
 
@@ -69,21 +63,14 @@ std::int32_t SceneManager::init()
 
   _scene->init();
 
-  char cwd[PATH_MAX];
-  char filePath[PATH_MAX];
-  if (getcwd(cwd, sizeof(cwd)) == NULL)
-  {
-    return 1;
-  }
-
-  snprintf(filePath, sizeof(filePath), "%s%s", cwd, CoreConstants::LUA_INIT_FILE.c_str());
+  std::string filePath = PathUtils::resolve(CoreConstants::LUA_INIT_FILE.data());
   if (!std::filesystem::exists(filePath))
   {
     logFailure(std::format("{} ### Lua init file: {} - not found! Aborting Scene init ", getName(), filePath));
     return 1;
   }
 
-  luaL_dofile(L, filePath);
+  luaL_dofile(L, filePath.c_str());
   lua_getglobal(L, "Init");
   lua_call(L, 0, 0);
 

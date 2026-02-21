@@ -1,6 +1,7 @@
 #include "../../../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
 
 #include <Config.h>
+#include <format>
 
 InputManager* KeyboardCallbacks::_iManager   = nullptr;
 WindowManager* KeyboardCallbacks::_wManager  = nullptr;

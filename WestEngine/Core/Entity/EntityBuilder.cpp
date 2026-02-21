@@ -70,7 +70,7 @@ void EntityBuilder::createEntities()
 void EntityBuilder::createProperties(Entity& e)
 {
   std::map<std::string, std::int32_t> infos;
-  std::string name = CoreConstants::UNDEFINED_STRING;
+  std::string name = CoreConstants::UNDEFINED_STRING.data();
   const char* key  = lua_tostring(L, -2);
 
   lua_pushnil(L);
