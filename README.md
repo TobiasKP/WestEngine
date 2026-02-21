@@ -18,7 +18,7 @@ The project is activly developed further privately. Issues active by the time of
 
 Linux: Arch v6.15.2, tested both release and debug build sucessfully, with cmake v4.1.1, gcc v15.1.1, nvidia driver v575.57.08, lua v5.4.8. 
 
-Windows:
+Windows: Tested with the latest installation of Visual Studio Community 2026 v18.3.1
 
 ## Building
 
@@ -52,6 +52,8 @@ Module-specific debug builds are also available (e.g. `linux-debug-core`, `windo
 The executable `WestCore` will be located in the projects root folder following the path: `build/<preset>/WestEngine/`. 
 
 **Note:** Write access is required in the application directory for log file generation, not having read/write rights may lead to undefined behaviour. 
+
+**Note:** Simply cloning the repo into VS Community will be enough to run the project, just be aware that MSVC v143 is needed. 
 
 ## Dependencies
 
