@@ -189,7 +189,7 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "BUILD_CORE": "ON",
         "BUILD_UI": "ON",
-        "CMAKE_CXX_FLAGS": "/W4 /Zi"
+        "CMAKE_CXX_FLAGS": "/W3 /Zi"
       }
     },
     {
@@ -201,7 +201,7 @@
       "cacheVariables": {
         "BUILD_CORE": "ON",
         "BUILD_UI": "OFF",
-        "CMAKE_CXX_FLAGS": "/W4"
+        "CMAKE_CXX_FLAGS": "/W3"
       }
     },
     {
@@ -213,7 +213,7 @@
       "cacheVariables": {
         "BUILD_CORE": "OFF",
         "BUILD_UI": "ON",
-        "CMAKE_CXX_FLAGS": "/W4"
+        "CMAKE_CXX_FLAGS": "/W3"
       }
     }
   ],
