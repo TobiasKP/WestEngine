@@ -6,11 +6,13 @@ function LoadScene(name)
   end
 
   if name == "Intro" then
-    print("loading Intro")
+    if DEBUG then
+      print("loading Intro")
+    end
     return intro.load()
   end
 end
 
 function Init()
-   intro = require("Intro/IntroScene")
+  intro = require("Intro/IntroScene")
 end

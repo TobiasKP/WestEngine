@@ -2,13 +2,12 @@
 
 #include "../../Constants/LuaAPI.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <CoreConstants.hpp>
-#include <PathUtils.h>
-
-#include <algorithm>
 #include <filesystem>
 #include <format>
+#include <PathUtils.h>
 
 
 LuaFacade& LuaFacade::getLuaFacadeInstance()
@@ -29,11 +28,22 @@ void LuaFacade::shutdown()
 {
   lua_close(L);
 }
+
 void LuaFacade::startup(WestLogger* logger)
 {
   L = luaL_newstate();
   luaL_openlibs(L);
-  _logger = logger;
+  _logger            = logger;
+  std::string luaDir = PathUtils::getExecutableDir() + "/lua/";
+  std::ranges::replace(luaDir, '\\', '/');
+  std::string luaPath = luaDir + "?.lua;" + luaDir + "?/init.lua";
+  luaL_dostring(L, std::format("package.path = '{}' .. ';' .. package.path", luaPath).c_str());
+#ifdef DEBUG
+  luaL_dostring(L, "DEBUG = true");
+#else
+  luaL_dostring(L, "DEBUG = false");
+#endif
+
   if (loadAPI() != 0)
   {
     _logger->log(Level::Error, std::format("Lua State error ::: Lua API file"));
@@ -111,11 +121,6 @@ bool LuaFacade::onStateChange(std::int32_t calleeId, std::int32_t state)
 
 bool LuaFacade::loadAPI()
 {
-  std::string luaDir = PathUtils::getExecutableDir() + "/lua/";
-  std::replace(luaDir.begin(), luaDir.end(), '\\', '/');
-  std::string luaPath = luaDir + "?.lua;" + luaDir + "?/init.lua";
-  luaL_dostring(L, std::format("package.path = '{}' .. ';' .. package.path", luaPath).c_str());
-
   std::string filePath = PathUtils::resolve(CoreConstants::LUA_API_FILE);
   if (!std::filesystem::exists(filePath))
   {
