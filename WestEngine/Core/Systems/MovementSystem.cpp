@@ -34,10 +34,11 @@ void MovementSystem::update()
     {
       Position* posComp = (Position*)e->getComponent(BitMasks::Components::POSITION);
       moveToDestination(id, posComp, movComp);
+      posComp->_dirty.store(true);
       continue;
     }
     if (movComp->movementPending.exchange(false) && !movComp->moving.load())
-    {  
+    {
       induceMovement(id, movComp);
     }
   }

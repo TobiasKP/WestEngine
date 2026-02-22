@@ -175,9 +175,10 @@ void RenderManager::renderWorld()
   glUseProgram(shaderProgramId);
 
   Material* mat = (Material*)world->getComponent(BitMasks::Components::MATERIAL);
-  if (mat != nullptr && mat->diffuseColorUniform > -1)
+  if (mat != nullptr && mat->_dirty && mat->diffuseColorUniform > -1)
   {
     UniformUtils::setUniform(mat->diffuseColorUniform, mat->diffuseColor);
+    mat->_dirty = false;
   }
 
   Model* model = (Model*)world->getComponent(BitMasks::Components::MODEL);
@@ -197,10 +198,14 @@ void RenderManager::renderWorld()
   }
 #endif
 
-  std::vector<std::uint32_t> flags = world->getFlagData();
-  std::int32_t dimension           = world->getGridSize();
-  UniformUtils::setUniform(world->getFlagUniform(), flags);
-  UniformUtils::setUniform(world->getGridUniform(), dimension);
+  if (world->isDirty())
+  {
+    std::vector<std::uint32_t> flags = world->getFlagData();
+    std::int32_t dimension           = world->getGridSize();
+    UniformUtils::setUniform(world->getFlagUniform(), flags);
+    UniformUtils::setUniform(world->getGridUniform(), dimension);
+    world->resetDirty();
+  }
 
 
   glBindVertexArray(model->id);
@@ -321,19 +326,21 @@ void RenderManager::updateUniforms(const Entity& e, Model* model, Material* mate
   }
 
   Texture* t = material->diffuseTexture;
-  if (t != nullptr)
+  if (material->_dirty && t != nullptr)
   {
     UniformUtils::setUniform(t->uniform, 0);
     assert(t->uniform != -1);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, t->id);
+    material->_dirty = false;
   }
 
   Position* p = (Position*)e.getComponent(BitMasks::Components::POSITION);
-  if (p != nullptr)
+  if (p != nullptr && p->_dirty.load())
   {
     glm::mat4 transform = PositionCalculation::createTransformationMatrix(p->position, p->rotation, p->scale);
     assert(p->uniform != -1);
     UniformUtils::setUniform(p->uniform, transform);
+    p->_dirty.store(false);
   }
 }

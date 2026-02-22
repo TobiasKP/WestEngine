@@ -4,8 +4,6 @@
 #include "../../CoreHeaders/SystemManager.h"
 #include "../../CoreHeaders/Systems/Umbrella.h"
 
-#include <format>
-
 void SystemFactory::createSystem(std::map<std::string, std::int32_t> infos, const std::string name, const Entity& e)
 {
 #ifdef DEBUG
@@ -13,13 +11,13 @@ void SystemFactory::createSystem(std::map<std::string, std::int32_t> infos, cons
 #endif
   if (Systems::PLAYER_CONTROL.compare(name) == 0)
   {
-    PlayerControl* c = (PlayerControl*)SystemManager::getSystemByName(Systems::PLAYER_CONTROL.data());
+    PlayerControl* c = (PlayerControl*)SystemManager::getSystemByName(Systems::PLAYER_CONTROL);
     assert(c != nullptr);
     c->addEntity(e);
   }
   else if (Systems::MOVEMENT.compare(name) == 0)
   {
-    MovementSystem* m = (MovementSystem*)SystemManager::getSystemByName(Systems::MOVEMENT.data());
+    MovementSystem* m = (MovementSystem*)SystemManager::getSystemByName(Systems::MOVEMENT);
     assert(m != nullptr);
     m->addEntity(e);
   }
