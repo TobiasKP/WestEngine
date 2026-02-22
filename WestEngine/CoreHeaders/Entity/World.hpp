@@ -33,7 +33,7 @@ public:
   {
     return _dimension;
   }
-  std::vector<std::uint32_t> getFlagData()
+  std::vector<std::uint32_t>& getFlagData()
   {
     std::lock_guard<std::mutex> lock(_mutex);
     return _vflags;
