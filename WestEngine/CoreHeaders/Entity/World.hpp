@@ -16,6 +16,10 @@ public:
   getReachableTiles(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a, void* callee);
   void clearFlag(std::uint32_t flag);
   void setFlag(std::uint32_t flag, std::int32_t idx);
+  void resetDirty()
+  {
+    _dirty.store(false);
+  }
 
   inline GLuint getFlagUniform()
   {
@@ -33,6 +37,10 @@ public:
   {
     std::lock_guard<std::mutex> lock(_mutex);
     return _vflags;
+  }
+  inline bool isDirty()
+  {
+    return _dirty;
   }
 
   void setCreationInformation(std::uint32_t d, std::uint32_t s, glm::vec2 o)
@@ -60,4 +68,5 @@ private:
   glm::vec2 _origin;
   std::vector<std::uint32_t> _vflags;
   GLuint _ugridSize, _utileFlags;
+  std::atomic<bool> _dirty;
 };

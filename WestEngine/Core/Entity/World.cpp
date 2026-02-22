@@ -7,6 +7,7 @@ World::World()
 {
   std::lock_guard<std::mutex> lock(_mutex);
   _lastIdx = -1;
+  _dirty   = true;
 }
 
 World::~World()
@@ -70,6 +71,10 @@ void World::clearFlag(std::uint32_t flag)
 void World::setFlag(std::uint32_t flag, std::int32_t idx)
 {
   _vflags[idx] |= flag;
+  if (!_dirty.load())
+  {
+    _dirty.store(true);
+  }
 }
 
 std::vector<std::int32_t>
