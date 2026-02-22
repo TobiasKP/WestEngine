@@ -3,6 +3,9 @@
 #include "Components/Umbrella.h"
 #include "Entity/Scene.h"
 #include "Interfaces/IManager.h"
+#ifdef DEBUG
+#include "Utils/Draw/DebugDrawUtils.h"
+#endif
 
 #include <WestInterfaceFacade.h>
 
@@ -36,4 +39,8 @@ private:
   void renderWorld();
   void renderMainLoop(const Entity& e);
   void updateUniforms(const Entity& e, Model* m, Material* m2);
+
+#ifdef DEBUG
+  DebugDrawUtils* _debugUtils = nullptr;
+#endif
 };

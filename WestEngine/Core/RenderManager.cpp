@@ -14,15 +14,17 @@ GLuint RenderManager::_usedShaderProgram = 0;
 RenderManager::RenderManager() : IManager(nullptr)
 {
   setName(CoreConstants::RENDER_MANAGER);
-  _facade = nullptr;
-  _scene  = nullptr;
+  _debugUtils = new DebugDrawUtils(nullptr);
+  _facade     = nullptr;
+  _scene      = nullptr;
 }
 
 RenderManager::RenderManager(WestLogger* logger) : IManager(logger)
 {
   setName(CoreConstants::RENDER_MANAGER);
-  _facade = nullptr;
-  _scene  = nullptr;
+  _debugUtils = new DebugDrawUtils(logger);
+  _facade     = nullptr;
+  _scene      = nullptr;
 }
 
 RenderManager::~RenderManager() {}
@@ -312,11 +314,26 @@ void RenderManager::renderUserInterfaces()
 
 void RenderManager::updateUniforms(const Entity& e, Model* model, Material* material)
 {
+  Position* p = (Position*)e.getComponent(BitMasks::Components::POSITION);
+  Texture* t  = material->diffuseTexture;
 #ifdef DEBUG
   if (e.isDebugEntity())
   {
     UniformUtils::setUniform(model->debugColorUniform, material->diffuseColor);
     assert(model->debugColorUniform != -1);
+  }
+  Movement* m = (Movement*)e.getComponent(BitMasks::Components::MOVEMENT);
+  if (m != nullptr && m->moving.load() && !m->debugInfoDisplayed)
+  {
+    m->debugEntity        = _debugUtils->addLine(p->position, m->destination - p->position);
+    m->debugInfoDisplayed = true;
+  }
+  else if (m != nullptr && m->removeDebugInfo)
+  {
+    Entity* e = _scene->getEntityById(m->debugEntity);
+    _debugUtils->unloadModel(*e);
+    m->removeDebugInfo = false;
+    _scene->removeEntity(*e);
   }
 #endif
 
@@ -325,7 +342,7 @@ void RenderManager::updateUniforms(const Entity& e, Model* model, Material* mate
     UniformUtils::setUniform(material->diffuseColorUniform, material->diffuseColor);
   }
 
-  Texture* t = material->diffuseTexture;
+
   if (material->_dirty && t != nullptr)
   {
     UniformUtils::setUniform(t->uniform, 0);
@@ -335,7 +352,7 @@ void RenderManager::updateUniforms(const Entity& e, Model* model, Material* mate
     material->_dirty = false;
   }
 
-  Position* p = (Position*)e.getComponent(BitMasks::Components::POSITION);
+
   if (p != nullptr && p->_dirty.load())
   {
     glm::mat4 transform = PositionCalculation::createTransformationMatrix(p->position, p->rotation, p->scale);

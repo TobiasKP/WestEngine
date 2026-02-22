@@ -66,6 +66,7 @@ void World::clearFlag(std::uint32_t flag)
   {
     _vflags[i] &= ~flag;
   }
+  _dirty.store(true, std::memory_order_relaxed);
 }
 
 void World::setFlag(std::uint32_t flag, std::int32_t idx)
