@@ -35,7 +35,7 @@ void LuaFacade::startup(WestLogger* logger)
   luaL_openlibs(L);
   _logger            = logger;
   std::string luaDir = PathUtils::getExecutableDir() + "/lua/";
-  std::replace(luaDir.begin(), luaDir.end(), '\\', '/');
+  std::ranges::replace(luaDir, '\\', '/');
   std::string luaPath = luaDir + "?.lua;" + luaDir + "?/init.lua";
   luaL_dostring(L, std::format("package.path = '{}' .. ';' .. package.path", luaPath).c_str());
 #ifdef DEBUG
