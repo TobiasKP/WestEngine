@@ -10,6 +10,7 @@ message(STATUS "C++ Standard = ${CMAKE_CXX_STANDARD}")
 option(BUILD_CORE "Build Core Module" ON)
 option(BUILD_UTILS "Build Utility Modul" OFF)
 option(BUILD_UI "Build User Interface Module" OFF)
+option(BUILD_TESTS "Build Unit Tests" OFF)
 
 if(BUILD_UTILS) 
   add_subdirectory(WestUtils/)
@@ -21,5 +22,9 @@ endif()
 
 if(BUILD_CORE)
   add_subdirectory(WestEngine/)
+endif()
+
+if(BUILD_TESTS)
+  add_subdirectory(Tests/)
 endif()
 
