@@ -16,6 +16,6 @@ struct Movement : public IComponent
   std::atomic<bool> movementPending = false, moving = false;
 #ifdef DEBUG
   bool debugInfoDisplayed = false, removeDebugInfo = false;
-  std::uint32_t debugEntity;
+  std::uint32_t debugEntity = 0;
 #endif
 };

@@ -61,8 +61,10 @@ void MovementSystem::moveToDestination(std::uint32_t id, Position* posComp, Move
                                (std::int32_t)LuaFacade::LuaStates::IDLE));
     }
     movComp->moving.store(false);
+#ifdef DEBUG
     movComp->debugInfoDisplayed = false;
     movComp->removeDebugInfo    = true;
+#endif
   }
 }
 

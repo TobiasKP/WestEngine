@@ -331,9 +331,12 @@ void RenderManager::updateUniforms(const Entity& e, Model* model, Material* mate
   else if (m != nullptr && m->removeDebugInfo)
   {
     Entity* e = _scene->getEntityById(m->debugEntity);
-    _debugUtils->unloadModel(*e);
+    if (e != nullptr)
+    {
+      _debugUtils->unloadModel(*e);
+      _scene->removeEntity(*e);
+    }
     m->removeDebugInfo = false;
-    _scene->removeEntity(*e);
   }
 #endif
 
