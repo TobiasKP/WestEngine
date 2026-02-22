@@ -11,7 +11,7 @@ The project is activly developed further privately. Issues active by the time of
 **Software:**
 
 - C++23 compatible compiler (GCC 13+, Clang 16+, MSVC 19.35+)
-- CMake 3.10+
+- CMake 3.15+
 - OpenGL compatible graphics driver ([Getting Started](https://www.khronos.org/opengl/wiki/Getting_Started))
 
 **Platforms:** 
