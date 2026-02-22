@@ -5,7 +5,9 @@ function Init()
 end
 
 function Worldpos_lclick(id, x, y, z)
-  print("clicked pos" .. x .. y .. z);
+  if DEBUG then
+    print("clicked pos" .. x .. y .. z);
+  end
   local state = playerB.getCurrentState();
   if state == playerB.IDLE then
     playerB.setState(playerB.MOVING);
@@ -14,8 +16,10 @@ function Worldpos_lclick(id, x, y, z)
 end
 
 function StateChange(id, state)
-  print(playerB.getCurrentState());
-  print(state);
+  if DEBUG then
+    print(playerB.getCurrentState());
+    print(state);
+  end
   playerB.setState(state);
   if (state == playerB.IDLE) then
     ActionFinished(id);
