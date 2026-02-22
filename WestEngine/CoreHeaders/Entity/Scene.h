@@ -25,8 +25,7 @@ public:
   void removeEntity(const Entity& entity);
   void deleteScene();
 
-  // Getter
-  // TODO: getEntities() copies the entire entity vector every frame, return const reference or provide iterator access
+  // Getter 
   const std::vector<Entity>& getEntities() const;
 #ifdef DEBUG
   const std::vector<Entity>& getDebugEntities() const;

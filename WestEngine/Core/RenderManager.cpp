@@ -129,8 +129,7 @@ void RenderManager::renderMainLoop(const Entity& entity)
 
   Model* model       = (Model*)entity.getComponent(BitMasks::Components::MODEL);
   Material* material = (Material*)entity.getComponent(BitMasks::Components::MATERIAL);
-  assert(model != nullptr && material != nullptr);
-  // TODO: uniforms re-uploaded every frame even if unchanged, add dirty flags to Position/Material
+  assert(model != nullptr && material != nullptr); 
   if (!Config::PAUSE)
   {
     updateUniforms(entity, model, material);
