@@ -94,5 +94,4 @@ std::tuple<std::int16_t, bool> MouseCallbacks::isInterfaceHovered()
     }
   }
   return std::make_tuple(-1, false);
-;
 }
