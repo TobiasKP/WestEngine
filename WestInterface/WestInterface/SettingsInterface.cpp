@@ -104,6 +104,7 @@ void SettingsInterface::createSettingInterface()
   c->stretchY                 = 1.0f;
   c->rows                     = 10;
   c->columns                  = 11;
+  c->zIndex                   = 5;
   c->hiddenContainer          = false;
   assert(_id == 0);
 
@@ -134,6 +135,7 @@ ElementProxy* SettingsInterface::createQuitSettingsButton()
   quitButton->column         = 10;
   quitButton->columnElements = 1;
   quitButton->givenFlags     = 0x0040;
+  quitButton->zIndex         = 10;
   quitButton->text           = "X";
   quitButton->eventHandler   = [this]()
   {
@@ -141,8 +143,8 @@ ElementProxy* SettingsInterface::createQuitSettingsButton()
     assert(_id > 0);
     std::uint32_t mainId = _id;
     std::uint32_t resId  = _resolutionId;
-    _id           = 0;
-    _resolutionId = 0;
+    _id                  = 0;
+    _resolutionId        = 0;
     if (resId != 0)
     {
       facade.destroyInterface(resId);
@@ -177,7 +179,7 @@ ElementProxy* SettingsInterface::createResolutionSetting()
   resolution->text           = "Screen Resolution";
   resolution->row            = 9;
   resolution->column         = 1;
-  resolution->zIndex         = 5;
+  resolution->zIndex         = 15;
   resolution->columnElements = resolution->text.length() + 1;
   resolution->givenFlags     = 0x0080;
   resolution->eventHandler   = [this]()
@@ -223,7 +225,7 @@ void SettingsInterface::createResolutionOptions()
   c->stretchY                  = row * 1.0f;
   c->rows                      = 1;
   c->columns                   = 1;
-  c->zIndex                    = 9;
+  c->zIndex                    = 10;
   c->hiddenContainer           = false;
   c->givenFlags               |= 0x0010;
   assert(_resolutionId == 0);
@@ -256,6 +258,7 @@ ElementProxy* SettingsInterface::resolutionOption(std::uint32_t x, std::uint32_t
   button->row            = row;
   button->column         = 0;
   button->givenFlags     = 0x0080;
+  button->zIndex         = 10;
   button->text           = std::format("{} x {}", x, y);
   button->columnElements = button->text.length() + 1;
   button->eventHandler   = [this, x, y]()
@@ -270,8 +273,8 @@ ElementProxy* SettingsInterface::resolutionOption(std::uint32_t x, std::uint32_t
         map.insert({"height", y});
         writeSetting(map);
       });
-    std::uint32_t resId = _resolutionId;
-    _resolutionId = 0;
+    std::uint32_t resId         = _resolutionId;
+    _resolutionId               = 0;
     WestInterfaceFacade& facade = WestInterfaceFacade::getInterfaceInstance();
     facade.destroyInterface(resId);
   };

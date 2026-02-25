@@ -66,7 +66,7 @@ void calculateGlowEffect(float intensity) {
     } else if ((vFlags & 0x0100u) != 0u) {
         glowColor = emerald;
     } else {
-        glowColor = vec3(1.0, 0.0, 0.0);
+        glowColor = vec3(0.0, 0.0, 0.0);
     }
     vec4 baseColor = vec4(1.0, 0.0, 0.0, 1.0);
     if ((vFlags & 0x0008u) != 0u) {

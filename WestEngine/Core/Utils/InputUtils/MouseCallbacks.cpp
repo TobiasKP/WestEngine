@@ -80,14 +80,19 @@ void MouseCallbacks::mouseButtonCallback(GLFWwindow* window,
 }
 
 std::tuple<std::int16_t, bool> MouseCallbacks::isInterfaceHovered()
-{
+{ 
   for (ElementBounds* eb : _elements)
   {
     if (_currentPos.x > eb->xLeft && _currentPos.x < eb->xRight && _currentPos.y < eb->yBottom
         && _currentPos.y > eb->yTop)
     {
-      return std::make_tuple(eb->id, eb->eventDriven);
+      if (eb->isContainer)
+      {
+        continue;
+      }
+      return std::make_tuple(eb->id, eb->eventDriven); 
     }
   }
   return std::make_tuple(-1, false);
+;
 }

@@ -35,10 +35,7 @@ private:
   std::mutex _vectorMutex;
   bool _dirty = true;
 
-  void fillComponentData(std::vector<ComponentData*>& cd, std::vector<ElementBounds*>& eb);
-  void gatherUIData(std::vector<ComponentData*>& local,
-                    const std::array<ContainerElement*, 32>& interfaces,
-                    size_t begin,
-                    size_t end);
-  void gatherBoundaryData(std::vector<ElementBounds*>& local, const std::array<ContainerElement*, 32>& interfaces, size_t begin, size_t end); 
+
+  void gatherUIData(const std::array<ContainerElement*, 32>& interfaces, size_t begin, size_t end);
+  void gatherBoundaryData(const std::array<ContainerElement*, 32>& interfaces, size_t begin, size_t end);
 };

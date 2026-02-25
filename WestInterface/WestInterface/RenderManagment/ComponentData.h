@@ -16,8 +16,9 @@ struct ComponentData
 
 
   std::uint32_t flags;
-  std::uint32_t texture = 0;
-  std::int8_t zIndex    = 0;
+  std::uint32_t texture     = 0;
+  std::int8_t zIndex        = 0;
+  std::uint8_t containerIdx = 0;
 };
 
 struct ElementBounds
@@ -25,7 +26,7 @@ struct ElementBounds
   float xLeft, xRight, yBottom, yTop;
   std::uint32_t id;
   std::int8_t zIndex;
-  bool eventDriven = false;
+  bool eventDriven = false, isContainer = false;
 };
 
 /**********************************************************************************

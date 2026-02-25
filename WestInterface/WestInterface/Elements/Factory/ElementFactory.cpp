@@ -117,15 +117,13 @@ void ElementFactory::fillText(ElementProxy* ep, IElement* el)
 void ElementFactory::registerElementEvent(ElementProxy* ep, IElement* e)
 {
   e->eventHandler   = ep->eventHandler;
-  e->supportsEvents = true;
-  e->zIndex         = 5;
+  e->supportsEvents = true; 
   _eObserver->registerElement(e);
 }
 
 void ElementFactory::registerElementValue(ElementProxy* ep, IElement* e)
 {
-  e->supportsEvents = true;
-  e->zIndex         = 5;
+  e->supportsEvents = true; 
   _vObserver->registerElement(e);
 }
 
