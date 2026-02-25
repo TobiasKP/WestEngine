@@ -52,11 +52,11 @@ void UIRenderManager::updateRenderData(std::array<ContainerElement*, 32>& interf
     futures.emplace_back(Config::THREADPOOL->enqueue(
       [&interfaces, begin, end, this]
       {
-        std::vector<ComponentData*> local;
-        std::vector<ElementBounds*> localB;
-        gatherUIData(local, interfaces, begin, end);
-        gatherBoundaryData(localB, interfaces, begin, end);
-        fillComponentData(local, localB);
+        std::vector<ComponentData*> localData     = gatherUIData(interfaces, begin, end);
+        std::vector<ElementBounds*> localBoundary = gatherBoundaryData(interfaces, begin, end);
+        std::lock_guard<std::mutex> lk(_vectorMutex);
+        _data.insert(_data.end(), localData.begin(), localData.end());
+        _boundaryData.insert(_boundaryData.end(), localBoundary.begin(), localBoundary.end());
       }));
   }
 
@@ -64,6 +64,19 @@ void UIRenderManager::updateRenderData(std::array<ContainerElement*, 32>& interf
   {
     future.wait();
   }
+  std::stable_sort(_data.begin(),
+                   _data.end(),
+                   [](const ComponentData* a, const ComponentData* b)
+                   {
+                     if (a->zIndex != b->zIndex)
+                     {
+                       return a->zIndex < b->zIndex;
+                     }
+                     return a->containerIdx < b->containerIdx;
+                   });
+  std::stable_sort(_boundaryData.begin(),
+                   _boundaryData.end(),
+                   [](const ElementBounds* a, const ElementBounds* b) { return a->zIndex > b->zIndex; });
   _dirty = false;
 
 #ifdef DEBUG
@@ -76,11 +89,10 @@ void UIRenderManager::updateRenderData(std::array<ContainerElement*, 32>& interf
 #endif
 }
 
-void UIRenderManager::gatherBoundaryData(std::vector<ElementBounds*>& local,
-                                         const std::array<ContainerElement*, 32>& interfaces,
-                                         size_t begin,
-                                         size_t end)
+std::vector<ElementBounds*>
+UIRenderManager::gatherBoundaryData(const std::array<ContainerElement*, 32>& interfaces, size_t begin, size_t end)
 {
+  std::vector<ElementBounds*> local;
   for (size_t j = begin; j < end; ++j)
   {
     ContainerElement* ce = interfaces[j];
@@ -102,13 +114,13 @@ void UIRenderManager::gatherBoundaryData(std::vector<ElementBounds*>& local,
     ce->getBoundaries(*b);
     local.push_back(b);
   }
+  return local;
 }
 
-void UIRenderManager::gatherUIData(std::vector<ComponentData*>& local,
-                                   const std::array<ContainerElement*, 32>& interfaces,
-                                   size_t begin,
-                                   size_t end)
+std::vector<ComponentData*>
+UIRenderManager::gatherUIData(const std::array<ContainerElement*, 32>& interfaces, size_t begin, size_t end)
 {
+  std::vector<ComponentData*> local;
   for (size_t j = begin; j < end; ++j)
   {
     if (interfaces[j] == nullptr)
@@ -117,19 +129,11 @@ void UIRenderManager::gatherUIData(std::vector<ComponentData*>& local,
       continue;
     }
     std::vector<ComponentData*> interfaceResult = interfaces[j]->describeContainer();
+    for (ComponentData* cd : interfaceResult)
+    {
+      cd->containerIdx = static_cast<std::uint8_t>(j);
+    }
     local.insert(local.end(), interfaceResult.begin(), interfaceResult.end());
   }
-  assert(local.size() > 0);
-}
-
-void UIRenderManager::fillComponentData(std::vector<ComponentData*>& cd, std::vector<ElementBounds*>& bounds)
-{
-  std::lock_guard<std::mutex> lk(_vectorMutex);
-  _data.insert(_data.end(), cd.begin(), cd.end());
-  std::stable_sort(
-    _data.begin(), _data.end(), [](const ComponentData* a, const ComponentData* b) { return a->zIndex < b->zIndex; });
-  _boundaryData.insert(_boundaryData.end(), bounds.begin(), bounds.end());
-  std::stable_sort(_boundaryData.begin(),
-                   _boundaryData.end(),
-                   [](const ElementBounds* a, const ElementBounds* b) { return a->zIndex > b->zIndex; });
+  return local;
 }
