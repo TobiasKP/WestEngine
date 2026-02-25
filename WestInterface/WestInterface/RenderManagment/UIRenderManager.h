@@ -36,6 +36,6 @@ private:
   bool _dirty = true;
 
 
-  void gatherUIData(const std::array<ContainerElement*, 32>& interfaces, size_t begin, size_t end);
-  void gatherBoundaryData(const std::array<ContainerElement*, 32>& interfaces, size_t begin, size_t end);
+  std::vector<ComponentData*> gatherUIData(const std::array<ContainerElement*, 32>& interfaces, size_t begin, size_t end);
+  std::vector<ElementBounds*> gatherBoundaryData(const std::array<ContainerElement*, 32>& interfaces, size_t begin, size_t end);
 };

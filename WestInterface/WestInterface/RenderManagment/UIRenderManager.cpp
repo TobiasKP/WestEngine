@@ -52,8 +52,11 @@ void UIRenderManager::updateRenderData(std::array<ContainerElement*, 32>& interf
     futures.emplace_back(Config::THREADPOOL->enqueue(
       [&interfaces, begin, end, this]
       {
-        gatherUIData(interfaces, begin, end);
-        gatherBoundaryData(interfaces, begin, end);
+        std::vector<ComponentData*> localData     = gatherUIData(interfaces, begin, end);
+        std::vector<ElementBounds*> localBoundary = gatherBoundaryData(interfaces, begin, end);
+        std::lock_guard<std::mutex> lk(_vectorMutex);
+        _data.insert(_data.end(), localData.begin(), localData.end());
+        _boundaryData.insert(_boundaryData.end(), localBoundary.begin(), localBoundary.end());
       }));
   }
 
@@ -86,8 +89,10 @@ void UIRenderManager::updateRenderData(std::array<ContainerElement*, 32>& interf
 #endif
 }
 
-void UIRenderManager::gatherBoundaryData(const std::array<ContainerElement*, 32>& interfaces, size_t begin, size_t end)
+std::vector<ElementBounds*>
+UIRenderManager::gatherBoundaryData(const std::array<ContainerElement*, 32>& interfaces, size_t begin, size_t end)
 {
+  std::vector<ElementBounds*> local;
   for (size_t j = begin; j < end; ++j)
   {
     ContainerElement* ce = interfaces[j];
@@ -102,21 +107,20 @@ void UIRenderManager::gatherBoundaryData(const std::array<ContainerElement*, 32>
       el->getBoundaries(*b);
       if (b->id >= 0)
       {
-        std::lock_guard<std::mutex> lk(_vectorMutex);
-        _boundaryData.push_back(b);
+        local.push_back(b);
       }
     }
     ElementBounds* b = new ElementBounds();
     ce->getBoundaries(*b);
-    {
-      std::lock_guard<std::mutex> lk(_vectorMutex);
-      _boundaryData.push_back(b);
-    }
+    local.push_back(b);
   }
+  return local;
 }
 
-void UIRenderManager::gatherUIData(const std::array<ContainerElement*, 32>& interfaces, size_t begin, size_t end)
+std::vector<ComponentData*>
+UIRenderManager::gatherUIData(const std::array<ContainerElement*, 32>& interfaces, size_t begin, size_t end)
 {
+  std::vector<ComponentData*> local;
   for (size_t j = begin; j < end; ++j)
   {
     if (interfaces[j] == nullptr)
@@ -129,10 +133,7 @@ void UIRenderManager::gatherUIData(const std::array<ContainerElement*, 32>& inte
     {
       cd->containerIdx = static_cast<std::uint8_t>(j);
     }
-    {
-      std::lock_guard<std::mutex> lk(_vectorMutex);
-      _data.insert(_data.end(), interfaceResult.begin(), interfaceResult.end());
-    }
+    local.insert(local.end(), interfaceResult.begin(), interfaceResult.end());
   }
-  assert(_data.size() > 0);
+  return local;
 }
