@@ -76,7 +76,6 @@ Entity* Scene::getEntityById(std::uint32_t id)
   return nullptr;
 }
 
-// TODO Sort by entity shader group
 void Scene::addEntity(Entity&& entity)
 {
   std::lock_guard<std::mutex> lock(_mutex);
