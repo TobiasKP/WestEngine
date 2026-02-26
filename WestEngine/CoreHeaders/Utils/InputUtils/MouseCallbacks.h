@@ -12,6 +12,7 @@ public:
   static void mouseCallback(GLFWwindow* window, double x, double y);
   static void enterCallback(GLFWwindow* window, std::int32_t entered);
   static void mouseButtonCallback(GLFWwindow* window, std::int32_t button, std::int32_t action, std::int32_t mods);
+  static void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 
   inline static void setInputObserver(InputObserver* o)
   {

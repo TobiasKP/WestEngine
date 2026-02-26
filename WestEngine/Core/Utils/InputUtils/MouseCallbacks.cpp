@@ -79,8 +79,16 @@ void MouseCallbacks::mouseButtonCallback(GLFWwindow* window,
   };
 }
 
+void MouseCallbacks::scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
+{
+  if (yOffset != 0.0)
+  {
+    _iObserver->setZoomFlag(BitMasks::Control::CAMERA_ZOOM, yOffset * -5);
+  }
+}
+
 std::tuple<std::int16_t, bool> MouseCallbacks::isInterfaceHovered()
-{ 
+{
   for (ElementBounds* eb : _elements)
   {
     if (_currentPos.x > eb->xLeft && _currentPos.x < eb->xRight && _currentPos.y < eb->yBottom
@@ -90,7 +98,7 @@ std::tuple<std::int16_t, bool> MouseCallbacks::isInterfaceHovered()
       {
         continue;
       }
-      return std::make_tuple(eb->id, eb->eventDriven); 
+      return std::make_tuple(eb->id, eb->eventDriven);
     }
   }
   return std::make_tuple(-1, false);

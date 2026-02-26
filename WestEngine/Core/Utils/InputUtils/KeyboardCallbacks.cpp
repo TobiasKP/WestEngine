@@ -47,26 +47,26 @@ void KeyboardCallbacks::executeBoundOperation(std::int32_t key, const std::strin
     return;
   }
 
-  std::int32_t x = 0, z = 0;
+  float x = 0, z = 0;
   bool updateCam = false;
   if (boundOperation.compare("CameraUp") == 0)
   {
-    z         = -1;
+    z         = -1.0f;
     updateCam = true;
   }
   else if (boundOperation.compare("CameraDown") == 0)
   {
-    z         = 1;
+    z         = 1.0f;
     updateCam = true;
   }
   else if (boundOperation.compare("CameraLeft") == 0)
   {
-    x         = -1;
+    x         = -1.0f;
     updateCam = true;
   }
   else if (boundOperation.compare("CameraRight") == 0)
   {
-    x         = 1;
+    x         = 1.0f;
     updateCam = true;
   }
 

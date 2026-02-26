@@ -84,6 +84,7 @@ void PlayerControl::updateCamera(glm::vec3 local)
   Camera* camera = Scene::getSceneInstance().getCamera();
   assert(camera != nullptr);
   camera->movePosition(local.x, local.y, local.z);
+  _moveCamera = glm::vec3(0.0f);
 }
 
 void PlayerControl::setCameraMovement(glm::vec3 move)
@@ -91,7 +92,7 @@ void PlayerControl::setCameraMovement(glm::vec3 move)
   std::unique_lock<std::mutex> lock(_CameraMutex, std::try_to_lock);
   if (lock.owns_lock())
   {
-    _moveCamera = move;
+    _moveCamera += move;
     _cameraPending.store(true);
   }
 }

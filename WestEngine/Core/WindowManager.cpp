@@ -4,11 +4,11 @@
 #include "../CoreHeaders/Utils/InputUtils/MouseCallbacks.h"
 
 #include <Config.h>
+#include <CoreConstants.hpp>
 #include <format>
 #include <GLFW/glfw3.h>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/glm.hpp>
-#include <CoreConstants.hpp>
 
 WindowManager::WindowManager() : IManager(nullptr)
 {
@@ -132,6 +132,7 @@ std::int32_t WindowManager::init()
   glfwSetCursorPosCallback(_window, MouseCallbacks::mouseCallback);
   glfwSetCursorEnterCallback(_window, MouseCallbacks::enterCallback);
   glfwSetMouseButtonCallback(_window, MouseCallbacks::mouseButtonCallback);
+  glfwSetScrollCallback(_window, MouseCallbacks::scrollCallback);
 
 #ifdef DEBUG
   logDebug(std::format("{}: initialized with \n\t\tWidth: {}\n\t\tHeight: {}\n", getName(), getWidth(), getHeight()));

@@ -54,6 +54,12 @@ void InputObserver::notify()
       _control->passDestinationPosition(_playerDestination);
     }
 
+    if (static_cast<bool>(_controlFlags & BitMasks::Control::CAMERA_ZOOM))
+    {
+      _control->setCameraMovement(glm::vec3(0, _y, 0));
+      _y = 0;
+    }
+
     _interfaceHoverId = _interfaceUnhoverId = -1;
     _controlFlags                           = {0b0000'0000};
   }
