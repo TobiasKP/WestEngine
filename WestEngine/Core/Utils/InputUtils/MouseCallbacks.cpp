@@ -81,7 +81,7 @@ void MouseCallbacks::mouseButtonCallback(GLFWwindow* window,
 
 void MouseCallbacks::scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
 {
-  if (yOffset > 0 || yOffset < 0)
+  if (yOffset != 0.0)
   {
     _iObserver->setZoomFlag(BitMasks::Control::CAMERA_ZOOM, yOffset * -5);
   }
