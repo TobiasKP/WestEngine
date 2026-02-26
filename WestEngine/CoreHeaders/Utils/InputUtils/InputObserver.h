@@ -19,6 +19,13 @@ public:
     _controlFlags |= flag;
   }
 
+  void setZoomFlag(std::uint8_t flag, double yOffset)
+  {
+    std::lock_guard<std::mutex> lock(_controlMutex);
+    _controlFlags |= flag;
+    _y             = yOffset;
+  }
+
   void setControlFlag(std::uint8_t flag, std::uint16_t interfaceId)
   {
     std::lock_guard<std::mutex> lock(_controlMutex);
@@ -56,6 +63,7 @@ public:
 
 private:
   float _x, _z;
+  double _y;
   glm::vec3 _playerDestination;
   PlayerControl* _control;
   WestInterface::WestInterfaceFacade* _facade;
