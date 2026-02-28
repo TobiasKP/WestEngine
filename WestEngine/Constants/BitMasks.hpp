@@ -22,5 +22,6 @@ constexpr std::uint16_t SHADER{0b0000'0000'0000'0010};
 constexpr std::uint16_t POSITION{0b0000'0000'0000'0100};
 constexpr std::uint16_t MATERIAL{0b0000'0000'0000'1000};
 constexpr std::uint16_t MOVEMENT{0b0000'0000'0001'0000};
+constexpr std::uint16_t AABB{0b0000'0000'0010'0000};
 }  // namespace Components
 };  // namespace BitMasks

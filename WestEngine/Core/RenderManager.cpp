@@ -87,11 +87,19 @@ void RenderManager::renderGameEntities()
   {
     _scene->getCamera()->update();
   }
-
-  // TODO: entities not sorted by shader group, causes redundant glUseProgram switches
+ 
   for (const Entity& entity : _scene->getEntities())
   {
-    renderMainLoop(entity);
+    if (AABBcheck(entity))
+    {
+      renderMainLoop(entity);
+    }
+#ifdef DEBUG
+    else
+    {
+      logCycle(std::format("{} ### skipped rendering entity: {}, did not pass AABB.\n", getName(), entity.getId()));
+    }
+#endif
   }
 #ifdef DEBUG
   for (const Entity& entity : _scene->getDebugEntities())
@@ -362,4 +370,38 @@ void RenderManager::updateUniforms(const Entity& e, Model* model, Material* mate
     UniformUtils::setUniform(p->uniform, transform);
     p->_dirty.store(false);
   }
+}
+
+bool RenderManager::AABBcheck(const Entity& e)
+{
+  const Frustum& f = _scene->getCamera()->getFrustum();
+  Position* p      = (Position*)e.getComponent(BitMasks::Components::POSITION);
+  AABB* aabb       = (AABB*)e.getComponent(BitMasks::Components::AABB);
+  assert(p != nullptr && aabb != nullptr);
+  glm::vec3 min = aabb->min * p->scale + p->position;
+  glm::vec3 max = aabb->max * p->scale + p->position;
+  return f.near.getSignedDistance(glm::vec3(f.near.normal.x > 0 ? max.x : min.x,
+                                            f.near.normal.y > 0 ? max.y : min.y,
+                                            f.near.normal.z > 0 ? max.z : min.z))
+           >= 0
+         && f.bottom.getSignedDistance(glm::vec3(f.bottom.normal.x > 0 ? max.x : min.x,
+                                                 f.bottom.normal.y > 0 ? max.y : min.y,
+                                                 f.bottom.normal.z > 0 ? max.z : min.z))
+              >= 0
+         && f.far.getSignedDistance(glm::vec3(f.far.normal.x > 0 ? max.x : min.x,
+                                              f.far.normal.y > 0 ? max.y : min.y,
+                                              f.far.normal.z > 0 ? max.z : min.z))
+              >= 0
+         && f.left.getSignedDistance(glm::vec3(f.left.normal.x > 0 ? max.x : min.x,
+                                               f.left.normal.y > 0 ? max.y : min.y,
+                                               f.left.normal.z > 0 ? max.z : min.z))
+              >= 0
+         && f.right.getSignedDistance(glm::vec3(f.right.normal.x > 0 ? max.x : min.x,
+                                                f.right.normal.y > 0 ? max.y : min.y,
+                                                f.right.normal.z > 0 ? max.z : min.z))
+              >= 0
+         && f.top.getSignedDistance(glm::vec3(f.top.normal.x > 0 ? max.x : min.x,
+                                              f.top.normal.y > 0 ? max.y : min.y,
+                                              f.top.normal.z > 0 ? max.z : min.z))
+              >= 0;
 }

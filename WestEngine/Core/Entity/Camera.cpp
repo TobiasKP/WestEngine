@@ -10,9 +10,17 @@ Camera::~Camera() {}
 void Camera::update()
 {
   assert(_cameraUniforms != -1);
+  if (!_dirty.load())
+  {
+    return;
+  }
+  _dirty.store(false);
+  _projection = getProjectionMatrix();
+  _view       = getViewMatrix();
+  createFrustumFromCamera();
   glBindBuffer(GL_UNIFORM_BUFFER, _cameraUniforms);
-  glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(getViewMatrix()));
-  glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(getProjectionMatrix()));
+  glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(_view));
+  glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(_projection));
   glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
@@ -49,6 +57,10 @@ void Camera::movePosition(float x, float y, float z)
     _position.z += glm::cos(glm::radians(_rotation.y - 90)) * x;
   }
   _position.y += y;
+  if (!_dirty.load())
+  {
+    _dirty.store(true);
+  }
 }
 
 void Camera::moveRotation(float x, float y, float z)
@@ -56,4 +68,28 @@ void Camera::moveRotation(float x, float y, float z)
   _rotation.x += x;
   _rotation.y += y;
   _rotation.z += z;
+  if (!_dirty.load())
+  {
+    _dirty.store(true);
+  }
+}
+
+void Camera::createFrustumFromCamera()
+{
+  const float aspect       = (float)Config::GeneralConfig.WIDTH / Config::GeneralConfig.HEIGHT;
+  const glm::mat4 inverse  = glm::inverse(_view);
+  const glm::mat3 rotation = glm::mat3(inverse);
+  const glm::vec3 front = rotation * glm::vec3(0, 0, -1), up = rotation * glm::vec3(0, 1, 0),
+                  right = rotation * glm::vec3(1, 0, 0);
+
+  const float halfVSide        = _Z_FAR * tanf(_FOV * 0.5f);
+  const float halfHSide        = halfVSide * aspect;
+  const glm::vec3 frontMultFar = _Z_FAR * front;
+
+  _FRUSTUM.near   = {_position + _Z_NEAR * front, front};
+  _FRUSTUM.far    = {_position + frontMultFar, -front};
+  _FRUSTUM.right  = {_position, glm::cross(frontMultFar - right * halfHSide, up)};
+  _FRUSTUM.left   = {_position, glm::cross(up, frontMultFar + right * halfHSide)};
+  _FRUSTUM.top    = {_position, glm::cross(right, frontMultFar - up * halfVSide)};
+  _FRUSTUM.bottom = {_position, glm::cross(frontMultFar + up * halfVSide, right)};
 }

@@ -35,7 +35,7 @@ private:
   void shaderInfo(Entity& e);
   void parseInfos(std::map<std::string, std::int32_t>& infos, std::string& name);
   void createWorld(World& e);
-  std::tuple<Model*, Material*> buildWorldMesh(const std::vector<std::uint8_t>& map, std::int32_t sqmap);
-  std::tuple<Model*, Material*> loadModel(std::string path);
+  std::tuple<Model*, Material*, AABB*> buildWorldMesh(const std::vector<std::uint8_t>& map, std::int32_t sqmap);
+  std::tuple<Model*, Material*, AABB*> loadModel(std::string path);
   Shader* loadShader(std::string vertexShaderFile, std::string fragShaderFile, std::int32_t shaderGroup);
 };

@@ -12,11 +12,11 @@ DebugDrawUtils::DebugDrawUtils(WestLogger* logger)
 
 std::uint32_t DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction)
 {
-  glm::vec3 end          = start + direction;
-  GLfloat vertices[]     = {start.x, start.y, start.z, end.x, end.y, end.z};
-  std::int32_t indices[] = {0, 1};
-  std::tuple<Model*, Material*> m =
-    _loader->loadModel(vertices, sizeof(vertices), indices, sizeof(indices), 0, 0, 0, 0, "");
+  glm::vec3 end                          = start + direction;
+  GLfloat vertices[]                     = {start.x, start.y, start.z, end.x, end.y, end.z};
+  std::int32_t indices[]                 = {0, 1};
+  std::tuple<Model*, Material*, AABB*> m = _loader->loadModel(
+    vertices, sizeof(vertices), indices, sizeof(indices), 0, 0, 0, 0, "", glm::vec3(0), glm::vec3(0));
 
   Shader* s           = new Shader();
   s->vertexShaderFile = CoreConstants::DEBUG_V_SHADER;

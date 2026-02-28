@@ -15,15 +15,17 @@
 #include <limits.h>
 #endif
 
-std::tuple<Model*, Material*> ObjectLoader::loadModel(float* vertices,
-                                                      size_t verticesLength,
-                                                      std::int32_t* indices,
-                                                      size_t indicesLength,
-                                                      float* texture,
-                                                      size_t textureLength,
-                                                      float* normals,
-                                                      size_t normalsLength,
-                                                      std::string mat)
+std::tuple<Model*, Material*, AABB*> ObjectLoader::loadModel(float* vertices,
+                                                             size_t verticesLength,
+                                                             std::int32_t* indices,
+                                                             size_t indicesLength,
+                                                             float* texture,
+                                                             size_t textureLength,
+                                                             float* normals,
+                                                             size_t normalsLength,
+                                                             std::string mat,
+                                                             glm::vec3 min,
+                                                             glm::vec3 max)
 {
   assert(vertices != nullptr && verticesLength > 0 && indices != nullptr && indicesLength > 0 && _logger != nullptr);
 
@@ -59,25 +61,29 @@ std::tuple<Model*, Material*> ObjectLoader::loadModel(float* vertices,
   }
 
   Model* m       = new Model();
+  AABB* aabb     = new AABB();
+  aabb->min      = min;
+  aabb->max      = max;
   m->id          = id;
   m->vertexCount = indicesLength / sizeof(std::int32_t);
   assert(material != nullptr);
-  return std::make_tuple(m, material);
+  return std::make_tuple(m, material, aabb);
 }
 
-std::tuple<Model*, Material*> ObjectLoader::loadModel(std::string path)
+std::tuple<Model*, Material*, AABB*> ObjectLoader::loadModel(std::string path)
 {
   FILE* file = PathUtils::openFile(path, true);
   if (file == nullptr)
   {
-    return std::make_tuple(nullptr, nullptr);
+    return std::make_tuple(nullptr, nullptr, nullptr);
   }
   return loadOBJModel(file);
 }
 
-std::tuple<Model*, Material*> ObjectLoader::loadOBJModel(FILE* file)
+std::tuple<Model*, Material*, AABB*> ObjectLoader::loadOBJModel(FILE* file)
 {
   std::vector<float> vertices;
+  glm::vec3 min = glm::vec3(0, 0, 0), max = glm::vec3(0, 0, 0);
   std::vector<std::int32_t> indices;
   std::vector<float> textures;
   std::vector<float> normals;
@@ -101,6 +107,8 @@ std::tuple<Model*, Material*> ObjectLoader::loadOBJModel(FILE* file)
       vertices.push_back(x);
       vertices.push_back(y);
       vertices.push_back(z);
+      min = glm::min(min, glm::vec3(x, y, z));
+      max = glm::max(max, glm::vec3(x, y, z));
     }
     else if (strncmp(line, "vt ", 3) == 0)
     {
@@ -314,7 +322,7 @@ std::tuple<Model*, Material*> ObjectLoader::loadOBJModel(FILE* file)
       else
       {
         _logger->log(Level::Error, "---Error parsing OBJ face data!");
-        return std::make_tuple(nullptr, nullptr);
+        return std::make_tuple(nullptr, nullptr, nullptr);
       }
     }
   }
@@ -344,7 +352,9 @@ std::tuple<Model*, Material*> ObjectLoader::loadOBJModel(FILE* file)
                    mappedTextures.size() * sizeof(float),
                    normalArray,
                    normals.size() * sizeof(float),
-                   material);
+                   material,
+                   min,
+                   max);
 }
 
 Material* ObjectLoader::generateMaterialFromMTL(const std::string& path)

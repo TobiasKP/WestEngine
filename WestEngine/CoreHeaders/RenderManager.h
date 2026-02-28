@@ -39,6 +39,7 @@ private:
   void renderWorld();
   void renderMainLoop(const Entity& e);
   void updateUniforms(const Entity& e, Model* m, Material* m2);
+  bool AABBcheck(const Entity& e);
 
 #ifdef DEBUG
   DebugDrawUtils* _debugUtils = nullptr;

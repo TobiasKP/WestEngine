@@ -126,10 +126,11 @@ void EntityBuilder::basicInfo(const char* key, Entity& e)
 #ifdef DEBUG
     WestLogger::getLoggerInstance().log(Level::Info, std::format("Loading Model: {}\n", meshPath));
 #endif
-    std::tuple<Model*, Material*> m = loadModel(meshPath);
+    std::tuple<Model*, Material*, AABB*> m = loadModel(meshPath);
     assert(std::get<0>(m) != nullptr);
     e.addComponent(BitMasks::Components::MODEL, std::move(std::get<0>(m)));
     e.addComponent(BitMasks::Components::MATERIAL, std::move(std::get<1>(m)));
+    e.addComponent(BitMasks::Components::AABB, std::move(std::get<2>(m)));
   }
 }
 
@@ -211,9 +212,9 @@ void EntityBuilder::createWorld(World& e)
   sqmap = sqrt(map.size());
   e.setCreationInformation(sqmap, 1, glm::vec2(0, 0));
 
-  std::tuple<Model*, Material*> m = buildWorldMesh(map, sqmap);
-  Material* mat                   = std::get<1>(m);
-  mat->diffuseColor               = glm::vec3(0.2f, 0.6f, 0.2f);
+  std::tuple<Model*, Material*, AABB*> m = buildWorldMesh(map, sqmap);
+  Material* mat                          = std::get<1>(m);
+  mat->diffuseColor                      = glm::vec3(0.2f, 0.6f, 0.2f);
 
   Shader* s = loadShader(vertexPath, fragmentPath, group);
   e.addComponent(BitMasks::Components::SHADER, s);
@@ -221,7 +222,8 @@ void EntityBuilder::createWorld(World& e)
   e.addComponent(BitMasks::Components::MATERIAL, mat);
 }
 
-std::tuple<Model*, Material*> EntityBuilder::buildWorldMesh(const std::vector<std::uint8_t>& map, std::int32_t sqmap)
+std::tuple<Model*, Material*, AABB*> EntityBuilder::buildWorldMesh(const std::vector<std::uint8_t>& map,
+                                                                   std::int32_t sqmap)
 {
   std::vector<float> vertices;
   std::vector<float> texCoords;
@@ -259,10 +261,12 @@ std::tuple<Model*, Material*> EntityBuilder::buildWorldMesh(const std::vector<st
                             texCoords.size() * sizeof(float),
                             nullptr,
                             0,
-                            "");
+                            "",
+                            glm::vec3(0),
+                            glm::vec3(0));
 }
 
-std::tuple<Model*, Material*> EntityBuilder::loadModel(std::string path)
+std::tuple<Model*, Material*, AABB*> EntityBuilder::loadModel(std::string path)
 {
   return _loader->loadModel(path);
 }
