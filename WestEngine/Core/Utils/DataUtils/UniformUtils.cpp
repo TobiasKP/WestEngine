@@ -23,6 +23,11 @@ void UniformUtils::setUniform(GLuint location, const std::vector<uint32_t>& valu
   glUniform1uiv(location, value.size(), value.data());
 }
 
+void UniformUtils::setUniform(GLuint location, const std::vector<int32_t>& value)
+{
+  glUniform1iv(location, value.size(), value.data());
+}
+
 void UniformUtils::setUniform(GLuint location, std::int32_t value)
 {
   glUniform1i(location, value);

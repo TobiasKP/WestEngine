@@ -1,6 +1,9 @@
 #include "../../CoreHeaders/Entity/Scene.h"
 
+#include "../../CoreHeaders/Components/Shader.h"
+
 #include <algorithm>
+
 
 std::mutex Scene::_mutex;
 Camera* Scene::_camera;
@@ -47,7 +50,7 @@ const std::vector<Entity>& Scene::getEntities() const
 
 #ifdef DEBUG
 const std::vector<Entity>& Scene::getDebugEntities() const
-{ 
+{
   return _debugEntities;
 }
 #endif
@@ -73,11 +76,10 @@ Entity* Scene::getEntityById(std::uint32_t id)
   return nullptr;
 }
 
-// TODO Sort by entity shader group
 void Scene::addEntity(Entity&& entity)
 {
   std::lock_guard<std::mutex> lock(_mutex);
-  _entities.emplace_back(std::move(entity));
+  insertEntityByGroup(std::move(entity));
 }
 
 void Scene::addDebugEntity(Entity&& entity)
@@ -98,6 +100,19 @@ void Scene::addWorld(World* world)
   assert(world != nullptr);
   std::lock_guard<std::mutex> lock(_mutex);
   _world = std::move(world);
+}
+
+void Scene::insertEntityByGroup(Entity&& entity)
+{
+  GLint group = static_cast<Shader*>(entity.getComponent(BitMasks::Components::SHADER))->shadergroup;
+
+  auto pos =
+    std::upper_bound(_entities.begin(),
+                     _entities.end(),
+                     group,
+                     [](GLint g, const Entity& e)
+                     { return g < static_cast<Shader*>(e.getComponent(BitMasks::Components::SHADER))->shadergroup; });
+  _entities.insert(pos, std::move(entity));
 }
 
 void Scene::removeEntity(const Entity& entity)

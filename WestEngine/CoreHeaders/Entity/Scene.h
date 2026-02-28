@@ -3,7 +3,6 @@
 #include "Camera.h"
 #include "Entity.h"
 #include "World.hpp"
-
 #include <CoreConstants.hpp>
 #include <mutex>
 #include <vector>
@@ -54,6 +53,8 @@ private:
   std::vector<Entity> _entities;
   std::vector<Entity> _debugEntities;
   std::string _sceneName = CoreConstants::UNDEFINED_STRING.data();
+
+  void insertEntityByGroup(Entity&& entity);
 
   Scene();
   ~Scene();
