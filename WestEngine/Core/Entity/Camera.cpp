@@ -57,10 +57,7 @@ void Camera::movePosition(float x, float y, float z)
     _position.z += glm::cos(glm::radians(_rotation.y - 90)) * x;
   }
   _position.y += y;
-  if (!_dirty.load())
-  {
-    _dirty.store(true);
-  }
+  _dirty.store(true, std::memory_order_relaxed);
 }
 
 void Camera::moveRotation(float x, float y, float z)
@@ -68,10 +65,6 @@ void Camera::moveRotation(float x, float y, float z)
   _rotation.x += x;
   _rotation.y += y;
   _rotation.z += z;
-  if (!_dirty.load())
-  {
-    _dirty.store(true);
-  }
 }
 
 void Camera::createFrustumFromCamera()
