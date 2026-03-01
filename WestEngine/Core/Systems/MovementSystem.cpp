@@ -16,32 +16,30 @@ void MovementSystem::init() {}
 
 void MovementSystem::update()
 {
-  std::vector<uint32_t> ids = getEntitieIds();
-  if (ids.empty())
-  {
-    _logger->log(Level::Info, std::format("{} *** No entitie for updating Entite in MovementSystem\n", getName()));
-    return;
-  }
+  ComponentRegistry* reg                              = Scene::getSceneInstance().getRegistry();
+  std::shared_ptr<ComponentArray<Movement>> movements = reg->getComponentArray<Movement>();
+  size_t size = movements->getSize(), current = 0;
 
-
-  Movement* movComp     = nullptr;
-  ComponentRegistry* reg = Scene::getSceneInstance().getRegistry();
-  for (std::uint32_t id : ids)
+  for (Movement& m : movements->getComponents())
   {
-    Entity* e         = Scene::getSceneInstance().getEntityById(id);
-    movComp           = reg->getComponent<Movement>(e->getId());
-    Position* posComp = reg->getComponent<Position>(e->getId());
-    assert(movComp != nullptr);
-    if (movComp->moving.load())
+    if (current >= size)
     {
-      moveToDestination(id, posComp, movComp);
+      break;
+    }
+    if (m.moving.load())
+    {
+      std::uint32_t id  = movements->getEntityIdByIdx(current);
+      Position* posComp = reg->getComponent<Position>(id);
+      moveToDestination(id, posComp, &m);
       posComp->dirty.store(true);
       continue;
     }
-    if (movComp->movementPending.exchange(false) && !movComp->moving.load())
+    if (m.movementPending.exchange(false) && !m.moving.load())
     {
-      induceMovement(id, movComp);
+      std::uint32_t id = movements->getEntityIdByIdx(current);
+      induceMovement(id, &m);
     }
+    current++;
   }
 }
 

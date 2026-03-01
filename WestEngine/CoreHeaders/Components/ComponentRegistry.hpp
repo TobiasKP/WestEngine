@@ -4,13 +4,17 @@
 #include "ComponentArray.hpp"
 #include "Umbrella.h"
 
+#include <memory>
+#include <typeinfo>
+#include <unordered_map>
+
 class ComponentRegistry
 {
 public:
   template <typename T>
   void registerComponent()
   {
-    const std::type_info& t = typeid(T);
+    const std::type_info& t        = typeid(T);
     componentArrays[t.hash_code()] = std::make_shared<ComponentArray<T>>();
   };
 
@@ -38,10 +42,10 @@ public:
 
 
   template <typename T>
-  std::shared_ptr<IComponentArray> getComponentArray(T component)
+  std::shared_ptr<ComponentArray<T>> getComponentArray()
   {
-    const std::type_info& t = typeid(component);
-    return componentArrays[t.hash_code()];
+    const std::type_info& t = typeid(T);
+    return std::static_pointer_cast<ComponentArray<T>>(componentArrays[t.hash_code()]);
   };
 
 private:
