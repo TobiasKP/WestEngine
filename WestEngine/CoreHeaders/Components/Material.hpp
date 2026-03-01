@@ -1,9 +1,7 @@
 #pragma once
 
-#include "../Interfaces/IComponent.h"
-
 #include <GL/glew.h>
-#include <PoolAllocator.h>
+#include <glm/glm.hpp>
 #include <string>
 
 struct Texture
@@ -12,7 +10,7 @@ struct Texture
   GLuint uniform  = -1;
 };
 
-struct Material : public IComponent
+struct Material
 {
   std::int32_t id;
 
@@ -26,17 +24,33 @@ struct Material : public IComponent
   float opacity;            // d
   float refractiveIndex;    // Ni
   Texture* diffuseTexture;
+  std::atomic<bool> dirty{true};
 
-  static void* operator new(size_t size)
+  Material() = default;
+  Material(Material&& o) noexcept
+      : id(o.id), name(std::move(o.name)), diffuseColor(o.diffuseColor), diffuseColorUniform(o.diffuseColorUniform),
+        ambientColor(o.ambientColor), specularColor(o.specularColor), emissiveColor(o.emissiveColor),
+        specularExponent(o.specularExponent), opacity(o.opacity), refractiveIndex(o.refractiveIndex),
+        diffuseTexture(o.diffuseTexture), dirty(o.dirty.load())
   {
-    return _allocator->allocate(size);
+    o.diffuseTexture = nullptr;
   }
-  static void operator delete(void* ptr, size_t size)
+  Material& operator=(Material&& o) noexcept
   {
-    return _allocator->deallocate(ptr, size);
+    id                  = o.id;
+    name                = std::move(o.name);
+    diffuseColor        = o.diffuseColor;
+    diffuseColorUniform = o.diffuseColorUniform;
+    ambientColor        = o.ambientColor;
+    specularColor       = o.specularColor;
+    emissiveColor       = o.emissiveColor;
+    specularExponent    = o.specularExponent;
+    opacity             = o.opacity;
+    refractiveIndex     = o.refractiveIndex;
+    diffuseTexture      = o.diffuseTexture;
+    dirty.store(o.dirty.load());
+    o.diffuseTexture = nullptr;
+    return *this;
   }
 
-
-private:
-  static inline PoolAllocator* _allocator = new PoolAllocator();
 };

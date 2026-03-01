@@ -1,30 +1,11 @@
 #pragma once
 
-#include "../Interfaces/IComponent.h"
-
 #include <cstdint>
-#include <PoolAllocator.h>
 #include <GL/glew.h>
 
-struct Model : public IComponent
+struct Model
 {
   std::int32_t id;
-  std::int32_t vertexCount; 
-
-  // Overrides
-  static void* operator new(size_t size)
-  {
-    return _allocator->allocate(size);
-  }
-  static void operator delete(void* ptr, size_t size)
-  {
-    return _allocator->deallocate(ptr, size);
-  }
-
-  // Debug fields
+  std::int32_t vertexCount;
   GLint debugColorUniform;
-
-
-private:
-  static inline PoolAllocator* _allocator = new PoolAllocator();
 };

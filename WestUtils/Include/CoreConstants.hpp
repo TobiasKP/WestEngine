@@ -17,7 +17,7 @@ inline constexpr std::string_view LUA_INIT_FILE    = "/lua/Main.lua";
 inline constexpr char LUA_API_FILE[]               = "/lua/WestAPI.lua";
 
 inline constexpr std::uint8_t MAX_Q_SIZE         = 7;
-inline constexpr std::uint16_t MAX_ENTITY_SIZE   = 512;
+inline constexpr std::uint16_t MAX_ENTITY_SIZE   = 1024;
 inline constexpr std::uint8_t CHUNK_SIZE         = 64;
 inline constexpr std::uint16_t DEBUG_SHADERGROUP = 999;
 inline constexpr std::uint16_t WORLD_SHADERGROUP = 1000;

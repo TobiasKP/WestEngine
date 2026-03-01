@@ -1,29 +1,31 @@
 #include "../CoreHeaders/SceneManager.h"
 
-#include <PathUtils.h>
+#include "../Constants/Components.hpp"
+#include "../CoreHeaders/Entity/Camera.h"
 
 #include <filesystem>
 #include <format>
 #include <lua.hpp>
-
-#include "../CoreHeaders/Entity/Camera.h"
+#include <PathUtils.h>
 
 SceneManager::SceneManager() : IManager(nullptr)
 {
   setName(CoreConstants::SCENE_MANAGER);
-  _scene   = nullptr;
-  _loader  = nullptr;
-  L        = nullptr;
-  _builder = nullptr;
+  _scene    = nullptr;
+  _loader   = nullptr;
+  L         = nullptr;
+  _builder  = nullptr;
+  _registry = nullptr;
 }
 
 SceneManager::SceneManager(WestLogger* logger) : IManager(logger)
 {
   setName(CoreConstants::SCENE_MANAGER);
-  _scene   = nullptr;
-  _loader  = nullptr;
-  L        = nullptr;
-  _builder = nullptr;
+  _scene    = nullptr;
+  _loader   = nullptr;
+  L         = nullptr;
+  _builder  = nullptr;
+  _registry = nullptr;
 }
 
 SceneManager::~SceneManager() {}
@@ -31,14 +33,16 @@ SceneManager::~SceneManager() {}
 std::int32_t SceneManager::startup()
 {
   _loader     = new ObjectLoader(getLogger());
+  _registry   = new ComponentRegistry();
   _scene      = &Scene::getSceneInstance();
   Camera* cam = new Camera(glm::vec3(0.0, 3.0, 5.0), glm::vec3(25.0f, 0, 0));
   _scene->addCamera(cam);
+  _scene->addRegistry(_registry);
   _facade = &LuaFacade::getLuaFacadeInstance();
   _facade->startup(getLogger());
   L = _facade->getLuaState();
 
-  _builder = new EntityBuilder(L, _loader);
+  _builder = new EntityBuilder(L, _loader, _registry);
   assert(_loader != nullptr && _scene != nullptr && L != nullptr && _builder != nullptr);
 #ifdef DEBUG
   logDebug(std::format("{} ### instantiated Lua state\n", getName()));
@@ -60,7 +64,12 @@ std::int32_t SceneManager::init()
 #ifdef DEBUG
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
-
+  _registry->registerComponent<Model>();
+  _registry->registerComponent<Material>();
+  _registry->registerComponent<Shader>();
+  _registry->registerComponent<Movement>();
+  _registry->registerComponent<Position>();
+  _registry->registerComponent<AABB>();
   _scene->init();
 
   std::string filePath = PathUtils::resolve(CoreConstants::LUA_INIT_FILE.data());
@@ -124,8 +133,24 @@ void SceneManager::removeEntityFromScene(const Entity& entity)
   _scene->removeEntity(entity);
   if (!entity.isDebugEntity())
   {
-    _loader->unloadModel((Model*)entity.getComponent(BitMasks::Components::MODEL),
-                         (Material*)entity.getComponent(BitMasks::Components::MATERIAL));
+    Model* mo    = _registry->getComponent<Model>(entity.getId());
+    Material* ma = _registry->getComponent<Material>(entity.getId());
+    if (!_registry->removeComponent<Material>(entity.getId()))
+    {
+      logFailure(std::format("{} ### error deleting Material Component from entity: {}, might cause memory leaks "
+                             "program will continue running",
+                             getName(),
+                             entity.getId()));
+    }
+
+    if (!_registry->removeComponent<Model>(entity.getId()))
+    {
+      logFailure(std::format(
+        "{} ### error deleting Model Component from entity: {}, might cause memory leaks program will continue running",
+        getName(),
+        entity.getId()));
+    }
+    _loader->unloadModel(mo, ma);
   }
 }
 

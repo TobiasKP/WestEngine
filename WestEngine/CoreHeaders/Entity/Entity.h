@@ -1,11 +1,7 @@
 #pragma once
 
-#include "../Interfaces/IComponent.h"
-
 #include <GL/glew.h>
 #include <PoolAllocator.h>
-#include <unordered_map>
-
 class Entity
 {
 public:
@@ -74,10 +70,6 @@ public:
     return _allocator->deallocate(ptr, size);
   }
 
-  // Functions
-  void addComponent(std::uint16_t flag, IComponent* component);
-  IComponent* getComponent(std::uint16_t componentMask) const;
-
 private:
   static PoolAllocator* _allocator;
 
@@ -85,5 +77,4 @@ private:
   std::uint16_t _componentMask;
   bool _destroyed, _debugEntity;
   char* _name;
-  std::unordered_map<std::uint16_t, IComponent*> _components;
 };

@@ -34,7 +34,7 @@ void ComponentFactory::createComponent(std::map<std::string, std::int32_t> infos
     p->position = pos;
     p->scale    = 1.0f;
     p->rotation = glm::vec3(1.0f);
-    e.addComponent(BitMasks::Components::POSITION, p);
+    _registry->addComponent<Position>(e.getId(), std::move(*p));
   }
   else if (Components::MOVEMENT.compare(name) == 0)
   {
@@ -49,6 +49,6 @@ void ComponentFactory::createComponent(std::map<std::string, std::int32_t> infos
     {
       m->a = (algorithm)it->second;
     }
-    e.addComponent(BitMasks::Components::MOVEMENT, m);
+    _registry->addComponent<Movement>(e.getId(), std::move(*m));
   }
 }

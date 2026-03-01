@@ -1,12 +1,10 @@
 #pragma once
 
-#include "../Interfaces/IComponent.h"
-
 #include <CoreConstants.hpp>
 #include <GL/glew.h>
 #include <string>
 
-struct Shader : public IComponent
+struct Shader
 {
   bool initialized = false;
   GLuint programId, shadergroup;

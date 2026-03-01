@@ -111,7 +111,8 @@ void RenderManager::renderGameEntities()
 
 void RenderManager::renderMainLoop(const Entity& entity)
 {
-  Shader* s = (Shader*)entity.getComponent(BitMasks::Components::SHADER);
+  ComponentRegistry* reg = _scene->getRegistry();
+  Shader* s              = reg->getComponent<Shader>(entity.getId());
   if (!s->initialized)
   {
 #ifdef DEBUG
@@ -135,8 +136,8 @@ void RenderManager::renderMainLoop(const Entity& entity)
   }
 
 
-  Model* model       = (Model*)entity.getComponent(BitMasks::Components::MODEL);
-  Material* material = (Material*)entity.getComponent(BitMasks::Components::MATERIAL);
+  Model* model       = reg->getComponent<Model>(entity.getId());
+  Material* material = reg->getComponent<Material>(entity.getId());
   assert(model != nullptr && material != nullptr);
   if (!Config::PAUSE)
   {
@@ -171,7 +172,8 @@ void RenderManager::renderWorld()
     return;
   }
 
-  Shader* s = (Shader*)world->getComponent(BitMasks::Components::SHADER);
+  ComponentRegistry* reg = _scene->getRegistry();
+  Shader* s              = reg->getComponent<Shader>(world->getId());
   if (s == nullptr || !s->initialized)
   {
 #ifdef DEBUG
@@ -183,14 +185,14 @@ void RenderManager::renderWorld()
   GLuint shaderProgramId = s->programId;
   glUseProgram(shaderProgramId);
 
-  Material* mat = (Material*)world->getComponent(BitMasks::Components::MATERIAL);
-  if (mat != nullptr && mat->_dirty && mat->diffuseColorUniform > -1)
+  Material* mat = reg->getComponent<Material>(world->getId());
+  if (mat != nullptr && mat->dirty && mat->diffuseColorUniform > -1)
   {
     UniformUtils::setUniform(mat->diffuseColorUniform, mat->diffuseColor);
-    mat->_dirty = false;
+    mat->dirty = false;
   }
 
-  Model* model = (Model*)world->getComponent(BitMasks::Components::MODEL);
+  Model* model = reg->getComponent<Model>(world->getId());
   if (model == nullptr)
   {
 #ifdef DEBUG
@@ -321,15 +323,16 @@ void RenderManager::renderUserInterfaces()
 
 void RenderManager::updateUniforms(const Entity& e, Model* model, Material* material)
 {
-  Position* p = (Position*)e.getComponent(BitMasks::Components::POSITION);
-  Texture* t  = material->diffuseTexture;
+  ComponentRegistry* reg = _scene->getRegistry();
+  Position* p            = reg->getComponent<Position>(e.getId());
+  Texture* t             = material->diffuseTexture;
 #ifdef DEBUG
   if (e.isDebugEntity())
   {
     UniformUtils::setUniform(model->debugColorUniform, material->diffuseColor);
     assert(model->debugColorUniform != -1);
   }
-  Movement* m = (Movement*)e.getComponent(BitMasks::Components::MOVEMENT);
+  Movement* m = reg->getComponent<Movement>(e.getId());
   if (m != nullptr && m->moving.load() && !m->debugInfoDisplayed)
   {
     m->debugEntity        = _debugUtils->addLine(p->position, m->destination - p->position);
@@ -353,30 +356,31 @@ void RenderManager::updateUniforms(const Entity& e, Model* model, Material* mate
   }
 
 
-  if (material->_dirty && t != nullptr)
+  if (material->dirty && t != nullptr)
   {
     UniformUtils::setUniform(t->uniform, 0);
     assert(t->uniform != -1);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, t->id);
-    material->_dirty = false;
+    material->dirty = false;
   }
 
 
-  if (p != nullptr && p->_dirty.load())
+  if (p != nullptr && p->dirty.load())
   {
     glm::mat4 transform = PositionCalculation::createTransformationMatrix(p->position, p->rotation, p->scale);
     assert(p->uniform != -1);
     UniformUtils::setUniform(p->uniform, transform);
-    p->_dirty.store(false);
+    p->dirty.store(false);
   }
 }
 
 bool RenderManager::AABBcheck(const Entity& e)
 {
-  const Frustum& f = _scene->getCamera()->getFrustum();
-  Position* p      = (Position*)e.getComponent(BitMasks::Components::POSITION);
-  AABB* aabb       = (AABB*)e.getComponent(BitMasks::Components::AABB);
+  const Frustum& f       = _scene->getCamera()->getFrustum();
+  ComponentRegistry* reg = _scene->getRegistry();
+  Position* p            = reg->getComponent<Position>(e.getId());
+  AABB* aabb             = reg->getComponent<AABB>(e.getId());
   assert(p != nullptr && aabb != nullptr);
   glm::vec3 min = aabb->min * p->scale + p->position;
   glm::vec3 max = aabb->max * p->scale + p->position;

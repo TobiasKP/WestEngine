@@ -25,9 +25,10 @@ std::uint32_t DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction)
 
   Entity e;
   e.setId(Config::incEntityId());
-  e.addComponent(BitMasks::Components::SHADER, s);
-  e.addComponent(BitMasks::Components::MODEL, std::move(std::get<0>(m)));
-  e.addComponent(BitMasks::Components::MATERIAL, std::move(std::get<1>(m)));
+  ComponentRegistry* reg = _scene->getRegistry();
+  reg->addComponent<Shader>(e.getId(), std::move(*s));
+  reg->addComponent<Model>(e.getId(), std::move(*std::get<0>(m)));
+  reg->addComponent<Material>(e.getId(), std::move(*std::get<1>(m)));
   e.debugEntity();
 
   _scene->addDebugEntity(std::move(e));
@@ -36,6 +37,7 @@ std::uint32_t DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction)
 
 void DebugDrawUtils::unloadModel(const Entity& entity)
 {
-  _loader->unloadModel((Model*)entity.getComponent(BitMasks::Components::MODEL),
-                       (Material*)entity.getComponent(BitMasks::Components::MATERIAL));
+  ComponentRegistry* reg = _scene->getRegistry();
+  _loader->unloadModel(reg->getComponent<Model>(entity.getId()),
+                       reg->getComponent<Material>(entity.getId()));
 }

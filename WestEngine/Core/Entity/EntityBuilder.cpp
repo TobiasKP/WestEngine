@@ -128,9 +128,9 @@ void EntityBuilder::basicInfo(const char* key, Entity& e)
 #endif
     std::tuple<Model*, Material*, AABB*> m = loadModel(meshPath);
     assert(std::get<0>(m) != nullptr);
-    e.addComponent(BitMasks::Components::MODEL, std::move(std::get<0>(m)));
-    e.addComponent(BitMasks::Components::MATERIAL, std::move(std::get<1>(m)));
-    e.addComponent(BitMasks::Components::AABB, std::move(std::get<2>(m)));
+    _registry->addComponent<Model>(e.getId(), std::move(*std::get<0>(m)));
+    _registry->addComponent<Material>(e.getId(), std::move(*std::get<1>(m)));
+    _registry->addComponent<AABB>(e.getId(), std::move(*std::get<2>(m)));
   }
 }
 
@@ -168,7 +168,7 @@ void EntityBuilder::shaderInfo(Entity& e)
 #endif
 
   Shader* s = loadShader(vertexPath, fragmentPath, group);
-  e.addComponent(BitMasks::Components::SHADER, s);
+  _registry->addComponent<Shader>(e.getId(), std::move(*s));
 }
 
 void EntityBuilder::createWorld(World& e)
@@ -217,9 +217,9 @@ void EntityBuilder::createWorld(World& e)
   mat->diffuseColor                      = glm::vec3(0.2f, 0.6f, 0.2f);
 
   Shader* s = loadShader(vertexPath, fragmentPath, group);
-  e.addComponent(BitMasks::Components::SHADER, s);
-  e.addComponent(BitMasks::Components::MODEL, std::get<0>(m));
-  e.addComponent(BitMasks::Components::MATERIAL, mat);
+  _registry->addComponent<Shader>(e.getId(), std::move(*s));
+  _registry->addComponent<Model>(e.getId(), std::move(*std::get<0>(m)));
+  _registry->addComponent<Material>(e.getId(), std::move(*mat));
 }
 
 std::tuple<Model*, Material*, AABB*> EntityBuilder::buildWorldMesh(const std::vector<std::uint8_t>& map,
