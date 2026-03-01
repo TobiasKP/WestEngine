@@ -15,28 +15,30 @@ public:
   void registerComponent()
   {
     const std::type_info& t        = typeid(T);
-    componentArrays[t.hash_code()] = std::make_shared<ComponentArray<T>>();
+    _componentArrays[t.hash_code()] = std::make_shared<ComponentArray<T>>();
   };
 
   template <typename T>
   void addComponent(std::uint32_t entityId, T&& component)
   {
     const std::type_info& t                = typeid(T);
-    std::shared_ptr<IComponentArray> array = componentArrays[t.hash_code()];
+    std::shared_ptr<IComponentArray> array = _componentArrays[t.hash_code()];
     std::static_pointer_cast<ComponentArray<T>>(array)->addComponent(entityId, std::forward<T>(component));
   };
 
   template <typename T>
   bool removeComponent(std::uint32_t entityId)
   {
-    return true;
+    const std::type_info& t                = typeid(T);
+    std::shared_ptr<IComponentArray> array = _componentArrays[t.hash_code()];
+    return std::static_pointer_cast<ComponentArray<T>>(array)->remove(entityId);
   };
 
   template <typename T>
   T* getComponent(std::uint32_t entityId)
   {
     const std::type_info& t                = typeid(T);
-    std::shared_ptr<IComponentArray> array = componentArrays[t.hash_code()];
+    std::shared_ptr<IComponentArray> array = _componentArrays[t.hash_code()];
     return std::static_pointer_cast<ComponentArray<T>>(array)->getComponentById(entityId);
   };
 
@@ -45,9 +47,9 @@ public:
   std::shared_ptr<ComponentArray<T>> getComponentArray()
   {
     const std::type_info& t = typeid(T);
-    return std::static_pointer_cast<ComponentArray<T>>(componentArrays[t.hash_code()]);
+    return std::static_pointer_cast<ComponentArray<T>>(_componentArrays[t.hash_code()]);
   };
 
 private:
-  std::unordered_map<std::size_t, std::shared_ptr<IComponentArray>> componentArrays{};
+  std::unordered_map<std::size_t, std::shared_ptr<IComponentArray>> _componentArrays{};
 };
