@@ -1,9 +1,11 @@
 #pragma once
 
+#include "../../../Constants/BitMasks.hpp"
 #include "../../../CoreHeaders/Systems/Umbrella.h"
 
 #include <cstdint>
 #include <WestInterfaceFacade.h>
+
 
 class InputObserver
 {
@@ -62,7 +64,7 @@ public:
   }
 
 private:
-  double _x, _z, _y; 
+  double _x, _z, _y;
   glm::vec3 _playerDestination;
   PlayerControl* _control;
   WestInterface::WestInterfaceFacade* _facade;

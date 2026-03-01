@@ -4,6 +4,7 @@
 #include "Entity/Scene.h"
 #include "Interfaces/IManager.h"
 #include "Utils/DataUtils/ObjectLoader.h"
+#include "Components/ComponentRegistry.hpp"
 #include "../Core/Scripting/LuaFacade.hpp"
 
 #include <lua.hpp>
@@ -27,6 +28,7 @@ private:
   ObjectLoader* _loader;
   lua_State* L;
   EntityBuilder* _builder;
+  ComponentRegistry* _registry;
 
   // Functions
   void removeEntityFromScene(const Entity& entity);

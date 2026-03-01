@@ -1,10 +1,9 @@
 #pragma once
 
-#include "../Interfaces/IComponent.h"
 
 #include <glm/glm.hpp>
 
-struct AABB : public IComponent
+struct AABB
 {
   glm::vec3 min, max;
 };

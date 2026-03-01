@@ -24,17 +24,18 @@ void MovementSystem::update()
   }
 
 
-  Movement* movComp = nullptr;
+  Movement* movComp     = nullptr;
+  ComponentRegistry* reg = Scene::getSceneInstance().getRegistry();
   for (std::uint32_t id : ids)
   {
     Entity* e         = Scene::getSceneInstance().getEntityById(id);
-    movComp           = (Movement*)e->getComponent(BitMasks::Components::MOVEMENT);
-    Position* posComp = (Position*)e->getComponent(BitMasks::Components::POSITION);
+    movComp           = reg->getComponent<Movement>(e->getId());
+    Position* posComp = reg->getComponent<Position>(e->getId());
     assert(movComp != nullptr);
     if (movComp->moving.load())
     {
       moveToDestination(id, posComp, movComp);
-      posComp->_dirty.store(true);
+      posComp->dirty.store(true);
       continue;
     }
     if (movComp->movementPending.exchange(false) && !movComp->moving.load())

@@ -37,7 +37,7 @@ void Scene::deleteScene()
 void Scene::init()
 {
   std::lock_guard<std::mutex> lock(_mutex);
-  _entities.reserve(512);
+  _entities.reserve(CoreConstants::MAX_ENTITY_SIZE);
 #ifdef DEBUG
   _debugEntities.reserve(256);
 #endif
@@ -78,6 +78,13 @@ Entity* Scene::getEntityById(std::uint32_t id)
 
 void Scene::addEntity(Entity&& entity)
 {
+  if (_entities.size() >= CoreConstants::MAX_ENTITY_SIZE)
+  {
+    WestLogger::getLoggerInstance().log(
+      Level::Error,
+      std::format("Could not add Entity to Scene, max number {} of entites reached", CoreConstants::MAX_ENTITY_SIZE));
+    return;
+  }
   std::lock_guard<std::mutex> lock(_mutex);
   insertEntityByGroup(std::move(entity));
 }
@@ -102,16 +109,22 @@ void Scene::addWorld(World* world)
   _world = std::move(world);
 }
 
+void Scene::addRegistry(ComponentRegistry* reg)
+{
+  assert(reg != nullptr);
+  std::lock_guard<std::mutex> lock(_mutex);
+  _registry = std::move(reg);
+}
+
 void Scene::insertEntityByGroup(Entity&& entity)
 {
-  GLint group = static_cast<Shader*>(entity.getComponent(BitMasks::Components::SHADER))->shadergroup;
+  GLint group = _registry->getComponent<Shader>(entity.getId())->shadergroup;
 
-  auto pos =
-    std::upper_bound(_entities.begin(),
-                     _entities.end(),
-                     group,
-                     [](GLint g, const Entity& e)
-                     { return g < static_cast<Shader*>(e.getComponent(BitMasks::Components::SHADER))->shadergroup; });
+  auto pos = std::upper_bound(_entities.begin(),
+                              _entities.end(),
+                              group,
+                              [&](GLint g, const Entity& e)
+                              { return g < _registry->getComponent<Shader>(e.getId())->shadergroup; });
   _entities.insert(pos, std::move(entity));
 }
 

@@ -2,7 +2,6 @@
 
 #include "../../Constants/LuaAPI.hpp"
 #include "../../Constants/Systems.hpp"
-#include "../CoreHeaders/Components/Movement.hpp"
 #include "../CoreHeaders/Entity/Scene.h"
 
 #include <Config.h>
@@ -59,10 +58,11 @@ void PlayerControl::update()
 
   if (!_movementInitiated.load())
   {
-    Entity* e         = Scene::getSceneInstance().getEntityById(ids.front());
-    Movement* movComp = (Movement*)e->getComponent(BitMasks::Components::MOVEMENT);
+    Entity* e                  = Scene::getSceneInstance().getEntityById(ids.front());
+    ComponentRegistry* reg     = Scene::getSceneInstance().getRegistry();
+    Movement* movComp = reg->getComponent<Movement>(e->getId());
     assert(movComp != nullptr);
-    Position* posComp = (Position*)e->getComponent(BitMasks::Components::POSITION);
+    Position* posComp = reg->getComponent<Position>(e->getId());
     assert(posComp != nullptr);
     World* w                      = Scene::getSceneInstance().getWorld();
     std::int32_t tileIdx          = w->calculateIndex(posComp->position.x, posComp->position.z);
@@ -101,10 +101,11 @@ void PlayerControl::updateDebuggingInfo() {}
 
 void PlayerControl::passDestinationPosition(glm::vec3 dest)
 {
-  std::vector<uint32_t> ids = getEntitieIds();
-  std::int32_t id           = ids.front();
-  Entity* e                 = Scene::getSceneInstance().getEntityById(id);
-  Movement* movComp         = (Movement*)e->getComponent(BitMasks::Components::MOVEMENT);
+  std::vector<uint32_t> ids  = getEntitieIds();
+  std::int32_t id            = ids.front();
+  Entity* e                  = Scene::getSceneInstance().getEntityById(id);
+  ComponentRegistry* reg     = Scene::getSceneInstance().getRegistry();
+  Movement* movComp          = reg->getComponent<Movement>(e->getId());
   assert(movComp != nullptr);
   std::int32_t tile = Scene::getSceneInstance().getWorld()->calculateIndex(dest.x, dest.z);
   bool inRange =

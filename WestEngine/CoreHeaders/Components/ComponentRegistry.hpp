@@ -1,0 +1,49 @@
+#pragma once
+
+#include "../Interfaces/IComponentArray.hpp"
+#include "ComponentArray.hpp"
+#include "Umbrella.h"
+
+class ComponentRegistry
+{
+public:
+  template <typename T>
+  void registerComponent()
+  {
+    const std::type_info& t = typeid(T);
+    componentArrays[t.hash_code()] = std::make_shared<ComponentArray<T>>();
+  };
+
+  template <typename T>
+  void addComponent(std::uint32_t entityId, T&& component)
+  {
+    const std::type_info& t                = typeid(T);
+    std::shared_ptr<IComponentArray> array = componentArrays[t.hash_code()];
+    std::static_pointer_cast<ComponentArray<T>>(array)->addComponent(entityId, std::forward<T>(component));
+  };
+
+  template <typename T>
+  bool removeComponent(std::uint32_t entityId)
+  {
+    return true;
+  };
+
+  template <typename T>
+  T* getComponent(std::uint32_t entityId)
+  {
+    const std::type_info& t                = typeid(T);
+    std::shared_ptr<IComponentArray> array = componentArrays[t.hash_code()];
+    return std::static_pointer_cast<ComponentArray<T>>(array)->getComponentById(entityId);
+  };
+
+
+  template <typename T>
+  std::shared_ptr<IComponentArray> getComponentArray(T component)
+  {
+    const std::type_info& t = typeid(component);
+    return componentArrays[t.hash_code()];
+  };
+
+private:
+  std::unordered_map<std::size_t, std::shared_ptr<IComponentArray>> componentArrays{};
+};

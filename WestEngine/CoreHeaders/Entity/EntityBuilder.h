@@ -3,6 +3,7 @@
 #include "../../CoreHeaders/Entity/Entity.h"
 #include "../../CoreHeaders/Entity/World.hpp"
 #include "../Components/ComponentFactory.h"
+#include "../Components/ComponentRegistry.hpp"
 #include "../Systems/SystemFactory.h"
 #include "../Utils/DataUtils/ObjectLoader.h"
 
@@ -13,10 +14,10 @@ class EntityBuilder
 {
 public:
   EntityBuilder() : L(nullptr), _loader(nullptr) {};
-  EntityBuilder(lua_State* state, ObjectLoader* loader) : L(state), _loader(loader)
+  EntityBuilder(lua_State* state, ObjectLoader* loader, ComponentRegistry* r) : L(state), _loader(loader), _registry(r)
   {
     _sFac = new SystemFactory();
-    _cFac = new ComponentFactory();
+    _cFac = new ComponentFactory(r);
   };
 
   void createEntities();
@@ -26,6 +27,7 @@ private:
   ObjectLoader* _loader;
   SystemFactory* _sFac;
   ComponentFactory* _cFac;
+  ComponentRegistry* _registry;
   static constexpr std::uint32_t indices[6] = {0, 1, 3, 1, 2, 3};
   static constexpr float baseQuad[]         = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f};
 

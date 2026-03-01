@@ -43,16 +43,17 @@ void ShaderManager::shutdown()
 #endif
 
   glUseProgram(0);
+  ComponentRegistry* reg = _scene->getRegistry();
   for (auto& entity : _scene->getEntities())
   {
-    Shader* s        = (Shader*)entity.getComponent(BitMasks::Components::SHADER);
+    Shader* s        = reg->getComponent<Shader>(entity.getId());
     GLuint programId = s->programId;
     glDeleteProgram(programId);
   }
 #ifdef DEBUG
   for (auto& entity : _scene->getDebugEntities())
   {
-    Shader* s        = (Shader*)entity.getComponent(BitMasks::Components::SHADER);
+    Shader* s        = reg->getComponent<Shader>(entity.getId());
     GLuint programId = s->programId;
     glDeleteProgram(programId);
   }
@@ -104,7 +105,8 @@ void ShaderManager::update()
 
 void ShaderManager::initEntityShader(const Entity& entity)
 {
-  Shader* s = (Shader*)entity.getComponent(BitMasks::Components::SHADER);
+  ComponentRegistry* reg = _scene->getRegistry();
+  Shader* s              = reg->getComponent<Shader>(entity.getId());
   assert(s != nullptr);
   if (s->initialized)
   {
@@ -155,7 +157,8 @@ void ShaderManager::initWorldShader()
     return;
   }
 
-  Shader* ws = (Shader*)world->getComponent(BitMasks::Components::SHADER);
+  ComponentRegistry* reg = _scene->getRegistry();
+  Shader* ws             = reg->getComponent<Shader>(world->getId());
   if (ws == nullptr || ws->initialized)
   {
     return;
@@ -187,7 +190,7 @@ void ShaderManager::initWorldShader()
   logDebug(std::format("{} ### World shader initialized. ProgramID: {}.\n", getName(), programId));
 #endif
 
-  Material* mat = (Material*)world->getComponent(BitMasks::Components::MATERIAL);
+  Material* mat = reg->getComponent<Material>(world->getId());
   if (mat != nullptr)
   {
     mat->diffuseColorUniform = UniformUtils::createUniform(UniformConstants::DCOLOR, programId);
@@ -292,8 +295,9 @@ GLuint ShaderManager::initShader(Shader* s, const Entity& entity)
 // per program
 void ShaderManager::addUniforms(GLuint programId, const Entity& entity)
 {
-  Model* m     = (Model*)entity.getComponent(BitMasks::Components::MODEL);
-  Material* m2 = (Material*)entity.getComponent(BitMasks::Components::MATERIAL);
+  ComponentRegistry* reg = _scene->getRegistry();
+  Model* m               = reg->getComponent<Model>(entity.getId());
+  Material* m2           = reg->getComponent<Material>(entity.getId());
   if (m2 != nullptr && m2->diffuseTexture != nullptr)
   {
     m2->diffuseTexture->uniform = UniformUtils::createUniform(UniformConstants::TEXTURE_SAMPLER, programId);
@@ -311,7 +315,7 @@ void ShaderManager::addUniforms(GLuint programId, const Entity& entity)
   }
 #endif
 
-  Position* pos = (Position*)entity.getComponent(BitMasks::Components::POSITION);
+  Position* pos = reg->getComponent<Position>(entity.getId());
   if (pos != nullptr)
   {
     pos->uniform = UniformUtils::createUniform(UniformConstants::TRANSFORMATION_MATRIX, programId);
