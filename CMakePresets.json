@@ -252,26 +252,23 @@
   "buildPresets": [
     {
       "name": "linux-debug-core",
-      "configurePreset": "linux-debug-core",
-      "cleanFirst": true,
+      "configurePreset": "linux-debug-core", 
       "environment": { "VERBOSE": "1" }
     },
     {
       "name": "linux-debug",
-      "configurePreset": "linux-debug",
-      "cleanFirst": true,
-      "environment": { "VERBOSE": "1" }
+      "configurePreset": "linux-debug",  
+      "environment": { "VERBOSE": "1" },
+      "jobs": 12
     },
     {
       "name": "linux-debug-ui",
-      "configurePreset": "linux-debug-ui",
-      "cleanFirst": true,
+      "configurePreset": "linux-debug-ui", 
       "environment": { "VERBOSE": "1" }
     },
     {
       "name": "linux-release",
-      "configurePreset": "linux-release",
-      "cleanFirst": true
+      "configurePreset": "linux-release"
     },
 
    
