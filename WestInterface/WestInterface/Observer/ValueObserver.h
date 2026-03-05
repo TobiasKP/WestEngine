@@ -17,8 +17,8 @@ public:
   virtual void deregisterElement(IElement* e) override;
 
 private:
-  std::vector<IElement*> _registeredElements;
+  std::unordered_map<std::int32_t, IElement*> _registeredElements;
 
   void executeElement(IElement* e) override;
-  void recalcText(IElement* e, std::string text);
+  void recalcText(IElement* e, std::string& text);
 };

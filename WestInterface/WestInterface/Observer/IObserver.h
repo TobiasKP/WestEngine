@@ -20,10 +20,7 @@ public:
 protected:
   WestLogger& logger;
 
-private:
-  std::vector<IElement*> _registeredElements;
-
-
+private: 
   virtual void executeElement(IElement* e) {};
   virtual void sort() {};
 };

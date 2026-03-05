@@ -2,35 +2,19 @@
 
 void ValueObserver::registerElement(IElement* e)
 {
-  _registeredElements.push_back(e);
+  _registeredElements[e->id] = e;
 }
 
 void ValueObserver::deregisterElement(IElement* e)
 {
-  auto it = std::find_if(_registeredElements.begin(),
-                         _registeredElements.end(),
-                         [e](const IElement* element) { return element->id == e->id; });
-  if (it != _registeredElements.end())
-  {
-    _registeredElements.erase(it);
-  }
+  _registeredElements.erase(e->id);
 }
 
 void ValueObserver::handleEvent(
   std::int16_t elementId, std::uint16_t event, std::uint16_t mouseX, std::uint16_t mouseY, std::string value)
 {
-  IElement* e = nullptr;
   assert(elementId > -1);
-  for (IElement* el : _registeredElements)
-  {
-    if (el->id == elementId)
-    {
-      e = el;
-      break;
-    }
-  }
-
-  if (e == nullptr)
+  if (!_registeredElements.contains(elementId))
   {
     logger.log(
       Level::Info,
@@ -38,7 +22,7 @@ void ValueObserver::handleEvent(
                   elementId));
     return;
   }
-
+  IElement* e = _registeredElements[elementId];
   if (event & 0x08)
   {
     recalcText(e, value);
@@ -56,7 +40,7 @@ void ValueObserver::executeElement(IElement* e)
   e->changed = true;
 };
 
-void ValueObserver::recalcText(IElement* e, std::string text)
+void ValueObserver::recalcText(IElement* e, std::string& text)
 {
   Text* t      = new Text();
   t->plaintext = text;

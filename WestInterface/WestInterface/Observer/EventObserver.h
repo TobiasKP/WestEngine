@@ -18,7 +18,7 @@ public:
   virtual void deregisterElement(IElement* e) override;
 
 private:
-  std::vector<IElement*> _registeredElements;
+  std::unordered_map<std::int32_t, IElement*> _registeredElements;
 
   void executeElement(IElement* e) override;
   void sort() override;

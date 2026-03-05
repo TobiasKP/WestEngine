@@ -189,19 +189,16 @@ InputManager::checkInputConfigLineForErrors(std::string key, std::string value, 
     return 1;
   }
 
-  std::cout << key << std::endl;
   if (key.length() == 1)
   {
     _inputMap[static_cast<int>(key[0])] = value;
   }
   else if (key.compare("ESC") == 0)
   {
-    std::cout << "esc " << value << std::endl;
     _inputMap[GLFW_KEY_ESCAPE] = value;
   }
   else if (key.compare("F2") == 0)
   {
-    std::cout << "f " << value << std::endl;
     _inputMap[GLFW_KEY_F2] = value;
   }
   else

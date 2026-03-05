@@ -22,9 +22,8 @@ struct DropDown : public IElement
     button->~Button();
   }
 
-  void handler() override
-  {
-    std::cout << "clicked" << std::endl;
+  void handler() override {
+
   };
 
   void describeMyself(ComponentData* cd, std::uint8_t row = 0, std::uint8_t column = 0) override
