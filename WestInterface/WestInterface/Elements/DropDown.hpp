@@ -4,8 +4,6 @@
 #include "IElement.hpp"
 #include "Label.hpp"
 
-#include <iostream>
-
 struct DropDown : public IElement
 {
   Label* label   = nullptr;

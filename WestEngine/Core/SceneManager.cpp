@@ -1,6 +1,5 @@
 #include "../CoreHeaders/SceneManager.h"
 
-#include "../Constants/Components.hpp"
 #include "../CoreHeaders/Entity/Camera.h"
 
 #include <filesystem>

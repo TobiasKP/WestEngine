@@ -1,6 +1,5 @@
 #include "EventObserver.h"
 
-#include <algorithm>
 #include <cassert>
 #include <format>
 
