@@ -4,7 +4,6 @@
 
 #include <cstdint>
 #include <string>
-#include <vector>
 
 class IObserver
 {
@@ -20,10 +19,7 @@ public:
 protected:
   WestLogger& logger;
 
-private:
-  std::vector<IElement*> _registeredElements;
-
-
+private: 
   virtual void executeElement(IElement* e) {};
   virtual void sort() {};
 };
@@ -33,5 +29,5 @@ private:
  *  0x01: hovered
  *  0x02: unhovered
  *  0x04: clicked left
- *
+ *  0x08: value changed
  * ********************************/

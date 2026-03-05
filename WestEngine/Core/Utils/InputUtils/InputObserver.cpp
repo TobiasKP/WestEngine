@@ -17,8 +17,22 @@ void InputObserver::notify()
   {
     std::lock_guard<std::mutex> lock(_generalMutex);
     if (static_cast<bool>(_generalFlags & BitMasks::General::MENU))
-    {}
-    // TODO set in Interface Manager
+    {
+      assert(Config::GeneralInterfaces.SETTING_ID.load() != -1);
+      _facade->notify(Config::GeneralInterfaces.SETTING_ID.load(), 0x04, -1, -1);
+    }
+    if (static_cast<bool>(_generalFlags & BitMasks::General::INFO))
+    {
+      if (Config::GeneralInterfaces.INFO_ID.load() == -1)
+      {
+        _facade->createNewInterface("info");
+      }
+      else
+      {
+        _facade->destroyInterface(Config::GeneralInterfaces.INFO_ID.load());
+        Config::GeneralInterfaces.INFO_ID.store(-1);
+      }
+    }
 
     _generalFlags = {0b0000'0000};
   }

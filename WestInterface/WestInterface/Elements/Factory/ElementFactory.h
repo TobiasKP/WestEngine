@@ -6,8 +6,6 @@
 #include "../DropDown.hpp"
 #include "../IElement.hpp"
 
-#include <array>
-
 class ElementFactory
 {
 public:
@@ -31,7 +29,6 @@ private:
   void fillText(WestInterface::ElementProxy* ep, IElement* el);
   void fillTexture(WestInterface::ElementProxy* ep, IElement* el);
   void fillDropdown(WestInterface::ElementProxy* ep, DropDown* d);
-  std::array<float, 4> getTextureCoordinatesForChar(char character);
 
   ValueObserver* _vObserver;
   EventObserver* _eObserver;

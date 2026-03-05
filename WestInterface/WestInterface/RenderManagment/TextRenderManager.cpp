@@ -5,7 +5,6 @@
 std::unordered_map<char, TextRenderManager::GlyphData> TextRenderManager::_glyphCache;
 
 TextRenderManager::TextRenderManager() {}
-
 TextRenderManager::~TextRenderManager() {}
 
 void TextRenderManager::initializeFontAtlas()
@@ -124,4 +123,25 @@ float TextRenderManager::calculateTextWidth(const std::string& text, float scale
   }
 
   return totalWidth;
+}
+
+std::array<float, 4> TextRenderManager::getTextureCoordinatesForChar(char character)
+{
+  const std::unordered_map<char, TextRenderManager::GlyphData>& res = TextRenderManager::getGlyphCache();
+
+  assert(character >= 32 && character <= 126 && res.size() > 0);
+
+  auto it = res.find(character);
+  if (it != res.end())
+  {
+    return it->second.textureCoords;
+  }
+
+  auto fallback = res.find(' ');
+  if (fallback != res.end())
+  {
+    return fallback->second.textureCoords;
+  }
+
+  return std::array<float, 4>{0};
 }

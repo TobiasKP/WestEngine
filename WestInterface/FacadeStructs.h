@@ -7,7 +7,7 @@
 namespace WestInterface
 {
 
-enum ElementType { LABEL, BUTTON, CONTAINER, ICON, DEBUG_ELEMENT, DROPDOWN };
+enum ElementType { LABEL, VLABEL, BUTTON, CONTAINER, ICON, DEBUG_ELEMENT, DROPDOWN };
 
 struct TextureInformation
 {

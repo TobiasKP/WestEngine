@@ -197,6 +197,10 @@ InputManager::checkInputConfigLineForErrors(std::string key, std::string value, 
   {
     _inputMap[GLFW_KEY_ESCAPE] = value;
   }
+  else if (key.compare("F2") == 0)
+  {
+    _inputMap[GLFW_KEY_F2] = value;
+  }
   else
   {
     // TODO Mouse Input

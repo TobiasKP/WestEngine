@@ -59,6 +59,7 @@ Container* SettingsInterface::createSettingButton(std::vector<ElementProxy*>& el
     }
     createSettingInterface();
   };
+  Config::GeneralInterfaces.SETTING_ID.store(settingsButton->elementId);
 
   TextureInformation* tex = new TextureInformation();
   tex->path               = "assets/Textures/gear.png";

@@ -52,7 +52,8 @@ void InterfaceBuilder::createNewInterface(Container* c)
   _current->id              = Config::incUiId();
   _current->dataPool        = _dataPool;
   _current->flags          |= c->givenFlags;
-  assert(_current->xLL >= 0 && _current->yLL >= 0); 
+  _current->hidden          = c->hiddenContainer;
+  assert(_current->xLL >= 0 && _current->yLL >= 0);
 
 #ifdef DEBUG
   _logger.log(Level::Info,

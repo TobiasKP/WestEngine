@@ -19,6 +19,10 @@ std::int32_t requestedHeight                  = -1;
 
 General GeneralConfig = {nullptr, 800, 600, 0.05f, 1e-6f, 60.0f, 64, 4};
 
+Info GeneralInfo = {0, 0};
+
+Interfaces GeneralInterfaces = {-1, -1, -1, -1};
+
 std::uint32_t incEntityId()
 {
   assert(std::atomic<std::uint32_t>::is_always_lock_free);

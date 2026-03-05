@@ -46,6 +46,7 @@ struct IElement
   std::int8_t zIndex  = -1;
   bool changed        = true;
   bool supportsEvents = false;
+  bool hidden         = false;
 
   std::uint16_t rowElements    = 0;
   std::uint16_t columnElements = 0;
@@ -54,10 +55,10 @@ struct IElement
 
   std::uint32_t id;
 
-  IElement* parent            = nullptr;
-  std::uint32_t poolPosition  = 0;
-  ComponentDataPool* dataPool = nullptr;
-  std::unique_ptr<Text> text;
+  IElement* parent                   = nullptr;
+  std::uint32_t poolPosition         = 0;
+  ComponentDataPool* dataPool        = nullptr;
+  std::unique_ptr<Text> text         = nullptr;
   std::function<void()> eventHandler = nullptr;
 
   virtual void handler() {};

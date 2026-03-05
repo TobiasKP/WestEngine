@@ -19,7 +19,7 @@ void KeyboardCallbacks::keyboardCallback(GLFWwindow* window, int key, int scanco
   assert(_iManager != nullptr && _wManager != nullptr && _iObserver != nullptr);
 
   const std::string command = _iManager->findByKey(key);
-  if (command.compare(CoreConstants::UNDEFINED_STRING))
+  if (command.compare(CoreConstants::UNDEFINED_STRING) == 0)
   {
     return;
   }
@@ -30,6 +30,10 @@ void KeyboardCallbacks::keyboardCallback(GLFWwindow* window, int key, int scanco
   else if (command.compare("OpenMenu") == 0 && action == GLFW_PRESS && !Config::PAUSE)
   {
     _iObserver->setGeneralFlag(BitMasks::General::MENU);
+  }
+  else if (command.compare("Info") == 0 && action == GLFW_PRESS)
+  {
+    _iObserver->setGeneralFlag(BitMasks::General::INFO);
   }
   else
   {

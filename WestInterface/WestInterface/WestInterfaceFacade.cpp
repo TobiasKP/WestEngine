@@ -2,12 +2,10 @@
 
 #include "RenderManagment/TextRenderManager.h"
 
-#include <PathUtils.h>
-
 #include <format>
 #include <GLFW/glfw3.h>
+#include <PathUtils.h>
 #include <stb_image.h>
-
 using namespace WestInterface;
 
 WestInterfaceFacade& WestInterfaceFacade::getInterfaceInstance()
@@ -25,7 +23,8 @@ WestInterfaceFacade::WestInterfaceFacade()
   _textManager   = new TextRenderManager();
   _builder       = new InterfaceBuilder(_eventObserver, _valueObserver);
   assert(_builder != nullptr);
-  _settings = new SettingsInterface(*_builder);
+  _settings  = new SettingsInterface(*_builder);
+  _debugInfo = new DebugInfoInterface(*_builder);
   for (std::uint8_t i = 0; i < 32; i++)
   {
     _interfaces.at(i) = nullptr;
@@ -43,6 +42,8 @@ void WestInterfaceFacade::shutdown()
   }
   delete _builder;
   delete _textManager;
+  delete _settings;
+  delete _debugInfo;
 }
 
 std::int32_t WestInterfaceFacade::init()
@@ -122,6 +123,10 @@ std::int32_t WestInterfaceFacade::init()
   ContainerElement* tmp                     = _settings->init();
   _interfaces.at(Config::INTERNAL_UI_COUNT) = tmp;
   Config::INTERNAL_UI_COUNT++;
+  tmp                                       = _debugInfo->init();
+  _interfaces.at(Config::INTERNAL_UI_COUNT) = tmp;
+  Config::INTERNAL_UI_COUNT++;
+
   _renderManager->toggleDirty();
   return 0;
 }
@@ -155,6 +160,24 @@ ContainerElement* WestInterfaceFacade::findInterfaceById(std::uint8_t id)
   }
 
   return nullptr;
+}
+
+std::uint8_t WestInterfaceFacade::createNewInterface(std::string name)
+{
+  if (name.compare("info") == 0)
+  {
+    assert(Config::GeneralInterfaces.SETTING_ID.load() != -1);
+    ContainerElement* tmp                     = _debugInfo->init();
+    _interfaces.at(Config::INTERNAL_UI_COUNT) = tmp;
+    Config::INTERNAL_UI_COUNT++;
+    _renderManager->toggleDirty();
+    return tmp->id;
+  }
+  else
+  {
+    _logger.log(Level::Error, std::format("@@@ Unknown interface identifier: {}\n", name));
+    return 0;
+  }
 }
 
 std::uint8_t WestInterfaceFacade::createNewInterface(Container* c)
@@ -270,7 +293,7 @@ void WestInterfaceFacade::notify(std::int16_t elementId, std::uint8_t event, std
 
 void WestInterfaceFacade::notify(std::int16_t elementId, std::uint8_t event, std::string value)
 {
-  _eventObserver->handleEvent(elementId, event, -1, -1, value);
+  _valueObserver->handleEvent(elementId, event, -1, -1, value);
   _renderManager->toggleDirty();
 };
 
@@ -282,6 +305,7 @@ const std::vector<ElementBounds*>& WestInterfaceFacade::getShownElementsBoundari
 bool WestInterfaceFacade::resolutionChange(std::uint32_t width, std::uint32_t height)
 {
   _settings->refreshInterface();
+  _debugInfo->refreshInterface();
   return true;
 }
 

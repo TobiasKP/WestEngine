@@ -5,6 +5,7 @@ namespace BitMasks
 namespace General
 {
 constexpr std::uint8_t MENU{0b0000'0001};
+constexpr std::uint8_t INFO{0b0000'0010};
 }  // namespace General
 namespace Control
 {

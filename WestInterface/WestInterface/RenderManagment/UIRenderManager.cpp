@@ -110,9 +110,12 @@ UIRenderManager::gatherBoundaryData(const std::array<ContainerElement*, 32>& int
         local.push_back(b);
       }
     }
-    ElementBounds* b = new ElementBounds();
-    ce->getBoundaries(*b);
-    local.push_back(b);
+    if (!ce->hidden)
+    {
+      ElementBounds* b = new ElementBounds();
+      ce->getBoundaries(*b);
+      local.push_back(b);
+    }
   }
   return local;
 }
