@@ -32,6 +32,8 @@ EngineManager::EngineManager(WestLogger* logger) : IManager(logger)
   setName(CoreConstants::ENGINE_MANAGER);
   _exitEngine    = false;
   _windowManager = new WindowManager(logger);
+  _FRAMERATE     = Config::GeneralConfig.FPS;
+  _FRAMETIME     = 1.0f / _FRAMERATE;
 
   _manager[0] = new InputManager(logger);
   _manager[1] = _windowManager;

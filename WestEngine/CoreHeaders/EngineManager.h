@@ -5,7 +5,6 @@
 
 #include <array>
 #include <Config.h>
-#include <memory>
 
 class EngineManager : public IManager
 {
@@ -43,8 +42,8 @@ private:
   std::int32_t _fps;
   std::array<IManager*, CoreConstants::MAX_Q_SIZE> _manager;
   WindowManager* _windowManager;
-  float _FRAMERATE       = Config::GeneralConfig.FPS;
-  float _FRAMETIME       = 1.0f / _FRAMERATE;
+  float _FRAMERATE;
+  float _FRAMETIME;
   const long _NANOSECOND = 1000000000;
 
   std::int32_t iterateQ(CYCLE code);
