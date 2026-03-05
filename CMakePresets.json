@@ -265,7 +265,7 @@
       "environment": {
         "VERBOSE": "1"
       },
-      "jobs": 12 
+      "jobs": 12
     },
     {
       "name": "linux-debug-ui",
