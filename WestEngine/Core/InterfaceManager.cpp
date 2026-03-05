@@ -65,6 +65,18 @@ void InterfaceManager::update()
 {
   _facade->updateRenderData();
   bool dirty = Config::INTERNAL_UI_COUNT != _cachedInterfaces;
+  if (_currentTE != Config::GeneralInfo.TOTAL_ENTITIES && Config::GeneralInterfaces.TE_ID.load() != -1)
+  {
+    _facade->notify(
+      Config::GeneralInterfaces.TE_ID.load(), 0x08, std::format("Entities in Scene: {}", Config::GeneralInfo.TOTAL_ENTITIES));
+    _currentTE = Config::GeneralInfo.TOTAL_ENTITIES;
+  }
+  if (_currentCE != Config::GeneralInfo.CULLED_ENTITIES && Config::GeneralInterfaces.CE_ID.load() != -1)
+  {
+    _facade->notify(
+      Config::GeneralInterfaces.CE_ID.load(), 0x08, std::format("Culled Entities: {}", Config::GeneralInfo.CULLED_ENTITIES));
+    _currentCE = Config::GeneralInfo.CULLED_ENTITIES;
+  }
   if (_currentX != Config::GeneralConfig.WIDTH && _currentY != Config::GeneralConfig.HEIGHT)
   {
 #ifdef DEBUG

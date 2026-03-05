@@ -128,6 +128,10 @@ struct ContainerElement : public IElement
     }
 
     assert(rowElements > 0 && columnElements > 0);
+    if (hidden)
+    {
+      return result;
+    }
     for (std::uint8_t i = 0; i < rowElements; i++)
     {
       for (std::uint8_t j = 0; j < columnElements; j++)

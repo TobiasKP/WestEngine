@@ -2,6 +2,8 @@
 
 #include "ThreadPool.h"
 
+#include <atomic>
+
 namespace Config
 {
 
@@ -24,9 +26,22 @@ struct General
   const std::uint8_t THREAD_COUNT;
 };
 
+struct Info
+{
+  std::int32_t TOTAL_ENTITIES, CULLED_ENTITIES;
+};
+
+struct Interfaces
+{
+  std::atomic<std::int32_t> TE_ID, CE_ID, INFO_ID, SETTING_ID;
+};
+
+
 extern std::uint32_t incEntityId();
 extern std::uint32_t incUiId();
 
 extern General GeneralConfig;
+extern Info GeneralInfo;
+extern Interfaces GeneralInterfaces;
 
 }  // namespace Config

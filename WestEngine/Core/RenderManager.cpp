@@ -87,20 +87,25 @@ void RenderManager::renderGameEntities()
   {
     _scene->getCamera()->update();
   }
- 
+
+  std::int32_t size = _scene->getEntities().size(), skipped = 0;
   for (const Entity& entity : _scene->getEntities())
   {
     if (AABBcheck(entity))
     {
       renderMainLoop(entity);
     }
-#ifdef DEBUG
     else
     {
+      skipped++;
+#ifdef DEBUG
       logCycle(std::format("{} ### skipped rendering entity: {}, did not pass AABB.\n", getName(), entity.getId()));
-    }
 #endif
+    }
   }
+  Config::GeneralInfo.TOTAL_ENTITIES  = size;
+  Config::GeneralInfo.CULLED_ENTITIES = skipped;
+
 #ifdef DEBUG
   for (const Entity& entity : _scene->getDebugEntities())
   {

@@ -7,7 +7,6 @@
 #include <format>
 #include <PathUtils.h>
 #include <stb_image.h>
-#include <unordered_map>
 
 using namespace WestInterface;
 
@@ -27,6 +26,12 @@ IElement* ElementFactory::createElementInternal(ElementProxy* e)
       result = new Label();
       fillBasicInfos(e, result);
       fillText(e, result);
+      break;
+    case VLABEL:
+      result = new Label();
+      fillBasicInfos(e, result);
+      fillText(e, result);
+      registerElementValue(e, result);
       break;
     case CONTAINER:
       result = new ContainerElement();
@@ -104,7 +109,7 @@ void ElementFactory::fillText(ElementProxy* ep, IElement* el)
 
   for (char c : ep->text)
   {
-    std::array<float, 4> coords = getTextureCoordinatesForChar(c);
+    std::array<float, 4> coords = TextRenderManager::getTextureCoordinatesForChar(c);
     t->coordinates.insert(t->coordinates.end(), coords.begin(), coords.end());
   }
 
@@ -117,13 +122,13 @@ void ElementFactory::fillText(ElementProxy* ep, IElement* el)
 void ElementFactory::registerElementEvent(ElementProxy* ep, IElement* e)
 {
   e->eventHandler   = ep->eventHandler;
-  e->supportsEvents = true; 
+  e->supportsEvents = true;
   _eObserver->registerElement(e);
 }
 
 void ElementFactory::registerElementValue(ElementProxy* ep, IElement* e)
 {
-  e->supportsEvents = true; 
+  e->supportsEvents = true;
   _vObserver->registerElement(e);
 }
 
@@ -173,25 +178,4 @@ void ElementFactory::fillDropdown(ElementProxy* ep, DropDown* d)
   d->label          = l;
   d->button         = b;
   assert(l != nullptr && b != nullptr && d != nullptr);
-}
-
-std::array<float, 4> ElementFactory::getTextureCoordinatesForChar(char character)
-{
-  const std::unordered_map<char, TextRenderManager::GlyphData>& res = TextRenderManager::getGlyphCache();
-
-  assert(character >= 32 && character <= 126 && res.size() > 0);
-
-  auto it = res.find(character);
-  if (it != res.end())
-  {
-    return it->second.textureCoords;
-  }
-
-  auto fallback = res.find(' ');
-  if (fallback != res.end())
-  {
-    return fallback->second.textureCoords;
-  }
-
-  return std::array<float, 4>{0};
 }

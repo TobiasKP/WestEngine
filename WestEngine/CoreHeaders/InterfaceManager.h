@@ -19,7 +19,7 @@ public:
 
 private:
   std::uint32_t _cachedInterfaces;
-  std::uint32_t _currentX, _currentY;
+  std::uint32_t _currentX, _currentY, _currentTE, _currentCE;
 
   WestInterface::WestInterfaceFacade* _facade;
   WindowManager* _windowManager;

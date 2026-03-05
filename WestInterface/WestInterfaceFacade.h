@@ -1,5 +1,6 @@
 #pragma once
 #include "FacadeStructs.h"
+#include "WestInterface/DebugInfoInterface.hpp"
 #include "WestInterface/Elements/ContainerElement.hpp"
 #include "WestInterface/InterfaceBuilder.h"
 #include "WestInterface/Observer/EventObserver.h"
@@ -26,6 +27,7 @@ public:
   void shutdown();
 
   // Managing Interfaces
+  std::uint8_t createNewInterface(std::string name);
   std::uint8_t createNewInterface(Container* c);
   bool destroyInterface(std::uint8_t interfaceId);
 
@@ -76,6 +78,7 @@ private:
   UIRenderManager* _renderManager = nullptr;
   TextRenderManager* _textManager = nullptr;
   SettingsInterface* _settings    = nullptr;
+  DebugInfoInterface* _debugInfo  = nullptr;
   WestLogger& _logger             = WestLogger::getLoggerInstance();
 
   ContainerElement* findInterfaceById(std::uint8_t id);

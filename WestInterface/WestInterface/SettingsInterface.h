@@ -17,7 +17,7 @@ public:
 private:
   WestLogger& _logger = WestLogger::getLoggerInstance();
   InterfaceBuilder* _interfaceBuilder;
-  std::uint8_t _id, _settingButtonId, _resolutionId;
+  std::uint8_t _id, _resolutionId, _settingButtonId;
   std::array<std::tuple<std::uint32_t, std::uint32_t>, 4> _supportedResolutions = {
     std::make_tuple(800, 600), std::make_tuple(1280, 960), std::make_tuple(1920, 1080), std::make_tuple(2560, 1440)};
 

@@ -28,6 +28,7 @@ public:
   void precomputeGlyphData();
 
   void renderText(const std::string& text, glm::vec2 screenPosition, float scale = 1.0f);
+
   void setTextShaderProgram();
   void resetTextShaderProgram();
 
@@ -38,6 +39,7 @@ public:
 
   static std::vector<float> calculateTextPositions(const std::string& text, float scale = 1.0f);
   static float calculateTextWidth(const std::string& text, float scale = 1.0f);
+  static std::array<float, 4> getTextureCoordinatesForChar(char character);
 
 private:
   void calculateGlyphCoordinates(char character, GlyphData& glyphData);
