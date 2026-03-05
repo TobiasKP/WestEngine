@@ -21,7 +21,7 @@ struct General
 {
   FILE* SETTINGS;
   std::uint32_t WIDTH, HEIGHT;
-  float SPEED, EPSILON, FPS;
+  float SPEED, EPSILON, FPS, DELTA;
   const std::uint8_t CHUNK_SIZE;
   const std::uint8_t THREAD_COUNT;
 };

@@ -118,8 +118,9 @@ void EngineManager::update()
     double passedTime = startTime - lastTime;
     lastTime          = startTime;
 
-    delta        += passedTime / (double)_NANOSECOND;
-    frameCounter += passedTime;
+    delta                       += passedTime / (double)_NANOSECOND;
+    Config::GeneralConfig.DELTA  = delta;
+    frameCounter                += passedTime;
 
     while (delta > _FRAMETIME)
     {
@@ -310,6 +311,8 @@ std::int32_t EngineManager::fillSettings(std::string key, std::string value)
   else if (key.compare("fps") == 0)
   {
     Config::GeneralConfig.FPS = stof(value);
+    _FRAMERATE                = Config::GeneralConfig.FPS;
+    _FRAMETIME                = 1.0f / _FRAMERATE;
     success                   = 0;
   }
   return success;

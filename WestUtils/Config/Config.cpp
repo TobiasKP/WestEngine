@@ -17,7 +17,7 @@ std::int32_t interfaceTextureOneUniform       = -1;
 std::int32_t requestedWidth                   = -1;
 std::int32_t requestedHeight                  = -1;
 
-General GeneralConfig = {nullptr, 800, 600, 0.05f, 1e-6f, 60.0f, 64, 4};
+General GeneralConfig = {nullptr, 800, 600, 2.5f, 1e-6f, 60.0f, 0, 64, 4};
 
 Info GeneralInfo = {0, 0};
 

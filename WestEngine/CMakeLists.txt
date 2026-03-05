@@ -1,6 +1,6 @@
 message(STATUS "Building Core Module")
 
-project(WestCore VERSION 0.2.2)
+project(WestCore VERSION 0.2.3)
 
 # ─────────────────────────────────────────────────────────────
 # Packages

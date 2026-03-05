@@ -3,8 +3,8 @@
 #include "Interfaces/IManager.h"
 #include "WindowManager.h"
 
-#include <Config.h>
 #include <array>
+#include <Config.h>
 #include <memory>
 
 class EngineManager : public IManager
@@ -43,9 +43,9 @@ private:
   std::int32_t _fps;
   std::array<IManager*, CoreConstants::MAX_Q_SIZE> _manager;
   WindowManager* _windowManager;
+  float _FRAMERATE       = Config::GeneralConfig.FPS;
+  float _FRAMETIME       = 1.0f / _FRAMERATE;
   const long _NANOSECOND = 1000000000;
-  const float _FRAMERATE = Config::GeneralConfig.FPS;
-  const float _FRAMETIME = 1.0f / _FRAMERATE;
 
   std::int32_t iterateQ(CYCLE code);
   std::int32_t executeCycle(CYCLE code, IManager& item);
