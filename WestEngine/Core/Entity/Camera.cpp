@@ -43,9 +43,9 @@ glm::mat4 Camera::getViewMatrix()
 
 void Camera::movePosition(float x, float y, float z)
 {
-  x = x * Config::GeneralConfig.SPEED;
-  z = z * Config::GeneralConfig.SPEED;
-  y = y * Config::GeneralConfig.SPEED;
+  x = x * Config::GeneralConfig.SPEED * Config::GeneralConfig.DELTA;
+  z = z * Config::GeneralConfig.SPEED * Config::GeneralConfig.DELTA;
+  y = y * Config::GeneralConfig.SPEED * Config::GeneralConfig.DELTA;
   if (z != 0)
   {
     _position.x += glm::sin(glm::radians(_rotation.y)) * -1.0f * z;

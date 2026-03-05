@@ -91,12 +91,12 @@ void MovementSystem::updatePosition(glm::vec3 local, Position* posComp)
 {
   assert(posComp != nullptr);
   glm::vec3 direction = local - posComp->position;
-  if (glm::length2(direction) <= Config::GeneralConfig.SPEED * Config::GeneralConfig.SPEED)
+  if (glm::length2(direction) <= 0.025f)
   {
     posComp->position = local;
     return;
   }
-  direction          = glm::normalize(direction) * Config::GeneralConfig.SPEED;
+  direction          = glm::normalize(direction) * Config::GeneralConfig.SPEED * Config::GeneralConfig.DELTA;
   posComp->position += direction;
 }
 
