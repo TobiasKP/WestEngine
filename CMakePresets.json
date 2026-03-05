@@ -1,7 +1,10 @@
 {
   "version": 6,
-  "cmakeMinimumRequired": { "major": 3, "minor": 21, "patch": 0 },
-
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
   "configurePresets": [
     {
       "name": "base",
@@ -13,7 +16,7 @@
         "BUILD_UI": "OFF",
         "BUILD_UTILS": "OFF"
       }
-    }, 
+    },
     {
       "name": "linux-release",
       "inherits": "base",
@@ -88,7 +91,7 @@
         "lhs": "${hostSystemName}",
         "rhs": "Linux"
       }
-    }, 
+    },
     {
       "name": "macos-base",
       "inherits": "base",
@@ -153,11 +156,11 @@
         "BUILD_UI": "ON",
         "CMAKE_CXX_FLAGS": "-Wpedantic"
       }
-    }, 
+    },
     {
       "name": "windows-base",
       "inherits": "base",
-      "hidden": true,  
+      "hidden": true,
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
@@ -248,57 +251,63 @@
       }
     }
   ],
-
   "buildPresets": [
     {
       "name": "linux-debug-core",
       "configurePreset": "linux-debug-core",
-      "cleanFirst": true,
-      "environment": { "VERBOSE": "1" }
+      "environment": {
+        "VERBOSE": "1"
+      }
     },
     {
       "name": "linux-debug",
       "configurePreset": "linux-debug",
-      "cleanFirst": true,
-      "environment": { "VERBOSE": "1" }
+      "environment": {
+        "VERBOSE": "1"
+      },
+      "jobs": 12
     },
     {
       "name": "linux-debug-ui",
       "configurePreset": "linux-debug-ui",
-      "cleanFirst": true,
-      "environment": { "VERBOSE": "1" }
+      "environment": {
+        "VERBOSE": "1"
+      }
     },
     {
       "name": "linux-release",
       "configurePreset": "linux-release",
       "cleanFirst": true
     },
-
-   
     {
       "name": "macos-debug-core",
       "configurePreset": "macos-debug-core",
       "cleanFirst": true,
-      "environment": { "VERBOSE": "1" }
+      "environment": {
+        "VERBOSE": "1"
+      }
     },
     {
       "name": "macos-debug",
       "configurePreset": "macos-debug",
       "cleanFirst": true,
-      "environment": { "VERBOSE": "1" }
+      "environment": {
+        "VERBOSE": "1"
+      }
     },
     {
       "name": "macos-debug-ui",
       "configurePreset": "macos-debug-ui",
       "cleanFirst": true,
-      "environment": { "VERBOSE": "1" }
+      "environment": {
+        "VERBOSE": "1"
+      }
     },
     {
       "name": "macos-release",
       "configurePreset": "macos-release",
       "cleanFirst": true
     },
-
     {
       "name": "windows-debug",
       "configurePreset": "windows-debug",
@@ -323,12 +332,13 @@
       "configuration": "Release",
       "cleanFirst": true
     },
-
     {
       "name": "linux-debug-tests",
       "configurePreset": "linux-debug-tests",
       "cleanFirst": true,
-      "environment": { "VERBOSE": "1" }
+      "environment": {
+        "VERBOSE": "1"
+      }
     },
     {
       "name": "windows-debug-tests",
@@ -338,4 +348,3 @@
     }
   ]
 }
-
