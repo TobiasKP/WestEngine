@@ -35,12 +35,6 @@ void KeyboardCallbacks::keyboardCallback(GLFWwindow* window, int key, int scanco
   {
     _iObserver->setGeneralFlag(BitMasks::General::INFO);
   }
-  else
-  {
-    WestLogger* logger = &WestLogger::getLoggerInstance();
-    logger->log(Level::Error,
-                std::format("Could not find Operation to execute for key: {} with command: {}\n", key, command));
-  }
 }
 
 void KeyboardCallbacks::executeBoundOperation(std::int32_t key, const std::string boundOperation)

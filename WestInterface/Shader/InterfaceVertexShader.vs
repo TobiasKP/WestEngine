@@ -1,4 +1,4 @@
-#version 460 core
+#version 410 core
 
 layout(location = 0) in vec2 position;
 layout(location = 1) in vec4 iColor;
@@ -9,8 +9,8 @@ layout(location = 5) in uint flags;
 
 uniform mat4 orthoMatrix;
 
-out flat vec4 vColor;
-out flat uint vFlags;
+flat out vec4 vColor;
+flat out uint vFlags;
 out vec2 TexCoord;
 out vec2 QuadCoord;
 out vec2 scale;

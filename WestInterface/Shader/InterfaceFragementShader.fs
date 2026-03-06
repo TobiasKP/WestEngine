@@ -1,9 +1,7 @@
-#version 460 core
+#version 410 core
 
-#extension GL_EXT_gpu_shader4 : enable
-
-in flat vec4 vColor;
-in flat uint vFlags;
+flat in vec4 vColor;
+flat in uint vFlags;
 in vec2 TexCoord;
 in vec2 QuadCoord;
 in vec2 scale;
