@@ -33,7 +33,7 @@ public:
     return _debugEntity;
   }
 
-  inline char* getName() const
+  inline std::string getName() const
   {
     return _name;
   }
@@ -54,7 +54,7 @@ public:
     _id = id;
   }
 
-  inline void setName(char* name)
+  inline void setName(std::string name)
   {
     _name = name;
   }
@@ -76,5 +76,5 @@ private:
   std::uint32_t _id = 0;
   std::uint16_t _componentMask;
   bool _destroyed, _debugEntity;
-  char* _name;
+  std::string _name;
 };

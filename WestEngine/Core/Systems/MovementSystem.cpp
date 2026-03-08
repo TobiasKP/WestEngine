@@ -12,12 +12,14 @@ MovementSystem::MovementSystem(WestLogger* logger) : ISystem(), _logger(logger)
 
 MovementSystem::~MovementSystem() {}
 
-void MovementSystem::init() {}
+void MovementSystem::init()
+{
+  _reg = Scene::getSceneInstance().getRegistry();
+}
 
 void MovementSystem::update()
 {
-  ComponentRegistry* reg                              = Scene::getSceneInstance().getRegistry();
-  std::shared_ptr<ComponentArray<Movement>> movements = reg->getComponentArray<Movement>();
+  std::shared_ptr<ComponentArray<Movement>> movements = _reg->getComponentArray<Movement>();
   size_t size = movements->getSize(), current = 0;
 
   for (Movement& m : movements->getComponents())
@@ -29,7 +31,7 @@ void MovementSystem::update()
     if (m.moving.load())
     {
       std::uint32_t id  = movements->getEntityIdByIdx(current);
-      Position* posComp = reg->getComponent<Position>(id);
+      Position* posComp = _reg->getComponent<Position>(id);
       moveToDestination(id, posComp, &m);
       posComp->dirty.store(true);
       continue;

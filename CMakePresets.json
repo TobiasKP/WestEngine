@@ -265,6 +265,7 @@
       "environment": {
         "VERBOSE": "1"
       },
+      "cleanFirst": true,
       "jobs": 12
     },
     {

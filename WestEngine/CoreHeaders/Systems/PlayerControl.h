@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Components/Position.h"
 #include "../Interfaces/ISystem.h"
 
 #include <atomic>

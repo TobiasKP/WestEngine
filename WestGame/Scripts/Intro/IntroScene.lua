@@ -1,6 +1,5 @@
-local entitiyList = { "Cube", "DemoWorld" }
-
-local Entities = {}
+local entitiyList = { "Cube" }
+local w = "DemoWorld"
 
 local utils = require("Utils")
 
@@ -11,11 +10,9 @@ function load()
     local result = utils.LoadEntity(entity)
     if result == 1 then
       print("Error loading Entity")
-    else
-      table.insert(Entities, result)
     end
   end
-  return Entities
+  utils.World(w)
 end
 
 IntroScene.load = load

@@ -22,14 +22,15 @@ PlayerControl::~PlayerControl() {}
 
 void PlayerControl::init()
 {
+  _reg = Scene::getSceneInstance().getRegistry();
   LuaFacade::getLuaFacadeInstance().registerCFunction(movePlayerUnit, LuaAPI::C_MOVE_PLAYER.data(), this);
   LuaFacade::getLuaFacadeInstance().registerCFunction(actionFinished, LuaAPI::C_ACTIONF_PLAYER.data(), this);
 }
 
 void PlayerControl::update()
 {
-  std::vector<uint32_t> ids = getEntitieIds();
-  assert(_logger != nullptr && !ids.empty());
+  std::shared_ptr<ComponentArray<Control>> controlUnits = _reg->getComponentArray<Control>();
+  std::uint32_t id                                      = controlUnits->getComponents()[0].entityId;
   if (_cameraPending.exchange(false))
   {
     glm::vec3 localCam;
@@ -58,11 +59,10 @@ void PlayerControl::update()
 
   if (!_movementInitiated.load())
   {
-    Entity* e                  = Scene::getSceneInstance().getEntityById(ids.front());
-    ComponentRegistry* reg     = Scene::getSceneInstance().getRegistry();
-    Movement* movComp = reg->getComponent<Movement>(e->getId());
+    Entity* e         = Scene::getSceneInstance().getEntityById(id);
+    Movement* movComp = _reg->getComponent<Movement>(e->getId());
     assert(movComp != nullptr);
-    Position* posComp = reg->getComponent<Position>(e->getId());
+    Position* posComp = _reg->getComponent<Position>(e->getId());
     assert(posComp != nullptr);
     World* w                      = Scene::getSceneInstance().getWorld();
     std::int32_t tileIdx          = w->calculateIndex(posComp->position.x, posComp->position.z);
@@ -101,11 +101,10 @@ void PlayerControl::updateDebuggingInfo() {}
 
 void PlayerControl::passDestinationPosition(glm::vec3 dest)
 {
-  std::vector<uint32_t> ids  = getEntitieIds();
-  std::int32_t id            = ids.front();
-  Entity* e                  = Scene::getSceneInstance().getEntityById(id);
-  ComponentRegistry* reg     = Scene::getSceneInstance().getRegistry();
-  Movement* movComp          = reg->getComponent<Movement>(e->getId());
+  std::shared_ptr<ComponentArray<Control>> controlUnits = _reg->getComponentArray<Control>();
+  std::uint32_t id                                      = controlUnits->getComponents()[0].entityId;
+  Entity* e                                             = Scene::getSceneInstance().getEntityById(id);
+  Movement* movComp                                     = _reg->getComponent<Movement>(e->getId());
   assert(movComp != nullptr);
   std::int32_t tile = Scene::getSceneInstance().getWorld()->calculateIndex(dest.x, dest.z);
   bool inRange =
