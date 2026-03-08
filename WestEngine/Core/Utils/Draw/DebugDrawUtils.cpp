@@ -12,10 +12,10 @@ DebugDrawUtils::DebugDrawUtils(WestLogger* logger)
 
 std::uint32_t DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction)
 {
-  glm::vec3 end                          = start + direction;
-  GLfloat vertices[]                     = {start.x, start.y, start.z, end.x, end.y, end.z};
-  std::int32_t indices[]                 = {0, 1};
-  std::tuple<Model*, Material*, AABB*> m = _loader->loadModel(
+  glm::vec3 end                = start + direction;
+  GLfloat vertices[]           = {start.x, start.y, start.z, end.x, end.y, end.z};
+  std::int32_t indices[]       = {0, 1};
+  auto [model, material, aabb] = _loader->loadModel(
     vertices, sizeof(vertices), indices, sizeof(indices), 0, 0, 0, 0, "", glm::vec3(0), glm::vec3(0));
 
   Shader* s           = new Shader();
@@ -27,8 +27,8 @@ std::uint32_t DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction)
   e.setId(Config::incEntityId());
   ComponentRegistry* reg = _scene->getRegistry();
   reg->addComponent<Shader>(e.getId(), std::move(*s));
-  reg->addComponent<Model>(e.getId(), std::move(*std::get<0>(m)));
-  reg->addComponent<Material>(e.getId(), std::move(*std::get<1>(m)));
+  reg->addComponent<Model>(e.getId(), std::move(*model));
+  reg->addComponent<Material>(e.getId(), std::move(*material));
   e.debugEntity();
 
   _scene->addDebugEntity(std::move(e));
@@ -38,6 +38,5 @@ std::uint32_t DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction)
 void DebugDrawUtils::unloadModel(const Entity& entity)
 {
   ComponentRegistry* reg = _scene->getRegistry();
-  _loader->unloadModel(reg->getComponent<Model>(entity.getId()),
-                       reg->getComponent<Material>(entity.getId()));
+  _loader->unloadModel(reg->getComponent<Model>(entity.getId()), reg->getComponent<Material>(entity.getId()));
 }

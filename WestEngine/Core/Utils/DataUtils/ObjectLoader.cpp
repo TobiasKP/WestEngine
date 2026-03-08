@@ -15,17 +15,18 @@
 #include <limits.h>
 #endif
 
-std::tuple<Model*, Material*, AABB*> ObjectLoader::loadModel(float* vertices,
-                                                             size_t verticesLength,
-                                                             std::int32_t* indices,
-                                                             size_t indicesLength,
-                                                             float* texture,
-                                                             size_t textureLength,
-                                                             float* normals,
-                                                             size_t normalsLength,
-                                                             std::string mat,
-                                                             glm::vec3 min,
-                                                             glm::vec3 max)
+std::tuple<std::unique_ptr<Model>, std::unique_ptr<Material>, std::unique_ptr<AABB>>
+ObjectLoader::loadModel(float* vertices,
+                        size_t verticesLength,
+                        std::int32_t* indices,
+                        size_t indicesLength,
+                        float* texture,
+                        size_t textureLength,
+                        float* normals,
+                        size_t normalsLength,
+                        std::string mat,
+                        glm::vec3 min,
+                        glm::vec3 max)
 {
   assert(vertices != nullptr && verticesLength > 0 && indices != nullptr && indicesLength > 0 && _logger != nullptr);
 
@@ -46,13 +47,13 @@ std::tuple<Model*, Material*, AABB*> ObjectLoader::loadModel(float* vertices,
 #ifdef DEBUG
   _logger->log(Level::Info, "---Loaded Model, stored Data in vbo and vao\n");
 #endif
-  Material* material = nullptr;
+  std::unique_ptr<Material> material;
   if (mat.size() == 0)
   {
 #ifdef DEBUG
     _logger->log(Level::Info, "---Falling back to Debug-Material\n");
 #endif
-    material               = new Material();
+    material               = std::make_unique<Material>();
     material->diffuseColor = glm::vec3(1, 0, 0);
   }
   else
@@ -60,17 +61,18 @@ std::tuple<Model*, Material*, AABB*> ObjectLoader::loadModel(float* vertices,
     material = generateMaterialFromMTL(mat);
   }
 
-  Model* m       = new Model();
-  AABB* aabb     = new AABB();
+  auto m         = std::make_unique<Model>();
+  auto aabb      = std::make_unique<AABB>();
   aabb->min      = min;
   aabb->max      = max;
   m->id          = id;
   m->vertexCount = indicesLength / sizeof(std::int32_t);
   assert(material != nullptr);
-  return std::make_tuple(m, material, aabb);
+  return std::make_tuple(std::move(m), std::move(material), std::move(aabb));
 }
 
-std::tuple<Model*, Material*, AABB*> ObjectLoader::loadModel(std::string path)
+std::tuple<std::unique_ptr<Model>, std::unique_ptr<Material>, std::unique_ptr<AABB>>
+ObjectLoader::loadModel(std::string path)
 {
   FILE* file = PathUtils::openFile(path, true);
   if (file == nullptr)
@@ -80,7 +82,8 @@ std::tuple<Model*, Material*, AABB*> ObjectLoader::loadModel(std::string path)
   return loadOBJModel(file);
 }
 
-std::tuple<Model*, Material*, AABB*> ObjectLoader::loadOBJModel(FILE* file)
+std::tuple<std::unique_ptr<Model>, std::unique_ptr<Material>, std::unique_ptr<AABB>>
+ObjectLoader::loadOBJModel(FILE* file)
 {
   std::vector<float> vertices;
   glm::vec3 min = glm::vec3(0, 0, 0), max = glm::vec3(0, 0, 0);
@@ -357,10 +360,10 @@ std::tuple<Model*, Material*, AABB*> ObjectLoader::loadOBJModel(FILE* file)
                    max);
 }
 
-Material* ObjectLoader::generateMaterialFromMTL(const std::string& path)
+std::unique_ptr<Material> ObjectLoader::generateMaterialFromMTL(const std::string& path)
 {
-  FILE* file       = PathUtils::openFile(path, true);
-  Material* result = new Material();
+  FILE* file                       = PathUtils::openFile(path, true);
+  std::unique_ptr<Material> result = std::make_unique<Material>();
   if (file == nullptr)
   {
     return result;
@@ -375,7 +378,6 @@ Material* ObjectLoader::generateMaterialFromMTL(const std::string& path)
       result->diffuseColor = glm::vec3(u, v, z);
     }
   }
-
 
   return result;
 }

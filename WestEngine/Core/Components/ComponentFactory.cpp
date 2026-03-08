@@ -4,7 +4,6 @@
 #include "../../CoreHeaders/Components/Umbrella.h"
 
 #include <format>
-#include <iostream>
 
 void ComponentFactory::createComponent(lua_State* L, std::string& name, Entity& e)
 {
@@ -13,12 +12,11 @@ void ComponentFactory::createComponent(lua_State* L, std::string& name, Entity& 
 #endif
   if (Components::MMA_COMBINATION.compare(name) == 0)
   {
-    std::string path = std::format("/assets/Models/{}", lua_tostring(L, 2));
-    std::cout << path << std::endl;
-    std::tuple<Model*, Material*, AABB*> result = _loader->loadModel(path);
-    _registry->addComponent<Model>(e.getId(), std::move(*std::get<0>(result)));
-    _registry->addComponent<Material>(e.getId(), std::move(*std::get<1>(result)));
-    _registry->addComponent<AABB>(e.getId(), std::move(*std::get<2>(result)));
+    std::string path             = std::format("/assets/Models/{}", lua_tostring(L, 2));
+    auto [model, material, aabb] = _loader->loadModel(path);
+    _registry->addComponent<Model>(e.getId(), std::move(*model));
+    _registry->addComponent<Material>(e.getId(), std::move(*material));
+    _registry->addComponent<AABB>(e.getId(), std::move(*aabb));
   }
   else if (Components::POSITION.compare(name) == 0)
   {

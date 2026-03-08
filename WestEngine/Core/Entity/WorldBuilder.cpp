@@ -62,22 +62,20 @@ void WorldBuilder::createWorld(World& w, lua_State* L)
   sqmap = sqrt(map.size());
   w.setCreationInformation(sqmap, 1, glm::vec2(0, 0));
 
-  std::tuple<Model*, Material*, AABB*> m = buildWorldMesh(map, sqmap);
-  Material* mat                          = std::get<1>(m);
-  mat->diffuseColor                      = glm::vec3(0.2f, 0.6f, 0.2f);
+  auto [model, material, aabb] = buildWorldMesh(map, sqmap);
+  material->diffuseColor       = glm::vec3(0.2f, 0.6f, 0.2f);
 
   Shader s           = {};
   s.vertexShaderFile = "/shader/worldshader.vs";
   s.fragShaderFile   = "/shader/worldshader.fs";
   s.shadergroup      = 1000;
   _registry->addComponent<Shader>(w.getId(), std::move(s));
-  _registry->addComponent<Model>(w.getId(), std::move(*std::get<0>(m)));
-  _registry->addComponent<Material>(w.getId(), std::move(*mat));
+  _registry->addComponent<Model>(w.getId(), std::move(*model));
+  _registry->addComponent<Material>(w.getId(), std::move(*material));
 }
 
-
-std::tuple<Model*, Material*, AABB*> WorldBuilder::buildWorldMesh(const std::vector<std::uint8_t>& map,
-                                                                  std::int32_t sqmap)
+std::tuple<std::unique_ptr<Model>, std::unique_ptr<Material>, std::unique_ptr<AABB>>
+WorldBuilder::buildWorldMesh(const std::vector<std::uint8_t>& map, std::int32_t sqmap)
 {
   std::vector<float> vertices;
   std::vector<float> texCoords;
