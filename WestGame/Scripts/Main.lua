@@ -9,7 +9,7 @@ function LoadScene(name)
     if DEBUG then
       print("loading Intro")
     end
-    return intro.load()
+    intro.load()
   end
 end
 

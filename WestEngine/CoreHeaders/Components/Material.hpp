@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <string>
@@ -28,10 +29,10 @@ struct Material
 
   Material() = default;
   Material(Material&& o) noexcept
-      : id(o.id), name(std::move(o.name)), diffuseColor(o.diffuseColor), diffuseColorUniform(o.diffuseColorUniform),
-        ambientColor(o.ambientColor), specularColor(o.specularColor), emissiveColor(o.emissiveColor),
-        specularExponent(o.specularExponent), opacity(o.opacity), refractiveIndex(o.refractiveIndex),
-        diffuseTexture(o.diffuseTexture), dirty(o.dirty.load())
+    : id(o.id), name(std::move(o.name)), diffuseColor(o.diffuseColor), diffuseColorUniform(o.diffuseColorUniform),
+      ambientColor(o.ambientColor), specularColor(o.specularColor), emissiveColor(o.emissiveColor),
+      specularExponent(o.specularExponent), opacity(o.opacity), refractiveIndex(o.refractiveIndex),
+      diffuseTexture(o.diffuseTexture), dirty(o.dirty.load())
   {
     o.diffuseTexture = nullptr;
   }
@@ -52,5 +53,4 @@ struct Material
     o.diffuseTexture = nullptr;
     return *this;
   }
-
 };

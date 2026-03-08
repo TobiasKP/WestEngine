@@ -14,6 +14,7 @@ SceneManager::SceneManager() : IManager(nullptr)
   _loader   = nullptr;
   L         = nullptr;
   _builder  = nullptr;
+  _wbuilder = nullptr;
   _registry = nullptr;
 }
 
@@ -24,6 +25,7 @@ SceneManager::SceneManager(WestLogger* logger) : IManager(logger)
   _loader   = nullptr;
   L         = nullptr;
   _builder  = nullptr;
+  _wbuilder = nullptr;
   _registry = nullptr;
 }
 
@@ -41,7 +43,8 @@ std::int32_t SceneManager::startup()
   _facade->startup(getLogger());
   L = _facade->getLuaState();
 
-  _builder = new EntityBuilder(L, _loader, _registry);
+  _builder  = new EntityBuilder(L, _loader, _registry);
+  _wbuilder = new WorldBuilder(_registry, _loader, L);
   assert(_loader != nullptr && _scene != nullptr && L != nullptr && _builder != nullptr);
 #ifdef DEBUG
   logDebug(std::format("{} ### instantiated Lua state\n", getName()));
@@ -69,6 +72,7 @@ std::int32_t SceneManager::init()
   _registry->registerComponent<Movement>();
   _registry->registerComponent<Position>();
   _registry->registerComponent<AABB>();
+  _registry->registerComponent<Control>();
   _scene->init();
 
   std::string filePath = PathUtils::resolve(CoreConstants::LUA_INIT_FILE.data());
@@ -86,16 +90,6 @@ std::int32_t SceneManager::init()
   lua_getglobal(L, "LoadScene");
   lua_pushstring(L, "Intro");
   lua_call(L, 1, 1);
-  if (lua_istable(L, -1))
-  {
-    _builder->createEntities();
-  }
-  else
-  {
-    logFailure("SceneManager ### Current Lua Stack does not contain a return table");
-  }
-  lua_pop(L, 1);
-  // This block belongs together for loading all entitys of a given scene
 
 #ifdef DEBUG
   logDebug(std::format("{} ### Scene Initialized\n", getName()));

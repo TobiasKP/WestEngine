@@ -1,11 +1,12 @@
 #pragma once
 
-#include "Entity/EntityBuilder.h"
+#include "../Core/Scripting/LuaFacade.hpp"
+#include "Components/ComponentRegistry.hpp"
+#include "Entity/EntityBuilder.hpp"
 #include "Entity/Scene.h"
+#include "Entity/WorldBuilder.hpp"
 #include "Interfaces/IManager.h"
 #include "Utils/DataUtils/ObjectLoader.h"
-#include "Components/ComponentRegistry.hpp"
-#include "../Core/Scripting/LuaFacade.hpp"
 
 #include <lua.hpp>
 
@@ -28,6 +29,7 @@ private:
   ObjectLoader* _loader;
   lua_State* L;
   EntityBuilder* _builder;
+  WorldBuilder* _wbuilder;
   ComponentRegistry* _registry;
 
   // Functions
