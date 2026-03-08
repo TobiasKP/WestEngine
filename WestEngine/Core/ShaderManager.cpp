@@ -200,6 +200,7 @@ void ShaderManager::initWorldShader()
   }
   world->setFlagUniform(UniformUtils::createUniform(UniformConstants::WORLD_TILEARRAY, programId));
   world->setGridUniform(UniformUtils::createUniform(UniformConstants::WORLD_GRIDSIZE, programId));
+  world->setGridOriginUniform(UniformUtils::createUniform(UniformConstants::WORLD_GRID_ORIGIN, programId));
 }
 
 GLuint ShaderManager::initInterfaceShader()

@@ -1,4 +1,4 @@
-local entitiyList = { "Cube" }
+local entitiyList = { "Cube", "EnemyCube" }
 local w = "DemoWorld"
 
 local utils = require("Utils")

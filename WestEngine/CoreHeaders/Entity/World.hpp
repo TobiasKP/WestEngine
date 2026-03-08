@@ -29,20 +29,27 @@ public:
   {
     return _ugridSize;
   }
+  inline GLuint getGridOriginUniform()
+  {
+    return _uGridOrigin;
+  }
   inline std::int32_t getGridSize()
   {
     return _dimension;
+  }
+  inline bool isDirty()
+  {
+    return _dirty;
+  }
+  inline glm::vec2& getOrigin()
+  {
+    return _origin;
   }
   std::vector<std::uint32_t>& getFlagData()
   {
     std::lock_guard<std::mutex> lock(_mutex);
     return _vflags;
   }
-  inline bool isDirty()
-  {
-    return _dirty;
-  }
-
   void setCreationInformation(std::uint32_t d, std::uint32_t s, glm::vec2 o)
   {
     _dimension = d;
@@ -59,6 +66,10 @@ public:
   {
     _ugridSize = u;
   }
+  inline void setGridOriginUniform(GLuint u)
+  {
+    _uGridOrigin = u;
+  }
 
 
 private:
@@ -67,6 +78,6 @@ private:
   std::int32_t _lastIdx;
   glm::vec2 _origin;
   std::vector<std::uint32_t> _vflags;
-  GLuint _ugridSize, _utileFlags;
+  GLuint _ugridSize, _utileFlags, _uGridOrigin;
   std::atomic<bool> _dirty;
 };

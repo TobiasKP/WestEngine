@@ -3,5 +3,5 @@ model: "Cube.obj"
 shader: { v: "Vertex.vs", f: "Fragment.fs" , group: 0 }
 playercontrol: true
 components: 
-  - { name: "position", x: 0, y: 0, z: 0 }
+  - { name: "position", x: 1.5, y: 0, z: 1.5 }
   - { name: "movement", r: 2, a: 0 }

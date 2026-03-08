@@ -60,7 +60,7 @@ void WorldBuilder::createWorld(World& w, lua_State* L)
   }
 
   sqmap = sqrt(map.size());
-  w.setCreationInformation(sqmap, 1, glm::vec2(0, 0));
+  w.setCreationInformation(sqmap, 1, glm::vec2(-sqmap / 2.0f, -sqmap / 2.0f));
 
   auto [model, material, aabb] = buildWorldMesh(map, sqmap);
   material->diffuseColor       = glm::vec3(0.2f, 0.6f, 0.2f);
@@ -90,9 +90,9 @@ WorldBuilder::buildWorldMesh(const std::vector<std::uint8_t>& map, std::int32_t 
 
       for (int v = 0; v < 4; ++v)
       {
-        vertices.push_back(baseQuad[v * 2] + static_cast<float>(col));
+        vertices.push_back((baseQuad[v * 2] + static_cast<float>(col)) - (sqmap >> 1));
         vertices.push_back(height);
-        vertices.push_back(baseQuad[v * 2 + 1] + static_cast<float>(row));
+        vertices.push_back((baseQuad[v * 2 + 1] + static_cast<float>(row)) - (sqmap >> 1));
 
         texCoords.push_back(baseQuad[v * 2]);
         texCoords.push_back(baseQuad[v * 2 + 1]);

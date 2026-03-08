@@ -12,6 +12,7 @@ inline constexpr const char* CAMERA_UNIFORMS       = "cameraUniforms";
 inline constexpr const char* ORTHO_UNIFORM         = "orthoMatrix";
 
 // World Specific Uniforms
-inline constexpr const char* WORLD_GRIDSIZE  = "gridSize";
-inline constexpr const char* WORLD_TILEARRAY = "tileFlags";
+inline constexpr const char* WORLD_GRIDSIZE    = "gridSize";
+inline constexpr const char* WORLD_TILEARRAY   = "tileFlags";
+inline constexpr const char* WORLD_GRID_ORIGIN = "gridOrigin";
 }  // namespace UniformConstants

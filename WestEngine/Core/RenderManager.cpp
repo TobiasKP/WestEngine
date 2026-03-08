@@ -218,8 +218,10 @@ void RenderManager::renderWorld()
   {
     std::vector<std::uint32_t> flags = world->getFlagData();
     std::int32_t dimension           = world->getGridSize();
+    glm::vec2 origin                 = world->getOrigin();
     UniformUtils::setUniform(world->getFlagUniform(), flags);
     UniformUtils::setUniform(world->getGridUniform(), dimension);
+    UniformUtils::setUniform(world->getGridOriginUniform(), origin);
     world->resetDirty();
   }
 
@@ -361,22 +363,24 @@ void RenderManager::updateUniforms(const Entity& e, Model* model, Material* mate
   }
 
 
-  if (material->dirty && t != nullptr)
+  if (t != nullptr)
   {
     UniformUtils::setUniform(t->uniform, 0);
     assert(t->uniform != -1);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, t->id);
-    material->dirty = false;
   }
 
 
-  if (p != nullptr && p->dirty.load())
+  if (p != nullptr)
   {
-    glm::mat4 transform = PositionCalculation::createTransformationMatrix(p->position, p->rotation, p->scale);
+    if (p->dirty.load())
+    {
+      p->transform = PositionCalculation::createTransformationMatrix(p->position, p->rotation, p->scale);
+      p->dirty.store(false);
+    }
     assert(p->uniform != -1);
-    UniformUtils::setUniform(p->uniform, transform);
-    p->dirty.store(false);
+    UniformUtils::setUniform(p->uniform, p->transform);
   }
 }
 

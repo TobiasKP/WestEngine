@@ -8,6 +8,7 @@ out vec4 fragColor;
 uniform vec3 ddColor;
 uniform uint tileFlags[512];
 uniform int gridSize;
+uniform vec2 gridOrigin;
 
 vec3 burgundy = vec3(0.557, 0.231, 0.275);
 vec3 gold = vec3(0.851, 0.643, 0.255);
@@ -51,8 +52,8 @@ void calculateBorderEffect(vec3 color, bool indicator) {
         fragColor = vec4(ddColor, 1.0);
     } else {
         if (indicator) {
-            int row = int(floor(worldPos.z));
-            int col = int(floor(worldPos.x));
+            int row = int(floor(worldPos.z - gridOrigin.y));
+            int col = int(floor(worldPos.x - gridOrigin.x));
             getNeighbours(row, col, color);
         } else {
             fragColor = vec4(color.rgb, 1.0);
@@ -61,7 +62,7 @@ void calculateBorderEffect(vec3 color, bool indicator) {
 }
 
 void main() {
-    index = int(floor(worldPos.z)) * int(gridSize) + int(floor(worldPos.x));
+    index = int(floor(worldPos.z - gridOrigin.y)) * int(gridSize) + int(floor(worldPos.x - gridOrigin.x));
     if ((tileFlags[index] & 0x0001u) != 0u) {
         calculateBorderEffect(burgundy, false);
     } else if ((tileFlags[index] & 0x0002u) != 0) {

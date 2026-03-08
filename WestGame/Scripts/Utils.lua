@@ -4,7 +4,6 @@ local yaml = require("yaml")
 local root = debug.getinfo(1, 'S').source:sub(2):gsub("[^/]+$", "")
 
 local function interpreteData(data, source)
-  print(data.name);
   createEntity(data.name);
   addComponent("object", data.model);
   addComponent("shader", data.shader);

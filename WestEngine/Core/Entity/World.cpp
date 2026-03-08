@@ -45,18 +45,20 @@ std::optional<glm::vec3> World::tileToWorldPos(std::int32_t idx)
   }
   std::int32_t column = idx % _dimension;
   std::int32_t row    = idx / _dimension;
-  return glm::vec3(column + 0.5, 0, row + 0.5);
+  return glm::vec3(column + 0.5 + _origin.x, 0, row + 0.5 + _origin.y);
 }
 
 std::int32_t World::calculateIndex(double x, double y)
 {
-  if (x < 0 || x >= _dimension || y < 0 || y >= _dimension)
+  double localX = x - _origin.x;
+  double localY = y - _origin.y;
+  if (localX < 0 || localX >= _dimension || localY < 0 || localY >= _dimension)
   {
     return -1;
   }
   else
   {
-    return std::int32_t(std::floor(x) + std::floor(y) * _dimension);
+    return std::int32_t(std::floor(localX) + std::floor(localY) * _dimension);
   }
 }
 
