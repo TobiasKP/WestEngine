@@ -82,6 +82,7 @@ std::int32_t WindowManager::startup()
   glfwSetWindowPos(_window, windowPosX, windowPosY);
   glfwGetFramebufferSize(_window, &bufferWidth, &bufferHeight);
   glfwMakeContextCurrent(_window);
+  glfwSwapInterval(1);
 
   if (glewInit() != GLEW_OK)
   {
