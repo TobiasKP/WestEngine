@@ -7,7 +7,7 @@
 namespace WestInterface
 {
 
-enum ElementType { LABEL, VLABEL, BUTTON, CONTAINER, ICON, DEBUG_ELEMENT, DROPDOWN };
+enum ElementType { LABEL, VLABEL, BUTTON, CONTAINER, ICON, DEBUG_ELEMENT, DROPDOWN, PROGESS_BAR };
 
 struct TextureInformation
 {
@@ -41,7 +41,8 @@ struct ElementProxy
   std::uint8_t column;
   std::uint32_t givenFlags = 0x00;
 
-  std::string text = "";
+  std::string text      = "";
+  std::uint8_t progress = 0;
 
   TextureInformation* texture = nullptr;
 };

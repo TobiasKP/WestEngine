@@ -35,6 +35,22 @@ void ComponentFactory::createComponent(lua_State* L, std::string& name, Entity& 
   {
     addPlayerControl(L, e);
   }
+  else if (Components::HEALTH.compare(name) == 0)
+  {
+    addHealth(L, e);
+  }
+}
+
+void ComponentFactory::addHealth(lua_State* L, Entity& e)
+{
+  Health h = {};
+  lua_getfield(L, 2, "m");
+  h.max = lua_tointeger(L, -1);
+  lua_pop(L, 1);
+  lua_getfield(L, 2, "c");
+  h.current = lua_tointeger(L, -1);
+  lua_pop(L, 1);
+  _registry->addComponent<Health>(e.getId(), std::move(h));
 }
 
 void ComponentFactory::addPlayerControl(lua_State* L, Entity& e)

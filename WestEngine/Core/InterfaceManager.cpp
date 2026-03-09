@@ -1,5 +1,6 @@
 #include "../CoreHeaders/InterfaceManager.h"
 
+#include "../Constants/LuaAPI.hpp"
 #include "Utils/InputUtils/MouseCallbacks.h"
 
 #include <format>
@@ -50,7 +51,10 @@ std::int32_t InterfaceManager::init()
 #endif
 
   std::int32_t result = 0;
-  result              = _facade->init();
+  LuaFacade::getLuaFacadeInstance().registerCFunction(registerInterface, LuaAPI::C_CREATE_INTERFACE.data(), this);
+  LuaFacade::getLuaFacadeInstance().registerCFunction(destroyInterface, LuaAPI::C_DESTROY_INTERFACE.data(), this);
+  LuaFacade::getLuaFacadeInstance().registerCFunction(updateInterfaceValue, LuaAPI::C_UPDATE_INTERFACE.data(), this);
+  result = _facade->init();
 
 #ifdef DEBUG
   _demoId    = buildTechDemoFooter();
@@ -67,14 +71,16 @@ void InterfaceManager::update()
   bool dirty = Config::INTERNAL_UI_COUNT != _cachedInterfaces;
   if (_currentTE != Config::GeneralInfo.TOTAL_ENTITIES && Config::GeneralInterfaces.TE_ID.load() != -1)
   {
-    _facade->notify(
-      Config::GeneralInterfaces.TE_ID.load(), 0x08, std::format("Entities in Scene: {}", Config::GeneralInfo.TOTAL_ENTITIES));
+    _facade->notify(Config::GeneralInterfaces.TE_ID.load(),
+                    0x08,
+                    std::format("Entities in Scene: {}", Config::GeneralInfo.TOTAL_ENTITIES));
     _currentTE = Config::GeneralInfo.TOTAL_ENTITIES;
   }
   if (_currentCE != Config::GeneralInfo.CULLED_ENTITIES && Config::GeneralInterfaces.CE_ID.load() != -1)
   {
-    _facade->notify(
-      Config::GeneralInterfaces.CE_ID.load(), 0x08, std::format("Culled Entities: {}", Config::GeneralInfo.CULLED_ENTITIES));
+    _facade->notify(Config::GeneralInterfaces.CE_ID.load(),
+                    0x08,
+                    std::format("Culled Entities: {}", Config::GeneralInfo.CULLED_ENTITIES));
     _currentCE = Config::GeneralInfo.CULLED_ENTITIES;
   }
   if (_currentX != Config::GeneralConfig.WIDTH && _currentY != Config::GeneralConfig.HEIGHT)
@@ -84,6 +90,7 @@ void InterfaceManager::update()
 #endif
     _facade->resolutionChange(Config::GeneralConfig.WIDTH, Config::GeneralConfig.HEIGHT);
     _facade->updateRenderData();
+    refreshGameInterfaces();
     _currentX = Config::GeneralConfig.WIDTH;
     _currentY = Config::GeneralConfig.HEIGHT;
     dirty     = true;
@@ -95,6 +102,143 @@ void InterfaceManager::update()
     _cachedInterfaces = Config::INTERNAL_UI_COUNT;
   }
 }
+
+int InterfaceManager::registerInterface(lua_State* L)
+{
+  InterfaceManager* me          = (InterfaceManager*)lua_touserdata(L, lua_upvalueindex(1));
+  std::vector<ElementProxy*> el = fillInfo(L);
+  Container* c                  = new Container(el);
+  c->colorR                     = 59.0f;
+  c->colorG                     = 58.0f;
+  c->colorB                     = 54.0f;
+  c->xScreenPosition            = lua_tonumber(L, 2);
+  c->yScreenPosition            = lua_tonumber(L, 3);
+  c->stretchX                   = lua_tonumber(L, 4);
+  c->stretchY                   = lua_tonumber(L, 5);
+  c->colorA                     = lua_tonumber(L, 6);
+  c->rows                       = lua_tointeger(L, 7);
+  c->columns                    = lua_tointeger(L, 8);
+  c->hiddenContainer            = lua_toboolean(L, 9);
+
+  std::uint8_t id = me->_facade->createNewInterface(c);
+#ifdef DEBUG
+  me->logDebug(std::format("{} ### created a new game Interface from lua with id: {}", me->getName(), id));
+#endif
+  assert(id > 0);
+  lua_pushinteger(L, id);
+  return 1;
+};
+
+std::vector<ElementProxy*> InterfaceManager::fillInfo(lua_State* L)
+{
+  std::vector<ElementProxy*> result;
+  lua_pushnil(L);
+  while (lua_next(L, 1) != 0)
+  {
+    ElementProxy* e = new ElementProxy();
+    lua_getfield(L, -1, "type");
+    e->type      = (ElementType)lua_tointeger(L, -1);
+    e->elementId = Config::incUiId();
+    lua_pop(L, 1);
+
+    lua_getfield(L, -1, "position");
+    if (lua_istable(L, -1))
+    {
+      lua_getfield(L, -1, "x");
+      e->xPosition = lua_tonumber(L, -1);
+      lua_pop(L, 1);
+      lua_getfield(L, -1, "y");
+      e->yPosition = lua_tonumber(L, -1);
+      lua_pop(L, 1);
+      lua_getfield(L, -1, "stretchX");
+      e->stretchX = lua_tonumber(L, -1);
+      lua_pop(L, 1);
+      lua_getfield(L, -1, "stretchY");
+      e->stretchY = lua_tonumber(L, -1);
+      lua_pop(L, 1);
+    }
+    lua_pop(L, 1);
+
+    lua_getfield(L, -1, "color");
+    if (lua_istable(L, -1))
+    {
+      lua_getfield(L, -1, "r");
+      e->colorR = lua_tonumber(L, -1);
+      lua_pop(L, 1);
+
+      lua_getfield(L, -1, "g");
+      e->colorG = lua_tonumber(L, -1);
+      lua_pop(L, 1);
+
+      lua_getfield(L, -1, "b");
+      e->colorB = lua_tonumber(L, -1);
+      lua_pop(L, 1);
+
+      lua_getfield(L, -1, "a");
+      e->colorA = lua_tonumber(L, -1);
+      lua_pop(L, 1);
+    }
+    lua_pop(L, 1);
+
+    lua_getfield(L, -1, "gridPosition");
+    if (lua_istable(L, -1))
+    {
+      lua_getfield(L, -1, "row");
+      e->row = lua_tointeger(L, -1);
+      lua_pop(L, 1);
+      lua_getfield(L, -1, "column");
+      e->column = lua_tointeger(L, -1);
+      lua_pop(L, 1);
+      lua_getfield(L, -1, "count");
+      e->columnElements = lua_tointeger(L, -1);
+      lua_pop(L, 1);
+    }
+    lua_pop(L, 1);
+
+    lua_getfield(L, -1, "progress");
+    if (!lua_isnil(L, -1))
+    {
+      e->progress = lua_tointeger(L, -1);
+    }
+    lua_pop(L, 1);
+
+    lua_getfield(L, -1, "text");
+    if (!lua_isnil(L, -1))
+    {
+      e->text       = lua_tostring(L, -1);
+      e->givenFlags = 0x0008;
+    }
+    lua_pop(L, 1);
+    result.push_back(e);
+    lua_pop(L, 1);
+  }
+  return result;
+}
+
+
+int InterfaceManager::updateInterfaceValue(lua_State* L)
+{
+  InterfaceManager* me = (InterfaceManager*)lua_touserdata(L, lua_upvalueindex(1));
+  std::uint16_t id     = lua_tointeger(L, 1);
+  std::string value    = lua_tostring(L, 2);
+  me->_facade->notify(id, 0x08, value);
+  return 0;
+};
+
+int InterfaceManager::destroyInterface(lua_State* L)
+{
+  InterfaceManager* me = (InterfaceManager*)lua_touserdata(L, lua_upvalueindex(1));
+  std::uint16_t id     = lua_tointeger(L, 1);
+  bool result          = me->_facade->destroyInterface(id);
+  lua_pushboolean(L, result);
+  return 1;
+}
+
+void InterfaceManager::refreshGameInterfaces()
+{
+  LuaFacade::getLuaFacadeInstance().onUIRefresh(0);
+}
+
 
 #ifdef DEBUG
 

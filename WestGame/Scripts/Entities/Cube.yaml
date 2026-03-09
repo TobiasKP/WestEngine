@@ -5,3 +5,4 @@ playercontrol: true
 components: 
   - { name: "position", x: 1.5, y: 0, z: 1.5 }
   - { name: "movement", r: 2, a: 0 }
+  - { name: "health", m: 100, c: 100 }

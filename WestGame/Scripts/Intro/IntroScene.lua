@@ -1,7 +1,7 @@
 local entitiyList = { "Cube", "EnemyCube" }
 local w = "DemoWorld"
 
-local utils = require("Utils")
+local utils = require("EntityUtils")
 
 IntroScene = {}
 

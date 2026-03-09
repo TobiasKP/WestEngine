@@ -17,11 +17,18 @@ public:
   void update() override;
   std::int32_t init() override;
 
+  static int registerInterface(lua_State*);
+  static int updateInterfaceValue(lua_State*);
+  static int destroyInterface(lua_State*);
+
 private:
+  static std::vector<WestInterface::ElementProxy*> fillInfo(lua_State* L);
+  void refreshGameInterfaces();
+
   std::uint32_t _cachedInterfaces;
   std::uint32_t _currentX, _currentY, _currentTE, _currentCE;
 
-  WestInterface::WestInterfaceFacade* _facade;
+  WestInterface::WestInterfaceFacade* _facade; 
   WindowManager* _windowManager;
 
 #ifdef DEBUG

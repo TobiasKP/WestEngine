@@ -2,6 +2,8 @@
 
 #include "IObserver.h"
 
+#include "../Elements/ProgressBar.hpp"
+
 class ValueObserver : public IObserver
 {
 public:
@@ -21,4 +23,5 @@ private:
 
   void executeElement(IElement* e) override;
   void recalcText(IElement* e, std::string& text);
+  void setProgress(ProgressBar* p, std::string& value);
 };

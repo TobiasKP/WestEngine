@@ -43,7 +43,6 @@ void LuaFacade::startup(WestLogger* logger)
 #else
   luaL_dostring(L, "DEBUG = false");
 #endif
-
   if (loadAPI() != 0)
   {
     _logger->log(Level::Error, std::format("Lua State error ::: Lua API file"));
@@ -116,6 +115,21 @@ bool LuaFacade::onStateChange(std::int32_t calleeId, std::int32_t state)
     lua_pop(L, 1);
     return 1;
   }
+  return 0;
+}
+
+bool LuaFacade::onUIRefresh(std::int32_t calleeId)
+{
+  lua_getglobal(L, LuaAPI::UI_REFRESH.data());
+  lua_pushinteger(L, calleeId);
+  std::int32_t status = lua_pcall(L, 1, 0, 0);
+  if (status != 0)
+  {
+    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}", lua_tostring(L, -1)));
+    lua_pop(L, 1);
+    return 1;
+  }
+
   return 0;
 }
 

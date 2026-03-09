@@ -27,8 +27,8 @@ private:
   LuaFacade* _facade;
   Scene* _scene;
   ObjectLoader* _loader;
-  lua_State* L;
   EntityBuilder* _builder;
+  lua_State* L;
   WorldBuilder* _wbuilder;
   ComponentRegistry* _registry;
 

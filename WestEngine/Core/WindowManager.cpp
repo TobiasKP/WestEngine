@@ -1,5 +1,6 @@
 #include "../CoreHeaders/WindowManager.h"
 
+#include "../Constants/LuaAPI.hpp"
 #include "../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
 #include "../CoreHeaders/Utils/InputUtils/MouseCallbacks.h"
 
@@ -133,6 +134,7 @@ std::int32_t WindowManager::init()
   glfwSetCursorEnterCallback(_window, MouseCallbacks::enterCallback);
   glfwSetMouseButtonCallback(_window, MouseCallbacks::mouseButtonCallback);
   glfwSetScrollCallback(_window, MouseCallbacks::scrollCallback);
+  LuaFacade::getLuaFacadeInstance().registerCFunction(getResolution, LuaAPI::C_GET_RESOLUTION.data(), this);
 
 #ifdef DEBUG
   logDebug(std::format("{}: initialized with \n\t\tWidth: {}\n\t\tHeight: {}\n", getName(), getWidth(), getHeight()));
@@ -188,4 +190,11 @@ bool WindowManager::isKeyPressed(std::int32_t keyCode)
 {
   assert(keyCode > -1);
   return glfwGetKey(_window, keyCode) == GLFW_PRESS;
+}
+
+int WindowManager::getResolution(lua_State* L)
+{
+  lua_pushnumber(L, Config::GeneralConfig.HEIGHT);
+  lua_pushnumber(L, Config::GeneralConfig.WIDTH);
+  return 2;
 }

@@ -50,6 +50,10 @@ IElement* ElementFactory::createElementInternal(ElementProxy* e)
       result = new DropDown();
       fillDropdown(e, (DropDown*)result);
       break;
+    case PROGESS_BAR:
+      result = new ProgressBar();
+      fillProgressBar(e, (ProgressBar*)result);
+      break;
     default:
       result = new DebugElement();
       fillBasicInfos(e, result);
@@ -68,6 +72,17 @@ IElement* ElementFactory::createElementInternal(ElementProxy* e)
   }
 
   return result;
+}
+
+void ElementFactory::fillProgressBar(ElementProxy* ep, ProgressBar* p)
+{
+  fillBasicInfos(ep, p);
+  p->progress         = new Label();
+  p->progresPerc      = ep->progress;
+  p->progress->zIndex = 15;
+  fillBasicInfos(ep, p->progress);
+  registerElementValue(ep, p);
+  p->zIndex = 15;
 }
 
 void ElementFactory::fillTexture(ElementProxy* ep, IElement* el)

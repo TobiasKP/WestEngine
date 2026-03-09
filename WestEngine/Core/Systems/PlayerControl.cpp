@@ -13,7 +13,7 @@ PlayerControl::PlayerControl(WestLogger* logger) : ISystem(), _logger(logger), _
   _movementInitiated.store(false);
   _cleared = false;
 #ifdef DEBUG
-  _logger->log(Level::Info, std::format("{} *** Initialized debug information", getName()));
+  _logger->log(Level::Info, std::format("{} *** Initialized debug information\n", getName()));
   _camLog = true;
 #endif
 };
