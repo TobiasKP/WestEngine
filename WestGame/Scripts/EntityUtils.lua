@@ -5,8 +5,8 @@ local uimanager = require("GameUIRegistry")
 local root = debug.getinfo(1, 'S').source:sub(2):gsub("[^/]+$", "")
 
 local playerHealthUI = {
-  { type = 1, position = { x = 0, y = 0, stretchX = 0.75, stretchY = 0.75 }, color = { r = 215, g = 207, b = 196, a = 1.0 }, gridPosition = { row = 0, column = 0, count = 2 }, text = "" },
-  { type = 7, position = { x = 0, y = 0, stretchX = 1.0, stretchY = 0.75 }, color = { r = 142, g = 59, b = 70, a = 1.0 },   gridPosition = { row = 0, column = 0, count = 10 }, progress = 100 }
+  { type = 1, position = { x = 0, y = 0, stretchX = 0.75, stretchY = 0.75 }, color = { r = 215, g = 207, b = 196, a = 1.0 }, gridPosition = { row = 0, column = 0, count = 2 },  text = "" },
+  { type = 7, position = { x = 0, y = 0, stretchX = 1.0, stretchY = 0.75 },  color = { r = 142, g = 59, b = 70, a = 1.0 },   gridPosition = { row = 0, column = 0, count = 10 }, progress = 100 }
 };
 
 local npcHealthUI = "";
@@ -42,11 +42,20 @@ local function interpreteData(data, source)
       playerHealthUI[2].position.x = x;
       playerHealthUI[2].position.y = y;
       local id = createInterface(playerHealthUI, x, y, 10, 0.75, 0.5, 1, 1, false)
-      uimanager.register(id, playerHealthUI, { function(w, h)
-        local newX = w - 10 * 40 - 10
-        local newY = 60
-        return newX, newY
-      end, 10, 0.75, 0.5, 1, 1, false })
+      uimanager.register(id, playerHealthUI, {
+        function(w, h)
+          local newX = w - 10 * 40 - 10
+          local newY = 60
+          return newX, newY
+        end,
+        10,
+        0.75,
+        0.5,
+        1,
+        1,
+        false,
+        parent = "playercontrol"
+      })
     end
   else
     --createInterface(npcHealthUI)

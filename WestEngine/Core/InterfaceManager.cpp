@@ -220,8 +220,9 @@ int InterfaceManager::updateInterfaceValue(lua_State* L)
 {
   InterfaceManager* me = (InterfaceManager*)lua_touserdata(L, lua_upvalueindex(1));
   std::uint16_t id     = lua_tointeger(L, 1);
-  std::string value    = lua_tostring(L, 2);
-  me->_facade->notify(id, 0x08, value);
+  std::uint8_t event   = lua_tointeger(L, 2);
+  std::string value    = lua_tostring(L, 3);
+  me->_facade->notify(id, event, value);
   return 0;
 };
 
