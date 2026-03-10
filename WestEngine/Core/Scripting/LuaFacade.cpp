@@ -79,7 +79,9 @@ bool LuaFacade::onTileClicked(std::int32_t calleeId, MouseAction m, glm::vec3 de
   }
   if (!lua_isfunction(L, -1))
   {
-    _logger->log(Level::Info, "Lua State ::: function for called action is not defined.\n");
+    _logger->log(Level::Info,
+                 std::format("Lua State ::: function for called action: {} is not defined.\n",
+                             m == LMOUSE_CLICK ? LuaAPI::WORLD_POS_LCLICK : LuaAPI::WORLD_POS_RCLICK));
     lua_pop(L, 1);
     return 1;
   }
@@ -100,6 +102,33 @@ bool LuaFacade::onTileClicked(std::int32_t calleeId, MouseAction m, glm::vec3 de
 bool LuaFacade::onEntityClicked(std::int32_t calleeId, MouseAction m, std::int32_t entity_id)
 {
   assert(calleeId > 0 && entity_id >= 0);
+  if (m == LMOUSE_CLICK)
+  {
+    lua_getglobal(L, LuaAPI::ENTITY_LCLICK.data());
+  }
+  else if (m == RMOUSE_CLICK)
+  {
+    lua_getglobal(L, LuaAPI::ENTITY_RCLICK.data());
+  }
+  if (!lua_isfunction(L, -1))
+  {
+    _logger->log(Level::Info,
+                 std::format("Lua State ::: function for called action is not defined.\n",
+                             m == LMOUSE_CLICK ? LuaAPI::ENTITY_LCLICK : LuaAPI::ENTITY_RCLICK));
+    lua_pop(L, 1);
+    return 1;
+  }
+
+  lua_pushinteger(L, calleeId);
+  lua_pushinteger(L, entity_id);
+  std::int32_t status = lua_pcall(L, 4, 0, 0);
+  if (status != 0)
+  {
+    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}", lua_tostring(L, -1)));
+    lua_pop(L, 1);
+    return 1;
+  }
+
   return 0;
 }
 

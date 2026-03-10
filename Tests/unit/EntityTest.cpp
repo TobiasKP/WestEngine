@@ -1,5 +1,5 @@
-#include <gtest/gtest.h>
 #include <Entity/Entity.h>
+#include <gtest/gtest.h>
 
 struct TestComponent : public IComponent
 {

@@ -49,11 +49,11 @@ void MovementSystem::moveToDestination(std::uint32_t id, Position* posComp, Move
 {
   if (!destinationReached(posComp, movComp))
   {
-    updatePosition(movComp->destination, posComp);
+    updatePosition(movComp->destination, posComp, id);
   }
   else
   {
-    bool result = LuaFacade::getLuaFacadeInstance().onStateChange(id, LuaFacade::LuaStates::IDLE);
+    bool result = LuaFacade::getLuaFacadeInstance().onStateChange(id, LuaFacade::LuaStates::MOVING_FINISHED);
     if (result)
     {
       _logger->log(Level::Info,
@@ -89,17 +89,21 @@ bool MovementSystem::destinationReached(Position* posComp, Movement* movComp)
   return reached;
 }
 
-void MovementSystem::updatePosition(glm::vec3 local, Position* posComp)
+void MovementSystem::updatePosition(glm::vec3 local, Position* posComp, std::uint32_t id)
 {
   assert(posComp != nullptr);
   glm::vec3 direction = local - posComp->position;
+
   if (glm::length2(direction) <= 0.025f)
   {
     posComp->position = local;
-    return;
   }
-  direction          = glm::normalize(direction) * Config::GeneralConfig.SPEED * Config::GeneralConfig.DELTA;
-  posComp->position += direction;
+  else
+  {
+    direction          = glm::normalize(direction) * Config::GeneralConfig.SPEED * Config::GeneralConfig.DELTA;
+    posComp->position += direction;
+  }
+  Scene::getSceneInstance().getWorld()->addEntityIdToIdx(posComp->position.x, posComp->position.z, id);
 }
 
 void MovementSystem::updateDebuggingInfo() {}

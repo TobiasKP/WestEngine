@@ -191,10 +191,9 @@ void RenderManager::renderWorld()
   glUseProgram(shaderProgramId);
 
   Material* mat = reg->getComponent<Material>(world->getId());
-  if (mat != nullptr && mat->dirty && mat->diffuseColorUniform > -1)
+  if (mat != nullptr  && mat->diffuseColorUniform > -1)
   {
-    UniformUtils::setUniform(mat->diffuseColorUniform, mat->diffuseColor);
-    mat->dirty = false;
+    UniformUtils::setUniform(mat->diffuseColorUniform, mat->diffuseColor); 
   }
 
   Model* model = reg->getComponent<Model>(world->getId());
@@ -357,9 +356,16 @@ void RenderManager::updateUniforms(const Entity& e, Model* model, Material* mate
   }
 #endif
 
-  if (!e.isDebugEntity() && material != nullptr && material->diffuseColorUniform > -1)
+  if (!e.isDebugEntity() && material != nullptr)
   {
-    UniformUtils::setUniform(material->diffuseColorUniform, material->diffuseColor);
+    if (material->diffuseColorUniform > -1)
+    {
+      UniformUtils::setUniform(material->diffuseColorUniform, material->diffuseColor);
+    }
+    if (material->emissiveColorUniform > -1)
+    {
+      UniformUtils::setUniform(material->emissiveColorUniform, material->emissiveColor);
+    }
   }
 
 

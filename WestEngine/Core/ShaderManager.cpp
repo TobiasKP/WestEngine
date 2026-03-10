@@ -306,7 +306,8 @@ void ShaderManager::addUniforms(GLuint programId, const Entity& entity)
 
   if (m != nullptr && !entity.isDebugEntity() && m2 != nullptr)
   {
-    m2->diffuseColorUniform = UniformUtils::createUniform(UniformConstants::COLOR, programId);
+    m2->diffuseColorUniform  = UniformUtils::createUniform(UniformConstants::COLOR, programId);
+    m2->emissiveColorUniform = UniformUtils::createUniform(UniformConstants::ECOLOR, programId);
   }
 
 #ifdef DEBUG

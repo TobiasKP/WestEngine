@@ -14,6 +14,8 @@ public:
   std::int32_t calculateIndex(double x, double y);
   std::vector<std::int32_t>
   getReachableTiles(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a, void* callee);
+  void addEntityIdToIdx(float x, float y, std::uint32_t id);
+  std::uint32_t getEntityByIdx(std::int32_t idx);
   void clearFlag(std::uint32_t flag);
   void setFlag(std::uint32_t flag, std::int32_t idx);
   void resetDirty()
@@ -71,7 +73,6 @@ public:
     _uGridOrigin = u;
   }
 
-
 private:
   std::mutex _mutex;
   std::uint32_t _dimension, _tileSize;
@@ -79,5 +80,7 @@ private:
   glm::vec2 _origin;
   std::vector<std::uint32_t> _vflags;
   GLuint _ugridSize, _utileFlags, _uGridOrigin;
+  std::unordered_map<std::int32_t, std::uint32_t> _idxToEntityId;
+  std::unordered_map<std::uint32_t, std::int32_t> _entityIdToIdx;
   std::atomic<bool> _dirty;
 };

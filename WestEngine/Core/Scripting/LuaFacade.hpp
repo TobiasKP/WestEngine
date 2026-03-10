@@ -10,7 +10,7 @@ class LuaFacade
 {
 public:
   enum MouseAction { LMOUSE_CLICK, RMOUSE_CLICK, MMOUSE_CLICK };
-  enum LuaStates { IDLE, MOVING };
+  enum LuaStates { IDLE, MOVING, MOVING_FINISHED, INSPECTING, ACTION };
 
   static LuaFacade& getLuaFacadeInstance();
   void shutdown();

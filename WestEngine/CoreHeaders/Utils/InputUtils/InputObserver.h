@@ -14,6 +14,7 @@ public:
   ~InputObserver() {};
 
   void notify();
+  void entityHovering();
 
   void setControlFlag(std::uint8_t flag)
   {
@@ -26,6 +27,12 @@ public:
     std::lock_guard<std::mutex> lock(_controlMutex);
     _controlFlags |= flag;
     _y             = yOffset;
+  }
+
+  void setTileIdx(std::uint16_t tile)
+  {
+    std::lock_guard<std::mutex> lock(_controlMutex);
+    _tileIdx = tile;
   }
 
   void setControlFlag(std::uint8_t flag, std::uint16_t interfaceId)
@@ -48,14 +55,7 @@ public:
     _controlFlags |= flag;
     _x             = x;
     _z             = z;
-  }
-
-  void setControlFlag(std::uint8_t flag, glm::vec3 dest)
-  {
-    std::lock_guard<std::mutex> lock(_controlMutex);
-    _controlFlags      |= flag;
-    _playerDestination  = dest;
-  }
+  } 
 
   void setGeneralFlag(std::uint8_t flag)
   {
@@ -64,11 +64,10 @@ public:
   }
 
 private:
-  double _x, _z, _y;
-  glm::vec3 _playerDestination;
+  double _x, _z, _y; 
   PlayerControl* _control;
   WestInterface::WestInterfaceFacade* _facade;
-  std::int16_t _interfaceHoverId, _interfaceUnhoverId = -1;
+  std::int16_t _interfaceHoverId, _interfaceUnhoverId, _tileIdx, _lastEntityHover = -1;
   std::mutex _controlMutex, _generalMutex;
   std::uint8_t _controlFlags{0b0000'0000}, _generalFlags{0b0000'0000};
 };

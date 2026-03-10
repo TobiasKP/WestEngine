@@ -17,14 +17,21 @@ function Worldpos_lclick(id, x, y, z)
   end
 end
 
+function Entity_lclick(id, entity)
+end
+
+function Entity_rclick(id, entity)
+end
+
 function StateChange(id, state)
   if DEBUG then
     print(playerB.getCurrentState());
     print(state);
   end
   playerB.setState(state);
-  if (state == playerB.IDLE) then
+  if state == playerB.MOVING_FINISHED then
     ActionFinished(id);
+    playerB.setState(playerB.IDLE)
   end
 end
 

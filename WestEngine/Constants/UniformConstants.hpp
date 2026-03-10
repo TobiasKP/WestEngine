@@ -5,6 +5,7 @@ namespace UniformConstants
 
 inline constexpr const char* DCOLOR                = "ddColor";
 inline constexpr const char* COLOR                 = "dColor";
+inline constexpr const char* ECOLOR                = "keColor";
 inline constexpr const char* TEXTURE_SAMPLER       = "textureSampler";
 inline constexpr const char* FONT_TEXTURE_SAMPLER  = "fontTextureSampler";
 inline constexpr const char* TRANSFORMATION_MATRIX = "transformationMatrix";

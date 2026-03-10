@@ -77,6 +77,32 @@ void World::setFlag(std::uint32_t flag, std::int32_t idx)
   _dirty.store(true, std::memory_order_relaxed);
 }
 
+void World::addEntityIdToIdx(float x, float y, std::uint32_t id)
+{
+  if (_entityIdToIdx.contains(id))
+  {
+    std::uint16_t tile = _entityIdToIdx[id];
+    _idxToEntityId.erase(tile);
+    _entityIdToIdx.erase(id);
+  }
+  std::int32_t tile = calculateIndex(x, y);
+  if (tile != -1)
+  {
+    _idxToEntityId[tile] = id;
+    _entityIdToIdx[id]   = tile;
+  }
+}
+
+std::uint32_t World::getEntityByIdx(std::int32_t idx)
+{
+  if (_idxToEntityId.contains(idx))
+  {
+    return _idxToEntityId[idx];
+  }
+  return 0;
+}
+
+
 std::vector<std::int32_t>
 World::getReachableTiles(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a, void* callee)
 {
