@@ -36,4 +36,6 @@ private:
   void removeEntityFromScene(const Entity& entity);
   void deleteScene();
   void loadNewScene() {};
+
+  static int getHealth(lua_State*);
 };

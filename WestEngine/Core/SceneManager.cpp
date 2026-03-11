@@ -1,5 +1,6 @@
 #include "../CoreHeaders/SceneManager.h"
 
+#include "../Constants/LuaAPI.hpp"
 #include "../CoreHeaders/Entity/Camera.h"
 
 #include <filesystem>
@@ -74,6 +75,7 @@ std::int32_t SceneManager::init()
   _registry->registerComponent<AABB>();
   _registry->registerComponent<Control>();
   _registry->registerComponent<Health>();
+  _facade->registerCFunction(getHealth, LuaAPI::C_GETHEALTH.data(), this);
   _scene->init();
 
   std::string filePath = PathUtils::resolve(CoreConstants::LUA_INIT_FILE.data());
@@ -157,4 +159,13 @@ void SceneManager::deleteScene()
 #ifdef DEBUG
   logDebug(std::format("{} ### Deleted Scene\n", getName()));
 #endif
+}
+
+int SceneManager::getHealth(lua_State* L)
+{
+  SceneManager* me     = (SceneManager*)lua_touserdata(L, lua_upvalueindex(1));
+  std::uint32_t id     = lua_tointeger(L, 1);
+  std::uint16_t health = me->_registry->getComponent<Health>(id)->current;
+  lua_pushinteger(L, health);
+  return 1;
 }

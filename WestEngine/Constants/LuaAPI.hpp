@@ -23,6 +23,9 @@ constexpr std::string_view C_ADD_COMPONENT = "addComponent";
 constexpr std::string_view C_BUILD_ENTITY  = "buildEntity";
 constexpr std::string_view C_LOAD_WORLD    = "loadWorld";
 
+// Entity Information
+constexpr std::string_view C_GETHEALTH = "getHealth";
+
 // General Calls
 constexpr std::string_view C_GET_RESOLUTION    = "getScreenResolution";
 constexpr std::string_view C_CREATE_INTERFACE  = "createInterface";

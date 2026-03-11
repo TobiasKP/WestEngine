@@ -74,7 +74,14 @@ void InputObserver::notify()
       }
     }
     if (static_cast<bool>(_controlFlags & BitMasks::Control::RCLICK))
-    {}
+    {
+      World* w         = Scene::getSceneInstance().getWorld();
+      std::uint32_t id = w->getEntityByIdx(_tileIdx);
+      if (id > 0)
+      {
+        LuaFacade::getLuaFacadeInstance().onEntityClicked(1, LuaFacade::MouseAction::RMOUSE_CLICK, id);
+      }
+    }
 
     if (static_cast<bool>(_controlFlags & BitMasks::Control::CAMERA_ZOOM))
     {
@@ -92,7 +99,7 @@ void InputObserver::notify()
 
 void InputObserver::entityHovering()
 {
-  //TODO duplicated code here and in LCLICK
+  // TODO duplicated code here and in LCLICK
   World* w         = Scene::getSceneInstance().getWorld();
   std::uint32_t id = w->getEntityByIdx(_tileIdx);
   Material* m;

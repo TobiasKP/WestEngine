@@ -121,7 +121,7 @@ bool LuaFacade::onEntityClicked(std::int32_t calleeId, MouseAction m, std::int32
 
   lua_pushinteger(L, calleeId);
   lua_pushinteger(L, entity_id);
-  std::int32_t status = lua_pcall(L, 4, 0, 0);
+  std::int32_t status = lua_pcall(L, 2, 0, 0);
   if (status != 0)
   {
     _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}", lua_tostring(L, -1)));

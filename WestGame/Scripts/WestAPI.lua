@@ -21,6 +21,9 @@ function Entity_lclick(id, entity)
 end
 
 function Entity_rclick(id, entity)
+  local health = getHealth(entity);
+  print(health)
+  --TODO get Health from component and display in UI
 end
 
 function StateChange(id, state)
