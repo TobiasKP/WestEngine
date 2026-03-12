@@ -14,17 +14,21 @@ GLuint RenderManager::_usedShaderProgram = 0;
 RenderManager::RenderManager() : IManager(nullptr)
 {
   setName(CoreConstants::RENDER_MANAGER);
+#ifdef DEBUG
   _debugUtils = new DebugDrawUtils(nullptr);
-  _facade     = nullptr;
-  _scene      = nullptr;
+#endif
+  _facade = nullptr;
+  _scene  = nullptr;
 }
 
 RenderManager::RenderManager(WestLogger* logger) : IManager(logger)
 {
   setName(CoreConstants::RENDER_MANAGER);
+#ifdef DEBUG
   _debugUtils = new DebugDrawUtils(logger);
-  _facade     = nullptr;
-  _scene      = nullptr;
+#endif
+  _facade = nullptr;
+  _scene  = nullptr;
 }
 
 RenderManager::~RenderManager() {}
@@ -191,9 +195,9 @@ void RenderManager::renderWorld()
   glUseProgram(shaderProgramId);
 
   Material* mat = reg->getComponent<Material>(world->getId());
-  if (mat != nullptr  && mat->diffuseColorUniform > -1)
+  if (mat != nullptr && mat->diffuseColorUniform > -1)
   {
-    UniformUtils::setUniform(mat->diffuseColorUniform, mat->diffuseColor); 
+    UniformUtils::setUniform(mat->diffuseColorUniform, mat->diffuseColor);
   }
 
   Model* model = reg->getComponent<Model>(world->getId());
