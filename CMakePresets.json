@@ -347,5 +347,31 @@
       "configuration": "Debug",
       "cleanFirst": true
     }
+  ],
+  "testPresets": [
+    {
+      "name": "linux-debug-tests",
+      "configurePreset": "linux-debug-tests",
+      "output": {
+        "outputOnFailure": true
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "windows-debug-tests",
+      "configurePreset": "windows-debug-tests",
+      "output": {
+        "outputOnFailure": true
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    }
   ]
 }
