@@ -6,6 +6,7 @@
 #include <io.h>
 #endif
 
+#include <format>
 #include <filesystem>
 #include <WestLogger.h>
 
