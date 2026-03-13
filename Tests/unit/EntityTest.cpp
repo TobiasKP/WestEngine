@@ -1,10 +1,6 @@
-<<<<<<< HEAD
-=======
-#include <Entity/Entity.h>
 #include <Components/ComponentRegistry.hpp>
->>>>>>> f99c998 ([000] intermediate test fixes)
-#include <gtest/gtest.h>
 #include <Entity/Entity.h>
+#include <gtest/gtest.h>
 
 struct TestComponent
 {
