@@ -26,6 +26,7 @@ if(BUILD_CORE)
 endif()
 
 if(BUILD_TESTS)
+  enable_testing()
   add_subdirectory(Tests/)
 endif()
 
