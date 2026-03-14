@@ -39,7 +39,7 @@ int EntityBuilder::addComponent(lua_State* L)
 
 int EntityBuilder::buildEntity(lua_State* L)
 {
-  EntityBuilder* me = EntityBuilder::retrieveMeFromStack(L);
+  EntityBuilder* me = EntityBuilder::retrieveMeFromStack(L); 
   Scene::getSceneInstance().addEntity(std::move(me->_e));
   return 0;
 }

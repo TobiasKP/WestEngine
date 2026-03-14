@@ -63,9 +63,24 @@ void InputObserver::notify()
       _z = 0;
     }
 
-    if (static_cast<bool>(_controlFlags & BitMasks::Control::PLAYER_MOVING))
+    if (static_cast<bool>(_controlFlags & BitMasks::Control::LCLICK))
     {
-      _control->passDestinationPosition(_playerDestination);
+      World* w                             = Scene::getSceneInstance().getWorld();
+      std::uint32_t id                     = w->getEntityByIdx(_tileIdx);
+      std::optional<glm::vec3> destination = w->tileToWorldPos(_tileIdx);
+      if (destination.has_value() && id == 0)
+      {
+        _control->passDestinationPosition(destination.value());
+      }
+    }
+    if (static_cast<bool>(_controlFlags & BitMasks::Control::RCLICK))
+    {
+      World* w         = Scene::getSceneInstance().getWorld();
+      std::uint32_t id = w->getEntityByIdx(_tileIdx);
+      if (id > 0)
+      {
+        LuaFacade::getLuaFacadeInstance().onEntityClicked(1, LuaFacade::MouseAction::RMOUSE_CLICK, id);
+      }
     }
 
     if (static_cast<bool>(_controlFlags & BitMasks::Control::CAMERA_ZOOM))
@@ -74,7 +89,29 @@ void InputObserver::notify()
       _y = 0;
     }
 
+    entityHovering();
+
+
     _interfaceHoverId = _interfaceUnhoverId = -1;
     _controlFlags                           = {0b0000'0000};
+  }
+}
+
+void InputObserver::entityHovering()
+{
+  // TODO duplicated code here and in LCLICK
+  World* w         = Scene::getSceneInstance().getWorld();
+  std::uint32_t id = w->getEntityByIdx(_tileIdx);
+  Material* m;
+  if (_lastEntityHover != -1)
+  {
+    m                = Scene::getSceneInstance().getRegistry()->getComponent<Material>(_lastEntityHover);
+    m->emissiveColor = glm::vec3(0.0, 0.0, 0.0);
+  }
+  if (id > 0)
+  {
+    m                = Scene::getSceneInstance().getRegistry()->getComponent<Material>(id);
+    m->emissiveColor = glm::vec3(0.0, 0.5, 0.5);
+    _lastEntityHover = id;
   }
 }

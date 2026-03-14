@@ -4,3 +4,4 @@
 #include "Icon.hpp"
 #include "Label.hpp"
 #include "DropDown.hpp"
+#include "ProgressBar.hpp"

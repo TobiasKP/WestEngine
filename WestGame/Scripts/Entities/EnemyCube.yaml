@@ -1,0 +1,7 @@
+name: "EnemyCube"
+model: "Cube.obj"
+shader: { v: "Vertex.vs", f: "Fragment.fs" , group: 0 }
+components: 
+  - { name: "position", x: -1.5, y: 0, z: -1.5 }
+  - { name: "movement", r: 2, a: 0 }
+  - { name: "health", m: 100, c: 100 }

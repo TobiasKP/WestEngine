@@ -45,18 +45,20 @@ std::optional<glm::vec3> World::tileToWorldPos(std::int32_t idx)
   }
   std::int32_t column = idx % _dimension;
   std::int32_t row    = idx / _dimension;
-  return glm::vec3(column + 0.5, 0, row + 0.5);
+  return glm::vec3(column + 0.5 + _origin.x, 0, row + 0.5 + _origin.y);
 }
 
 std::int32_t World::calculateIndex(double x, double y)
 {
-  if (x < 0 || x >= _dimension || y < 0 || y >= _dimension)
+  double localX = x - _origin.x;
+  double localY = y - _origin.y;
+  if (localX < 0 || localX >= _dimension || localY < 0 || localY >= _dimension)
   {
     return -1;
   }
   else
   {
-    return std::int32_t(std::floor(x) + std::floor(y) * _dimension);
+    return std::int32_t(std::floor(localX) + std::floor(localY) * _dimension);
   }
 }
 
@@ -74,6 +76,32 @@ void World::setFlag(std::uint32_t flag, std::int32_t idx)
   _vflags[idx] |= flag;
   _dirty.store(true, std::memory_order_relaxed);
 }
+
+void World::addEntityIdToIdx(float x, float y, std::uint32_t id)
+{
+  if (_entityIdToIdx.contains(id))
+  {
+    std::uint16_t tile = _entityIdToIdx[id];
+    _idxToEntityId.erase(tile);
+    _entityIdToIdx.erase(id);
+  }
+  std::int32_t tile = calculateIndex(x, y);
+  if (tile != -1)
+  {
+    _idxToEntityId[tile] = id;
+    _entityIdToIdx[id]   = tile;
+  }
+}
+
+std::uint32_t World::getEntityByIdx(std::int32_t idx)
+{
+  if (_idxToEntityId.contains(idx))
+  {
+    return _idxToEntityId[idx];
+  }
+  return 0;
+}
+
 
 std::vector<std::int32_t>
 World::getReachableTiles(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a, void* callee)

@@ -9,6 +9,7 @@
 
 #include <cstring>
 #include <format>
+#include <iostream>
 #include <PathUtils.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -150,16 +151,14 @@ void EngineManager::update()
       success = iterateQ(CYCLE::UPDATE);
       frames++;
     }
-    else
+
+    double remainingTime = _FRAMETIME - delta;
+    if (remainingTime >= Config::GeneralConfig.EPSILON)
     {
-      double remainingTime = _FRAMETIME - delta;
-      if (remainingTime >= Config::GeneralConfig.EPSILON)
+      std::int32_t sleepMs = static_cast<std::int32_t>(remainingTime * 1000) - 1;
+      if (sleepMs > 0)
       {
-        std::int32_t sleepMs = static_cast<std::int32_t>(remainingTime * 1000) - 1;
-        if (sleepMs > 0)
-        {
-          std::this_thread::sleep_for(std::chrono::milliseconds(sleepMs));
-        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(sleepMs));
       }
     }
 

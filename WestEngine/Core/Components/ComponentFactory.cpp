@@ -2,6 +2,7 @@
 
 #include "../../Constants/Components.hpp"
 #include "../../CoreHeaders/Components/Umbrella.h"
+#include "../../CoreHeaders/Entity/Scene.h"
 
 #include <format>
 
@@ -35,6 +36,22 @@ void ComponentFactory::createComponent(lua_State* L, std::string& name, Entity& 
   {
     addPlayerControl(L, e);
   }
+  else if (Components::HEALTH.compare(name) == 0)
+  {
+    addHealth(L, e);
+  }
+}
+
+void ComponentFactory::addHealth(lua_State* L, Entity& e)
+{
+  Health h = {};
+  lua_getfield(L, 2, "m");
+  h.max = lua_tointeger(L, -1);
+  lua_pop(L, 1);
+  lua_getfield(L, 2, "c");
+  h.current = lua_tointeger(L, -1);
+  lua_pop(L, 1);
+  _registry->addComponent<Health>(e.getId(), std::move(h));
 }
 
 void ComponentFactory::addPlayerControl(lua_State* L, Entity& e)
@@ -61,6 +78,7 @@ void ComponentFactory::addPosition(lua_State* L, Entity& e)
   p.scale    = 1.0f;
   p.rotation = glm::vec3(1.0f);
   _registry->addComponent<Position>(e.getId(), std::move(p));
+  Scene::getSceneInstance().getWorld()->addEntityIdToIdx(p.position.x, p.position.z, e.getId());
 };
 
 void ComponentFactory::addMovement(lua_State* L, Entity& e)

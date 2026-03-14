@@ -16,6 +16,8 @@ public:
   std::int32_t calculateIndex(double x, double y);
   std::vector<std::int32_t>
   getReachableTiles(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a, void* callee);
+  void addEntityIdToIdx(float x, float y, std::uint32_t id);
+  std::uint32_t getEntityByIdx(std::int32_t idx);
   void clearFlag(std::uint32_t flag);
   void setFlag(std::uint32_t flag, std::int32_t idx);
   void resetDirty()
@@ -31,20 +33,27 @@ public:
   {
     return _ugridSize;
   }
+  inline GLuint getGridOriginUniform()
+  {
+    return _uGridOrigin;
+  }
   inline std::int32_t getGridSize()
   {
     return _dimension;
+  }
+  inline bool isDirty()
+  {
+    return _dirty;
+  }
+  inline glm::vec2& getOrigin()
+  {
+    return _origin;
   }
   std::vector<std::uint32_t>& getFlagData()
   {
     std::lock_guard<std::mutex> lock(_mutex);
     return _vflags;
   }
-  inline bool isDirty()
-  {
-    return _dirty;
-  }
-
   void setCreationInformation(std::uint32_t d, std::uint32_t s, glm::vec2 o)
   {
     _dimension = d;
@@ -61,7 +70,10 @@ public:
   {
     _ugridSize = u;
   }
-
+  inline void setGridOriginUniform(GLuint u)
+  {
+    _uGridOrigin = u;
+  }
 
 private:
   std::mutex _mutex;
@@ -69,6 +81,8 @@ private:
   std::int32_t _lastIdx;
   glm::vec2 _origin;
   std::vector<std::uint32_t> _vflags;
-  GLuint _ugridSize, _utileFlags;
+  GLuint _ugridSize, _utileFlags, _uGridOrigin;
+  std::unordered_map<std::int32_t, std::uint32_t> _idxToEntityId;
+  std::unordered_map<std::uint32_t, std::int32_t> _entityIdToIdx;
   std::atomic<bool> _dirty;
 };

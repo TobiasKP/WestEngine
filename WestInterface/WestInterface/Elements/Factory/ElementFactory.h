@@ -5,6 +5,7 @@
 #include "../../Observer/ValueObserver.h"
 #include "../DropDown.hpp"
 #include "../IElement.hpp"
+#include "../ProgressBar.hpp"
 
 class ElementFactory
 {
@@ -29,6 +30,7 @@ private:
   void fillText(WestInterface::ElementProxy* ep, IElement* el);
   void fillTexture(WestInterface::ElementProxy* ep, IElement* el);
   void fillDropdown(WestInterface::ElementProxy* ep, DropDown* d);
+  void fillProgressBar(WestInterface::ElementProxy* ep, ProgressBar* p);
 
   ValueObserver* _vObserver;
   EventObserver* _eObserver;

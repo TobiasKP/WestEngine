@@ -1,5 +1,6 @@
 #include "../CoreHeaders/SceneManager.h"
 
+#include "../Constants/LuaAPI.hpp"
 #include "../CoreHeaders/Entity/Camera.h"
 
 #include <filesystem>
@@ -12,10 +13,10 @@ SceneManager::SceneManager() : IManager(nullptr)
   setName(CoreConstants::SCENE_MANAGER);
   _scene    = nullptr;
   _loader   = nullptr;
-  L         = nullptr;
   _builder  = nullptr;
   _wbuilder = nullptr;
   _registry = nullptr;
+  L         = nullptr;
 }
 
 SceneManager::SceneManager(WestLogger* logger) : IManager(logger)
@@ -23,10 +24,10 @@ SceneManager::SceneManager(WestLogger* logger) : IManager(logger)
   setName(CoreConstants::SCENE_MANAGER);
   _scene    = nullptr;
   _loader   = nullptr;
-  L         = nullptr;
   _builder  = nullptr;
   _wbuilder = nullptr;
   _registry = nullptr;
+  L         = nullptr;
 }
 
 SceneManager::~SceneManager() {}
@@ -45,7 +46,7 @@ std::int32_t SceneManager::startup()
 
   _builder  = new EntityBuilder(L, _loader, _registry);
   _wbuilder = new WorldBuilder(_registry, _loader, L);
-  assert(_loader != nullptr && _scene != nullptr && L != nullptr && _builder != nullptr);
+  assert(_loader != nullptr && _scene != nullptr && _wbuilder != nullptr && _builder != nullptr);
 #ifdef DEBUG
   logDebug(std::format("{} ### instantiated Lua state\n", getName()));
 #endif
@@ -73,6 +74,8 @@ std::int32_t SceneManager::init()
   _registry->registerComponent<Position>();
   _registry->registerComponent<AABB>();
   _registry->registerComponent<Control>();
+  _registry->registerComponent<Health>();
+  _facade->registerCFunction(getHealth, LuaAPI::C_GETHEALTH.data(), this);
   _scene->init();
 
   std::string filePath = PathUtils::resolve(CoreConstants::LUA_INIT_FILE.data());
@@ -81,7 +84,6 @@ std::int32_t SceneManager::init()
     logFailure(std::format("{} ### Lua init file: {} - not found! Aborting Scene init ", getName(), filePath));
     return 1;
   }
-
   luaL_dofile(L, filePath.c_str());
   lua_getglobal(L, "Init");
   lua_call(L, 0, 0);
@@ -157,4 +159,13 @@ void SceneManager::deleteScene()
 #ifdef DEBUG
   logDebug(std::format("{} ### Deleted Scene\n", getName()));
 #endif
+}
+
+int SceneManager::getHealth(lua_State* L)
+{
+  SceneManager* me     = (SceneManager*)lua_touserdata(L, lua_upvalueindex(1));
+  std::uint32_t id     = lua_tointeger(L, 1);
+  std::uint16_t health = me->_registry->getComponent<Health>(id)->current;
+  lua_pushinteger(L, health);
+  return 1;
 }

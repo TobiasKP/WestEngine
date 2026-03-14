@@ -28,7 +28,17 @@ void ValueObserver::handleEvent(
     recalcText(e, value);
     executeElement(e);
   }
+  if (event & 0x10)
+  {
+    setProgress((ProgressBar*)e, value);
+    executeElement(e);
+  }
 };
+
+void ValueObserver::setProgress(ProgressBar* p, std::string& value)
+{
+  p->progresPerc = stoi(value);
+}
 
 
 void ValueObserver::executeElement(IElement* e)

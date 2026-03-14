@@ -14,17 +14,21 @@ GLuint RenderManager::_usedShaderProgram = 0;
 RenderManager::RenderManager() : IManager(nullptr)
 {
   setName(CoreConstants::RENDER_MANAGER);
+#ifdef DEBUG
   _debugUtils = new DebugDrawUtils(nullptr);
-  _facade     = nullptr;
-  _scene      = nullptr;
+#endif
+  _facade = nullptr;
+  _scene  = nullptr;
 }
 
 RenderManager::RenderManager(WestLogger* logger) : IManager(logger)
 {
   setName(CoreConstants::RENDER_MANAGER);
+#ifdef DEBUG
   _debugUtils = new DebugDrawUtils(logger);
-  _facade     = nullptr;
-  _scene      = nullptr;
+#endif
+  _facade = nullptr;
+  _scene  = nullptr;
 }
 
 RenderManager::~RenderManager() {}
@@ -191,10 +195,9 @@ void RenderManager::renderWorld()
   glUseProgram(shaderProgramId);
 
   Material* mat = reg->getComponent<Material>(world->getId());
-  if (mat != nullptr && mat->dirty && mat->diffuseColorUniform > -1)
+  if (mat != nullptr && mat->diffuseColorUniform > -1)
   {
     UniformUtils::setUniform(mat->diffuseColorUniform, mat->diffuseColor);
-    mat->dirty = false;
   }
 
   Model* model = reg->getComponent<Model>(world->getId());
@@ -218,8 +221,10 @@ void RenderManager::renderWorld()
   {
     std::vector<std::uint32_t> flags = world->getFlagData();
     std::int32_t dimension           = world->getGridSize();
+    glm::vec2 origin                 = world->getOrigin();
     UniformUtils::setUniform(world->getFlagUniform(), flags);
     UniformUtils::setUniform(world->getGridUniform(), dimension);
+    UniformUtils::setUniform(world->getGridOriginUniform(), origin);
     world->resetDirty();
   }
 
@@ -355,28 +360,37 @@ void RenderManager::updateUniforms(const Entity& e, Model* model, Material* mate
   }
 #endif
 
-  if (!e.isDebugEntity() && material != nullptr && material->diffuseColorUniform > -1)
+  if (!e.isDebugEntity() && material != nullptr)
   {
-    UniformUtils::setUniform(material->diffuseColorUniform, material->diffuseColor);
+    if (material->diffuseColorUniform > -1)
+    {
+      UniformUtils::setUniform(material->diffuseColorUniform, material->diffuseColor);
+    }
+    if (material->emissiveColorUniform > -1)
+    {
+      UniformUtils::setUniform(material->emissiveColorUniform, material->emissiveColor);
+    }
   }
 
 
-  if (material->dirty && t != nullptr)
+  if (t != nullptr)
   {
     UniformUtils::setUniform(t->uniform, 0);
     assert(t->uniform != -1);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, t->id);
-    material->dirty = false;
   }
 
 
-  if (p != nullptr && p->dirty.load())
+  if (p != nullptr)
   {
-    glm::mat4 transform = PositionCalculation::createTransformationMatrix(p->position, p->rotation, p->scale);
+    if (p->dirty.load())
+    {
+      p->transform = PositionCalculation::createTransformationMatrix(p->position, p->rotation, p->scale);
+      p->dirty.store(false);
+    }
     assert(p->uniform != -1);
-    UniformUtils::setUniform(p->uniform, transform);
-    p->dirty.store(false);
+    UniformUtils::setUniform(p->uniform, p->transform);
   }
 }
 

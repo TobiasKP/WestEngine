@@ -21,5 +21,5 @@ private:
   void moveToDestination(std::uint32_t id, Position* posComp, Movement* movComp);
   void induceMovement(std::uint32_t id, Movement* movComp);
   bool destinationReached(Position* posComp, Movement* movComp);
-  void updatePosition(glm::vec3 local, Position* posComp);
+  void updatePosition(glm::vec3 local, Position* posComp, std::uint32_t id);
 };

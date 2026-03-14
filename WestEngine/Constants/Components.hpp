@@ -13,4 +13,5 @@ inline constexpr std::string_view POSITION        = "position";
 inline constexpr std::string_view MOVEMENT        = "movement";
 inline constexpr std::string_view AABB            = "aabb";
 inline constexpr std::string_view CONTROL         = "playercontrol";
+inline constexpr std::string_view HEALTH          = "health";
 }  // namespace Components

@@ -30,4 +30,5 @@ private:
  *  0x02: unhovered
  *  0x04: clicked left
  *  0x08: value changed
+ *  0x10: progress changed
  * ********************************/

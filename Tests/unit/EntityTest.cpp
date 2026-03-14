@@ -1,5 +1,5 @@
-#include <Components/ComponentRegistry.hpp>
 #include <Entity/Entity.h>
+#include <Components/ComponentRegistry.hpp>
 #include <gtest/gtest.h>
 
 struct TestComponent
