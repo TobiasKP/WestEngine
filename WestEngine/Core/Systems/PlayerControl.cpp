@@ -6,9 +6,10 @@
 #include <Config.h>
 #include <format>
 
-PlayerControl::PlayerControl(WestLogger* logger) : ISystem(), _logger(logger), _cameraPending(false)
+PlayerControl::PlayerControl(WestLogger* logger) : ISystem(), _cameraPending(false)
 {
   setName(Systems::PLAYER_CONTROL);
+  _logger = logger;
 #ifdef DEBUG
   _logger->log(Level::Info, std::format("{} *** Initialized debug information\n", getName()));
   _camLog = true;

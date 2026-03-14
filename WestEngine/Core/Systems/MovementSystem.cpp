@@ -30,7 +30,7 @@ void MovementSystem::update()
       break;
     }
 
-    if (m.destination.x != 0 && m.destination.z != 0 && _state == LuaFacade::LuaStates::MOVING)
+    if (m.destination.has_value() && _state == LuaFacade::LuaStates::MOVING)
     {
       std::uint32_t id  = movements->getEntityIdByIdx(current);
       Position* posComp = _reg->getComponent<Position>(id);
@@ -46,7 +46,7 @@ void MovementSystem::moveToDestination(std::uint32_t id, Position* posComp, Move
 {
   if (!destinationReached(posComp, movComp))
   {
-    updatePosition(movComp->destination, posComp, id);
+    updatePosition(*movComp->destination, posComp, id);
   }
   else
   {
@@ -58,7 +58,7 @@ void MovementSystem::moveToDestination(std::uint32_t id, Position* posComp, Move
                                getName(),
                                (std::int32_t)LuaFacade::LuaStates::IDLE));
     }
-    movComp->destination = glm::vec3(0);
+    movComp->destination.reset();
 #ifdef DEBUG
     movComp->debugInfoDisplayed = false;
     movComp->removeDebugInfo    = true;
@@ -68,7 +68,7 @@ void MovementSystem::moveToDestination(std::uint32_t id, Position* posComp, Move
 
 bool MovementSystem::destinationReached(Position* posComp, Movement* movComp)
 {
-  bool reached = glm::all(glm::epsilonEqual(posComp->position, movComp->destination, Config::GeneralConfig.EPSILON));
+  bool reached = glm::all(glm::epsilonEqual(posComp->position, *movComp->destination, Config::GeneralConfig.EPSILON));
   return reached;
 }
 

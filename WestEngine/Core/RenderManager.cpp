@@ -353,9 +353,9 @@ void RenderManager::updateUniforms(const Entity& e, Model* model, Material* mate
     }
     m->removeDebugInfo = false;
   }
-  else if (m != nullptr && !m->debugInfoDisplayed && (m->destination.x != 0 || m->destination.z != 0))
+  else if (m != nullptr && !m->debugInfoDisplayed && m->destination.has_value())
   {
-    m->debugEntity        = _debugUtils->addLine(p->position, m->destination - p->position);
+    m->debugEntity        = _debugUtils->addLine(p->position, *m->destination - p->position);
     m->debugInfoDisplayed = true;
   }
 #endif
