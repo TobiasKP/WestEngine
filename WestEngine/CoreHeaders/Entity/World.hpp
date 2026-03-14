@@ -3,6 +3,8 @@
 #include "../Components/Movement.hpp"
 #include "Entity.h"
 
+#include <optional>
+
 class World : public Entity
 {
 public:
