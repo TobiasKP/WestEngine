@@ -1,11 +1,11 @@
-local C             = {}
+local C           = {}
 
-C.IDLE              = 0;
-C.MOVING            = 1;
+C.IDLE            = 0;
+C.MOVING          = 1;
 C.MOVING_FINISHED = 2;
-C.INSPECTING        = 3;
-C.ACTION            = 4;
-local _current      = 0;
+C.INSPECTING      = 3;
+C.ACTION          = 4;
+local _current    = 0;
 
 function C.getCurrentState()
   return _current;

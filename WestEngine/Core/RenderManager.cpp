@@ -343,12 +343,7 @@ void RenderManager::updateUniforms(const Entity& e, Model* model, Material* mate
     assert(model->debugColorUniform != -1);
   }
   Movement* m = reg->getComponent<Movement>(e.getId());
-  if (m != nullptr && m->moving.load() && !m->debugInfoDisplayed)
-  {
-    m->debugEntity        = _debugUtils->addLine(p->position, m->destination - p->position);
-    m->debugInfoDisplayed = true;
-  }
-  else if (m != nullptr && m->removeDebugInfo)
+  if (m != nullptr && m->removeDebugInfo)
   {
     Entity* e = _scene->getEntityById(m->debugEntity);
     if (e != nullptr)
@@ -357,6 +352,11 @@ void RenderManager::updateUniforms(const Entity& e, Model* model, Material* mate
       _scene->removeEntity(*e);
     }
     m->removeDebugInfo = false;
+  }
+  else if (m != nullptr && !m->debugInfoDisplayed && (m->destination.x != 0 || m->destination.z != 0))
+  {
+    m->debugEntity        = _debugUtils->addLine(p->position, m->destination - p->position);
+    m->debugInfoDisplayed = true;
   }
 #endif
 

@@ -1,6 +1,5 @@
 #include "../../CoreHeaders/Systems/PlayerControl.h"
 
-#include "../../Constants/LuaAPI.hpp"
 #include "../../Constants/Systems.hpp"
 #include "../CoreHeaders/Entity/Scene.h"
 
@@ -10,8 +9,6 @@
 PlayerControl::PlayerControl(WestLogger* logger) : ISystem(), _logger(logger), _cameraPending(false)
 {
   setName(Systems::PLAYER_CONTROL);
-  _movementInitiated.store(false);
-  _cleared = false;
 #ifdef DEBUG
   _logger->log(Level::Info, std::format("{} *** Initialized debug information\n", getName()));
   _camLog = true;
@@ -23,8 +20,6 @@ PlayerControl::~PlayerControl() {}
 void PlayerControl::init()
 {
   _reg = Scene::getSceneInstance().getRegistry();
-  LuaFacade::getLuaFacadeInstance().registerCFunction(movePlayerUnit, LuaAPI::C_MOVE_PLAYER.data(), this);
-  LuaFacade::getLuaFacadeInstance().registerCFunction(actionFinished, LuaAPI::C_ACTIONF_PLAYER.data(), this);
 }
 
 void PlayerControl::update()
@@ -56,8 +51,7 @@ void PlayerControl::update()
     _camLog = true;
   }
 #endif
-
-  if (!_movementInitiated.load())
+  if (_state == LuaFacade::LuaStates::IDLE)
   {
     Entity* e         = Scene::getSceneInstance().getEntityById(id);
     Movement* movComp = _reg->getComponent<Movement>(e->getId());
@@ -72,7 +66,7 @@ void PlayerControl::update()
     std::vector<std::int32_t> res = w->getReachableTiles(row, column, movComp->range, movComp->a, this);
     movComp->reachableTiles       = res;
   }
-  if (!_cleared.exchange(true))
+  if (_state == LuaFacade::LuaStates::MOVING)
   {
     World* w = Scene::getSceneInstance().getWorld();
     w->clearFlag(0x0002u);
@@ -109,28 +103,16 @@ void PlayerControl::passDestinationPosition(glm::vec3 dest)
   std::int32_t tile = Scene::getSceneInstance().getWorld()->calculateIndex(dest.x, dest.z);
   bool inRange =
     std::find(movComp->reachableTiles.begin(), movComp->reachableTiles.end(), tile) != movComp->reachableTiles.end();
-  if (!_movementInitiated.load() && inRange)
+  if (_state == LuaFacade::LuaStates::IDLE && inRange)
   {
     movComp->destination = dest;
-    movComp->movementPending.store(true);
+    bool result = LuaFacade::getLuaFacadeInstance().onTileClicked(id, LuaFacade::MouseAction::LMOUSE_CLICK, dest);
+    if (result)
+    {
+      _logger->log(Level::Info,
+                   std::format("{} *** Error calling lua function: {}\n",
+                               getName(),
+                               (std::int32_t)LuaFacade::MouseAction::LMOUSE_CLICK));
+    }
   }
-}
-
-int PlayerControl::movePlayerUnit(lua_State* L)
-{
-  std::int32_t n = lua_gettop(L);
-  assert(n == 1);
-  PlayerControl* me = (PlayerControl*)lua_touserdata(L, lua_upvalueindex(1));
-  me->_movementInitiated.store(true);
-  me->_cleared.store(false);
-  return 0;
-}
-
-int PlayerControl::actionFinished(lua_State* L)
-{
-  std::int32_t n = lua_gettop(L);
-  assert(n == 1);
-  PlayerControl* me = (PlayerControl*)lua_touserdata(L, lua_upvalueindex(1));
-  me->_movementInitiated.store(false);
-  return 0;
 }

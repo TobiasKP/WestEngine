@@ -22,6 +22,7 @@ public:
   bool onEntityClicked(std::int32_t calleeId, MouseAction m, std::int32_t entity_id);
   bool onStateChange(std::int32_t calleeId, std::int32_t state);
   bool onUIRefresh(std::int32_t calleeId);
+  LuaStates getState(std::int32_t calleeId);
 
   inline lua_State* getLuaState()
   {

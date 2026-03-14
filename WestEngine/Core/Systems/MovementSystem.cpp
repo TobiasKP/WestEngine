@@ -5,8 +5,9 @@
 
 #include <format>
 
-MovementSystem::MovementSystem(WestLogger* logger) : ISystem(), _logger(logger)
+MovementSystem::MovementSystem(WestLogger* logger) : ISystem()
 {
+  _logger = logger;
   setName(Systems::MOVEMENT);
 };
 
@@ -28,18 +29,14 @@ void MovementSystem::update()
     {
       break;
     }
-    if (m.moving.load())
+
+    if (m.destination.x != 0 && m.destination.z != 0 && _state == LuaFacade::LuaStates::MOVING)
     {
       std::uint32_t id  = movements->getEntityIdByIdx(current);
       Position* posComp = _reg->getComponent<Position>(id);
       moveToDestination(id, posComp, &m);
       posComp->dirty.store(true);
       continue;
-    }
-    if (m.movementPending.exchange(false) && !m.moving.load())
-    {
-      std::uint32_t id = movements->getEntityIdByIdx(current);
-      induceMovement(id, &m);
     }
     current++;
   }
@@ -61,26 +58,12 @@ void MovementSystem::moveToDestination(std::uint32_t id, Position* posComp, Move
                                getName(),
                                (std::int32_t)LuaFacade::LuaStates::IDLE));
     }
-    movComp->moving.store(false);
+    movComp->destination = glm::vec3(0);
 #ifdef DEBUG
     movComp->debugInfoDisplayed = false;
     movComp->removeDebugInfo    = true;
 #endif
   }
-}
-
-void MovementSystem::induceMovement(std::uint32_t id, Movement* movComp)
-{
-  bool result =
-    LuaFacade::getLuaFacadeInstance().onTileClicked(id, LuaFacade::MouseAction::LMOUSE_CLICK, movComp->destination);
-  if (result)
-  {
-    _logger->log(Level::Info,
-                 std::format("{} *** Error calling lua function: {}\n",
-                             getName(),
-                             (std::int32_t)LuaFacade::MouseAction::LMOUSE_CLICK));
-  }
-  movComp->moving.store(true);
 }
 
 bool MovementSystem::destinationReached(Position* posComp, Movement* movComp)

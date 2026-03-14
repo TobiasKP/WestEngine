@@ -13,7 +13,6 @@ function Worldpos_lclick(id, x, y, z)
   local state = playerB.getCurrentState();
   if state == playerB.IDLE then
     playerB.setState(playerB.MOVING);
-    MoveCurPlayer(id);
   end
 end
 
@@ -29,6 +28,10 @@ function Entity_rclick(id, entity)
   --TODO get Health from component and display in UI
 end
 
+function GetState(id)
+  return playerB.getCurrentState();
+end
+
 function StateChange(id, state)
   if DEBUG then
     print(playerB.getCurrentState());
@@ -36,7 +39,6 @@ function StateChange(id, state)
   end
   playerB.setState(state);
   if state == playerB.MOVING_FINISHED then
-    ActionFinished(id);
     playerB.setState(playerB.IDLE)
   end
 end
