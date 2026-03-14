@@ -13,10 +13,7 @@ constexpr std::string_view ENTITY_RCLICK    = "Entity_rclick";
 constexpr std::string_view STATE_CHANGE     = "StateChange";
 constexpr std::string_view UI_REFRESH       = "RefreshInterfaces";
 constexpr std::string_view UI_DELETE        = "DestroyInterface";
-
-// Player Actions
-constexpr std::string_view C_MOVE_PLAYER    = "MoveCurPlayer";
-constexpr std::string_view C_ACTIONF_PLAYER = "ActionFinished";
+constexpr std::string_view GET_STATE        = "GetState";
 
 // Entity Creation
 constexpr std::string_view C_CREATE_ENTITY = "createEntity";

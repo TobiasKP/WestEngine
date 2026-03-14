@@ -68,18 +68,20 @@ void SystemManager::update()
     system->updateDebuggingInfo();
   }
 #endif
-
+  LuaFacade& l               = LuaFacade::getLuaFacadeInstance();
+  LuaFacade::LuaStates state = l.getState(1);
   std::vector<std::future<void>> futures;
   for (ISystem* system : _systems)
   {
     futures.emplace_back(Config::THREADPOOL->enqueue(
-      [system, logger = getLogger()]
+      [system, state, logger = getLogger()]
       {
         if (system == nullptr)
         {
           logger->log(Level::Error, "System invalid null ptr check entity file or debug\n");
           return;
         }
+        system->setState(state);
         system->update();
       }));
   }

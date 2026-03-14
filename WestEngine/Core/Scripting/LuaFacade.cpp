@@ -162,6 +162,22 @@ bool LuaFacade::onUIRefresh(std::int32_t calleeId)
   return 0;
 }
 
+LuaFacade::LuaStates LuaFacade::getState(std::int32_t id)
+{
+  lua_getglobal(L, LuaAPI::GET_STATE.data());
+  lua_pushinteger(L, id);
+  std::int32_t status = lua_pcall(L, 1, 1, 0);
+  if (status != 0)
+  {
+    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}", lua_tostring(L, -1)));
+    lua_pop(L, 1);
+    return IDLE;
+  }
+  std::int32_t result = lua_tointeger(L, -1);
+  lua_remove(L, -1);
+  return static_cast<LuaFacade::LuaStates>(result);
+}
+
 bool LuaFacade::loadAPI()
 {
   std::string filePath = PathUtils::resolve(CoreConstants::LUA_API_FILE);
