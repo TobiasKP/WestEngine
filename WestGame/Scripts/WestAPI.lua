@@ -17,6 +17,9 @@ function Worldpos_lclick(id, x, y, z)
   end
 end
 
+function Worldpos_rclick(id, x, y, z)
+end
+
 function Entity_lclick(id, entity)
 end
 
@@ -36,6 +39,15 @@ function StateChange(id, state)
     ActionFinished(id);
     playerB.setState(playerB.IDLE)
   end
+end
+
+function DestroyInterface(callee, id)
+  local result = destroyInterface(id)
+  if result == false then
+    print("Error deleting UI with id " .. id)
+    return
+  end
+  uimanager.unregister(id)
 end
 
 function RefreshInterfaces(callee)
