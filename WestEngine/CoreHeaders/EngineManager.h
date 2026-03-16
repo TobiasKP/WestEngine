@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Core/Events/EventDispatcher.hpp"
 #include "Interfaces/IManager.h"
 #include "WindowManager.h"
 
@@ -45,6 +46,7 @@ private:
   float _FRAMERATE;
   float _FRAMETIME;
   const long _NANOSECOND = 1000000000;
+  std::shared_ptr<EventDispatcher> _dispatcher;
 
   std::int32_t iterateQ(CYCLE code);
   std::int32_t executeCycle(CYCLE code, IManager& item);

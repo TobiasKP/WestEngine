@@ -1,5 +1,6 @@
 #include "../CoreHeaders/InputManager.h"
 
+#include "../Constants/InternalEvents.hpp"
 #include "../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
 #include "../CoreHeaders/Utils/InputUtils/MouseCallbacks.h"
 
@@ -15,12 +16,15 @@
 
 #define SH_DENYNO 0x40
 
+using namespace WestInterface;
+
 InputManager::InputManager() : IManager(nullptr)
 {
+  _dispatcher = nullptr;
   setName(CoreConstants::INPUT_MANAGER);
 }
 
-InputManager::InputManager(WestLogger* logger) : IManager(logger)
+InputManager::InputManager(WestLogger* logger, std::shared_ptr<EventDispatcher> d) : IManager(logger), _dispatcher(d)
 {
   setName(CoreConstants::INPUT_MANAGER);
 }
@@ -36,9 +40,13 @@ std::int32_t InputManager::startup()
   std::int32_t fd;
   _inputConfig       = PathUtils::openFile(CoreConstants::INPUT_CONFIG_FILE_NAME, true);
   _availableCommands = PathUtils::openFile(CoreConstants::AVAILABLE_INPUTS_FILE_NAME, true);
-
+  _dispatcher->registerNewEvent(EventIdentifiers::MOUSE_LCLICK);
+  _dispatcher->registerNewEvent(EventIdentifiers::MOUSE_RCLICK);
+  _dispatcher->registerNewEvent(EventIdentifiers::MOUSE_WHEEL);
+  _dispatcher->registerNewEvent(EventIdentifiers::MOUSE_MOVE);
+  _dispatcher->registerNewEvent(EventIdentifiers::KEY);
   assert(_inputConfig != NULL && _availableCommands != NULL);
-  KeyboardCallbacks::setInputManager(this);
+
 
 #ifdef DEBUG
   logDebug(std::format(
@@ -52,8 +60,6 @@ void InputManager::shutdown()
 #ifdef DEBUG
   logDebug(std::format("{} ### Shutting down {}...\n", getName(), getName()));
 #endif
-
-  delete _observer;
 }
 
 std::int32_t InputManager::init()
@@ -105,9 +111,9 @@ std::int32_t InputManager::init()
   fclose(_inputConfig);
   fclose(_availableCommands);
 
-  _observer = new InputObserver();
-  KeyboardCallbacks::setInputObserver(_observer);
-  MouseCallbacks::setInputObserver(_observer);
+
+  KeyboardCallbacks::setDispatcher(_dispatcher);
+  MouseCallbacks::setDispatcher(_dispatcher);
 
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
@@ -120,12 +126,6 @@ std::int32_t InputManager::init()
 
 void InputManager::update()
 {
-  for (const auto& entry : _inputMap)
-  {
-    assert(entry.first > -1 && entry.second.length() > 0);
-    KeyboardCallbacks::executeBoundOperation(entry.first, entry.second);
-  }
-  _observer->notify();
 }
 
 void InputManager::setKey(std::int32_t key, std::string command)
@@ -146,24 +146,6 @@ std::int32_t InputManager::findByOperation(std::string command)
     }
   }
   return -1;
-}
-
-const std::string InputManager::findByKey(std::int32_t key)
-{
-#ifdef DEBUG
-  logCycle(std::format("{} ### Searching for Key {}.\n", getName(), key));
-#endif
-  for (const auto& entry : _inputMap)
-  {
-    if (entry.first == key)
-    {
-      return entry.second;
-    }
-  }
-#ifdef DEBUG
-  logDebug(std::format("{} ### No Key: {} found in input map.\n", getName(), key));
-#endif
-  return CoreConstants::UNDEFINED_STRING.data();
 }
 
 std::int32_t

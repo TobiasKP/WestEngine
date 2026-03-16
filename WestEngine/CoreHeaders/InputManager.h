@@ -1,7 +1,8 @@
 #pragma once
 
+#include "../Core/Events/EventDispatcher.hpp"
 #include "Interfaces/IManager.h"
-#include "Utils/InputUtils/InputObserver.h"
+#include <WestInterfaceFacade.h>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -12,7 +13,7 @@ class InputManager : public IManager
 {
 public:
   InputManager();
-  InputManager(WestLogger* logger);
+  InputManager(WestLogger* logger, std::shared_ptr<EventDispatcher> d);
   ~InputManager();
 
   // Overrides
@@ -23,15 +24,15 @@ public:
 
   // Functions
   void setKey(std::int32_t key, std::string command);
-  std::int32_t findByOperation(std::string command);
-  const std::string findByKey(std::int32_t key);
+  std::int32_t findByOperation(std::string command); 
 
 private:
+  std::mutex _m;
   std::map<std::int32_t, std::string> _inputMap;
-  InputObserver* _observer;
+  std::shared_ptr<EventDispatcher> _dispatcher; 
   FILE* _inputConfig;
   FILE* _availableCommands;
 
   // Functions
-  std::int32_t checkInputConfigLineForErrors(std::string key, std::string value, std::list<std::string> _commandList);
+  std::int32_t checkInputConfigLineForErrors(std::string key, std::string value, std::list<std::string> _commandList); 
 };

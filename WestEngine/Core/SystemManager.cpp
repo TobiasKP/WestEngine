@@ -13,7 +13,7 @@ SystemManager::SystemManager() : IManager(nullptr)
   setName(CoreConstants::ENTITY_SYSTEM_MANAGER);
 }
 
-SystemManager::SystemManager(WestLogger* logger) : IManager(logger)
+SystemManager::SystemManager(WestLogger* logger, std::shared_ptr<EventDispatcher> d) : IManager(logger), _dispatcher(d)
 {
   setName(CoreConstants::ENTITY_SYSTEM_MANAGER);
 }

@@ -5,11 +5,10 @@
 #include "../CoreHeaders/SceneManager.h"
 #include "../CoreHeaders/ShaderManager.h"
 #include "../CoreHeaders/SystemManager.h"
-#include "../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
+#include "../CoreHeaders/InputManager.h"
 
 #include <cstring>
 #include <format>
-#include <iostream>
 #include <PathUtils.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,12 +34,13 @@ EngineManager::EngineManager(WestLogger* logger) : IManager(logger)
   _windowManager = new WindowManager(logger);
   _FRAMERATE     = Config::GeneralConfig.FPS;
   _FRAMETIME     = 1.0f / _FRAMERATE;
+  _dispatcher    = std::make_shared<EventDispatcher>();
 
-  _manager[0] = new InputManager(logger);
+  _manager[0] = new InputManager(logger, _dispatcher);
   _manager[1] = _windowManager;
   _manager[2] = new ShaderManager(logger);
-  _manager[3] = new SystemManager(logger);
-  _manager[4] = new InterfaceManager(logger, _windowManager);
+  _manager[3] = new SystemManager(logger, _dispatcher);
+  _manager[4] = new InterfaceManager(logger, _windowManager, _dispatcher);
   _manager[5] = new RenderManager(logger);
   _manager[6] = new SceneManager(logger);
   assert(_manager.size() == CoreConstants::MAX_Q_SIZE);
@@ -94,7 +94,7 @@ void EngineManager::shutdown()
       item->shutdown();
     }
   }
-  KeyboardCallbacks::shutdown();
+  _dispatcher.reset();
 }
 
 void EngineManager::update()

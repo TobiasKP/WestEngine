@@ -3,6 +3,7 @@
 #include "../Constants/LuaAPI.hpp"
 #include "../CoreHeaders/Utils/InputUtils/KeyboardCallbacks.h"
 #include "../CoreHeaders/Utils/InputUtils/MouseCallbacks.h"
+#include "Scripting/LuaFacade.hpp"
 
 #include <Config.h>
 #include <CoreConstants.hpp>
@@ -129,7 +130,6 @@ std::int32_t WindowManager::init()
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
 
-  KeyboardCallbacks::setWindowManager(this);
   glfwSetKeyCallback(_window, KeyboardCallbacks::keyboardCallback);
   glfwSetCursorPosCallback(_window, MouseCallbacks::mouseCallback);
   glfwSetCursorEnterCallback(_window, MouseCallbacks::enterCallback);

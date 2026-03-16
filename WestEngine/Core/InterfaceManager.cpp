@@ -1,9 +1,10 @@
 #include "../CoreHeaders/InterfaceManager.h"
 
 #include "../Constants/LuaAPI.hpp"
-#include "Utils/InputUtils/MouseCallbacks.h"
+#include "../Core/Scripting/LuaFacade.hpp"
 
 #include <format>
+#include <iostream>
 
 using namespace WestInterface;
 
@@ -11,18 +12,25 @@ InterfaceManager::InterfaceManager() : IManager(nullptr)
 {
   setName(CoreConstants::INTERFACE_MANAGER);
   _facade           = nullptr;
+  _dispatcher       = nullptr;
   _cachedInterfaces = _currentX = _currentY = 0;
+  _currentPos                               = glm::vec2(0);
+  _currentHover                             = std::make_tuple(-1, false);
 #ifdef DEBUG
   _demoId = 0;
 #endif
 };
 
-InterfaceManager::InterfaceManager(WestLogger* logger, WindowManager* manager) : IManager(logger)
+InterfaceManager::InterfaceManager(WestLogger* logger, WindowManager* manager, std::shared_ptr<EventDispatcher> d)
+  : IManager(logger)
 {
   setName(CoreConstants::INTERFACE_MANAGER);
   _facade           = nullptr;
   _cachedInterfaces = 0;
   _windowManager    = manager;
+  _dispatcher       = d;
+  _currentPos       = glm::vec2(0);
+  _currentHover     = std::make_tuple(-1, false);
 #ifdef DEBUG
   _demoId = 0;
 #endif
@@ -54,6 +62,8 @@ std::int32_t InterfaceManager::init()
   LuaFacade::getLuaFacadeInstance().registerCFunction(registerInterface, LuaAPI::C_CREATE_INTERFACE.data(), this);
   LuaFacade::getLuaFacadeInstance().registerCFunction(destroyInterface, LuaAPI::C_DESTROY_INTERFACE.data(), this);
   LuaFacade::getLuaFacadeInstance().registerCFunction(updateInterfaceValue, LuaAPI::C_UPDATE_INTERFACE.data(), this);
+  _dispatcher->subscribe(EventIdentifiers::MOUSE_MOVE, [this](EventIdentifiers event) { pushEvent(event); });
+  _dispatcher->subscribe(EventIdentifiers::MOUSE_LCLICK, [this](EventIdentifiers event) { pushEvent(event); });
   result = _facade->init();
 
 #ifdef DEBUG
@@ -67,6 +77,7 @@ std::int32_t InterfaceManager::init()
 
 void InterfaceManager::update()
 {
+  pollEvents();
   _facade->updateRenderData();
   bool dirty = Config::INTERNAL_UI_COUNT != _cachedInterfaces;
   if (_currentTE != Config::GeneralInfo.TOTAL_ENTITIES && Config::GeneralInterfaces.TE_ID.load() != -1)
@@ -97,10 +108,73 @@ void InterfaceManager::update()
   }
   if (dirty)
   {
-    std::vector<ElementBounds*> result = _facade->getShownElementsBoundaries();
-    MouseCallbacks::setElementBounds(result);
+    _elements         = _facade->getShownElementsBoundaries();
     _cachedInterfaces = Config::INTERNAL_UI_COUNT;
   }
+}
+
+void InterfaceManager::pollEvents()
+{
+  std::vector<EventIdentifiers> events = _eventQueue.drain();
+
+  for (EventIdentifiers event : events)
+  {
+    switch (event)
+    {
+      case EventIdentifiers::MOUSE_MOVE:
+      {
+        MousePayload* p = std::get_if<MousePayload>(&_dispatcher->getPayload(EventIdentifiers::MOUSE_MOVE));
+        {
+          std::lock_guard lock(_m);
+          _currentPos.x = p->x;
+          _currentPos.y = p->y;
+        }
+        std::tuple<std::int16_t, bool> hover = isInterfaceHovered();
+        std::cout << std::get<0>(hover) << std::endl;
+        if (std::get<0>(hover) != std::get<0>(_currentHover))
+        {
+          if (std::get<0>(_currentHover) != -1 && std::get<1>(_currentHover))
+          {
+            std::cout << "unhover" << std::endl;
+            _facade->notify(std::get<0>(_currentHover), 0x02, -1, -1);
+          }
+          if (std::get<0>(hover) != -1 && std::get<1>(hover))
+          {
+            _facade->notify(std::get<0>(hover), 0x01, -1, -1);
+          }
+        }
+        _currentHover = hover;
+        break;
+      }
+      case EventIdentifiers::MOUSE_LCLICK:
+        if (std::get<0>(_currentHover) != -1 && std::get<1>(_currentHover))
+        {
+          std::cout << "click" << std::endl;
+          _facade->notify(std::get<0>(_currentHover), 0x04, -1, -1);
+        }
+        break;
+      default:
+        break;
+    }
+  }
+}
+
+
+std::tuple<std::int16_t, bool> InterfaceManager::isInterfaceHovered()
+{
+  for (ElementBounds* eb : _elements)
+  {
+    if (_currentPos.x > eb->xLeft && _currentPos.x < eb->xRight && _currentPos.y < eb->yBottom
+        && _currentPos.y > eb->yTop)
+    {
+      if (eb->isContainer)
+      {
+        continue;
+      }
+      return std::make_tuple(eb->id, eb->eventDriven);
+    }
+  }
+  return std::make_tuple(-1, false);
 }
 
 int InterfaceManager::registerInterface(lua_State* L)

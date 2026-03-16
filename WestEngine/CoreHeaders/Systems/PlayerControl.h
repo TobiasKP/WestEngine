@@ -17,6 +17,7 @@ public:
   void update() override;
   void updateDebuggingInfo() override;
   void init() override;
+
   void setCameraMovement(glm::vec3 move);
   void passDestinationPosition(glm::vec3 dest);
 

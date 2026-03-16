@@ -1,31 +1,19 @@
 #pragma once
 
-#include "../../InputManager.h"
-#include "../../WindowManager.h"
+#include "../../../Core/Events/EventDispatcher.hpp"
+
+#include <GLFW/glfw3.h>
+#include <memory>
 
 class KeyboardCallbacks
 {
 public:
   static void keyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-  static void executeBoundOperation(std::int32_t key, const std::string boundOperation);
-  static void shutdown();
-
-  // Setter
-  static void setInputManager(InputManager* manager)
+  static void setDispatcher(std::shared_ptr<EventDispatcher> d)
   {
-    _iManager = manager;
-  }
-  static void setWindowManager(WindowManager* manager)
-  {
-    _wManager = manager;
-  }
-  static void setInputObserver(InputObserver* observer)
-  {
-    _iObserver = observer;
+    _dispatcher = d;
   }
 
 private:
-  static InputManager* _iManager;
-  static WindowManager* _wManager;
-  static InputObserver* _iObserver;
+  static std::shared_ptr<EventDispatcher> _dispatcher;
 };
