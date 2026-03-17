@@ -1,6 +1,6 @@
 #pragma once
 
-enum EventIdentifiers {
+enum class EventIdentifiers {
   MOUSE_MOVE,
   MOUSE_LCLICK,
   MOUSE_RCLICK,

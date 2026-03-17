@@ -61,13 +61,14 @@ void PlayerControl::update()
 void PlayerControl::pollEvents()
 {
   std::vector<std::tuple<EventIdentifiers, EventPayload>> events = _eventQueue.drain();
+  World* w                                                       = Scene::getSceneInstance().getWorld();
   for (std::tuple<EventIdentifiers, EventPayload> event : events)
   {
     switch (std::get<0>(event))
     {
       case EventIdentifiers::MOUSE_MOVE:
       {
-        MousePayload* p = std::get_if<MousePayload>(&std::get<1>(event)); 
+        MousePayload* p = std::get_if<MousePayload>(&std::get<1>(event));
         glm::vec3 hoverPosition =
           PositionCalculation::getWorldPosition(glm::vec2(p->x, p->y), Scene::getSceneInstance().getCamera());
         _tileIdx = Scene::getSceneInstance().getWorld()->worldPosToTile(hoverPosition.x, hoverPosition.z);
@@ -75,7 +76,6 @@ void PlayerControl::pollEvents()
       }
       case EventIdentifiers::MOUSE_RCLICK:
       {
-        World* w         = Scene::getSceneInstance().getWorld();
         std::uint32_t id = w->getEntityByIdx(_tileIdx);
         if (id > 0)
         {
@@ -84,7 +84,6 @@ void PlayerControl::pollEvents()
       }
       case EventIdentifiers::MOUSE_LCLICK:
       {
-        World* w                             = Scene::getSceneInstance().getWorld();
         std::uint32_t id                     = w->getEntityByIdx(_tileIdx);
         std::optional<glm::vec3> destination = w->tileToWorldPos(_tileIdx);
         if (destination.has_value() && id == 0)

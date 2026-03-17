@@ -20,7 +20,7 @@ public:
   void subscribe(const EventIdentifiers name, Callback callback);
 
 private:
-  static std::mutex _mutex;
+  std::mutex _mutex;
   std::flat_map<EventIdentifiers, std::int32_t> _nameToIdx;
   std::vector<Event> _events;
   WestLogger* _logger = &WestLogger::getLoggerInstance();

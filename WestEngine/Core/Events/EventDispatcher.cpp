@@ -1,7 +1,5 @@
 #include "EventDispatcher.hpp"
 
-std::mutex EventDispatcher::_mutex;
-
 void EventDispatcher::registerNewEvent(const EventIdentifiers name)
 {
   std::lock_guard<std::mutex> lock(_mutex);
@@ -17,7 +15,7 @@ void EventDispatcher::dispatchEvent(const EventIdentifiers name, EventPayload pa
   std::lock_guard<std::mutex> lock(_mutex);
   std::int32_t idx            = _nameToIdx[name];
   std::vector<Callback>& subs = _events[idx].subscriber;
-  for (Callback sub : subs)
+  for (Callback& sub : subs)
   {
     sub(name, payload);
   }
