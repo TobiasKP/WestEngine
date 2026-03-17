@@ -1,6 +1,6 @@
 #pragma once
 
-#include "InputObserver.h"
+#include "../../../Core/Events/EventDispatcher.hpp"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -13,23 +13,12 @@ public:
   static void enterCallback(GLFWwindow* window, std::int32_t entered);
   static void mouseButtonCallback(GLFWwindow* window, std::int32_t button, std::int32_t action, std::int32_t mods);
   static void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
-
-  inline static void setInputObserver(InputObserver* o)
+  static void setDispatcher(std::shared_ptr<EventDispatcher> d)
   {
-    _iObserver = o;
+    _dispatcher = d;
   }
-  inline static void setElementBounds(std::vector<ElementBounds*>& elements)
-  {
-    _elements = elements;
-  };
 
 private:
-  static std::tuple<std::int16_t, bool> isInterfaceHovered();
-
-  static std::vector<ElementBounds*> _elements;
-
-  static glm::vec2 _currentPos;
-  static std::tuple<std::int16_t, bool> _currentHover;
-  static std::int32_t _inWindow, _tileIdx;
-  static InputObserver* _iObserver;
+  static std::shared_ptr<EventDispatcher> _dispatcher;
+  static std::int32_t _inWindow;
 };

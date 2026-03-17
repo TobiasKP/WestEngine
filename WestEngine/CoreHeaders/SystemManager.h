@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Core/Events/EventDispatcher.hpp"
 #include "Entity/Scene.h"
 #include "Interfaces/IManager.h"
 #include "Interfaces/ISystem.h"
@@ -12,7 +13,7 @@ class SystemManager : public IManager
 {
 public:
   SystemManager();
-  SystemManager(WestLogger* logger);
+  SystemManager(WestLogger* logger, std::shared_ptr<EventDispatcher> d);
   ~SystemManager();
 
   // Overrides
@@ -25,7 +26,8 @@ public:
 
 private:
   Scene* _scene;
-  static std::array<ISystem*, 2> _systems;
+  static std::array<ISystem*, 4> _systems;
+  std::shared_ptr<EventDispatcher> _dispatcher;
 
 #ifdef DEBUG
   std::int32_t _loggingFrequence = 0;

@@ -24,9 +24,9 @@ std::int32_t World::worldPosToTile(double x, double y)
   }
   {
     std::lock_guard<std::mutex> lock(_mutex);
-    for (std::int32_t i = 0; i < _vflags.size(); i++)
+    if (_lastIdx >= 0)
     {
-      _vflags[i] &= ~0x0001u;
+      _vflags[_lastIdx] &= ~0x0001u;
     }
     if (index >= 0)
     {

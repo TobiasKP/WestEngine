@@ -1,43 +1,18 @@
 #include "../../../CoreHeaders/Utils/InputUtils/MouseCallbacks.h"
 
-#include "../../../CoreHeaders/Entity/Scene.h"
-#include "../../../CoreHeaders/Utils/Math/PositionCalculation.h"
+#include "../../../Constants/InternalEvents.hpp"
 
-glm::vec2 MouseCallbacks::_currentPos = glm::vec2(0.0f);
-
-std::int32_t MouseCallbacks::_inWindow                       = 0;
-std::int32_t MouseCallbacks::_tileIdx                        = -1;
-std::tuple<std::int16_t, bool> MouseCallbacks::_currentHover = std::make_tuple(-1, false);
-std::vector<ElementBounds*> MouseCallbacks::_elements;
-
-InputObserver* MouseCallbacks::_iObserver = nullptr;
+std::shared_ptr<EventDispatcher> MouseCallbacks::_dispatcher;
+std::int32_t MouseCallbacks::_inWindow;
 
 void MouseCallbacks::mouseCallback(GLFWwindow* window, double x, double y)
 {
-  _currentPos.x = x;
-  _currentPos.y = y;
   if (!_inWindow)
   {
     return;
   }
-
-  std::tuple<std::int16_t, bool> hover = isInterfaceHovered();
-  if (std::get<0>(hover) != std::get<0>(_currentHover))
-  {
-    if (std::get<0>(_currentHover) != -1 && std::get<1>(_currentHover))
-    {
-      _iObserver->setControlFlag(BitMasks::Control::UI_UNHOVERED, std::get<0>(_currentHover));
-    }
-
-    if (std::get<0>(hover) != -1 && std::get<1>(hover))
-    {
-      _iObserver->setControlFlag(BitMasks::Control::UI_HOVERED, std::get<0>(hover));
-    }
-  }
-  glm::vec3 hoverPosition = PositionCalculation::getWorldPosition(_currentPos, Scene::getSceneInstance().getCamera());
-  _tileIdx                = Scene::getSceneInstance().getWorld()->worldPosToTile(hoverPosition.x, hoverPosition.z);
-  _iObserver->setTileIdx(_tileIdx);
-  _currentHover = hover;
+  assert(_dispatcher != nullptr);
+  _dispatcher->dispatchEvent(EventIdentifiers::MOUSE_MOVE, MousePayload(x, y));
 }
 
 void MouseCallbacks::enterCallback(GLFWwindow* window, std::int32_t entered)
@@ -50,51 +25,23 @@ void MouseCallbacks::mouseButtonCallback(GLFWwindow* window,
                                          std::int32_t action,
                                          std::int32_t mods)
 {
-  assert(_iObserver != nullptr);
   if (!_inWindow)
   {
     return;
   }
-
+  assert(_dispatcher != nullptr);
   if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS)
   {
-    std::tuple<std::int16_t, bool> hover = isInterfaceHovered();
-    if (std::get<0>(hover) != -1 && std::get<1>(hover))
-    {
-      _iObserver->setControlFlag(BitMasks::Control::UI_CLICKED, std::get<0>(hover));
-    }
-    else if (std::get<0>(hover) == -1)
-    {
-      _iObserver->setControlFlag(BitMasks::Control::LCLICK);
-    }
+    _dispatcher->dispatchEvent(EventIdentifiers::MOUSE_LCLICK, EmptyPayload{});
   }
+
   if (button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS)
   {
-    _iObserver->setControlFlag(BitMasks::Control::RCLICK);
-  };
+    _dispatcher->dispatchEvent(EventIdentifiers::MOUSE_RCLICK, EmptyPayload{});
+  }
 }
 
 void MouseCallbacks::scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
 {
-  if (yOffset != 0.0)
-  {
-    _iObserver->setZoomFlag(BitMasks::Control::CAMERA_ZOOM, yOffset * -5);
-  }
-}
-
-std::tuple<std::int16_t, bool> MouseCallbacks::isInterfaceHovered()
-{
-  for (ElementBounds* eb : _elements)
-  {
-    if (_currentPos.x > eb->xLeft && _currentPos.x < eb->xRight && _currentPos.y < eb->yBottom
-        && _currentPos.y > eb->yTop)
-    {
-      if (eb->isContainer)
-      {
-        continue;
-      }
-      return std::make_tuple(eb->id, eb->eventDriven);
-    }
-  }
-  return std::make_tuple(-1, false);
+  _dispatcher->dispatchEvent(EventIdentifiers::MOUSE_WHEEL, MousePayload{0, 0, yOffset * -5});
 }

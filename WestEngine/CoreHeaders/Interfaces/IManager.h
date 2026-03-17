@@ -1,11 +1,14 @@
 #pragma once
 
-#include <CoreConstants.hpp>
+#include "../Constants/InternalEvents.hpp"
+#include "../Core/Events/Event.hpp"
+
 #include <cassert>
+#include <CoreConstants.hpp>
 #include <cstdint>
-#include <format>
 #include <string>
 #include <string_view>
+#include <ThreadSafeQueue.hpp>
 #include <TimeUtils.hpp>
 #include <WestLogger.h>
 
@@ -19,6 +22,7 @@ public:
   virtual void shutdown()        = 0;
   virtual void update()          = 0;
   virtual std::int32_t init()    = 0;
+  virtual void pollEvents() {};
 
   inline void setName(std::string_view name)
   {
@@ -33,8 +37,13 @@ public:
   {
     return this->_logger;
   }
+  void pushEvent(EventIdentifiers event, EventPayload payload)
+  {
+    _eventQueue.push(std::make_tuple<>(event, payload));
+  }
 
 protected:
+  tQueue<std::tuple<EventIdentifiers, EventPayload>> _eventQueue;
   inline void logFailure(const std::string message)
   {
     _logger->log(Level::Error, message);

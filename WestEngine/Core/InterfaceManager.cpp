@@ -1,7 +1,8 @@
 #include "../CoreHeaders/InterfaceManager.h"
 
 #include "../Constants/LuaAPI.hpp"
-#include "Utils/InputUtils/MouseCallbacks.h"
+#include "../Core/Scripting/LuaFacade.hpp"
+#include "InputManager.h"
 
 #include <format>
 
@@ -11,18 +12,25 @@ InterfaceManager::InterfaceManager() : IManager(nullptr)
 {
   setName(CoreConstants::INTERFACE_MANAGER);
   _facade           = nullptr;
+  _dispatcher       = nullptr;
   _cachedInterfaces = _currentX = _currentY = 0;
+  _currentPos                               = glm::vec2(0);
+  _currentHover                             = std::make_tuple(-1, false);
 #ifdef DEBUG
   _demoId = 0;
 #endif
 };
 
-InterfaceManager::InterfaceManager(WestLogger* logger, WindowManager* manager) : IManager(logger)
+InterfaceManager::InterfaceManager(WestLogger* logger, WindowManager* manager, std::shared_ptr<EventDispatcher> d)
+  : IManager(logger)
 {
   setName(CoreConstants::INTERFACE_MANAGER);
   _facade           = nullptr;
   _cachedInterfaces = 0;
   _windowManager    = manager;
+  _dispatcher       = d;
+  _currentPos       = glm::vec2(0);
+  _currentHover     = std::make_tuple(-1, false);
 #ifdef DEBUG
   _demoId = 0;
 #endif
@@ -54,6 +62,12 @@ std::int32_t InterfaceManager::init()
   LuaFacade::getLuaFacadeInstance().registerCFunction(registerInterface, LuaAPI::C_CREATE_INTERFACE.data(), this);
   LuaFacade::getLuaFacadeInstance().registerCFunction(destroyInterface, LuaAPI::C_DESTROY_INTERFACE.data(), this);
   LuaFacade::getLuaFacadeInstance().registerCFunction(updateInterfaceValue, LuaAPI::C_UPDATE_INTERFACE.data(), this);
+  _dispatcher->subscribe(EventIdentifiers::MOUSE_MOVE,
+                         [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
+  _dispatcher->subscribe(EventIdentifiers::MOUSE_LCLICK,
+                         [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
+  _dispatcher->subscribe(EventIdentifiers::KEY,
+                         [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
   result = _facade->init();
 
 #ifdef DEBUG
@@ -67,6 +81,7 @@ std::int32_t InterfaceManager::init()
 
 void InterfaceManager::update()
 {
+  pollEvents();
   _facade->updateRenderData();
   bool dirty = Config::INTERNAL_UI_COUNT != _cachedInterfaces;
   if (_currentTE != Config::GeneralInfo.TOTAL_ENTITIES && Config::GeneralInterfaces.TE_ID.load() != -1)
@@ -97,10 +112,97 @@ void InterfaceManager::update()
   }
   if (dirty)
   {
-    std::vector<ElementBounds*> result = _facade->getShownElementsBoundaries();
-    MouseCallbacks::setElementBounds(result);
+    _elements         = _facade->getShownElementsBoundaries();
     _cachedInterfaces = Config::INTERNAL_UI_COUNT;
   }
+}
+
+void InterfaceManager::pollEvents()
+{
+  std::vector<std::tuple<EventIdentifiers, EventPayload>> events = _eventQueue.drain();
+
+  for (std::tuple<EventIdentifiers, EventPayload> event : events)
+  {
+    switch (std::get<0>(event))
+    {
+      case EventIdentifiers::MOUSE_MOVE:
+      {
+        MousePayload* p = std::get_if<MousePayload>(&std::get<1>(event));
+        {
+          std::lock_guard lock(_m);
+          _currentPos.x = p->x;
+          _currentPos.y = p->y;
+        }
+        std::tuple<std::int16_t, bool> hover = isInterfaceHovered();
+
+        if (std::get<0>(hover) != std::get<0>(_currentHover))
+        {
+          if (std::get<0>(_currentHover) != -1 && std::get<1>(_currentHover))
+          {
+            _facade->notify(std::get<0>(_currentHover), 0x02, -1, -1);
+          }
+          if (std::get<0>(hover) != -1 && std::get<1>(hover))
+          {
+            _facade->notify(std::get<0>(hover), 0x01, -1, -1);
+          }
+        }
+        _currentHover = hover;
+        break;
+      }
+      case EventIdentifiers::MOUSE_LCLICK:
+        if (std::get<0>(_currentHover) != -1 && std::get<1>(_currentHover))
+        {
+          _facade->notify(std::get<0>(_currentHover), 0x04, -1, -1);
+        }
+        break;
+      case EventIdentifiers::KEY:
+      {
+        KeyboardPayload* k = std::get_if<KeyboardPayload>(&std::get<1>(event));
+        if (k->action != GLFW_PRESS || !InputManager::getInputMap().contains(k->key))
+        {
+          break;
+        }
+        std::string action = InputManager::getInputMap()[k->key];
+        if (action.compare("OpenMenu") == 0)
+        {
+          _facade->notify(Config::GeneralInterfaces.SETTING_ID.load(), 0x04, -1, -1);
+        }
+        else if (action.compare("Info") == 0)
+        {
+          if (Config::GeneralInterfaces.INFO_ID.load() == -1)
+          {
+            _facade->createNewInterface("info");
+          }
+          else
+          {
+            _facade->destroyInterface(Config::GeneralInterfaces.INFO_ID.load());
+            Config::GeneralInterfaces.INFO_ID.store(-1);
+          }
+        }
+        break;
+      }
+      default:
+        break;
+    }
+  }
+}
+
+
+std::tuple<std::int16_t, bool> InterfaceManager::isInterfaceHovered()
+{
+  for (ElementBounds* eb : _elements)
+  {
+    if (_currentPos.x > eb->xLeft && _currentPos.x < eb->xRight && _currentPos.y < eb->yBottom
+        && _currentPos.y > eb->yTop)
+    {
+      if (eb->isContainer)
+      {
+        continue;
+      }
+      return std::make_tuple(eb->id, eb->eventDriven);
+    }
+  }
+  return std::make_tuple(-1, false);
 }
 
 int InterfaceManager::registerInterface(lua_State* L)

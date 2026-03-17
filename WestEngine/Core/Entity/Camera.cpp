@@ -3,7 +3,11 @@
 #include "glm/gtc/type_ptr.hpp"
 
 #include <Config.h>
+#include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
+
+
+Camera::Camera(glm::vec3 pos, glm::vec3 rot) : _rotation(rot), _position(pos), _cameraUniforms(-1), _dirty(true) {}
 
 Camera::~Camera() {}
 

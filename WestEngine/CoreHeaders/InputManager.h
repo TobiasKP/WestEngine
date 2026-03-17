@@ -1,18 +1,19 @@
 #pragma once
 
+#include "../Core/Events/EventDispatcher.hpp"
 #include "Interfaces/IManager.h"
-#include "Utils/InputUtils/InputObserver.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <list>
 #include <map>
+#include <WestInterfaceFacade.h>
 
 class InputManager : public IManager
 {
 public:
   InputManager();
-  InputManager(WestLogger* logger);
+  InputManager(WestLogger* logger, std::shared_ptr<EventDispatcher> d);
   ~InputManager();
 
   // Overrides
@@ -23,12 +24,15 @@ public:
 
   // Functions
   void setKey(std::int32_t key, std::string command);
-  std::int32_t findByOperation(std::string command);
-  const std::string findByKey(std::int32_t key);
+  static std::map<std::int32_t, std::string> getInputMap()
+  {
+    return _inputMap;
+  }
 
 private:
-  std::map<std::int32_t, std::string> _inputMap;
-  InputObserver* _observer;
+  std::mutex _m;
+  static std::map<std::int32_t, std::string> _inputMap;
+  std::shared_ptr<EventDispatcher> _dispatcher;
   FILE* _inputConfig;
   FILE* _availableCommands;
 
