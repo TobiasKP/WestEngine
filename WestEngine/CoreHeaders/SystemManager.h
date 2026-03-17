@@ -26,7 +26,7 @@ public:
 
 private:
   Scene* _scene;
-  static std::array<ISystem*, 2> _systems;
+  static std::array<ISystem*, 4> _systems;
   std::shared_ptr<EventDispatcher> _dispatcher;
 
 #ifdef DEBUG

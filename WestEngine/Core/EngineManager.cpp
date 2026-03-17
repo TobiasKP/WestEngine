@@ -42,7 +42,7 @@ EngineManager::EngineManager(WestLogger* logger) : IManager(logger)
   _manager[3] = new SystemManager(logger, _dispatcher);
   _manager[4] = new InterfaceManager(logger, _windowManager, _dispatcher);
   _manager[5] = new RenderManager(logger);
-  _manager[6] = new SceneManager(logger);
+  _manager[6] = new SceneManager(logger, _dispatcher);
   assert(_manager.size() == CoreConstants::MAX_Q_SIZE);
 }
 

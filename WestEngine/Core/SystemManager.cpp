@@ -6,7 +6,7 @@
 #include <Config.h>
 #include <format>
 
-std::array<ISystem*, 2> SystemManager::_systems = {};
+std::array<ISystem*, 4> SystemManager::_systems = {};
 
 SystemManager::SystemManager() : IManager(nullptr)
 {
@@ -24,7 +24,10 @@ SystemManager::~SystemManager() {}
 
 std::int32_t SystemManager::startup()
 {
-  _systems = {new PlayerControl(getLogger(), _dispatcher), new MovementSystem(getLogger())};
+  _systems = {new PlayerControl(getLogger(), _dispatcher),
+              new MovementSystem(getLogger()),
+              new CameraSystem(getLogger(), _dispatcher),
+              new PositionalSystem(getLogger(), _dispatcher)};
 
 #ifdef DEBUG
   logDebug(std::format("{} ### Instantiated critical game systems\n", getName()));
@@ -44,7 +47,6 @@ std::int32_t SystemManager::init()
 #ifdef DEBUG
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
-
   _scene = &Scene::getSceneInstance();
   for (ISystem* sys : _systems)
   {

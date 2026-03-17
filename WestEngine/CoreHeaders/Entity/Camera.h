@@ -5,16 +5,18 @@
 #include <atomic>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include <ThreadSafeQueue.hpp>
 
 struct Frustum
 {
-  Plane near, far, left, right, top, bottom; };
+  Plane near, far, left, right, top, bottom;
+};
 
 class Camera
 {
 public:
   Camera() : _rotation(glm::vec3(0)), _position(glm::vec3(0)), _cameraUniforms(-1), _dirty(true) {};
-  Camera(glm::vec3 pos, glm::vec3 rot) : _rotation(rot), _position(pos), _cameraUniforms(-1), _dirty(true) {};
+  Camera(glm::vec3 pos, glm::vec3 rot);
   ~Camera();
 
   void update();
@@ -47,7 +49,9 @@ public:
 private:
   void createFrustumFromCamera();
 
+
   GLuint _cameraUniforms;
+  glm::vec3 _move;
   glm::vec3 _position;
   glm::vec3 _rotation;
   glm::mat4 _view;

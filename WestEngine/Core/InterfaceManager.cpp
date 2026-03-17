@@ -2,6 +2,7 @@
 
 #include "../Constants/LuaAPI.hpp"
 #include "../Core/Scripting/LuaFacade.hpp"
+#include "InputManager.h"
 
 #include <format>
 
@@ -64,6 +65,8 @@ std::int32_t InterfaceManager::init()
   _dispatcher->subscribe(EventIdentifiers::MOUSE_MOVE,
                          [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
   _dispatcher->subscribe(EventIdentifiers::MOUSE_LCLICK,
+                         [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
+  _dispatcher->subscribe(EventIdentifiers::KEY,
                          [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
   result = _facade->init();
 
@@ -152,6 +155,32 @@ void InterfaceManager::pollEvents()
           _facade->notify(std::get<0>(_currentHover), 0x04, -1, -1);
         }
         break;
+      case EventIdentifiers::KEY:
+      {
+        KeyboardPayload* k = std::get_if<KeyboardPayload>(&std::get<1>(event));
+        if (k->action != GLFW_PRESS || !InputManager::getInputMap().contains(k->key))
+        {
+          break;
+        }
+        std::string action = InputManager::getInputMap()[k->key];
+        if (action.compare("OpenMenu") == 0)
+        {
+          _facade->notify(Config::GeneralInterfaces.SETTING_ID.load(), 0x04, -1, -1);
+        }
+        else if (action.compare("Info") == 0)
+        {
+          if (Config::GeneralInterfaces.INFO_ID.load() == -1)
+          {
+            _facade->createNewInterface("info");
+          }
+          else
+          {
+            _facade->destroyInterface(Config::GeneralInterfaces.INFO_ID.load());
+            Config::GeneralInterfaces.INFO_ID.store(-1);
+          }
+        }
+        break;
+      }
       default:
         break;
     }

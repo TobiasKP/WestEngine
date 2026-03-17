@@ -1,6 +1,5 @@
 #pragma once
 
-#include <atomic>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <string>
@@ -18,11 +17,11 @@ struct Material
   std::string name;
   glm::vec3 diffuseColor;  // Kd - base color
   GLint diffuseColorUniform = -1, emissiveColorUniform = -1;
-  glm::vec3 ambientColor;   // Ka
-  glm::vec3 specularColor;  // Ks
-  glm::vec3 emissiveColor;  // Ke
-  float specularExponent;   // Ns
-  float opacity;            // d
-  float refractiveIndex;    // Ni
-  Texture* diffuseTexture; 
+  glm::vec3 ambientColor;                  // Ka
+  glm::vec3 specularColor;                 // Ks
+  glm::vec3 emissiveColor = glm::vec3(0);  // Ke
+  float specularExponent;                  // Ns
+  float opacity;                           // d
+  float refractiveIndex;                   // Ni
+  Texture* diffuseTexture;
 };
