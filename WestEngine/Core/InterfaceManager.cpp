@@ -4,7 +4,6 @@
 #include "../Core/Scripting/LuaFacade.hpp"
 
 #include <format>
-#include <iostream>
 
 using namespace WestInterface;
 
@@ -62,8 +61,10 @@ std::int32_t InterfaceManager::init()
   LuaFacade::getLuaFacadeInstance().registerCFunction(registerInterface, LuaAPI::C_CREATE_INTERFACE.data(), this);
   LuaFacade::getLuaFacadeInstance().registerCFunction(destroyInterface, LuaAPI::C_DESTROY_INTERFACE.data(), this);
   LuaFacade::getLuaFacadeInstance().registerCFunction(updateInterfaceValue, LuaAPI::C_UPDATE_INTERFACE.data(), this);
-  _dispatcher->subscribe(EventIdentifiers::MOUSE_MOVE, [this](EventIdentifiers event) { pushEvent(event); });
-  _dispatcher->subscribe(EventIdentifiers::MOUSE_LCLICK, [this](EventIdentifiers event) { pushEvent(event); });
+  _dispatcher->subscribe(EventIdentifiers::MOUSE_MOVE,
+                         [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
+  _dispatcher->subscribe(EventIdentifiers::MOUSE_LCLICK,
+                         [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
   result = _facade->init();
 
 #ifdef DEBUG
@@ -115,27 +116,26 @@ void InterfaceManager::update()
 
 void InterfaceManager::pollEvents()
 {
-  std::vector<EventIdentifiers> events = _eventQueue.drain();
+  std::vector<std::tuple<EventIdentifiers, EventPayload>> events = _eventQueue.drain();
 
-  for (EventIdentifiers event : events)
+  for (std::tuple<EventIdentifiers, EventPayload> event : events)
   {
-    switch (event)
+    switch (std::get<0>(event))
     {
       case EventIdentifiers::MOUSE_MOVE:
       {
-        MousePayload* p = std::get_if<MousePayload>(&_dispatcher->getPayload(EventIdentifiers::MOUSE_MOVE));
+        MousePayload* p = std::get_if<MousePayload>(&std::get<1>(event));
         {
           std::lock_guard lock(_m);
           _currentPos.x = p->x;
           _currentPos.y = p->y;
         }
         std::tuple<std::int16_t, bool> hover = isInterfaceHovered();
-        std::cout << std::get<0>(hover) << std::endl;
+
         if (std::get<0>(hover) != std::get<0>(_currentHover))
         {
           if (std::get<0>(_currentHover) != -1 && std::get<1>(_currentHover))
           {
-            std::cout << "unhover" << std::endl;
             _facade->notify(std::get<0>(_currentHover), 0x02, -1, -1);
           }
           if (std::get<0>(hover) != -1 && std::get<1>(hover))
@@ -149,7 +149,6 @@ void InterfaceManager::pollEvents()
       case EventIdentifiers::MOUSE_LCLICK:
         if (std::get<0>(_currentHover) != -1 && std::get<1>(_currentHover))
         {
-          std::cout << "click" << std::endl;
           _facade->notify(std::get<0>(_currentHover), 0x04, -1, -1);
         }
         break;

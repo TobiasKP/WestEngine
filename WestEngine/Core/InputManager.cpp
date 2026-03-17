@@ -18,6 +18,8 @@
 
 using namespace WestInterface;
 
+std::map<std::int32_t, std::string> InputManager::_inputMap;
+
 InputManager::InputManager() : IManager(nullptr)
 {
   _dispatcher = nullptr;
@@ -124,29 +126,13 @@ std::int32_t InputManager::init()
   return success;
 }
 
-void InputManager::update()
-{
-}
+void InputManager::update() {}
 
 void InputManager::setKey(std::int32_t key, std::string command)
 {
   _inputMap[key] = command;
 }
 
-std::int32_t InputManager::findByOperation(std::string command)
-{
-#ifdef DEBUG
-  logCycle(std::format("{} ### Searching for command {}.\n", getName(), command));
-#endif
-  for (const auto& entry : _inputMap)
-  {
-    if (entry.second.compare(command) == 0)
-    {
-      return entry.first;
-    }
-  }
-  return -1;
-}
 
 std::int32_t
 InputManager::checkInputConfigLineForErrors(std::string key, std::string value, std::list<std::string> _commandList)

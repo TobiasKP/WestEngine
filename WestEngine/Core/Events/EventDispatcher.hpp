@@ -10,7 +10,7 @@
 class EventDispatcher
 {
 public:
-  using Callback = std::function<void(EventIdentifiers)>;
+  using Callback = std::function<void(EventIdentifiers, EventPayload)>;
 
   EventDispatcher() {};
   ~EventDispatcher() {};
@@ -18,7 +18,6 @@ public:
   void registerNewEvent(const EventIdentifiers event);
   void dispatchEvent(const EventIdentifiers name, EventPayload payload);
   void subscribe(const EventIdentifiers name, Callback callback);
-  EventPayload& getPayload(const EventIdentifiers name);
 
 private:
   static std::mutex _mutex;

@@ -10,11 +10,13 @@ std::array<ISystem*, 2> SystemManager::_systems = {};
 
 SystemManager::SystemManager() : IManager(nullptr)
 {
+  _dispatcher = nullptr;
   setName(CoreConstants::ENTITY_SYSTEM_MANAGER);
 }
 
-SystemManager::SystemManager(WestLogger* logger, std::shared_ptr<EventDispatcher> d) : IManager(logger), _dispatcher(d)
+SystemManager::SystemManager(WestLogger* logger, std::shared_ptr<EventDispatcher> d) : IManager(logger)
 {
+  _dispatcher = d;
   setName(CoreConstants::ENTITY_SYSTEM_MANAGER);
 }
 
@@ -22,7 +24,7 @@ SystemManager::~SystemManager() {}
 
 std::int32_t SystemManager::startup()
 {
-  _systems = {new PlayerControl(getLogger()), new MovementSystem(getLogger())};
+  _systems = {new PlayerControl(getLogger(), _dispatcher), new MovementSystem(getLogger())};
 
 #ifdef DEBUG
   logDebug(std::format("{} ### Instantiated critical game systems\n", getName()));

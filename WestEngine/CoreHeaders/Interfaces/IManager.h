@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Constants/InternalEvents.hpp"
+#include "../Core/Events/Event.hpp"
 
 #include <cassert>
 #include <CoreConstants.hpp>
@@ -36,13 +37,13 @@ public:
   {
     return this->_logger;
   }
-  void pushEvent(EventIdentifiers event)
+  void pushEvent(EventIdentifiers event, EventPayload payload)
   {
-    _eventQueue.push(event);
+    _eventQueue.push(std::make_tuple<>(event, payload));
   }
 
 protected:
-  tQueue<EventIdentifiers> _eventQueue;
+  tQueue<std::tuple<EventIdentifiers, EventPayload>> _eventQueue;
   inline void logFailure(const std::string message)
   {
     _logger->log(Level::Error, message);

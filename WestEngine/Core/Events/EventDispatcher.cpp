@@ -17,18 +17,10 @@ void EventDispatcher::dispatchEvent(const EventIdentifiers name, EventPayload pa
   std::lock_guard<std::mutex> lock(_mutex);
   std::int32_t idx            = _nameToIdx[name];
   std::vector<Callback>& subs = _events[idx].subscriber;
-  _events[idx].payload        = std::move(payload);
   for (Callback sub : subs)
   {
-    sub(name);
+    sub(name, payload);
   }
-};
-
-EventPayload& EventDispatcher::getPayload(const EventIdentifiers name)
-{
-  std::lock_guard<std::mutex> lock(_mutex);
-  std::int32_t idx = _nameToIdx[name];
-  return _events[idx].payload;
 };
 
 void EventDispatcher::subscribe(const EventIdentifiers name, Callback callback)

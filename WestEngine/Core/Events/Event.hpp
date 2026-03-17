@@ -10,6 +10,6 @@
 struct Event
 {
   std::string name;
-  std::vector<std::function<void(EventIdentifiers)>> subscriber;
+  std::vector<std::function<void(EventIdentifiers, EventPayload)>> subscriber;
   EventPayload payload;
 };

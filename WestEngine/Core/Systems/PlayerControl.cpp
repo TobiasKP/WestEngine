@@ -2,14 +2,16 @@
 
 #include "../../Constants/Systems.hpp"
 #include "../CoreHeaders/Entity/Scene.h"
+#include "../CoreHeaders/Utils/Math/PositionCalculation.h"
 
 #include <Config.h>
 #include <format>
 
-PlayerControl::PlayerControl(WestLogger* logger) : ISystem(), _cameraPending(false)
+PlayerControl::PlayerControl(WestLogger* logger, std::shared_ptr<EventDispatcher> d) : ISystem(), _cameraPending(false)
 {
   setName(Systems::PLAYER_CONTROL);
-  _logger = logger;
+  _logger     = logger;
+  _dispatcher = d;
 #ifdef DEBUG
   _logger->log(Level::Info, std::format("{} *** Initialized debug information\n", getName()));
   _camLog = true;
@@ -20,18 +22,26 @@ PlayerControl::~PlayerControl() {}
 
 void PlayerControl::init()
 {
-  _reg = Scene::getSceneInstance().getRegistry();
+  _tileIdx = 0;
+  _reg     = Scene::getSceneInstance().getRegistry();
+  _dispatcher->subscribe(EventIdentifiers::MOUSE_MOVE,
+                         [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
+  _dispatcher->subscribe(EventIdentifiers::MOUSE_LCLICK,
+                         [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
+  _dispatcher->subscribe(EventIdentifiers::MOUSE_RCLICK,
+                         [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
 }
 
 void PlayerControl::update()
 {
+  pollEvents();
   std::shared_ptr<ComponentArray<Control>> controlUnits = _reg->getComponentArray<Control>();
   std::uint32_t id                                      = controlUnits->getComponents()[0].entityId;
   if (_cameraPending.exchange(false))
   {
     glm::vec3 localCam;
     {
-      std::lock_guard<std::mutex> lock(_CameraMutex);
+      std::lock_guard<std::mutex> lock(_mutex);
       localCam = _moveCamera;
     }
 
@@ -52,6 +62,7 @@ void PlayerControl::update()
     _camLog = true;
   }
 #endif
+
   if (_state == LuaFacade::LuaStates::IDLE)
   {
     Entity* e         = Scene::getSceneInstance().getEntityById(id);
@@ -74,6 +85,48 @@ void PlayerControl::update()
   }
 }
 
+void PlayerControl::pollEvents()
+{
+  std::vector<std::tuple<EventIdentifiers, EventPayload>> events = _eventQueue.drain();
+  for (std::tuple<EventIdentifiers, EventPayload> event : events)
+  {
+    switch (std::get<0>(event))
+    {
+      case EventIdentifiers::MOUSE_MOVE:
+      {
+        MousePayload* p = std::get_if<MousePayload>(&std::get<1>(event));
+        std::unique_lock<std::mutex> lock(_mutex, std::try_to_lock);
+        glm::vec3 hoverPosition =
+          PositionCalculation::getWorldPosition(glm::vec2(p->x, p->y), Scene::getSceneInstance().getCamera());
+        _tileIdx = Scene::getSceneInstance().getWorld()->worldPosToTile(hoverPosition.x, hoverPosition.z);
+        break;
+      }
+      case EventIdentifiers::MOUSE_RCLICK:
+      {
+        World* w         = Scene::getSceneInstance().getWorld();
+        std::uint32_t id = w->getEntityByIdx(_tileIdx);
+        if (id > 0)
+        {
+          LuaFacade::getLuaFacadeInstance().onEntityClicked(1, LuaFacade::MouseAction::RMOUSE_CLICK, id);
+        }
+      }
+      case EventIdentifiers::MOUSE_LCLICK:
+      {
+        World* w                             = Scene::getSceneInstance().getWorld();
+        std::uint32_t id                     = w->getEntityByIdx(_tileIdx);
+        std::optional<glm::vec3> destination = w->tileToWorldPos(_tileIdx);
+        if (destination.has_value() && id == 0)
+        {
+          passDestinationPosition(destination.value());
+        }
+        break;
+      }
+      default:
+        break;
+    }
+  }
+}
+
 void PlayerControl::updateCamera(glm::vec3 local)
 {
   Camera* camera = Scene::getSceneInstance().getCamera();
@@ -84,7 +137,7 @@ void PlayerControl::updateCamera(glm::vec3 local)
 
 void PlayerControl::setCameraMovement(glm::vec3 move)
 {
-  std::unique_lock<std::mutex> lock(_CameraMutex, std::try_to_lock);
+  std::unique_lock<std::mutex> lock(_mutex, std::try_to_lock);
   if (lock.owns_lock())
   {
     _moveCamera += move;

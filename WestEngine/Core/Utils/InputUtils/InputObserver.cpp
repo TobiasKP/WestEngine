@@ -11,40 +11,7 @@ InputObserver::InputObserver()
   _facade  = &WestInterfaceFacade::getInterfaceInstance();
 }
 
-void InputObserver::notify()
-{
-  assert(_control != nullptr);
-  {
-    std::lock_guard<std::mutex> lock(_generalMutex);
-    _generalFlags = {0b0000'0000};
-  }
-  {
-    std::lock_guard<std::mutex> lock(_controlMutex);
-    if (static_cast<bool>(_controlFlags & BitMasks::Control::UI_CLICKED))
-    {
-      assert(_interfaceHoverId != -1);
-      _facade->notify(_interfaceHoverId, 0x04, -1, -1);
-    }
-
-    if (static_cast<bool>(_controlFlags & BitMasks::Control::UI_HOVERED))
-    {
-      assert(_interfaceHoverId != -1);
-      _facade->notify(_interfaceHoverId, 0x01, _x, _z);
-    }
-
-    if (static_cast<bool>(_controlFlags & BitMasks::Control::UI_UNHOVERED))
-    {
-      assert(_interfaceUnhoverId != -1);
-      _facade->notify(_interfaceUnhoverId, 0x02, -1, -1);
-    }
-
-    entityHovering();
-
-
-    _interfaceHoverId = _interfaceUnhoverId = -1;
-    _controlFlags                           = {0b0000'0000};
-  }
-}
+void InputObserver::notify() {}
 
 void InputObserver::entityHovering()
 {

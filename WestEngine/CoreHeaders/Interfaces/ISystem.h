@@ -4,6 +4,7 @@
 
 #include "../Components/ComponentRegistry.hpp"
 #include "../Constants/InternalEvents.hpp"
+#include "../Core/Events/EventDispatcher.hpp"
 #include "../Core/Scripting/LuaFacade.hpp"
 
 #include <CoreConstants.hpp>
@@ -33,9 +34,9 @@ public:
   {
     _state = s;
   }
-  void pushEvent(EventIdentifiers event)
+  void pushEvent(EventIdentifiers event, EventPayload payload)
   {
-    _eventQueue.push(event);
+    _eventQueue.push(std::make_tuple<>(event, payload));
   }
 
   virtual void update()              = 0;
@@ -44,7 +45,8 @@ public:
   virtual void pollEvents() {};
 
 protected:
-  tQueue<EventIdentifiers> _eventQueue;
+  tQueue<std::tuple<EventIdentifiers, EventPayload>> _eventQueue;
+  std::shared_ptr<EventDispatcher> _dispatcher;
   ComponentRegistry* _reg;
   WestLogger* _logger;
   LuaFacade::LuaStates _state = LuaFacade::LuaStates::IDLE;
