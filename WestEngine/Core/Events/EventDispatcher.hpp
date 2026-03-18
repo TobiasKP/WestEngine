@@ -4,7 +4,7 @@
 #include "Event.hpp"
 
 #include <cstdint>
-#include <flat_map>
+#include <unordered_map>
 #include <WestLogger.h>
 
 class EventDispatcher
@@ -21,7 +21,7 @@ public:
 
 private:
   std::mutex _mutex;
-  std::flat_map<EventIdentifiers, std::int32_t> _nameToIdx;
+  std::unordered_map<EventIdentifiers, std::int32_t> _nameToIdx;
   std::vector<Event> _events;
   WestLogger* _logger = &WestLogger::getLoggerInstance();
 };

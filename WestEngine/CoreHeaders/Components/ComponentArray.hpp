@@ -4,6 +4,7 @@
 
 #include <CoreConstants.hpp>
 #include <unordered_map>
+#include <array>
 
 template <typename T>
 class ComponentArray : public IComponentArray
