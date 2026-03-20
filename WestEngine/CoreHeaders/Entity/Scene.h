@@ -1,9 +1,9 @@
 #pragma once
 
+#include "../Components/ComponentRegistry.hpp"
 #include "Camera.h"
 #include "Entity.h"
 #include "World.hpp"
-#include "../Components/ComponentRegistry.hpp"
 
 #include <CoreConstants.hpp>
 #include <mutex>
@@ -21,9 +21,9 @@ public:
   void init();
   void addEntity(Entity&& entity);
   void addDebugEntity(Entity&& entity);
-  void addCamera(Camera* cam);
-  void addWorld(World* world);
-  void addRegistry(ComponentRegistry* reg);
+  void addWorld(std::shared_ptr<World> world);
+  void addCamera(std::shared_ptr<Camera> cam);
+  void addRegistry(std::shared_ptr<ComponentRegistry> reg);
   void removeEntity(const Entity& entity);
   void deleteScene();
 
@@ -39,25 +39,26 @@ public:
   {
     return _sceneName;
   }
-  inline Camera* getCamera()
-  {
-    return _camera;
-  }
-  inline World* getWorld()
+
+  inline std::shared_ptr<World> getWorld()
   {
     return _world;
   }
-  inline ComponentRegistry* getRegistry()
+  inline std::shared_ptr<ComponentRegistry> getRegistry()
   {
     return _registry;
+  }
+  inline std::shared_ptr<Camera> getCamera()
+  {
+    return _camera;
   }
 
 private:
   static std::mutex _mutex;
 
-  static Camera* _camera;
-  static World* _world;
-  ComponentRegistry* _registry;
+  std::shared_ptr<ComponentRegistry> _registry;
+  std::shared_ptr<World> _world;
+  std::shared_ptr<Camera> _camera;
   std::vector<Entity> _entities;
   std::vector<Entity> _debugEntities;
   std::string _sceneName = CoreConstants::UNDEFINED_STRING.data();

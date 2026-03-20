@@ -30,8 +30,8 @@ private:
   ObjectLoader* _loader;
   EntityBuilder* _builder;
   lua_State* L;
-  WorldBuilder* _wbuilder;
-  ComponentRegistry* _registry;
+  WorldBuilder* _wbuilder; 
+  std::shared_ptr<ComponentRegistry> _registry;
   std::shared_ptr<EventDispatcher> _dispatcher;
 
   // Functions

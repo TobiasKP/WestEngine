@@ -78,7 +78,7 @@ void World::setFlag(std::uint32_t flag, std::int32_t idx)
 }
 
 void World::addEntityIdToIdx(float x, float y, std::uint32_t id)
-{
+{ 
   if (_entityIdToIdx.contains(id))
   {
     std::uint16_t tile = _entityIdToIdx[id];
@@ -94,7 +94,7 @@ void World::addEntityIdToIdx(float x, float y, std::uint32_t id)
 }
 
 std::uint32_t World::getEntityByIdx(std::int32_t idx)
-{
+{ 
   if (_idxToEntityId.contains(idx))
   {
     return _idxToEntityId[idx];

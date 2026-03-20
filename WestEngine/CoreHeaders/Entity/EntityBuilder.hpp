@@ -9,7 +9,7 @@
 class EntityBuilder
 {
 public:
-  EntityBuilder(lua_State* state, ObjectLoader* loader, ComponentRegistry* r);
+  EntityBuilder(lua_State* state, ObjectLoader* loader, std::shared_ptr<ComponentRegistry> r);
   ~EntityBuilder();
 
   static int createEntity(lua_State*);
@@ -23,7 +23,7 @@ private:
   Entity _e;
 
   ComponentFactory* _cFac;
-  ComponentRegistry* _registry;
+  std::shared_ptr<ComponentRegistry> _registry;
 
   static EntityBuilder* retrieveMeFromStack(lua_State*);
 };

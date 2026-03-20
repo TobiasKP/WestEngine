@@ -10,7 +10,7 @@
 class WorldBuilder
 {
 public:
-  WorldBuilder(ComponentRegistry* r, ObjectLoader* o, lua_State* l);
+  WorldBuilder(std::shared_ptr<ComponentRegistry> r, ObjectLoader* o, lua_State* l);
   ~WorldBuilder();
 
   static int loadWorld(lua_State*);
@@ -23,6 +23,6 @@ private:
   static constexpr std::uint32_t indices[6] = {0, 1, 3, 1, 2, 3};
   static constexpr float baseQuad[]         = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f};
 
-  ComponentRegistry* _registry;
+  std::shared_ptr<ComponentRegistry> _registry;
   ObjectLoader* _loader;
 };

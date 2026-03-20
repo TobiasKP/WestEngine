@@ -25,7 +25,7 @@ std::uint32_t DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction)
 
   Entity e;
   e.setId(Config::incEntityId());
-  ComponentRegistry* reg = _scene->getRegistry();
+  std::shared_ptr<ComponentRegistry> reg = _scene->getRegistry();
   reg->addComponent<Shader>(e.getId(), std::move(*s));
   reg->addComponent<Model>(e.getId(), std::move(*model));
   reg->addComponent<Material>(e.getId(), std::move(*material));
@@ -37,6 +37,6 @@ std::uint32_t DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction)
 
 void DebugDrawUtils::unloadModel(const Entity& entity)
 {
-  ComponentRegistry* reg = _scene->getRegistry();
+  std::shared_ptr<ComponentRegistry> reg = _scene->getRegistry();
   _loader->unloadModel(reg->getComponent<Model>(entity.getId()), reg->getComponent<Material>(entity.getId()));
 }

@@ -120,8 +120,8 @@ void RenderManager::renderGameEntities()
 
 void RenderManager::renderMainLoop(const Entity& entity)
 {
-  ComponentRegistry* reg = _scene->getRegistry();
-  Shader* s              = reg->getComponent<Shader>(entity.getId());
+  std::shared_ptr<ComponentRegistry> reg = _scene->getRegistry();
+  Shader* s                              = reg->getComponent<Shader>(entity.getId());
   if (!s->initialized)
   {
 #ifdef DEBUG
@@ -175,14 +175,14 @@ void RenderManager::renderWorld()
 {
   glEnable(GL_DEPTH_TEST);
 
-  World* world = _scene->getWorld();
+  std::shared_ptr<World> world = _scene->getWorld();
   if (world == nullptr)
   {
     return;
   }
 
-  ComponentRegistry* reg = _scene->getRegistry();
-  Shader* s              = reg->getComponent<Shader>(world->getId());
+  std::shared_ptr<ComponentRegistry> reg = _scene->getRegistry();
+  Shader* s                              = reg->getComponent<Shader>(world->getId());
   if (s == nullptr || !s->initialized)
   {
 #ifdef DEBUG
@@ -333,9 +333,9 @@ void RenderManager::renderUserInterfaces()
 
 void RenderManager::updateUniforms(const Entity& e, Model* model, Material* material)
 {
-  ComponentRegistry* reg = _scene->getRegistry();
-  Position* p            = reg->getComponent<Position>(e.getId());
-  Texture* t             = material->diffuseTexture;
+  std::shared_ptr<ComponentRegistry> reg = _scene->getRegistry();
+  Position* p                            = reg->getComponent<Position>(e.getId());
+  Texture* t                             = material->diffuseTexture;
 #ifdef DEBUG
   if (e.isDebugEntity())
   {
@@ -396,10 +396,10 @@ void RenderManager::updateUniforms(const Entity& e, Model* model, Material* mate
 
 bool RenderManager::AABBcheck(const Entity& e)
 {
-  const Frustum& f       = _scene->getCamera()->getFrustum();
-  ComponentRegistry* reg = _scene->getRegistry();
-  Position* p            = reg->getComponent<Position>(e.getId());
-  AABB* aabb             = reg->getComponent<AABB>(e.getId());
+  const Frustum& f                       = _scene->getCamera()->getFrustum();
+  std::shared_ptr<ComponentRegistry> reg = _scene->getRegistry();
+  Position* p                            = reg->getComponent<Position>(e.getId());
+  AABB* aabb                             = reg->getComponent<AABB>(e.getId());
   assert(p != nullptr && aabb != nullptr);
   glm::vec3 min = aabb->min * p->scale + p->position;
   glm::vec3 max = aabb->max * p->scale + p->position;

@@ -6,8 +6,6 @@
 
 
 std::mutex Scene::_mutex;
-Camera* Scene::_camera;
-World* Scene::_world;
 
 Scene& Scene::getSceneInstance()
 {
@@ -17,21 +15,13 @@ Scene& Scene::getSceneInstance()
   return instance;
 }
 
-Scene::Scene()
-{
-  _camera = nullptr;
-  _world  = nullptr;
-}
+Scene::Scene() {}
 
 Scene::~Scene() {}
 
 void Scene::deleteScene()
 {
-  delete _world;
-  delete _camera;
   _entities.clear();
-  _world  = nullptr;
-  _camera = nullptr;
 }
 
 void Scene::init()
@@ -95,25 +85,23 @@ void Scene::addDebugEntity(Entity&& entity)
   _debugEntities.emplace_back(std::move(entity));
 }
 
-void Scene::addCamera(Camera* cam)
+void Scene::addWorld(std::shared_ptr<World> w)
 {
-  assert(cam != nullptr);
   std::lock_guard<std::mutex> lock(_mutex);
-  _camera = cam;
+  _world = w;
 }
 
-void Scene::addWorld(World* world)
+
+void Scene::addCamera(std::shared_ptr<Camera> c)
 {
-  assert(world != nullptr);
   std::lock_guard<std::mutex> lock(_mutex);
-  _world = std::move(world);
+  _camera = c;
 }
 
-void Scene::addRegistry(ComponentRegistry* reg)
+void Scene::addRegistry(std::shared_ptr<ComponentRegistry> r)
 {
-  assert(reg != nullptr);
   std::lock_guard<std::mutex> lock(_mutex);
-  _registry = std::move(reg);
+  _registry = r;
 }
 
 void Scene::insertEntityByGroup(Entity&& entity)

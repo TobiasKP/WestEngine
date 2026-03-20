@@ -4,7 +4,8 @@
 #include "../../CoreHeaders/Entity/Scene.h"
 #include "../Scripting/LuaFacade.hpp"
 
-EntityBuilder::EntityBuilder(lua_State* state, ObjectLoader* loader, ComponentRegistry* r) : _registry(r)
+EntityBuilder::EntityBuilder(lua_State* state, ObjectLoader* loader, std::shared_ptr<ComponentRegistry> r)
+  : _registry(r)
 {
   _cFac = new ComponentFactory(r, loader);
   LuaFacade::getLuaFacadeInstance().registerCFunction(createEntity, LuaAPI::C_CREATE_ENTITY.data(), this);
@@ -39,7 +40,7 @@ int EntityBuilder::addComponent(lua_State* L)
 
 int EntityBuilder::buildEntity(lua_State* L)
 {
-  EntityBuilder* me = EntityBuilder::retrieveMeFromStack(L); 
+  EntityBuilder* me = EntityBuilder::retrieveMeFromStack(L);
   Scene::getSceneInstance().addEntity(std::move(me->_e));
   return 0;
 }

@@ -1,7 +1,6 @@
 #include "../CoreHeaders/SceneManager.h"
 
 #include "../Constants/LuaAPI.hpp"
-#include "../CoreHeaders/Entity/Camera.h"
 
 #include <filesystem>
 #include <format>
@@ -35,12 +34,14 @@ SceneManager::~SceneManager() {}
 
 std::int32_t SceneManager::startup()
 {
-  _loader     = new ObjectLoader(getLogger());
-  _registry   = new ComponentRegistry();
-  _scene      = &Scene::getSceneInstance();
-  Camera* cam = new Camera(glm::vec3(0.0, 3.0, 5.0), glm::vec3(25.0f, 0, 0));
-  _scene->addCamera(cam);
+  std::shared_ptr<Camera> c = std::make_shared<Camera>(glm::vec3(0.0, 3.0, 5.0), glm::vec3(25.0f, 0, 0));
+  _registry                 = std::make_shared<ComponentRegistry>();
+  _loader                   = new ObjectLoader(getLogger());
+
+  _scene = &Scene::getSceneInstance();
   _scene->addRegistry(_registry);
+  _scene->addCamera(std::move(c));
+
   _facade = &LuaFacade::getLuaFacadeInstance();
   _facade->startup(getLogger());
   L = _facade->getLuaState();

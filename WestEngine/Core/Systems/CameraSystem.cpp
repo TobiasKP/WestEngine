@@ -1,15 +1,16 @@
 #include "../../CoreHeaders/Systems/CameraSystem.hpp"
 
-#include "../../CoreHeaders/Entity/Scene.h"
 #include "../../CoreHeaders/InputManager.h"
 
-CameraSystem::CameraSystem(WestLogger* logger, std::shared_ptr<EventDispatcher> d)
+CameraSystem::CameraSystem(std::shared_ptr<EventDispatcher> d,
+                           WestLogger* l,
+                           std::shared_ptr<ComponentRegistry> r,
+                           std::shared_ptr<Camera> c)
+  : ISystem(d, l, r)
 {
-  _move       = glm::vec3(0);
-  _cam        = nullptr;
-  _dirty      = false;
-  _logger     = logger;
-  _dispatcher = d;
+  _move  = glm::vec3(0);
+  _cam   = c;
+  _dirty = false;
 };
 
 
@@ -24,9 +25,8 @@ void CameraSystem::update()
 
 void CameraSystem::updateDebuggingInfo() {};
 
-void CameraSystem::init()
-{
-  _cam = Scene::getSceneInstance().getCamera();
+void CameraSystem::init(std::shared_ptr<World> w)
+{ 
   assert(_cam != nullptr);
   _dispatcher->subscribe(EventIdentifiers::MOUSE_WHEEL,
                          [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });

@@ -77,8 +77,8 @@ void ComponentFactory::addPosition(lua_State* L, Entity& e)
   p.position = pos;
   p.scale    = 1.0f;
   p.rotation = glm::vec3(1.0f);
+  Scene::getSceneInstance().getWorld()->addEntityIdToIdx(pos.x, pos.z, e.getId());
   _registry->addComponent<Position>(e.getId(), std::move(p));
-  Scene::getSceneInstance().getWorld()->addEntityIdToIdx(p.position.x, p.position.z, e.getId());
 };
 
 void ComponentFactory::addMovement(lua_State* L, Entity& e)

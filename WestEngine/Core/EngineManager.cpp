@@ -1,11 +1,11 @@
 #include "../CoreHeaders/EngineManager.h"
 
+#include "../CoreHeaders/InputManager.h"
 #include "../CoreHeaders/InterfaceManager.h"
 #include "../CoreHeaders/RenderManager.h"
 #include "../CoreHeaders/SceneManager.h"
 #include "../CoreHeaders/ShaderManager.h"
 #include "../CoreHeaders/SystemManager.h"
-#include "../CoreHeaders/InputManager.h"
 
 #include <cstring>
 #include <format>
@@ -39,10 +39,11 @@ EngineManager::EngineManager(WestLogger* logger) : IManager(logger)
   _manager[0] = new InputManager(logger, _dispatcher);
   _manager[1] = _windowManager;
   _manager[2] = new ShaderManager(logger);
-  _manager[3] = new SystemManager(logger, _dispatcher);
-  _manager[4] = new InterfaceManager(logger, _windowManager, _dispatcher);
-  _manager[5] = new RenderManager(logger);
-  _manager[6] = new SceneManager(logger, _dispatcher);
+  _manager[3] = new InterfaceManager(logger, _windowManager, _dispatcher);
+  _manager[4] = new RenderManager(logger);
+  _manager[5] = new SceneManager(logger, _dispatcher);
+  _manager[6] = new SystemManager(logger, _dispatcher);
+
   assert(_manager.size() == CoreConstants::MAX_Q_SIZE);
 }
 

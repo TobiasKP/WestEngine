@@ -59,5 +59,5 @@ protected:
 
 private:
   WestLogger* _logger = nullptr;
-  std::string _name   = CoreConstants::UNDEFINED_STRING.data();
+  std::string _name                   = CoreConstants::UNDEFINED_STRING.data();
 };

@@ -24,10 +24,13 @@ SystemManager::~SystemManager() {}
 
 std::int32_t SystemManager::startup()
 {
-  _systems = {new PlayerControl(getLogger(), _dispatcher),
-              new MovementSystem(getLogger()),
-              new CameraSystem(getLogger(), _dispatcher),
-              new PositionalSystem(getLogger(), _dispatcher)};
+  std::shared_ptr<Camera> c            = Scene::getSceneInstance().getCamera();
+  std::shared_ptr<ComponentRegistry> r = Scene::getSceneInstance().getRegistry();
+  _systems                             = {new PlayerControl(_dispatcher, getLogger(), r, c),
+                                          new MovementSystem(_dispatcher, getLogger(), r),
+                                          new CameraSystem(_dispatcher, getLogger(), r, c),
+                                          new PositionalSystem(_dispatcher, getLogger(), r, c)};
+
 
 #ifdef DEBUG
   logDebug(std::format("{} ### Instantiated critical game systems\n", getName()));
@@ -47,10 +50,12 @@ std::int32_t SystemManager::init()
 #ifdef DEBUG
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
-  _scene = &Scene::getSceneInstance();
+
+  _scene                   = &Scene::getSceneInstance();
+  std::shared_ptr<World> w = _scene->getWorld();
   for (ISystem* sys : _systems)
   {
-    sys->init();
+    sys->init(w);
   }
 
 #ifdef DEBUG
