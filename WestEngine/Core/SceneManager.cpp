@@ -92,7 +92,13 @@ std::int32_t SceneManager::init()
   }
   luaL_dofile(L, filePath.c_str());
   lua_getglobal(L, "Init");
-  lua_call(L, 0, 0);
+  std::int32_t result = lua_pcall(L, 0, 0, 0);
+  if (result != 0)
+  {
+    logFailure(
+      std::format("{} ### Lua init file: {} - Init function not found, Aborting Scene init ", getName(), filePath));
+    return 1;
+  }
 
   // TODO potentially do in update later on
   lua_getglobal(L, "LoadScene");
@@ -122,7 +128,7 @@ void SceneManager::update()
   for (std::uint32_t id : removedEntities)
   {
     Entity* e = _scene->getEntityById(id);
-    removeEntityFromScene(*e); 
+    removeEntityFromScene(*e);
   }
 }
 
@@ -169,9 +175,11 @@ void SceneManager::deleteScene()
 
 int SceneManager::getHealth(lua_State* L)
 {
-  SceneManager* me     = (SceneManager*)lua_touserdata(L, lua_upvalueindex(1));
-  std::uint32_t id     = lua_tointeger(L, 1);
+  SceneManager* me = (SceneManager*)lua_touserdata(L, lua_upvalueindex(1));
+  std::uint32_t id = lua_tointeger(L, 1);
+  assert(me->_registry->getComponent<Health>(id) != nullptr);
   std::uint16_t health = me->_registry->getComponent<Health>(id)->current;
+
   lua_pushinteger(L, health);
   return 1;
 }

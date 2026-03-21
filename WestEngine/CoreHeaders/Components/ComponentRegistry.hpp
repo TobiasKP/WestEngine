@@ -14,7 +14,7 @@ public:
   template <typename T>
   void registerComponent()
   {
-    const std::type_info& t        = typeid(T);
+    const std::type_info& t         = typeid(T);
     _componentArrays[t.hash_code()] = std::make_shared<ComponentArray<T>>();
   };
 
@@ -37,7 +37,8 @@ public:
   template <typename T>
   T* getComponent(std::uint32_t entityId)
   {
-    const std::type_info& t                = typeid(T);
+    const std::type_info& t = typeid(T);
+    assert(_componentArrays.contains(t.hash_code()));
     std::shared_ptr<IComponentArray> array = _componentArrays[t.hash_code()];
     return std::static_pointer_cast<ComponentArray<T>>(array)->getComponentById(entityId);
   };

@@ -3,6 +3,8 @@
 #include "../../Constants/LuaAPI.hpp"
 #include "../Scripting/LuaFacade.hpp"
 
+#include <format>
+
 EntityBuilder::EntityBuilder(lua_State* state,
                              ObjectLoader* loader,
                              std::shared_ptr<ComponentRegistry> r,
@@ -45,7 +47,14 @@ int EntityBuilder::buildEntity(lua_State* L)
   EntityBuilder* me = EntityBuilder::retrieveMeFromStack(L);
   Position* p       = me->_registry->getComponent<Position>(me->_e.getId());
   Control* c        = me->_registry->getComponent<Control>(me->_e.getId());
-  LuaFacade::getLuaFacadeInstance().onEntityCreation(me->_e.getId(), c != nullptr ? true : false);
+  bool result       = LuaFacade::getLuaFacadeInstance().onEntityCreation(me->_e.getId(), c != nullptr ? true : false);
+  if (result != 0)
+  {
+    WestLogger::getLoggerInstance().log(
+      Level::Error, std::format("Error creating Entity, can not add to lua registration aborting scene addition."));
+    me->_e = {};
+    return 1;
+  }
   me->_scene->getWorld()->addEntityIdToIdx(p->position.x, p->position.z, me->_e.getId());
   me->_scene->addEntity(std::move(me->_e));
   return 0;

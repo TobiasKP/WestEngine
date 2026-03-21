@@ -166,6 +166,10 @@ void EngineManager::update()
 
     if (Config::requestedWidth > 0 && Config::requestedHeight > 0)
     {
+#ifdef DEBUG
+      logDebug(std::format(
+        "{} ### Requested window change: {} x {}.\n", getName(), Config::requestedWidth, Config::requestedHeight));
+#endif
       _windowManager->resizeWindow(Config::requestedWidth, Config::requestedHeight);
       Config::requestedWidth  = -1;
       Config::requestedHeight = -1;
