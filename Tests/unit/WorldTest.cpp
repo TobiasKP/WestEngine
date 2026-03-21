@@ -1,5 +1,5 @@
-#include <gtest/gtest.h>
 #include <Entity/World.hpp>
+#include <gtest/gtest.h>
 #include <Interfaces/ISystem.h>
 
 class WorldTest : public ::testing::Test
@@ -79,7 +79,7 @@ public:
   }
   void update() override {}
   void updateDebuggingInfo() override {}
-  void init() override {}
+  void init(const std::shared_ptr<World>& w) override {}
 };
 
 TEST_F(WorldTest, GetReachableTilesRange1FromCenter)

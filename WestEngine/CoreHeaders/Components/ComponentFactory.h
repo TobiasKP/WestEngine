@@ -9,11 +9,11 @@
 class ComponentFactory
 {
 public:
-  ComponentFactory(ComponentRegistry* r, ObjectLoader* l) : _registry(r), _loader(l) {};
+  ComponentFactory(std::shared_ptr<ComponentRegistry> r, ObjectLoader* l) : _registry(r), _loader(l) {};
   void createComponent(lua_State* L, std::string& name, Entity& e);
 
 private:
-  ComponentRegistry* _registry;
+  std::shared_ptr<ComponentRegistry> _registry;
   ObjectLoader* _loader;
 
   void addPosition(lua_State* L, Entity& e);

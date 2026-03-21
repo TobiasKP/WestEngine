@@ -6,19 +6,19 @@
 class CameraSystem : public ISystem
 {
 public:
-  CameraSystem() : ISystem() {};
-  CameraSystem(WestLogger* logger, std::shared_ptr<EventDispatcher> d);
+  CameraSystem(std::shared_ptr<EventDispatcher> d,
+               WestLogger* l,
+               std::shared_ptr<ComponentRegistry> r,
+               std::shared_ptr<Camera> c); 
   ~CameraSystem() override;
 
   void update() override;
   void updateDebuggingInfo() override;
-  void init() override;
+  void init(const std::shared_ptr<World>& w) override;
   void pollEvents() override;
 
- private:
+private:
   bool _dirty;
-  WestLogger* _logger;
-  std::shared_ptr<EventDispatcher> _dispatcher;
-  Camera* _cam;
+  std::shared_ptr<Camera> _cam;
   glm::vec3 _move;
 };

@@ -1,7 +1,6 @@
 #include "../CoreHeaders/SceneManager.h"
 
 #include "../Constants/LuaAPI.hpp"
-#include "../CoreHeaders/Entity/Camera.h"
 
 #include <filesystem>
 #include <format>
@@ -13,19 +12,20 @@ SceneManager::SceneManager() : IManager(nullptr)
   setName(CoreConstants::SCENE_MANAGER);
   _scene    = nullptr;
   _loader   = nullptr;
-  _builder  = nullptr;
+  _ebuilder = nullptr;
   _wbuilder = nullptr;
   _registry = nullptr;
   L         = nullptr;
 }
 
-SceneManager::SceneManager(WestLogger* logger, std::shared_ptr<EventDispatcher> d) : IManager(logger)
+SceneManager::SceneManager(WestLogger* logger, const std::shared_ptr<EventDispatcher>& d, const std::shared_ptr<Scene>& s)
+  : IManager(logger)
 {
   setName(CoreConstants::SCENE_MANAGER);
   _dispatcher = d;
-  _scene      = nullptr;
+  _scene      = s;
   _loader     = nullptr;
-  _builder    = nullptr;
+  _ebuilder   = nullptr;
   _wbuilder   = nullptr;
   _registry   = nullptr;
   L           = nullptr;
@@ -35,19 +35,20 @@ SceneManager::~SceneManager() {}
 
 std::int32_t SceneManager::startup()
 {
-  _loader     = new ObjectLoader(getLogger());
-  _registry   = new ComponentRegistry();
-  _scene      = &Scene::getSceneInstance();
-  Camera* cam = new Camera(glm::vec3(0.0, 3.0, 5.0), glm::vec3(25.0f, 0, 0));
-  _scene->addCamera(cam);
+  std::shared_ptr<Camera> c = std::make_shared<Camera>(glm::vec3(0.0, 3.0, 5.0), glm::vec3(25.0f, 0, 0));
+  _registry                 = std::make_shared<ComponentRegistry>();
+  _loader                   = new ObjectLoader(getLogger());
+
   _scene->addRegistry(_registry);
+  _scene->addCamera(std::move(c));
+
   _facade = &LuaFacade::getLuaFacadeInstance();
   _facade->startup(getLogger());
   L = _facade->getLuaState();
 
-  _builder  = new EntityBuilder(L, _loader, _registry);
-  _wbuilder = new WorldBuilder(_registry, _loader, L);
-  assert(_loader != nullptr && _scene != nullptr && _wbuilder != nullptr && _builder != nullptr);
+  _ebuilder = std::make_unique<EntityBuilder>(L, _loader, _registry, _scene);
+  _wbuilder = std::make_unique<WorldBuilder>(L, _loader, _registry, _scene);
+  assert(_loader != nullptr && _scene != nullptr && _wbuilder != nullptr && _ebuilder != nullptr);
 #ifdef DEBUG
   logDebug(std::format("{} ### instantiated Lua state\n", getName()));
 #endif
@@ -59,6 +60,8 @@ void SceneManager::shutdown()
 #ifdef DEBUG
   logDebug(std::format("{} ### Shutting down {}...\n", getName(), getName()));
 #endif
+  _ebuilder.reset();
+  _wbuilder.reset();
   _facade->shutdown();
   deleteScene();
 }

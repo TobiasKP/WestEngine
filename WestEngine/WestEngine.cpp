@@ -5,9 +5,9 @@
 
 int main()
 {
-  WestLogger& westLogger       = WestLogger::getLoggerInstance();
-  EngineManager* engineManager = new EngineManager(&westLogger);
-  std::int32_t success         = 0;
+  WestLogger& westLogger                       = WestLogger::getLoggerInstance();
+  std::unique_ptr<EngineManager> engineManager = std::make_unique<EngineManager>(&westLogger);
+  std::int32_t success                         = 0;
 
   success = engineManager->startup();
   if (success != 0)

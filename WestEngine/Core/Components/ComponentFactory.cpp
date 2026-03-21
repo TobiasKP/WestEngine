@@ -2,7 +2,6 @@
 
 #include "../../Constants/Components.hpp"
 #include "../../CoreHeaders/Components/Umbrella.h"
-#include "../../CoreHeaders/Entity/Scene.h"
 
 #include <format>
 
@@ -78,7 +77,6 @@ void ComponentFactory::addPosition(lua_State* L, Entity& e)
   p.scale    = 1.0f;
   p.rotation = glm::vec3(1.0f);
   _registry->addComponent<Position>(e.getId(), std::move(p));
-  Scene::getSceneInstance().getWorld()->addEntityIdToIdx(p.position.x, p.position.z, e.getId());
 };
 
 void ComponentFactory::addMovement(lua_State* L, Entity& e)

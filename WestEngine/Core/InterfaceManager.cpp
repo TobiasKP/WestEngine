@@ -21,7 +21,7 @@ InterfaceManager::InterfaceManager() : IManager(nullptr)
 #endif
 };
 
-InterfaceManager::InterfaceManager(WestLogger* logger, WindowManager* manager, std::shared_ptr<EventDispatcher> d)
+InterfaceManager::InterfaceManager(WestLogger* logger, WindowManager* manager, const std::shared_ptr<EventDispatcher>& d)
   : IManager(logger)
 {
   setName(CoreConstants::INTERFACE_MANAGER);

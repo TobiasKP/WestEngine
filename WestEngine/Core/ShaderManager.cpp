@@ -22,11 +22,11 @@ ShaderManager::ShaderManager() : IManager(nullptr)
   _scene  = nullptr;
 }
 
-ShaderManager::ShaderManager(WestLogger* logger) : IManager(logger)
+ShaderManager::ShaderManager(WestLogger* logger, const std::shared_ptr<Scene>& s) : IManager(logger)
 {
   setName(CoreConstants::SHADER_MANAGER);
   _facade = nullptr;
-  _scene  = nullptr;
+  _scene  = s;
 }
 
 ShaderManager::~ShaderManager() {}
@@ -43,7 +43,7 @@ void ShaderManager::shutdown()
 #endif
 
   glUseProgram(0);
-  ComponentRegistry* reg = _scene->getRegistry();
+  std::shared_ptr<ComponentRegistry> reg = _scene->getRegistry();
   for (auto& entity : _scene->getEntities())
   {
     Shader* s        = reg->getComponent<Shader>(entity.getId());
@@ -66,10 +66,7 @@ std::int32_t ShaderManager::init()
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
 
-  _facade = &WestInterfaceFacade::getInterfaceInstance();
-  _scene  = &Scene::getSceneInstance();
-  _scene->getCamera()->setCameraUniforms(
-    UniformUtils::createUniformBufferObject(UniformConstants::CAMERA_UNIFORMS, sizeof(glm::mat4) * 2, 1));
+  _facade        = &WestInterfaceFacade::getInterfaceInstance();
   GLuint success = initInterfaceShader();
   if (success == 1)
   {
@@ -105,8 +102,8 @@ void ShaderManager::update()
 
 void ShaderManager::initEntityShader(const Entity& entity)
 {
-  ComponentRegistry* reg = _scene->getRegistry();
-  Shader* s              = reg->getComponent<Shader>(entity.getId());
+  std::shared_ptr<ComponentRegistry> reg = _scene->getRegistry();
+  Shader* s                              = reg->getComponent<Shader>(entity.getId());
   assert(s != nullptr);
   if (s->initialized)
   {
@@ -151,14 +148,14 @@ void ShaderManager::initEntityShader(const Entity& entity)
 
 void ShaderManager::initWorldShader()
 {
-  World* world = _scene->getWorld();
+  std::shared_ptr<World> world = _scene->getWorld();
   if (world == nullptr)
   {
     return;
   }
 
-  ComponentRegistry* reg = _scene->getRegistry();
-  Shader* ws             = reg->getComponent<Shader>(world->getId());
+  std::shared_ptr<ComponentRegistry> reg = _scene->getRegistry();
+  Shader* ws                             = reg->getComponent<Shader>(world->getId());
   if (ws == nullptr || ws->initialized)
   {
     return;
@@ -296,9 +293,9 @@ GLuint ShaderManager::initShader(Shader* s, const Entity& entity)
 // per program
 void ShaderManager::addUniforms(GLuint programId, const Entity& entity)
 {
-  ComponentRegistry* reg = _scene->getRegistry();
-  Model* m               = reg->getComponent<Model>(entity.getId());
-  Material* m2           = reg->getComponent<Material>(entity.getId());
+  std::shared_ptr<ComponentRegistry> reg = _scene->getRegistry();
+  Model* m                               = reg->getComponent<Model>(entity.getId());
+  Material* m2                           = reg->getComponent<Material>(entity.getId());
   if (m2 != nullptr && m2->diffuseTexture != nullptr)
   {
     m2->diffuseTexture->uniform = UniformUtils::createUniform(UniformConstants::TEXTURE_SAMPLER, programId);

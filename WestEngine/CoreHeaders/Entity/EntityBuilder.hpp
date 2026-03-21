@@ -3,13 +3,14 @@
 #include "../Components/ComponentFactory.h"
 #include "../Components/ComponentRegistry.hpp"
 #include "Entity.h"
+#include "Scene.h"
 
 #include <lua.hpp>
 
 class EntityBuilder
 {
 public:
-  EntityBuilder(lua_State* state, ObjectLoader* loader, ComponentRegistry* r);
+  EntityBuilder(lua_State* state, ObjectLoader* loader, std::shared_ptr<ComponentRegistry> r, std::shared_ptr<Scene> s);
   ~EntityBuilder();
 
   static int createEntity(lua_State*);
@@ -22,8 +23,9 @@ public:
 private:
   Entity _e;
 
-  ComponentFactory* _cFac;
-  ComponentRegistry* _registry;
+  std::unique_ptr<ComponentFactory> _cFac;
+  std::shared_ptr<ComponentRegistry> _registry;
+  std::shared_ptr<Scene> _scene;
 
   static EntityBuilder* retrieveMeFromStack(lua_State*);
 };

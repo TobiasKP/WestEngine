@@ -2,6 +2,7 @@
 
 #include "../Components/ComponentRegistry.hpp"
 #include "../Utils/DataUtils/ObjectLoader.h"
+#include "Scene.h"
 #include "World.hpp"
 
 #include <lua.hpp>
@@ -10,7 +11,7 @@
 class WorldBuilder
 {
 public:
-  WorldBuilder(ComponentRegistry* r, ObjectLoader* o, lua_State* l);
+  WorldBuilder(lua_State* l, ObjectLoader* o, std::shared_ptr<ComponentRegistry> r, std::shared_ptr<Scene> s);
   ~WorldBuilder();
 
   static int loadWorld(lua_State*);
@@ -23,6 +24,7 @@ private:
   static constexpr std::uint32_t indices[6] = {0, 1, 3, 1, 2, 3};
   static constexpr float baseQuad[]         = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f};
 
-  ComponentRegistry* _registry;
+  std::shared_ptr<ComponentRegistry> _registry;
+  std::shared_ptr<Scene> _scene;
   ObjectLoader* _loader;
 };

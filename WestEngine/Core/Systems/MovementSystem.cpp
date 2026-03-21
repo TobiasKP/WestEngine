@@ -1,21 +1,20 @@
 #include "../../CoreHeaders/Systems/MovementSystem.hpp"
 
 #include "../../Constants/Systems.hpp"
-#include "../CoreHeaders/Entity/Scene.h"
 
 #include <format>
 
-MovementSystem::MovementSystem(WestLogger* logger) : ISystem()
+MovementSystem::MovementSystem(std::shared_ptr<EventDispatcher> d, WestLogger* l, std::shared_ptr<ComponentRegistry> r)
+  : ISystem(d, l, r)
 {
-  _logger = logger;
   setName(Systems::MOVEMENT);
 };
 
 MovementSystem::~MovementSystem() {}
 
-void MovementSystem::init()
+void MovementSystem::init(const std::shared_ptr<World>& w)
 {
-  _reg = Scene::getSceneInstance().getRegistry();
+  _world = w;
 }
 
 void MovementSystem::update()
@@ -86,7 +85,7 @@ void MovementSystem::updatePosition(glm::vec3 local, Position* posComp, std::uin
     direction          = glm::normalize(direction) * Config::GeneralConfig.SPEED * Config::GeneralConfig.DELTA;
     posComp->position += direction;
   }
-  Scene::getSceneInstance().getWorld()->addEntityIdToIdx(posComp->position.x, posComp->position.z, id);
+  _world->addEntityIdToIdx(posComp->position.x, posComp->position.z, id);
 }
 
 void MovementSystem::updateDebuggingInfo() {}

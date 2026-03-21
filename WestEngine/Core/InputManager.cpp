@@ -26,7 +26,7 @@ InputManager::InputManager() : IManager(nullptr)
   setName(CoreConstants::INPUT_MANAGER);
 }
 
-InputManager::InputManager(WestLogger* logger, std::shared_ptr<EventDispatcher> d) : IManager(logger), _dispatcher(d)
+InputManager::InputManager(WestLogger* logger, const std::shared_ptr<EventDispatcher>& d) : IManager(logger), _dispatcher(d)
 {
   setName(CoreConstants::INPUT_MANAGER);
 }
