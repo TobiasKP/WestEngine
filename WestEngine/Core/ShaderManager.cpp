@@ -22,7 +22,7 @@ ShaderManager::ShaderManager() : IManager(nullptr)
   _scene  = nullptr;
 }
 
-ShaderManager::ShaderManager(WestLogger* logger, std::shared_ptr<Scene> s) : IManager(logger)
+ShaderManager::ShaderManager(WestLogger* logger, const std::shared_ptr<Scene>& s) : IManager(logger)
 {
   setName(CoreConstants::SHADER_MANAGER);
   _facade = nullptr;

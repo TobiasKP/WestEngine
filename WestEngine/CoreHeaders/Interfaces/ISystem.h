@@ -44,7 +44,7 @@ public:
 
   virtual void update()                       = 0;
   virtual void updateDebuggingInfo()          = 0;
-  virtual void init(std::shared_ptr<World> w) = 0;
+  virtual void init(const std::shared_ptr<World>& w) = 0;
   virtual void pollEvents() {};
 
 protected:

@@ -18,7 +18,7 @@ SceneManager::SceneManager() : IManager(nullptr)
   L         = nullptr;
 }
 
-SceneManager::SceneManager(WestLogger* logger, std::shared_ptr<EventDispatcher> d, std::shared_ptr<Scene> s)
+SceneManager::SceneManager(WestLogger* logger, const std::shared_ptr<EventDispatcher>& d, const std::shared_ptr<Scene>& s)
   : IManager(logger)
 {
   setName(CoreConstants::SCENE_MANAGER);

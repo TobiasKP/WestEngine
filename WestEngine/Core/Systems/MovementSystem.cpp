@@ -12,7 +12,7 @@ MovementSystem::MovementSystem(std::shared_ptr<EventDispatcher> d, WestLogger* l
 
 MovementSystem::~MovementSystem() {}
 
-void MovementSystem::init(std::shared_ptr<World> w)
+void MovementSystem::init(const std::shared_ptr<World>& w)
 {
   _world = w;
 }

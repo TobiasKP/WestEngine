@@ -21,7 +21,7 @@ RenderManager::RenderManager() : IManager(nullptr)
   _scene  = nullptr;
 }
 
-RenderManager::RenderManager(WestLogger* logger, std::shared_ptr<Scene> s) : IManager(logger)
+RenderManager::RenderManager(WestLogger* logger, const std::shared_ptr<Scene>& s) : IManager(logger)
 {
   setName(CoreConstants::RENDER_MANAGER);
 #ifdef DEBUG
@@ -119,8 +119,8 @@ void RenderManager::renderGameEntities()
 
 void RenderManager::renderMainLoop(const Entity& entity)
 {
-  std::shared_ptr<ComponentRegistry> reg = _scene->getRegistry();
-  Shader* s                              = reg->getComponent<Shader>(entity.getId());
+  const std::shared_ptr<ComponentRegistry>& reg = _scene->getRegistry();
+  Shader* s                                     = reg->getComponent<Shader>(entity.getId());
   if (!s->initialized)
   {
 #ifdef DEBUG

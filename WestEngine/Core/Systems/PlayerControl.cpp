@@ -21,7 +21,7 @@ PlayerControl::PlayerControl(std::shared_ptr<EventDispatcher> d,
 
 PlayerControl::~PlayerControl() {}
 
-void PlayerControl::init(std::shared_ptr<World> w)
+void PlayerControl::init(const std::shared_ptr<World>& w)
 {
   _world   = w;
   _tileIdx = 0;

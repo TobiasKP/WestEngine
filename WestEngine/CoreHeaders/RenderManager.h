@@ -13,7 +13,7 @@ class RenderManager : public IManager
 {
 public:
   RenderManager();
-  RenderManager(WestLogger* logger, std::shared_ptr<Scene> s);
+  RenderManager(WestLogger* logger, const std::shared_ptr<Scene>& s);
   ~RenderManager() override;
 
   // Overrides

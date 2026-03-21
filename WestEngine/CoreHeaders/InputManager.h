@@ -13,7 +13,7 @@ class InputManager : public IManager
 {
 public:
   InputManager();
-  InputManager(WestLogger* logger, std::shared_ptr<EventDispatcher> d);
+  InputManager(WestLogger* logger, const std::shared_ptr<EventDispatcher>& d);
   ~InputManager();
 
   // Overrides

@@ -10,7 +10,7 @@ class InterfaceManager : public IManager
 {
 public:
   InterfaceManager();
-  InterfaceManager(WestLogger* logger, WindowManager* manager, std::shared_ptr<EventDispatcher> d);
+  InterfaceManager(WestLogger* logger, WindowManager* manager,const std::shared_ptr<EventDispatcher>& d);
   ~InterfaceManager() override;
 
   std::int32_t startup() override;

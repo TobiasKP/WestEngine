@@ -20,7 +20,7 @@ void PositionalSystem::update()
   pollEvents();
   std::shared_ptr<ComponentArray<Position>> pos = _reg->getComponentArray<Position>();
   std::uint32_t id                              = _world->getEntityByIdx(_tileIdx);
-  Material* m; 
+  Material* m;
 
   // TODO: Bug -> if emissiveColor is ever used this will overwrite it
   if (_lastEntity != -1 && _lastEntity != id)
@@ -38,7 +38,7 @@ void PositionalSystem::update()
 
 void PositionalSystem::updateDebuggingInfo() {};
 
-void PositionalSystem::init(std::shared_ptr<World> w)
+void PositionalSystem::init(const std::shared_ptr<World>& w)
 {
   _world = w;
   _dispatcher->subscribe(EventIdentifiers::MOUSE_MOVE,
@@ -60,7 +60,7 @@ void PositionalSystem::pollEvents()
   }
 
   if (lastMouse)
-  { 
+  {
     glm::vec3 hoverPosition = PositionCalculation::getWorldPosition(glm::vec2(lastMouse->x, lastMouse->y), _cam);
     _tileIdx                = _world->calculateIndex(hoverPosition.x, hoverPosition.z);
   }

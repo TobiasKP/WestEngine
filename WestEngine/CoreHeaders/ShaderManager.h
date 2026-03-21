@@ -12,7 +12,7 @@ class ShaderManager : public IManager
 {
 public:
   ShaderManager();
-  ShaderManager(WestLogger* logger, std::shared_ptr<Scene> s);
+  ShaderManager(WestLogger* logger, const std::shared_ptr<Scene>& s);
   ~ShaderManager() override;
 
   // Overrides

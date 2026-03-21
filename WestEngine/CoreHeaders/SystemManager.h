@@ -13,7 +13,7 @@ class SystemManager : public IManager
 {
 public:
   SystemManager();
-  SystemManager(WestLogger* logger, std::shared_ptr<EventDispatcher> d, std::shared_ptr<Scene>);
+  SystemManager(WestLogger* logger, const std::shared_ptr<EventDispatcher>& d, const std::shared_ptr<Scene>& s);
   ~SystemManager();
 
   // Overrides

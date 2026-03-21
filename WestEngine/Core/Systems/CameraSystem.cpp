@@ -27,7 +27,7 @@ void CameraSystem::update()
 
 void CameraSystem::updateDebuggingInfo() {};
 
-void CameraSystem::init(std::shared_ptr<World> w)
+void CameraSystem::init(const std::shared_ptr<World>& w)
 {
   assert(_cam != nullptr);
   _cam->setCameraUniforms(

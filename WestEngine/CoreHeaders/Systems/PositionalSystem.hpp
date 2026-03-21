@@ -15,7 +15,7 @@ public:
 
   void update() override;
   void updateDebuggingInfo() override;
-  void init( std::shared_ptr<World> w) override;
+  void init(const std::shared_ptr<World>& w) override;
   void pollEvents() override;
 
 private:

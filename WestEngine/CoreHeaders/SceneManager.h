@@ -15,7 +15,7 @@ class SceneManager : public IManager
 {
 public:
   SceneManager();
-  SceneManager(WestLogger* logger, std::shared_ptr<EventDispatcher> d, std::shared_ptr<Scene> s);
+  SceneManager(WestLogger* logger, const std::shared_ptr<EventDispatcher>& d, const std::shared_ptr<Scene>& s);
   ~SceneManager() override;
 
   // Overrides
