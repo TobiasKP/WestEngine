@@ -5,7 +5,6 @@
 #include "../Components/ComponentRegistry.hpp"
 #include "../Constants/InternalEvents.hpp"
 #include "../Core/Events/EventDispatcher.hpp"
-#include "../Core/Scripting/LuaFacade.hpp"
 #include "../Entity/World.hpp"
 
 #include <CoreConstants.hpp>
@@ -33,10 +32,6 @@ public:
   {
     _name = name;
   }
-  inline void setState(LuaFacade::LuaStates s)
-  {
-    _state = s;
-  }
   void pushEvent(EventIdentifiers event, EventPayload payload)
   {
     _eventQueue.push(std::make_tuple<>(event, payload));
@@ -48,7 +43,6 @@ public:
   virtual void pollEvents() {};
 
 protected:
-  LuaFacade::LuaStates _state = LuaFacade::LuaStates::IDLE;
   tQueue<std::tuple<EventIdentifiers, EventPayload>> _eventQueue;
   std::shared_ptr<EventDispatcher> _dispatcher;
   std::shared_ptr<ComponentRegistry> _reg;
