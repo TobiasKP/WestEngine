@@ -1,6 +1,7 @@
 #include "../../CoreHeaders/Systems/MovementSystem.hpp"
 
 #include "../../Constants/Systems.hpp"
+#include "../Core/Scripting/LuaFacade.hpp"
 
 #include <format>
 
@@ -29,9 +30,9 @@ void MovementSystem::update()
       break;
     }
 
-    if (m.destination.has_value() && _state == LuaFacade::LuaStates::MOVING)
+    std::uint32_t id = movements->getEntityIdByIdx(current);
+    if (m.destination.has_value())
     {
-      std::uint32_t id  = movements->getEntityIdByIdx(current);
       Position* posComp = _reg->getComponent<Position>(id);
       moveToDestination(id, posComp, &m);
       posComp->dirty.store(true);
@@ -49,7 +50,8 @@ void MovementSystem::moveToDestination(std::uint32_t id, Position* posComp, Move
   }
   else
   {
-    bool result = LuaFacade::getLuaFacadeInstance().onStateChange(id, LuaFacade::LuaStates::MOVING_FINISHED);
+    bool result =
+      LuaFacade::getLuaFacadeInstance().onStateChange(id, LuaFacade::LuaStates::MOVING, LuaFacade::LuaStates::IDLE);
     if (result)
     {
       _logger->log(Level::Info,

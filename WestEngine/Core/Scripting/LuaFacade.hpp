@@ -10,7 +10,7 @@ class LuaFacade
 {
 public:
   enum MouseAction { LMOUSE_CLICK, RMOUSE_CLICK, MMOUSE_CLICK };
-  enum LuaStates { IDLE, MOVING, MOVING_FINISHED, INSPECTING, ACTION };
+  enum LuaStates { IDLE, MOVING, INSPECTING, ACTION };
 
   static LuaFacade& getLuaFacadeInstance();
   void shutdown();
@@ -18,10 +18,11 @@ public:
   bool registerCFunction(int (*f)(lua_State*), std::string name, void* me);
 
   //
-  bool onTileClicked(std::int32_t calleeId, MouseAction m, glm::vec3 destination);
-  bool onEntityClicked(std::int32_t calleeId, MouseAction m, std::int32_t entity_id);
-  bool onStateChange(std::int32_t calleeId, std::int32_t state);
-  bool onUIRefresh(std::int32_t calleeId);
+  bool onEntityCreation(std::int32_t entityId, bool playable);
+  bool onTileClicked(std::int32_t entityId, MouseAction m);
+  bool onEntityClicked(std::int32_t entityId, MouseAction m);
+  bool onStateChange(std::int32_t entityId, std::int32_t oldState, std::int32_t newState);
+  bool onUIRefresh();
   LuaStates getState(std::int32_t calleeId);
 
   inline lua_State* getLuaState()

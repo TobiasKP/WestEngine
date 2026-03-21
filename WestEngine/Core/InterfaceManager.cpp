@@ -339,7 +339,7 @@ int InterfaceManager::destroyInterface(lua_State* L)
 
 void InterfaceManager::refreshGameInterfaces()
 {
-  LuaFacade::getLuaFacadeInstance().onUIRefresh(0);
+  LuaFacade::getLuaFacadeInstance().onUIRefresh();
 }
 
 

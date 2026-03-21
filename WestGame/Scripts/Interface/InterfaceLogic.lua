@@ -1,49 +1,8 @@
-local playerB
-local uimanager
+local InterfaceLogic = {}
 
-function Init()
-  playerB = require("Player/PlayerBehaviour")
-  uimanager = require("GameUIRegistry")
-end
+local uimanager = require("Interface.GameUIRegistry")
 
-function Worldpos_lclick(id, x, y, z)
-  if DEBUG then
-    print("clicked pos: " .. x .. y .. z);
-  end
-  local state = playerB.getCurrentState();
-  if state == playerB.IDLE then
-    playerB.setState(playerB.MOVING);
-  end
-end
-
-function Worldpos_rclick(id, x, y, z)
-end
-
-function Entity_lclick(id, entity)
-end
-
-function Entity_rclick(id, entity)
-  local health = getHealth(entity);
-  print(health)
-  --TODO get Health from component and display in UI
-end
-
-function GetState(id)
-  return playerB.getCurrentState();
-end
-
-function StateChange(id, state)
-  if DEBUG then
-    print(playerB.getCurrentState());
-    print(state);
-  end
-  playerB.setState(state);
-  if state == playerB.MOVING_FINISHED then
-    playerB.setState(playerB.IDLE)
-  end
-end
-
-function DestroyInterface(callee, id)
+function DestroyInterface(id)
   local result = destroyInterface(id)
   if result == false then
     print("Error deleting UI with id " .. id)
@@ -52,7 +11,7 @@ function DestroyInterface(callee, id)
   uimanager.unregister(id)
 end
 
-function RefreshInterfaces(callee)
+function RefreshInterfaces()
   local registeredUis, additionalData = table.unpack(uimanager.get());
   local height, width                 = getScreenResolution();
   local tmpUnregister                 = {};
@@ -82,3 +41,8 @@ function RefreshInterfaces(callee)
     uimanager.register(table.unpack(entry))
   end
 end
+
+InterfaceLogic.DestroyInterface = DestroyInterface
+InterfaceLogic.RefreshInterfaces = RefreshInterfaces
+
+return InterfaceLogic

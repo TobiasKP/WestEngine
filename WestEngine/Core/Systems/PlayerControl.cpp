@@ -1,6 +1,7 @@
 #include "../../CoreHeaders/Systems/PlayerControl.h"
 
 #include "../../Constants/Systems.hpp"
+#include "../Core/Scripting/LuaFacade.hpp"
 #include "../CoreHeaders/Utils/Math/PositionCalculation.h"
 
 #include <Config.h>
@@ -38,9 +39,9 @@ void PlayerControl::update()
   pollEvents();
   std::shared_ptr<ComponentArray<Control>> controlUnits = _reg->getComponentArray<Control>();
   std::uint32_t id                                      = controlUnits->getComponents()[0].entityId;
-  if (_state == LuaFacade::LuaStates::IDLE)
+  Movement* movComp                                     = _reg->getComponent<Movement>(id);
+  if (!movComp->destination.has_value())
   {
-    Movement* movComp = _reg->getComponent<Movement>(id);
     assert(movComp != nullptr);
     Position* posComp = _reg->getComponent<Position>(id);
     assert(posComp != nullptr);
@@ -51,7 +52,7 @@ void PlayerControl::update()
     std::vector<std::int32_t> res = _world->getReachableTiles(row, column, movComp->range, movComp->a, this);
     movComp->reachableTiles       = res;
   }
-  if (_state == LuaFacade::LuaStates::MOVING)
+  else
   {
     _world->clearFlag(0x0002u);
   }
@@ -76,7 +77,7 @@ void PlayerControl::pollEvents()
         std::uint32_t id = _world->getEntityByIdx(_tileIdx);
         if (id > 0)
         {
-          LuaFacade::getLuaFacadeInstance().onEntityClicked(1, LuaFacade::MouseAction::RMOUSE_CLICK, id);
+          LuaFacade::getLuaFacadeInstance().onEntityClicked(id, LuaFacade::MouseAction::RMOUSE_CLICK);
         }
         break;
       }
@@ -107,10 +108,9 @@ void PlayerControl::passDestinationPosition(glm::vec3 dest)
   std::int32_t tile = _world->calculateIndex(dest.x, dest.z);
   bool inRange =
     std::find(movComp->reachableTiles.begin(), movComp->reachableTiles.end(), tile) != movComp->reachableTiles.end();
-  if (_state == LuaFacade::LuaStates::IDLE && inRange)
+  if (inRange && !movComp->destination.has_value())
   {
-    movComp->destination = dest;
-    bool result = LuaFacade::getLuaFacadeInstance().onTileClicked(id, LuaFacade::MouseAction::LMOUSE_CLICK, dest);
+    bool result = LuaFacade::getLuaFacadeInstance().onTileClicked(id, LuaFacade::MouseAction::LMOUSE_CLICK);
     if (result)
     {
       _logger->log(Level::Info,
@@ -118,5 +118,6 @@ void PlayerControl::passDestinationPosition(glm::vec3 dest)
                                getName(),
                                (std::int32_t)LuaFacade::MouseAction::LMOUSE_CLICK));
     }
+    movComp->destination = dest;
   }
 }

@@ -1,7 +1,7 @@
-local entitiyList = { "Cube", "EnemyCube" }
-local w = "DemoWorld"
+local entitiyList = { "../Entities/Player/Cube", "../Entities/Npc/EnemyCube" }
+local w = "../Entities/World/DemoWorld"
 
-local utils = require("EntityUtils")
+local utils = require("Core.EntityUtils")
 
 IntroScene = {}
 

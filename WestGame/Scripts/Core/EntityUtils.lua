@@ -1,7 +1,7 @@
 Utils = {}
 
-local yaml = require("yaml")
-local uimanager = require("GameUIRegistry")
+local yaml = require("Lib.yaml")
+local uimanager = require("Interface.GameUIRegistry")
 local root = debug.getinfo(1, 'S').source:sub(2):gsub("[^/]+$", "")
 
 local playerHealthUI = {
@@ -69,7 +69,6 @@ local function interpreteData(data, source)
   end
 
   buildEntity();
-
   if DEBUG then
     print("Creating Entity " .. data.name);
   end
@@ -78,7 +77,7 @@ end
 function loadFile(name)
   local file = nil
 
-  file = io.open(root .. "Entities/" .. name .. ".yaml")
+  file = io.open(root .. name .. ".yaml")
 
   if file == nil then
     print("Error opening file")
