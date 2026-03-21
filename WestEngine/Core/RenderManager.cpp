@@ -121,6 +121,7 @@ void RenderManager::renderMainLoop(const Entity& entity)
 {
   const std::shared_ptr<ComponentRegistry>& reg = _scene->getRegistry();
   Shader* s                                     = reg->getComponent<Shader>(entity.getId());
+  assert(s != nullptr);
   if (!s->initialized)
   {
 #ifdef DEBUG
@@ -177,6 +178,7 @@ void RenderManager::renderWorld()
   std::shared_ptr<World> world = _scene->getWorld();
   if (world == nullptr)
   {
+    logFailure(std::format("{} ### No World found, something went horribly wrong", getName()));
     return;
   }
 

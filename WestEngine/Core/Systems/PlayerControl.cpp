@@ -37,12 +37,14 @@ void PlayerControl::init(const std::shared_ptr<World>& w)
 void PlayerControl::update()
 {
   pollEvents();
+
   std::shared_ptr<ComponentArray<Control>> controlUnits = _reg->getComponentArray<Control>();
-  std::uint32_t id                                      = controlUnits->getComponents()[0].entityId;
-  Movement* movComp                                     = _reg->getComponent<Movement>(id);
+  assert(controlUnits->getComponents().size() > 0);
+  std::uint32_t id  = controlUnits->getComponents()[0].entityId;
+  Movement* movComp = _reg->getComponent<Movement>(id);
+  assert(movComp != nullptr);
   if (!movComp->destination.has_value())
   {
-    assert(movComp != nullptr);
     Position* posComp = _reg->getComponent<Position>(id);
     assert(posComp != nullptr);
     std::int32_t tileIdx          = _world->calculateIndex(posComp->position.x, posComp->position.z);
@@ -103,8 +105,11 @@ void PlayerControl::passDestinationPosition(glm::vec3 dest)
 {
   std::shared_ptr<ComponentArray<Control>> controlUnits = _reg->getComponentArray<Control>();
   std::uint32_t id                                      = controlUnits->getComponents()[0].entityId;
-  Movement* movComp                                     = _reg->getComponent<Movement>(id);
+
+  assert(controlUnits->getComponents().size() > 0);
+  Movement* movComp = _reg->getComponent<Movement>(id);
   assert(movComp != nullptr);
+
   std::int32_t tile = _world->calculateIndex(dest.x, dest.z);
   bool inRange =
     std::find(movComp->reachableTiles.begin(), movComp->reachableTiles.end(), tile) != movComp->reachableTiles.end();
@@ -113,7 +118,7 @@ void PlayerControl::passDestinationPosition(glm::vec3 dest)
     bool result = LuaFacade::getLuaFacadeInstance().onTileClicked(id, LuaFacade::MouseAction::LMOUSE_CLICK);
     if (result)
     {
-      _logger->log(Level::Info,
+      _logger->log(Level::Error,
                    std::format("{} *** Error calling lua function: {}\n",
                                getName(),
                                (std::int32_t)LuaFacade::MouseAction::LMOUSE_CLICK));

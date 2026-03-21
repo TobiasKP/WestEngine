@@ -47,6 +47,7 @@ void ShaderManager::shutdown()
   for (auto& entity : _scene->getEntities())
   {
     Shader* s        = reg->getComponent<Shader>(entity.getId());
+    assert(s != nullptr);
     GLuint programId = s->programId;
     glDeleteProgram(programId);
   }

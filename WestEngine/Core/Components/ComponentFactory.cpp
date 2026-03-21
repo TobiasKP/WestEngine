@@ -39,6 +39,10 @@ void ComponentFactory::createComponent(lua_State* L, std::string& name, Entity& 
   {
     addHealth(L, e);
   }
+  else
+  {
+    WestLogger::getLoggerInstance().log(Level::Error, std::format("Unkown Component: {} \n", name));
+  }
 }
 
 void ComponentFactory::addHealth(lua_State* L, Entity& e)

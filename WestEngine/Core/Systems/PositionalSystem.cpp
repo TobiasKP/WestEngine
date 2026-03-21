@@ -25,12 +25,14 @@ void PositionalSystem::update()
   // TODO: Bug -> if emissiveColor is ever used this will overwrite it
   if (_lastEntity != -1 && _lastEntity != id)
   {
-    m                = _reg->getComponent<Material>(_lastEntity);
+    m = _reg->getComponent<Material>(_lastEntity);
+    assert(m != nullptr);
     m->emissiveColor = glm::vec3(0.0, 0.0, 0.0);
   }
   if (id > 0)
   {
-    m                = _reg->getComponent<Material>(id);
+    m = _reg->getComponent<Material>(id);
+    assert(m != nullptr);
     m->emissiveColor = glm::vec3(0.0, 0.5, 0.5);
     _lastEntity      = id;
   }

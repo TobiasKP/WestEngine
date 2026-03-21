@@ -54,7 +54,7 @@ void MovementSystem::moveToDestination(std::uint32_t id, Position* posComp, Move
       LuaFacade::getLuaFacadeInstance().onStateChange(id, LuaFacade::LuaStates::MOVING, LuaFacade::LuaStates::IDLE);
     if (result)
     {
-      _logger->log(Level::Info,
+      _logger->log(Level::Error,
                    std::format("{} *** Error calling lua function state change with state: {}\n",
                                getName(),
                                (std::int32_t)LuaFacade::LuaStates::IDLE));
