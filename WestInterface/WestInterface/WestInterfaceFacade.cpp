@@ -236,6 +236,7 @@ bool WestInterfaceFacade::destroyInterface(std::uint8_t interfaceId)
   Config::INTERNAL_UI_COUNT--;
 
   _renderManager->toggleDirty();
+  Config::freedUiIds.push(elementToDelete->id);
   delete elementToDelete;
   return true;
 }

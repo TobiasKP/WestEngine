@@ -18,7 +18,9 @@ SceneManager::SceneManager() : IManager(nullptr)
   L         = nullptr;
 }
 
-SceneManager::SceneManager(WestLogger* logger, const std::shared_ptr<EventDispatcher>& d, const std::shared_ptr<Scene>& s)
+SceneManager::SceneManager(WestLogger* logger,
+                           const std::shared_ptr<EventDispatcher>& d,
+                           const std::shared_ptr<Scene>& s)
   : IManager(logger)
 {
   setName(CoreConstants::SCENE_MANAGER);
@@ -120,7 +122,7 @@ void SceneManager::update()
   for (std::uint32_t id : removedEntities)
   {
     Entity* e = _scene->getEntityById(id);
-    removeEntityFromScene(*e);
+    removeEntityFromScene(*e); 
   }
 }
 

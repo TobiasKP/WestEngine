@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mutex>
+#include <optional>
 #include <vector>
 
 template <typename T>
@@ -21,6 +22,18 @@ public:
     std::lock_guard lock(_m);
     std::vector<T> result;
     result.swap(_data);
+    return result;
+  }
+
+  std::optional<T> tryPop()
+  {
+    std::lock_guard lock(_m);
+    if (_data.size() == 0)
+    {
+      return {};
+    }
+    T result = _data.back();
+    _data.pop_back();
     return result;
   }
 
