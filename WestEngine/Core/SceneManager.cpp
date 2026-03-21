@@ -122,8 +122,7 @@ void SceneManager::update()
   for (std::uint32_t id : removedEntities)
   {
     Entity* e = _scene->getEntityById(id);
-    removeEntityFromScene(*e);
-    delete e;
+    removeEntityFromScene(*e); 
   }
 }
 
