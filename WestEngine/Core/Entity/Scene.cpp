@@ -16,6 +16,10 @@ void Scene::deleteScene()
   _world.reset();
   _camera.reset();
   _registry.reset();
+  for (Entity& e : _entities)
+  {
+    Config::freedEntityIds.push(e.getId());
+  }
   _entities.clear();
 }
 
@@ -120,6 +124,7 @@ void Scene::removeEntity(const Entity& entity)
 
   if (entityIt != _entities.end())
   {
+    Config::freedEntityIds.push(entityIt->getId());
     _entities.erase(entityIt);
   }
 
@@ -131,6 +136,7 @@ void Scene::removeEntity(const Entity& entity)
 
     if (debugIt != _debugEntities.end())
     {
+      Config::freedEntityIds.push(debugIt->getId());
       _debugEntities.erase(debugIt);
     }
   }

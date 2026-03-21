@@ -33,6 +33,7 @@ struct ContainerElement : public IElement
 #ifdef DEBUG
       _logger.log(Level::Info, std::format("@@@ Deleted child: {}\n", e->id));
 #endif
+      Config::freedUiIds.push(e->id);
       delete e;
     }
     if (texture != 0)
@@ -68,6 +69,7 @@ struct ContainerElement : public IElement
                               + elementToDelete->rowElements * elementToDelete->columnElements - 1);
     }
 
+    Config::freedUiIds.push(d_id);
     children.erase(result);
     return true;
   }

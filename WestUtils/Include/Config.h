@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ThreadPool.h"
+#include "ThreadSafeQueue.hpp"
 
 #include <atomic>
 
@@ -39,6 +40,9 @@ struct Interfaces
 
 extern std::uint32_t incEntityId();
 extern std::uint32_t incUiId();
+
+extern tQueue<std::uint32_t> freedEntityIds;
+extern tQueue<std::uint32_t> freedUiIds;
 
 extern General GeneralConfig;
 extern Info GeneralInfo;
