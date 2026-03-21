@@ -42,9 +42,9 @@ void PlayerControl::update()
   assert(controlUnits->getComponents().size() > 0);
   std::uint32_t id  = controlUnits->getComponents()[0].entityId;
   Movement* movComp = _reg->getComponent<Movement>(id);
+  assert(movComp != nullptr);
   if (!movComp->destination.has_value())
   {
-    assert(movComp != nullptr);
     Position* posComp = _reg->getComponent<Position>(id);
     assert(posComp != nullptr);
     std::int32_t tileIdx          = _world->calculateIndex(posComp->position.x, posComp->position.z);
