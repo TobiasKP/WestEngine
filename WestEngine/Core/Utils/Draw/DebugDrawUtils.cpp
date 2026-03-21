@@ -4,10 +4,10 @@
 
 #include <Config.h>
 
-DebugDrawUtils::DebugDrawUtils(WestLogger* logger)
+DebugDrawUtils::DebugDrawUtils(WestLogger* logger, std::shared_ptr<Scene> s)
 {
   _loader = new ObjectLoader(logger);
-  _scene  = &Scene::getSceneInstance();
+  _scene  = s;
 }
 
 std::uint32_t DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction)

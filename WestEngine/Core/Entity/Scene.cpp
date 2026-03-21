@@ -7,20 +7,15 @@
 
 std::mutex Scene::_mutex;
 
-Scene& Scene::getSceneInstance()
-{
-  std::lock_guard<std::mutex> lock(_mutex);
-
-  static Scene instance;
-  return instance;
-}
-
 Scene::Scene() {}
 
 Scene::~Scene() {}
 
 void Scene::deleteScene()
 {
+  _world.reset();
+  _camera.reset();
+  _registry.reset();
   _entities.clear();
 }
 

@@ -1,6 +1,8 @@
 #include "../../CoreHeaders/Systems/CameraSystem.hpp"
 
+#include "../../Constants/UniformConstants.hpp"
 #include "../../CoreHeaders/InputManager.h"
+#include "../../CoreHeaders/Utils/DataUtils/UniformUtils.h"
 
 CameraSystem::CameraSystem(std::shared_ptr<EventDispatcher> d,
                            WestLogger* l,
@@ -26,8 +28,10 @@ void CameraSystem::update()
 void CameraSystem::updateDebuggingInfo() {};
 
 void CameraSystem::init(std::shared_ptr<World> w)
-{ 
+{
   assert(_cam != nullptr);
+  _cam->setCameraUniforms(
+    UniformUtils::createUniformBufferObject(UniformConstants::CAMERA_UNIFORMS, sizeof(glm::mat4) * 2, 1));
   _dispatcher->subscribe(EventIdentifiers::MOUSE_WHEEL,
                          [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
   _dispatcher->subscribe(EventIdentifiers::KEY,

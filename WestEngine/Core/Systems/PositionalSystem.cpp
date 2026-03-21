@@ -1,7 +1,6 @@
 #include "../../CoreHeaders/Systems/PositionalSystem.hpp"
 
 #include "../CoreHeaders/Utils/Math/PositionCalculation.h"
-#include <iostream>
 
 PositionalSystem::PositionalSystem(std::shared_ptr<EventDispatcher> d,
                                    WestLogger* l,

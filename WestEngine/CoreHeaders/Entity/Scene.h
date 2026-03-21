@@ -12,10 +12,8 @@
 class Scene
 {
 public:
-  static Scene& getSceneInstance();
-
-  Scene(Scene const&)          = delete;
-  void operator=(Scene const&) = delete;
+  Scene();
+  ~Scene();
 
   // Functions
   void init();
@@ -64,7 +62,4 @@ private:
   std::string _sceneName = CoreConstants::UNDEFINED_STRING.data();
 
   void insertEntityByGroup(Entity&& entity);
-
-  Scene();
-  ~Scene();
 };

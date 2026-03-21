@@ -14,8 +14,10 @@ SystemManager::SystemManager() : IManager(nullptr)
   setName(CoreConstants::ENTITY_SYSTEM_MANAGER);
 }
 
-SystemManager::SystemManager(WestLogger* logger, std::shared_ptr<EventDispatcher> d) : IManager(logger)
+SystemManager::SystemManager(WestLogger* logger, std::shared_ptr<EventDispatcher> d, std::shared_ptr<Scene> s)
+  : IManager(logger)
 {
+  _scene      = s;
   _dispatcher = d;
   setName(CoreConstants::ENTITY_SYSTEM_MANAGER);
 }
@@ -24,8 +26,8 @@ SystemManager::~SystemManager() {}
 
 std::int32_t SystemManager::startup()
 {
-  std::shared_ptr<Camera> c            = Scene::getSceneInstance().getCamera();
-  std::shared_ptr<ComponentRegistry> r = Scene::getSceneInstance().getRegistry();
+  std::shared_ptr<Camera> c            = _scene->getCamera();
+  std::shared_ptr<ComponentRegistry> r = _scene->getRegistry();
   _systems                             = {new PlayerControl(_dispatcher, getLogger(), r, c),
                                           new MovementSystem(_dispatcher, getLogger(), r),
                                           new CameraSystem(_dispatcher, getLogger(), r, c),
@@ -51,7 +53,6 @@ std::int32_t SystemManager::init()
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
 
-  _scene                   = &Scene::getSceneInstance();
   std::shared_ptr<World> w = _scene->getWorld();
   for (ISystem* sys : _systems)
   {

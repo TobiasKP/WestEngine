@@ -12,19 +12,20 @@ SceneManager::SceneManager() : IManager(nullptr)
   setName(CoreConstants::SCENE_MANAGER);
   _scene    = nullptr;
   _loader   = nullptr;
-  _builder  = nullptr;
+  _ebuilder = nullptr;
   _wbuilder = nullptr;
   _registry = nullptr;
   L         = nullptr;
 }
 
-SceneManager::SceneManager(WestLogger* logger, std::shared_ptr<EventDispatcher> d) : IManager(logger)
+SceneManager::SceneManager(WestLogger* logger, std::shared_ptr<EventDispatcher> d, std::shared_ptr<Scene> s)
+  : IManager(logger)
 {
   setName(CoreConstants::SCENE_MANAGER);
   _dispatcher = d;
-  _scene      = nullptr;
+  _scene      = s;
   _loader     = nullptr;
-  _builder    = nullptr;
+  _ebuilder   = nullptr;
   _wbuilder   = nullptr;
   _registry   = nullptr;
   L           = nullptr;
@@ -38,7 +39,6 @@ std::int32_t SceneManager::startup()
   _registry                 = std::make_shared<ComponentRegistry>();
   _loader                   = new ObjectLoader(getLogger());
 
-  _scene = &Scene::getSceneInstance();
   _scene->addRegistry(_registry);
   _scene->addCamera(std::move(c));
 
@@ -46,9 +46,9 @@ std::int32_t SceneManager::startup()
   _facade->startup(getLogger());
   L = _facade->getLuaState();
 
-  _builder  = new EntityBuilder(L, _loader, _registry);
-  _wbuilder = new WorldBuilder(_registry, _loader, L);
-  assert(_loader != nullptr && _scene != nullptr && _wbuilder != nullptr && _builder != nullptr);
+  _ebuilder = std::make_unique<EntityBuilder>(L, _loader, _registry, _scene);
+  _wbuilder = std::make_unique<WorldBuilder>(L, _loader, _registry, _scene);
+  assert(_loader != nullptr && _scene != nullptr && _wbuilder != nullptr && _ebuilder != nullptr);
 #ifdef DEBUG
   logDebug(std::format("{} ### instantiated Lua state\n", getName()));
 #endif
@@ -60,6 +60,8 @@ void SceneManager::shutdown()
 #ifdef DEBUG
   logDebug(std::format("{} ### Shutting down {}...\n", getName(), getName()));
 #endif
+  _ebuilder.reset();
+  _wbuilder.reset();
   _facade->shutdown();
   deleteScene();
 }

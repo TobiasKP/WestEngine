@@ -1,14 +1,16 @@
 #include "../../CoreHeaders/Entity/WorldBuilder.hpp"
 
 #include "../../Constants/LuaAPI.hpp"
-#include "../../CoreHeaders/Entity/Scene.h"
 #include "../Scripting/LuaFacade.hpp"
 
 #include <format>
 
 
-WorldBuilder::WorldBuilder(std::shared_ptr<ComponentRegistry> r, ObjectLoader* o, lua_State* l)
-  : _registry(r), _loader(o)
+WorldBuilder::WorldBuilder(lua_State* l,
+                           ObjectLoader* o,
+                           std::shared_ptr<ComponentRegistry> r,
+                           std::shared_ptr<Scene> s)
+  : _registry(r), _loader(o), _scene(s)
 {
   LuaFacade::getLuaFacadeInstance().registerCFunction(loadWorld, LuaAPI::C_LOAD_WORLD.data(), this);
 };
@@ -25,7 +27,7 @@ int WorldBuilder::loadWorld(lua_State* L)
   std::shared_ptr<World> w = std::make_shared<World>();
   w->setId(Config::incEntityId());
   me->createWorld(*w, L);
-  Scene::getSceneInstance().addWorld(w);
+  me->_scene->addWorld(w);
   return 0;
 };
 

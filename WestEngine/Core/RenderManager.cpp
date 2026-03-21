@@ -15,20 +15,20 @@ RenderManager::RenderManager() : IManager(nullptr)
 {
   setName(CoreConstants::RENDER_MANAGER);
 #ifdef DEBUG
-  _debugUtils = new DebugDrawUtils(nullptr);
+  _debugUtils = new DebugDrawUtils(nullptr, nullptr);
 #endif
   _facade = nullptr;
   _scene  = nullptr;
 }
 
-RenderManager::RenderManager(WestLogger* logger) : IManager(logger)
+RenderManager::RenderManager(WestLogger* logger, std::shared_ptr<Scene> s) : IManager(logger)
 {
   setName(CoreConstants::RENDER_MANAGER);
 #ifdef DEBUG
-  _debugUtils = new DebugDrawUtils(logger);
+  _debugUtils = new DebugDrawUtils(logger, s);
 #endif
   _facade = nullptr;
-  _scene  = nullptr;
+  _scene  = s;
 }
 
 RenderManager::~RenderManager() {}
@@ -51,7 +51,6 @@ std::int32_t RenderManager::init()
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
 
-  _scene  = &Scene::getSceneInstance();
   _facade = &WestInterfaceFacade::getInterfaceInstance();
   assert(_scene != nullptr && _facade != nullptr);
 

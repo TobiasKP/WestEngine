@@ -22,11 +22,11 @@ ShaderManager::ShaderManager() : IManager(nullptr)
   _scene  = nullptr;
 }
 
-ShaderManager::ShaderManager(WestLogger* logger) : IManager(logger)
+ShaderManager::ShaderManager(WestLogger* logger, std::shared_ptr<Scene> s) : IManager(logger)
 {
   setName(CoreConstants::SHADER_MANAGER);
   _facade = nullptr;
-  _scene  = nullptr;
+  _scene  = s;
 }
 
 ShaderManager::~ShaderManager() {}
@@ -66,10 +66,7 @@ std::int32_t ShaderManager::init()
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
 
-  _facade = &WestInterfaceFacade::getInterfaceInstance();
-  _scene  = &Scene::getSceneInstance();
-  _scene->getCamera()->setCameraUniforms(
-    UniformUtils::createUniformBufferObject(UniformConstants::CAMERA_UNIFORMS, sizeof(glm::mat4) * 2, 1));
+  _facade        = &WestInterfaceFacade::getInterfaceInstance();
   GLuint success = initInterfaceShader();
   if (success == 1)
   {

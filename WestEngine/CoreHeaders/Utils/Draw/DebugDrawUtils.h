@@ -10,11 +10,11 @@
 class DebugDrawUtils
 {
 public:
-  DebugDrawUtils(WestLogger* logger);
+  DebugDrawUtils(WestLogger* logger, std::shared_ptr<Scene> s);
   void unloadModel(const Entity& entity);
   std::uint32_t addLine(glm::vec3 start, glm::vec3 direction);
 
 private:
   ObjectLoader* _loader;
-  Scene* _scene;
+  std::shared_ptr<Scene> _scene;
 };

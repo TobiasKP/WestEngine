@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Core/Scripting/LuaFacade.hpp"
 #include "../Core/Events/EventDispatcher.hpp"
+#include "../Core/Scripting/LuaFacade.hpp"
 #include "Components/ComponentRegistry.hpp"
 #include "Entity/EntityBuilder.hpp"
 #include "Entity/Scene.h"
@@ -15,7 +15,7 @@ class SceneManager : public IManager
 {
 public:
   SceneManager();
-  SceneManager(WestLogger* logger, std::shared_ptr<EventDispatcher> d);
+  SceneManager(WestLogger* logger, std::shared_ptr<EventDispatcher> d, std::shared_ptr<Scene> s);
   ~SceneManager() override;
 
   // Overrides
@@ -26,11 +26,14 @@ public:
 
 private:
   LuaFacade* _facade;
-  Scene* _scene;
+
   ObjectLoader* _loader;
-  EntityBuilder* _builder;
   lua_State* L;
-  WorldBuilder* _wbuilder; 
+
+  std::unique_ptr<WorldBuilder> _wbuilder;
+  std::unique_ptr<EntityBuilder> _ebuilder;
+
+  std::shared_ptr<Scene> _scene;
   std::shared_ptr<ComponentRegistry> _registry;
   std::shared_ptr<EventDispatcher> _dispatcher;
 

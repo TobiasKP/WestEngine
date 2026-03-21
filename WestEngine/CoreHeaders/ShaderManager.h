@@ -1,9 +1,9 @@
 #pragma once
 
+#include "Components/Umbrella.h"
 #include "Entity/Scene.h"
 #include "Interfaces/IManager.h"
 #include "Systems/Umbrella.h"
-#include "Components/Umbrella.h"
 
 #include <map>
 #include <WestInterfaceFacade.h>
@@ -12,7 +12,7 @@ class ShaderManager : public IManager
 {
 public:
   ShaderManager();
-  ShaderManager(WestLogger* logger);
+  ShaderManager(WestLogger* logger, std::shared_ptr<Scene> s);
   ~ShaderManager() override;
 
   // Overrides
@@ -28,8 +28,8 @@ public:
 private:
   std::map<std::int32_t, GLuint> _programList;
   std::int32_t _lastEntityCount;
+  std::shared_ptr<Scene> _scene;
   WestInterface::WestInterfaceFacade* _facade;
-  Scene* _scene;
 
   GLuint initInterfaceShader();
   void initWorldShader();

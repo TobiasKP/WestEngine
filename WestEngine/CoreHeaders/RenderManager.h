@@ -13,7 +13,7 @@ class RenderManager : public IManager
 {
 public:
   RenderManager();
-  RenderManager(WestLogger* logger);
+  RenderManager(WestLogger* logger, std::shared_ptr<Scene> s);
   ~RenderManager() override;
 
   // Overrides
@@ -31,7 +31,7 @@ public:
 private:
   static GLuint _usedShaderProgram;
   WestInterface::WestInterfaceFacade* _facade;
-  Scene* _scene;
+  std::shared_ptr<Scene> _scene;
 
   void clearColor();
   void renderUserInterfaces();
