@@ -45,9 +45,9 @@ int EntityBuilder::buildEntity(lua_State* L)
   EntityBuilder* me = EntityBuilder::retrieveMeFromStack(L);
   Position* p       = me->_registry->getComponent<Position>(me->_e.getId());
   Control* c        = me->_registry->getComponent<Control>(me->_e.getId());
+  LuaFacade::getLuaFacadeInstance().onEntityCreation(me->_e.getId(), c != nullptr ? true : false);
   me->_scene->getWorld()->addEntityIdToIdx(p->position.x, p->position.z, me->_e.getId());
   me->_scene->addEntity(std::move(me->_e));
-  LuaFacade::getLuaFacadeInstance().onEntityCreation(me->_e.getId(), c != nullptr ? true : false);
   return 0;
 }
 
