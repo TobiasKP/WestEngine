@@ -35,7 +35,7 @@ Entity& Entity::operator=(const Entity& other)
 }
 
 Entity::Entity(Entity&& other) noexcept
-  : _id(other._id), _name(other._name), _destroyed(other._destroyed),
+  : _id(other._id), _name(std::move(other._name)), _destroyed(other._destroyed),
     _debugEntity(other._debugEntity)
 {
   other._destroyed   = false;
