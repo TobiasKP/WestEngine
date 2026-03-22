@@ -1,9 +1,9 @@
 #include <Components/ComponentRegistry.hpp>
 #include <Entity/World.hpp>
 #include <Interfaces/ISystem.h>
-#include <TimeUtils.hpp>
 #include <gtest/gtest.h>
 
+#include <chrono>
 #include <glm/gtc/matrix_transform.hpp>
 #include <random>
 
@@ -118,7 +118,7 @@ protected:
 
 TEST_F(ECSStressTest, FullSystemsTickUnder8ms)
 {
-  double start = TimeUtils::getCurrentTimeAsTime();
+  auto start = std::chrono::steady_clock::now();
 
   // --- PlayerControl-like pass ---
   // For the controlled entity: calculate reachable tiles
@@ -195,8 +195,8 @@ TEST_F(ECSStressTest, FullSystemsTickUnder8ms)
   // --- World flag clear (end of frame) ---
   world.clearFlag(0x0002u);
 
-  double end     = TimeUtils::getCurrentTimeAsTime();
-  double elapsed = TimeUtils::getDuration(start, end);
+  auto end       = std::chrono::steady_clock::now();
+  double elapsed = std::chrono::duration<double, std::milli>(end - start).count();
 
   std::cout << "[  PERF   ] Full systems tick (" << ENTITY_COUNT << " entities): "
             << elapsed << " ms" << std::endl;
@@ -208,7 +208,7 @@ TEST_F(ECSStressTest, FullSystemsTickUnder8ms)
 
 TEST_F(ECSStressTest, ComponentLookupScalability)
 {
-  double start = TimeUtils::getCurrentTimeAsTime();
+  auto start = std::chrono::steady_clock::now();
 
   // Simulate 200 entities × 3 component lookups × 60 fps = one second of lookups
   for (int frame = 0; frame < 60; frame++)
@@ -224,8 +224,8 @@ TEST_F(ECSStressTest, ComponentLookupScalability)
     }
   }
 
-  double end     = TimeUtils::getCurrentTimeAsTime();
-  double elapsed = TimeUtils::getDuration(start, end);
+  auto end       = std::chrono::steady_clock::now();
+  double elapsed = std::chrono::duration<double, std::milli>(end - start).count();
 
   std::cout << "[  PERF   ] 60 frames × " << ENTITY_COUNT << " entities × 3 lookups: "
             << elapsed << " ms (budget: " << 60 * TARGET_MS << " ms)" << std::endl;
@@ -238,7 +238,7 @@ TEST_F(ECSStressTest, ComponentLookupScalability)
 
 TEST_F(ECSStressTest, WorldQueryScalability)
 {
-  double start = TimeUtils::getCurrentTimeAsTime();
+  auto start = std::chrono::steady_clock::now();
 
   auto posArr = registry.getComponentArray<Position>();
   for (size_t i = 0; i < posArr->getSize(); i++)
@@ -255,8 +255,8 @@ TEST_F(ECSStressTest, WorldQueryScalability)
     }
   }
 
-  double end     = TimeUtils::getCurrentTimeAsTime();
-  double elapsed = TimeUtils::getDuration(start, end);
+  auto end       = std::chrono::steady_clock::now();
+  double elapsed = std::chrono::duration<double, std::milli>(end - start).count();
 
   std::cout << "[  PERF   ] getReachableTiles for " << ENTITY_COUNT << " entities: "
             << elapsed << " ms" << std::endl;
