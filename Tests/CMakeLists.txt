@@ -40,6 +40,7 @@ set(TEST_SOURCES
     unit/EntitySemanticsTest.cpp
     unit/ComponentArrayTest.cpp
     unit/ThreadSafeQueueTest.cpp
+    unit/ECSStressTest.cpp
 )
 
 # ─────────────────────────────────────────────────────────────
