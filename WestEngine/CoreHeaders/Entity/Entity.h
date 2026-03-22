@@ -73,8 +73,7 @@ public:
 private:
   static PoolAllocator* _allocator;
 
-  std::uint32_t _id = 0;
-  std::uint16_t _componentMask;
+  std::uint32_t _id = 0; 
   bool _destroyed, _debugEntity;
   std::string _name;
 };
