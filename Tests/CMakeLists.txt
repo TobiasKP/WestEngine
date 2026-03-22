@@ -31,10 +31,15 @@ set(ENGINE_TEST_SOURCES
 set(TEST_SOURCES
     unit/TimeUtilsTest.cpp
     unit/ConfigTest.cpp
+    unit/ConfigIdReuseTest.cpp
     unit/PoolAllocatorTest.cpp
     unit/PathUtilsTest.cpp
     unit/WorldTest.cpp
+    unit/WorldFlagTest.cpp
     unit/EntityTest.cpp
+    unit/EntitySemanticsTest.cpp
+    unit/ComponentArrayTest.cpp
+    unit/ThreadSafeQueueTest.cpp
 )
 
 # ─────────────────────────────────────────────────────────────
