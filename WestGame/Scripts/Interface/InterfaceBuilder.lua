@@ -180,6 +180,7 @@ Button.__index = Button
 function Button.new()
   local self = Label.new("")
   self._handler = nil
+  return self
 end
 
 function Button:handler(f)
