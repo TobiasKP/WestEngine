@@ -56,7 +56,7 @@ bool LuaFacade::registerCFunction(int (*f)(lua_State*), std::string name, void* 
   {
     _logger->log(
       Level::Error,
-      std::format("Lua State error ::: Registering function to stack, function is nullptr or name is empty: {}", name));
+      std::format("Lua State error ::: Registering function to stack, function is nullptr or name is empty: {}\n", name));
     return 1;
   }
   lua_pushlightuserdata(L, me);
@@ -89,7 +89,7 @@ bool LuaFacade::onTileClicked(std::int32_t entityId, MouseAction m)
   std::int32_t status = lua_pcall(L, 1, 0, 0);
   if (status != 0)
   {
-    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}", lua_tostring(L, -1)));
+    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
     lua_pop(L, 1);
     return 1;
   }
@@ -120,7 +120,7 @@ bool LuaFacade::onEntityClicked(std::int32_t entityId, MouseAction m)
   std::int32_t status = lua_pcall(L, 1, 0, 0);
   if (status != 0)
   {
-    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}", lua_tostring(L, -1)));
+    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
     lua_pop(L, 1);
     return 1;
   }
@@ -173,6 +173,26 @@ bool LuaFacade::onUIRefresh()
   return 0;
 }
 
+bool LuaFacade::onUIDelete(std::int32_t uiId)
+{
+  return 0;
+}
+
+bool LuaFacade::internalCall(const std::string& toCall, std::int32_t callingId)
+{
+  lua_getglobal(L, LuaAPI::INTERNAL.data());
+  lua_pushstring(L, toCall.data());
+  lua_pushinteger(L, callingId);
+  std::int32_t status = lua_pcall(L, 2, 0, 0);
+  if (status != 0)
+  {
+    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
+    lua_pop(L, 1);
+    return IDLE;
+  }
+  return 0;
+}
+
 LuaFacade::LuaStates LuaFacade::getState(std::int32_t id)
 {
   lua_getglobal(L, LuaAPI::GET_STATE.data());
@@ -180,7 +200,7 @@ LuaFacade::LuaStates LuaFacade::getState(std::int32_t id)
   std::int32_t status = lua_pcall(L, 1, 1, 0);
   if (status != 0)
   {
-    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}", lua_tostring(L, -1)));
+    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
     lua_pop(L, 1);
     return IDLE;
   }
@@ -194,12 +214,12 @@ bool LuaFacade::loadAPI()
   std::string filePath = PathUtils::resolve(CoreConstants::LUA_API_FILE);
   if (!std::filesystem::exists(filePath))
   {
-    _logger->log(Level::Error, std::format("Lua State error ::: Lua API file: {} - not found!", filePath));
+    _logger->log(Level::Error, std::format("Lua State error ::: Lua API file: {} - not found!\n", filePath));
     return 1;
   }
   if (luaL_dofile(L, filePath.data()) != 0)
   {
-    _logger->log(Level::Error, std::format("Lua State error ::: Loading API file: {}", lua_tostring(L, -1)));
+    _logger->log(Level::Error, std::format("Lua State error ::: Loading API file: {}\n", lua_tostring(L, -1)));
     lua_pop(L, 1);
     return 1;
   }
@@ -207,7 +227,7 @@ bool LuaFacade::loadAPI()
   std::int32_t status = lua_pcall(L, 0, 0, 0);
   if (status != 0)
   {
-    _logger->log(Level::Error, std::format("Lua State error ::: Calling Init: {}", lua_tostring(L, -1)));
+    _logger->log(Level::Error, std::format("Lua State error ::: Calling Init: {}\n", lua_tostring(L, -1)));
     lua_pop(L, 1);
     return 1;
   }

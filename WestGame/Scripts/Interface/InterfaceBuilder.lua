@@ -108,7 +108,7 @@ Label.__index = Label
 
 function Label.new(text)
   return setmetatable({
-    _type = 1,
+    _type = 0,
     _text = text or "",
     _color = { r = 255, g = 255, b = 255, a = 1.0 },
     _span = 1,
@@ -173,12 +173,13 @@ function ProgressBar:toElement()
 end
 
 ---@class Button : Label
----@field _handler function | nil
+---@field _handler string | nil
 local Button = setmetatable({}, { __index = Label })
 Button.__index = Button
 
 function Button.new()
   local self = Label.new("")
+  self._type = 3
   self._handler = nil
   return self
 end

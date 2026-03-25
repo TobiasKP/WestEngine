@@ -21,7 +21,9 @@ InterfaceManager::InterfaceManager() : IManager(nullptr)
 #endif
 };
 
-InterfaceManager::InterfaceManager(WestLogger* logger, WindowManager* manager, const std::shared_ptr<EventDispatcher>& d)
+InterfaceManager::InterfaceManager(WestLogger* logger,
+                                   WindowManager* manager,
+                                   const std::shared_ptr<EventDispatcher>& d)
   : IManager(logger)
 {
   setName(CoreConstants::INTERFACE_MANAGER);
@@ -309,6 +311,13 @@ std::vector<ElementProxy*> InterfaceManager::fillInfo(lua_State* L)
     {
       e->text       = lua_tostring(L, -1);
       e->givenFlags = 0x0008;
+    }
+    lua_pop(L, 1);
+    lua_getfield(L, -1, "handler");
+    if (!lua_isnil(L, -1))
+    {
+      const std::string call = lua_tostring(L, -1);
+      e->eventHandler = [call, id = e->elementId]() { LuaFacade::getLuaFacadeInstance().internalCall(call, id); };
     }
     lua_pop(L, 1);
     result.push_back(e);
