@@ -34,7 +34,7 @@ local function interpreteData(data, source)
     addComponent("playercontrol");
     if health ~= nil then
       builder.Panel("playercontrol")
-          :anchor("top-right", -10, 60)
+          :anchor("bottom-right", 415, 60)
           :size(10, 0.75)
           :alpha(0.5)
           :add(builder.Label(tostring(health.c))

@@ -55,7 +55,7 @@ function Panel:isHidden(h)
 end
 
 function Panel:build()
-  local w, h = getScreenResolution()
+  local h, w = getScreenResolution()
   local x, y = self:_resolveAnchor(w, h)
 
   local elements = {}
@@ -172,4 +172,24 @@ function ProgressBar:toElement()
   return elem
 end
 
-return { Panel = Panel.new, Label = Label.new, ProgressBar = ProgressBar.new }
+---@class Button : Label
+---@field _handler function | nil
+local Button = setmetatable({}, { __index = Label })
+Button.__index = Button
+
+function Button.new()
+  local self = Label.new("")
+  self._handler = nil
+end
+
+function Button:handler(f)
+  self._handler = f
+  return self
+end
+
+function Button:toElement()
+  local elem = Label.toElement(self)
+  return elem
+end
+
+return { Panel = Panel.new, Label = Label.new, ProgressBar = ProgressBar.new, Button = Button.new }
