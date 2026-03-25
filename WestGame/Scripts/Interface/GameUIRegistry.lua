@@ -4,8 +4,6 @@ local uiIdToParent = {};
 local registeredUIs = {};
 local additionalInfo = {}
 
---local root = debug.getinfo(1, 'S').source:sub(2):gsub("[^/]+$", "")
-
 function RegisterUI(id, ui, info)
   registeredUIs[id] = ui;
   additionalInfo[id] = info;
