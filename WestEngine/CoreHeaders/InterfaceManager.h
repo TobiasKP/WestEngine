@@ -24,7 +24,7 @@ public:
   static int destroyInterface(lua_State*);
 
 private:
-  static std::vector<WestInterface::ElementProxy*> fillInfo(lua_State* L);
+  static std::vector<WestInterface::ElementProxy*> fillInfo(lua_State* L, std::uint32_t id);
   std::tuple<std::int16_t, bool> isInterfaceHovered();
   void refreshGameInterfaces();
 

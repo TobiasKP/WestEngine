@@ -217,6 +217,7 @@ bool WestInterfaceFacade::destroyInterface(std::uint8_t interfaceId)
 
   if (location == -1)
   {
+    _logger.log(Level::Error, std::format("@@@ Error deleting Interface, not found in list: {}", interfaceId));
     return false;
   }
 

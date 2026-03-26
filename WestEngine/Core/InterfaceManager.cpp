@@ -210,8 +210,10 @@ std::tuple<std::int16_t, bool> InterfaceManager::isInterfaceHovered()
 int InterfaceManager::registerInterface(lua_State* L)
 {
   InterfaceManager* me          = (InterfaceManager*)lua_touserdata(L, lua_upvalueindex(1));
-  std::vector<ElementProxy*> el = fillInfo(L);
+  std::uint32_t id              = Config::incUiId();
+  std::vector<ElementProxy*> el = fillInfo(L, id);
   Container* c                  = new Container(el);
+  c->elementId                  = id;
   c->colorR                     = 59.0f;
   c->colorG                     = 58.0f;
   c->colorB                     = 54.0f;
@@ -224,16 +226,17 @@ int InterfaceManager::registerInterface(lua_State* L)
   c->columns                    = lua_tointeger(L, 8);
   c->hiddenContainer            = lua_toboolean(L, 9);
 
-  std::uint8_t id = me->_facade->createNewInterface(c);
+  std::uint8_t cid = me->_facade->createNewInterface(c);
+  assert(cid == id);
 #ifdef DEBUG
-  me->logDebug(std::format("{} ### created a new game Interface from lua with id: {}", me->getName(), id));
+    me->logDebug(std::format("{} ### created a new game Interface from lua with id: {}", me->getName(), id));
 #endif
   assert(id > 0);
   lua_pushinteger(L, id);
   return 1;
 };
 
-std::vector<ElementProxy*> InterfaceManager::fillInfo(lua_State* L)
+std::vector<ElementProxy*> InterfaceManager::fillInfo(lua_State* L, std::uint32_t id)
 {
   std::vector<ElementProxy*> result;
   lua_pushnil(L);
@@ -309,15 +312,17 @@ std::vector<ElementProxy*> InterfaceManager::fillInfo(lua_State* L)
     lua_getfield(L, -1, "text");
     if (!lua_isnil(L, -1))
     {
-      e->text       = lua_tostring(L, -1);
-      e->givenFlags = 0x0008;
+      e->text        = lua_tostring(L, -1);
+      e->givenFlags |= 0x0008;
     }
     lua_pop(L, 1);
+
     lua_getfield(L, -1, "handler");
     if (!lua_isnil(L, -1))
     {
-      const std::string call = lua_tostring(L, -1);
-      e->eventHandler = [call, id = e->elementId]() { LuaFacade::getLuaFacadeInstance().internalCall(call, id); };
+      const std::string call  = lua_tostring(L, -1);
+      e->eventHandler         = [call, id]() { LuaFacade::getLuaFacadeInstance().internalCall(call, id); };
+      e->givenFlags          |= 0x0040;
     }
     lua_pop(L, 1);
     result.push_back(e);

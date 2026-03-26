@@ -31,8 +31,8 @@ function Entity_lclick(targetId)
   Logic.LclickEntity(targetId)
 end
 
-function InternalFunctionCall(functionToCall, callingId)
-  Logic.internal(functionToCall, callingId)
+function InterfaceInternalFunctionCall(functionToCall, callingButtonId)
+  Logic.Internal(functionToCall, callingButtonId)
 end
 
 function Entity_rclick(targetId)

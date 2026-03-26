@@ -80,9 +80,9 @@ void ElementFactory::fillProgressBar(ElementProxy* ep, ProgressBar* p)
   p->progress         = new Label();
   p->progresPerc      = ep->progress;
   p->progress->zIndex = 15;
+  p->zIndex           = 15;
   fillBasicInfos(ep, p->progress);
   registerElementValue(ep, p);
-  p->zIndex = 15;
 }
 
 void ElementFactory::fillTexture(ElementProxy* ep, IElement* el)

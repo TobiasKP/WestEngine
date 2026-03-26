@@ -49,7 +49,7 @@ void InterfaceBuilder::createNewInterface(Container* c)
   _current->colorG          = c->colorG / 255.0;
   _current->colorB          = c->colorB / 255.0;
   _current->colorA          = c->colorA;
-  _current->id              = Config::incUiId();
+  _current->id              = c->elementId > 0 ? c->elementId : Config::incUiId();
   _current->dataPool        = _dataPool;
   _current->flags          |= c->givenFlags;
   _current->hidden          = c->hiddenContainer;

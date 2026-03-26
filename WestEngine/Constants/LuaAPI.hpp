@@ -15,7 +15,7 @@ constexpr std::string_view STATE_CHANGE     = "EntityStateChange";
 constexpr std::string_view UI_REFRESH       = "RefreshInterfaces";
 constexpr std::string_view UI_DELETE        = "DestroyInterface";
 constexpr std::string_view GET_STATE        = "GetState";
-constexpr std::string_view INTERNAL         = "InternalFunctionCall";
+constexpr std::string_view INTERNAL         = "InterfaceInternalFunctionCall";
 
 // Entity Creation
 constexpr std::string_view C_CREATE_ENTITY = "createEntity";

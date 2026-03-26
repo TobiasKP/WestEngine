@@ -7,8 +7,7 @@ local EntityStates = {
   IN_ACTION  = 5,
 }
 
-local GameStates = { PLAYER_TURN = 0, AI_TURN = 1
-}
+local GameStates = { PLAYER_TURN = 0, AI_TURN = 1 }
 
 local GameState = GameStates.PLAYER_TURN
 local PlayerEntitiesState = {}

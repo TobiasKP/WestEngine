@@ -89,6 +89,7 @@ function Panel:_resolveAnchor(w, h)
     ["bottom-right"] = function() return w - self._offsetX, self._offsetY end,
     ["bottom-left"]  = function() return self._offsetX, self._offsetY end,
     ["center"]       = function() return w / 2 + self._offsetX, h / 2 + self._offsetY end,
+    ["none"]         = function() return self._offsetX, self._offsetY end,
   }
   local fn = anchors[self._anchor]
   if fn then return fn() end
@@ -177,20 +178,21 @@ end
 local Button = setmetatable({}, { __index = Label })
 Button.__index = Button
 
-function Button.new()
-  local self = Label.new("")
-  self._type = 3
+function Button.new(text)
+  local self = Label.new(text)
+  self._type = 2
   self._handler = nil
-  return self
+  return setmetatable(self, Button)
 end
 
-function Button:handler(f)
-  self._handler = f
+function Button:handler(func)
+  self._handler = func
   return self
 end
 
 function Button:toElement()
   local elem = Label.toElement(self)
+  elem.handler = self._handler
   return elem
 end
 
