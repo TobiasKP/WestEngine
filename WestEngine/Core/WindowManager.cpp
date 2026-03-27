@@ -149,7 +149,14 @@ std::int32_t WindowManager::init()
 
 void WindowManager::update()
 {
+#ifdef DEBUG
+  double s = TimeUtils::getCurrentTimeAsTime();
+#endif
   glfwSwapBuffers(_window);
+#ifdef DEBUG
+  double e = TimeUtils::getCurrentTimeAsTime();
+  logCycle(std::format("SwapBuffers: {} ms \n", e - s));
+#endif
   glfwPollEvents();
 }
 

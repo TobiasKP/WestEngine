@@ -83,7 +83,7 @@ void WestLogger::workerThread()
   while (!(_stopWorker.load() && _q.empty()))
   {
     std::unique_lock<std::mutex> lock(_mutex);
-    _cv.wait(lock, [&] { return _q.size() < BULK_SIZE || _stopWorker.load(); });
+    _cv.wait(lock, [&] { return !_q.empty() || _stopWorker.load(); });
 
     while (!_q.empty() && bulk.size() < 512)
     {
