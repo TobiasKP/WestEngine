@@ -2,7 +2,7 @@ message(STATUS "Building Utils Module")
 
 set(LIB_DEST "${CMAKE_SOURCE_DIR}/Libs/")
 
-project(WestUtils VERSION 0.1.0)
+project(WestUtils VERSION 0.1.1)
 
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
   "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"

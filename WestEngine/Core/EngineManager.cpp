@@ -151,13 +151,13 @@ void EngineManager::update()
     if (render)
     {
 #ifdef DEBUG
-      double s = TimeUtils::getCurrentTimeAsTime();
+      double start = TimeUtils::getCurrentTimeAsTime();
 #endif
       success = iterateQ(CYCLE::UPDATE);
       frames++;
 #ifdef DEBUG
-      double e = TimeUtils::getCurrentTimeAsTime();
-      logCycle(std::format("Full Cycle: {} ms \n", e - s));
+      double end = TimeUtils::getCurrentTimeAsTime();
+      logCycle(std::format("Full Cycle: {} ms \n", end - start));
 #endif
     }
 
