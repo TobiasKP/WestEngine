@@ -3,7 +3,7 @@
 #include <Config.h>
 #include <glm/gtc/matrix_transform.hpp>
 
-glm::vec3 PositionCalculation::getWorldPosition(glm::vec2 screenPosition, std::shared_ptr<Camera> camera)
+glm::vec3 PositionCalculation::getWorldPosition(glm::vec2 screenPosition, const std::shared_ptr<Camera>& camera)
 {
   float ndcX = (2.0f * screenPosition.x) / Config::GeneralConfig.WIDTH - 1.0f;
   float ndcY = 1.0f - (2.0f * screenPosition.y) / Config::GeneralConfig.HEIGHT;
@@ -22,7 +22,7 @@ glm::vec3 PositionCalculation::getWorldPosition(glm::vec2 screenPosition, std::s
   return destination;
 }
 
-glm::vec2 PositionCalculation::getScreenPosition(glm::vec3 worldPos, std::shared_ptr<Camera> camera)
+glm::vec2 PositionCalculation::getScreenPosition(glm::vec3 worldPos, const std::shared_ptr<Camera>& camera)
 {
   glm::vec4 clip = camera->getProjectionMatrix() * camera->getViewMatrix() * glm::vec4(worldPos, 1.0f);
   glm::vec3 ndc  = glm::vec3(clip) / clip.w;
