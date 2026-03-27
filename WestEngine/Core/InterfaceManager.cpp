@@ -229,7 +229,7 @@ int InterfaceManager::registerInterface(lua_State* L)
   std::uint8_t cid = me->_facade->createNewInterface(c);
   assert(cid == id);
 #ifdef DEBUG
-    me->logDebug(std::format("{} ### created a new game Interface from lua with id: {}", me->getName(), id));
+  me->logDebug(std::format("{} ### created a new game Interface from lua with id: {}", me->getName(), id));
 #endif
   assert(id > 0);
   lua_pushinteger(L, id);
@@ -323,6 +323,13 @@ std::vector<ElementProxy*> InterfaceManager::fillInfo(lua_State* L, std::uint32_
       const std::string call  = lua_tostring(L, -1);
       e->eventHandler         = [call, id]() { LuaFacade::getLuaFacadeInstance().internalCall(call, id); };
       e->givenFlags          |= 0x0040;
+    }
+    lua_pop(L, 1);
+
+    lua_getfield(L, -1, "flags");
+    if (!lua_isnil(L, -1))
+    {
+      e->givenFlags |= lua_tointeger(L, -1);
     }
     lua_pop(L, 1);
     result.push_back(e);

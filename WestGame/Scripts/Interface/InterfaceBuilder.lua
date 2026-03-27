@@ -115,7 +115,13 @@ function Label.new(text)
     _span = 1,
     _grid = { row = 0, column = 0 },
     _stretch = { x = 1, y = 1 },
+    _flags = 0,
   }, Label)
+end
+
+function Label:flag(flag)
+  self._flags = flag | self._flags
+  return self
 end
 
 function Label:color(r, g, b, a)
@@ -145,6 +151,7 @@ function Label:toElement()
     color = self._color,
     gridPosition = { row = self._grid.row, column = self._grid.column, count = self._span },
     text = self._text,
+    flags = self._flags,
   }
 end
 
