@@ -150,18 +150,30 @@ void EngineManager::update()
 
     if (render)
     {
+#ifdef DEBUG
+      double s = TimeUtils::getCurrentTimeAsTime();
+#endif
       success = iterateQ(CYCLE::UPDATE);
       frames++;
+#ifdef DEBUG
+      double e = TimeUtils::getCurrentTimeAsTime();
+      logCycle(std::format("Full Cycle: {} ms \n", e - s));
+#endif
     }
 
-    double remainingTime = _FRAMETIME - delta;
-    if (remainingTime >= Config::GeneralConfig.EPSILON)
+    double endTime    = TimeUtils::getNanoseconds();
+    double elapsed    = endTime - startTime;
+    double frameNanos = _FRAMETIME * _NANOSECOND;
+    double sleepTime  = frameNanos - elapsed;
+    if (sleepTime > 0)
     {
-      std::int32_t sleepMs = static_cast<std::int32_t>(remainingTime * 1000) - 1;
-      if (sleepMs > 0)
-      {
-        std::this_thread::sleep_for(std::chrono::milliseconds(sleepMs));
-      }
+#ifdef DEBUG
+      logCycle(std::format("Sleeping main loop for: {}ms \n", sleepTime));
+#endif
+      struct timespec ts;
+      ts.tv_sec  = 0;
+      ts.tv_nsec = static_cast<long>(sleepTime);
+      std::this_thread::sleep_for(std::chrono::nanoseconds(static_cast<std::int64_t>(sleepTime)));
     }
 
     if (Config::requestedWidth > 0 && Config::requestedHeight > 0)
