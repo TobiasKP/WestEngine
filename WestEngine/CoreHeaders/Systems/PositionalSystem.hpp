@@ -22,4 +22,6 @@ private:
   std::shared_ptr<World> _world;
   std::shared_ptr<Camera> _cam;
   std::int32_t _tileIdx, _lastEntity;
+  glm::vec3 _lastEmissive;
+  bool _highlighted;
 };

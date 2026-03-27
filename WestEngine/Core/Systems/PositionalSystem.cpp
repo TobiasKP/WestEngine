@@ -8,9 +8,11 @@ PositionalSystem::PositionalSystem(std::shared_ptr<EventDispatcher> d,
                                    std::shared_ptr<Camera> c)
   : ISystem(d, l, r)
 {
-  _cam        = c;
-  _lastEntity = -1;
-  _tileIdx    = -1;
+  _cam          = c;
+  _lastEntity   = -1;
+  _tileIdx      = -1;
+  _lastEmissive = glm::vec3(0);
+  _highlighted  = false;
 };
 
 PositionalSystem::~PositionalSystem() {};
@@ -27,14 +29,18 @@ void PositionalSystem::update()
   {
     m = _reg->getComponent<Material>(_lastEntity);
     assert(m != nullptr);
-    m->emissiveColor = glm::vec3(0.0, 0.0, 0.0);
+    m->emissiveColor = _lastEmissive;
+    _lastEmissive    = glm::vec3(0);
+    _highlighted     = false;
   }
-  if (id > 0)
+  if (id > 0 && !_highlighted)
   {
     m = _reg->getComponent<Material>(id);
     assert(m != nullptr);
-    m->emissiveColor = glm::vec3(0.0, 0.5, 0.5);
+    _lastEmissive    = m->emissiveColor;
+    m->emissiveColor += glm::vec3(0.0, 0.5, 0.5);
     _lastEntity      = id;
+    _highlighted     = true;
   }
 };
 
