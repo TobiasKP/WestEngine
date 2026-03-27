@@ -170,9 +170,6 @@ void EngineManager::update()
 #ifdef DEBUG
       logCycle(std::format("Sleeping main loop for: {}ms \n", sleepTime));
 #endif
-      struct timespec ts;
-      ts.tv_sec  = 0;
-      ts.tv_nsec = static_cast<long>(sleepTime);
       std::this_thread::sleep_for(std::chrono::nanoseconds(static_cast<std::int64_t>(sleepTime)));
     }
 
