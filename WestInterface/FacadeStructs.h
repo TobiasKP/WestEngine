@@ -20,7 +20,7 @@ struct TextureInformation
 struct ElementProxy
 {
   ElementType type;
-  std::uint32_t elementId;
+  std::uint32_t elementId = 0;
 
   std::function<void()> eventHandler = nullptr;
 

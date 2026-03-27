@@ -77,12 +77,12 @@ IElement* ElementFactory::createElementInternal(ElementProxy* e)
 void ElementFactory::fillProgressBar(ElementProxy* ep, ProgressBar* p)
 {
   fillBasicInfos(ep, p);
-  p->progress         = new Label();
-  p->progresPerc      = ep->progress;
-  p->progress->zIndex = 15;
+  p->progress    = new Label();
+  p->progresPerc = ep->progress;
+  p->zIndex      = 8;
   fillBasicInfos(ep, p->progress);
+  p->progress->zIndex = 8;
   registerElementValue(ep, p);
-  p->zIndex = 15;
 }
 
 void ElementFactory::fillTexture(ElementProxy* ep, IElement* el)
@@ -130,8 +130,9 @@ void ElementFactory::fillText(ElementProxy* ep, IElement* el)
 
   assert(t->coordinates.size() == ep->text.size() * 4);
   assert(t->positions.size() == ep->text.size());
-  el->flags |= 0x08;
-  el->text   = std::unique_ptr<Text>(t);
+  el->flags  |= 0x08;
+  el->zIndex  = 10;
+  el->text    = std::unique_ptr<Text>(t);
 }
 
 void ElementFactory::registerElementEvent(ElementProxy* ep, IElement* e)

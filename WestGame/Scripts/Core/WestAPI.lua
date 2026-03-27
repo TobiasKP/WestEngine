@@ -3,6 +3,7 @@ local Interfaces
 
 function Init()
   StateMachine = require("Core.GameState")
+  Logic = require("Core.GameLogic")
   Interfaces = require("Interface.InterfaceLogic")
 end
 
@@ -27,13 +28,15 @@ function RegisterEntity(id, playable)
 end
 
 function Entity_lclick(targetId)
-  print(targetId)
+  Logic.LclickEntity(targetId)
 end
 
-function Entity_rclick(id)
-  --TODO get Health from component and display in UI
-  local health = getHealth(id);
-  print(health)
+function InterfaceInternalFunctionCall(functionToCall, callingButtonId)
+  Logic.Internal(functionToCall, callingButtonId)
+end
+
+function Entity_rclick(targetId)
+  Logic.RclickEntity(targetId)
 end
 
 function DestroyInterface(id)

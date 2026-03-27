@@ -89,6 +89,7 @@ function Panel:_resolveAnchor(w, h)
     ["bottom-right"] = function() return w - self._offsetX, self._offsetY end,
     ["bottom-left"]  = function() return self._offsetX, self._offsetY end,
     ["center"]       = function() return w / 2 + self._offsetX, h / 2 + self._offsetY end,
+    ["none"]         = function() return self._offsetX, self._offsetY end,
   }
   local fn = anchors[self._anchor]
   if fn then return fn() end
@@ -108,13 +109,19 @@ Label.__index = Label
 
 function Label.new(text)
   return setmetatable({
-    _type = 1,
+    _type = 0,
     _text = text or "",
     _color = { r = 255, g = 255, b = 255, a = 1.0 },
     _span = 1,
     _grid = { row = 0, column = 0 },
     _stretch = { x = 1, y = 1 },
+    _flags = 0,
   }, Label)
+end
+
+function Label:flag(flag)
+  self._flags = flag | self._flags
+  return self
 end
 
 function Label:color(r, g, b, a)
@@ -144,6 +151,7 @@ function Label:toElement()
     color = self._color,
     gridPosition = { row = self._grid.row, column = self._grid.column, count = self._span },
     text = self._text,
+    flags = self._flags,
   }
 end
 
@@ -173,23 +181,25 @@ function ProgressBar:toElement()
 end
 
 ---@class Button : Label
----@field _handler function | nil
+---@field _handler string | nil
 local Button = setmetatable({}, { __index = Label })
 Button.__index = Button
 
-function Button.new()
-  local self = Label.new("")
+function Button.new(text)
+  local self = Label.new(text)
+  self._type = 2
   self._handler = nil
-  return self
+  return setmetatable(self, Button)
 end
 
-function Button:handler(f)
-  self._handler = f
+function Button:handler(func)
+  self._handler = func
   return self
 end
 
 function Button:toElement()
   local elem = Label.toElement(self)
+  elem.handler = self._handler
   return elem
 end
 

@@ -23,6 +23,8 @@ public:
   bool onEntityClicked(std::int32_t entityId, MouseAction m);
   bool onStateChange(std::int32_t entityId, std::int32_t oldState, std::int32_t newState);
   bool onUIRefresh();
+  bool onUIDelete(std::int32_t uiId);
+  bool internalCall(const std::string& toCall, std::int32_t callingId);
   LuaStates getState(std::int32_t calleeId);
 
   inline lua_State* getLuaState()

@@ -43,4 +43,5 @@ private:
   void loadNewScene() {};
 
   static int getHealth(lua_State*);
+  static int getPosition(lua_State*);
 };

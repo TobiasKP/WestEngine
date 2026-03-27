@@ -1,6 +1,7 @@
 #include "../CoreHeaders/SceneManager.h"
 
 #include "../Constants/LuaAPI.hpp"
+#include "../CoreHeaders/Utils/Math/PositionCalculation.h"
 
 #include <filesystem>
 #include <format>
@@ -82,6 +83,7 @@ std::int32_t SceneManager::init()
   _registry->registerComponent<Control>();
   _registry->registerComponent<Health>();
   _facade->registerCFunction(getHealth, LuaAPI::C_GETHEALTH.data(), this);
+  _facade->registerCFunction(getPosition, LuaAPI::C_GETPOSITION.data(), this);
   _scene->init();
 
   std::string filePath = PathUtils::resolve(CoreConstants::LUA_INIT_FILE.data());
@@ -182,4 +184,16 @@ int SceneManager::getHealth(lua_State* L)
 
   lua_pushinteger(L, health);
   return 1;
+}
+
+int SceneManager::getPosition(lua_State* L)
+{
+  SceneManager* me = (SceneManager*)lua_touserdata(L, lua_upvalueindex(1));
+  std::uint32_t id = lua_tointeger(L, 1);
+  assert(me->_registry->getComponent<Position>(id) != nullptr);
+  glm::vec3 pos    = me->_registry->getComponent<Position>(id)->position;
+  glm::vec2 screen = PositionCalculation::getScreenPosition(pos, me->_scene->getCamera());
+  lua_pushnumber(L, screen.x);
+  lua_pushnumber(L, screen.y);
+  return 2;
 }

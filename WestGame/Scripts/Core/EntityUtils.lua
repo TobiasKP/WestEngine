@@ -1,16 +1,8 @@
 Utils = {}
 
 local yaml = require("Lib.yaml")
-local uimanager = require("Interface.GameUIRegistry")
 local builder = require("Interface.InterfaceBuilder")
 local root = debug.getinfo(1, 'S').source:sub(2):gsub("[^/]+$", "")
-
-local playerHealthUI = {
-  { type = 1, position = { x = 0, y = 0, stretchX = 0.75, stretchY = 0.75 }, color = { r = 215, g = 207, b = 196, a = 1.0 }, gridPosition = { row = 0, column = 0, count = 0 },  text = "" },
-  { type = 7, position = { x = 0, y = 0, stretchX = 1.0, stretchY = 0.75 },  color = { r = 142, g = 59, b = 70, a = 1.0 },   gridPosition = { row = 0, column = 0, count = 10 }, progress = 100 }
-};
-
-local npcHealthUI = "";
 
 local function interpreteData(data, source)
   local height, width = getScreenResolution();
@@ -35,7 +27,7 @@ local function interpreteData(data, source)
     if health ~= nil then
       builder.Panel("playercontrol")
           :anchor("bottom-right", 415, 60)
-          :size(10, 0.75)
+          :size(10, 1)
           :alpha(0.5)
           :add(builder.Label(tostring(health.c))
             :color(215, 207, 196, 1.0)

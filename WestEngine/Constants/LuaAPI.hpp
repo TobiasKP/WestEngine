@@ -15,6 +15,7 @@ constexpr std::string_view STATE_CHANGE     = "EntityStateChange";
 constexpr std::string_view UI_REFRESH       = "RefreshInterfaces";
 constexpr std::string_view UI_DELETE        = "DestroyInterface";
 constexpr std::string_view GET_STATE        = "GetState";
+constexpr std::string_view INTERNAL         = "InterfaceInternalFunctionCall";
 
 // Entity Creation
 constexpr std::string_view C_CREATE_ENTITY = "createEntity";
@@ -23,7 +24,8 @@ constexpr std::string_view C_BUILD_ENTITY  = "buildEntity";
 constexpr std::string_view C_LOAD_WORLD    = "loadWorld";
 
 // Entity Information
-constexpr std::string_view C_GETHEALTH = "getHealth";
+constexpr std::string_view C_GETHEALTH   = "getHealth";
+constexpr std::string_view C_GETPOSITION = "getPosition";
 
 // General Calls
 constexpr std::string_view C_GET_RESOLUTION    = "getScreenResolution";
