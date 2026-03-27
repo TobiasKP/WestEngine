@@ -20,5 +20,5 @@ public:
 private:
   bool _dirty;
   std::shared_ptr<Camera> _cam;
-  glm::vec3 _move;
+  glm::vec3 _move, _rot;
 };

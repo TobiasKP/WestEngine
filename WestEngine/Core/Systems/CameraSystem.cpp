@@ -10,9 +10,9 @@ CameraSystem::CameraSystem(std::shared_ptr<EventDispatcher> d,
                            std::shared_ptr<Camera> c)
   : ISystem(d, l, r)
 {
-  _move  = glm::vec3(0);
-  _cam   = c;
-  _dirty = false;
+  _move = _rot = glm::vec3(0);
+  _cam         = c;
+  _dirty       = false;
 };
 
 
@@ -22,6 +22,7 @@ void CameraSystem::update()
 {
   pollEvents();
   _cam->movePosition(_move.x, _move.y, _move.z);
+  _cam->moveRotation(_rot.x, _rot.y, _rot.x);
   _move.y = 0;
 };
 
@@ -75,6 +76,14 @@ void CameraSystem::pollEvents()
         else if (action.compare("CameraRight") == 0)
         {
           _move.x = sign;
+        }
+        else if (action.compare("CameraRotateRight") == 0)
+        {
+          _rot.y = -sign;
+        }
+        else if (action.compare("CameraRotateLeft") == 0)
+        {
+          _rot.y = sign;
         }
         break;
       }
