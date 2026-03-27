@@ -22,7 +22,7 @@ void CameraSystem::update()
 {
   pollEvents();
   _cam->movePosition(_move.x, _move.y, _move.z);
-  _cam->moveRotation(_rot.x, _rot.y, _rot.x);
+  _cam->moveRotation(_rot.x, _rot.y, _rot.z);
   _move.y = 0;
 };
 
