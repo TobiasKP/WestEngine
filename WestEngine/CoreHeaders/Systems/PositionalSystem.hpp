@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Entity/World.hpp"
 #include "../Entity/Camera.h"
+#include "../Entity/World.hpp"
 #include "../Interfaces/ISystem.h"
 
 class PositionalSystem : public ISystem
@@ -22,4 +22,6 @@ private:
   std::shared_ptr<World> _world;
   std::shared_ptr<Camera> _cam;
   std::int32_t _tileIdx, _lastEntity;
+  bool _highlighted;
+  glm::vec3 _lastEmissive;
 };
