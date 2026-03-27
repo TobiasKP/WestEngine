@@ -30,7 +30,6 @@ void PositionalSystem::update()
     m = _reg->getComponent<Material>(_lastEntity);
     assert(m != nullptr);
     m->emissiveColor = _lastEmissive;
-    _lastEmissive    = glm::vec3(0);
     _highlighted     = false;
   }
   if (id > 0 && !_highlighted)
