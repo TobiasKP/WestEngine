@@ -5,4 +5,5 @@
 struct Control
 {
   std::uint32_t entityId;
+  bool active = true;
 };

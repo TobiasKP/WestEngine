@@ -82,6 +82,7 @@ std::int32_t SceneManager::init()
   _registry->registerComponent<AABB>();
   _registry->registerComponent<Control>();
   _registry->registerComponent<Health>();
+  _registry->registerComponent<Projectile>();
   _facade->registerCFunction(getHealth, LuaAPI::C_GETHEALTH.data(), this);
   _facade->registerCFunction(getPosition, LuaAPI::C_GETPOSITION.data(), this);
   _scene->init();

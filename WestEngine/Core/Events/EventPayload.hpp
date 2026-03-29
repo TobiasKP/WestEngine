@@ -22,7 +22,13 @@ struct GamePayload
   std::int32_t turn;
 };
 
+struct AttackPayload
+{
+  std::uint32_t attacker;
+  std::uint32_t target;
+};
+
 struct EmptyPayload
 {};
 
-using EventPayload = std::variant<MousePayload, KeyboardPayload, GamePayload, EmptyPayload>;
+using EventPayload = std::variant<MousePayload, KeyboardPayload, GamePayload, AttackPayload, EmptyPayload>;

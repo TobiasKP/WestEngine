@@ -31,4 +31,5 @@ private:
   std::shared_ptr<World> _world;
   std::shared_ptr<Camera> _cam;
   std::int32_t _tileIdx, _state;
+  std::uint32_t _me;
 };

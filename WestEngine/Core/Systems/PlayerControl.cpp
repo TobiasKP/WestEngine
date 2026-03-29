@@ -6,6 +6,7 @@
 
 #include <Config.h>
 #include <format>
+#include <iostream>
 
 PlayerControl::PlayerControl(std::shared_ptr<EventDispatcher> d,
                              WestLogger* l,
@@ -27,6 +28,7 @@ void PlayerControl::init(const std::shared_ptr<World>& w)
 {
   _world   = w;
   _tileIdx = 0;
+  _me      = 0;
   _dispatcher->subscribe(EventIdentifiers::MOUSE_MOVE,
                          [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
   _dispatcher->subscribe(EventIdentifiers::MOUSE_LCLICK,
@@ -39,16 +41,18 @@ void PlayerControl::init(const std::shared_ptr<World>& w)
 
 void PlayerControl::update()
 {
-  pollEvents();
-
   std::shared_ptr<ComponentArray<Control>> controlUnits = _reg->getComponentArray<Control>();
   assert(controlUnits->getComponents().size() > 0);
-  std::uint32_t id  = controlUnits->getComponents()[0].entityId;
-  Movement* movComp = _reg->getComponent<Movement>(id);
+  std::array<Control, CoreConstants::MAX_ENTITY_SIZE> res = controlUnits->getComponents();
+  std::uint32_t _me = std::find_if(res.begin(), res.end(), [](const Control& c) { return c.active; })->entityId;
+  pollEvents();
+
+
+  Movement* movComp = _reg->getComponent<Movement>(_me);
   assert(movComp != nullptr);
   if (!movComp->destination.has_value() && isPlayerturn())
   {
-    Position* posComp = _reg->getComponent<Position>(id);
+    Position* posComp = _reg->getComponent<Position>(_me);
     assert(posComp != nullptr);
     std::int32_t tileIdx          = _world->calculateIndex(posComp->position.x, posComp->position.z);
     std::int32_t dimension        = _world->getGridSize();
@@ -101,6 +105,14 @@ void PlayerControl::pollEvents()
         if (destination.has_value() && id == 0)
         {
           passDestinationPosition(destination.value());
+        }
+        else if (id != 0)
+        {
+          AttackPayload a = {};
+          a.target        = id;
+          a.attacker      = _me;
+          std::cout << _me << " pew pew " << id << std::endl;
+          _dispatcher->dispatchEvent(EventIdentifiers::ATTACK_EVENT, a);
         }
         break;
       }
