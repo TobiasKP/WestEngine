@@ -24,7 +24,7 @@ public:
   void passDestinationPosition(glm::vec3 dest);
 
 private:
-  bool isPlayerturn() {
+  bool isPlayerturn() const {
     return _state == 0;
   }
 
