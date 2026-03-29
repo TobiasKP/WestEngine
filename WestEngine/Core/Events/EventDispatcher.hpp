@@ -4,6 +4,7 @@
 #include "Event.hpp"
 
 #include <cstdint>
+#include <lua.hpp>
 #include <unordered_map>
 #include <WestLogger.h>
 
@@ -15,9 +16,12 @@ public:
   EventDispatcher() {};
   ~EventDispatcher() {};
 
+  void init();
   void registerNewEvent(const EventIdentifiers event);
   void dispatchEvent(const EventIdentifiers name, EventPayload payload);
   void subscribe(const EventIdentifiers name, Callback callback);
+
+  static int event(lua_State*);
 
 private:
   std::mutex _mutex;

@@ -1,5 +1,14 @@
 #include "EventDispatcher.hpp"
 
+#include "../../Constants/LuaAPI.hpp"
+#include "../Scripting/LuaFacade.hpp"
+
+void EventDispatcher::init()
+{
+  LuaFacade::getLuaFacadeInstance().registerCFunction(event, LuaAPI::C_EVENT.data(), this);
+}
+
+
 void EventDispatcher::registerNewEvent(const EventIdentifiers name)
 {
   std::lock_guard<std::mutex> lock(_mutex);
@@ -28,3 +37,13 @@ void EventDispatcher::subscribe(const EventIdentifiers name, Callback callback)
   Event& e         = _events[idx];
   e.subscriber.push_back(callback);
 };
+
+int EventDispatcher::event(lua_State* L)
+{
+  EventDispatcher* me = (EventDispatcher*)lua_touserdata(L, lua_upvalueindex(1));
+  std::int32_t state  = lua_tointeger(L, 1);
+  GamePayload e       = {};
+  e.turn              = state;
+  me->dispatchEvent(EventIdentifiers::GAME_EVENT, std::move(e));
+  return 0;
+}

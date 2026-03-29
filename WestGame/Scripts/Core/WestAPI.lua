@@ -7,8 +7,12 @@ function Init()
   Interfaces = require("Interface.InterfaceLogic")
 end
 
+function GetGameState()
+  return StateMachine.GetGameState()
+end
+
 function GetState(id)
-  return StateMachine.GetEntityState(id);
+  return StateMachine.GetEntityState(id)
 end
 
 function EntityStateChange(id, oldState, newState)
@@ -31,10 +35,6 @@ function Entity_lclick(targetId)
   Logic.LclickEntity(targetId)
 end
 
-function InterfaceInternalFunctionCall(functionToCall, callingButtonId)
-  Logic.Internal(functionToCall, callingButtonId)
-end
-
 function Entity_rclick(targetId)
   Logic.RclickEntity(targetId)
 end
@@ -45,4 +45,8 @@ end
 
 function RefreshInterfaces()
   Interfaces.RefreshInterfaces()
+end
+
+function InterfaceInternalFunctionCall(functionToCall, callingButtonId)
+  Logic.Internal(functionToCall, callingButtonId)
 end

@@ -26,7 +26,8 @@ InputManager::InputManager() : IManager(nullptr)
   setName(CoreConstants::INPUT_MANAGER);
 }
 
-InputManager::InputManager(WestLogger* logger, const std::shared_ptr<EventDispatcher>& d) : IManager(logger), _dispatcher(d)
+InputManager::InputManager(WestLogger* logger, const std::shared_ptr<EventDispatcher>& d)
+  : IManager(logger), _dispatcher(d)
 {
   setName(CoreConstants::INPUT_MANAGER);
 }
@@ -47,6 +48,7 @@ std::int32_t InputManager::startup()
   _dispatcher->registerNewEvent(EventIdentifiers::MOUSE_WHEEL);
   _dispatcher->registerNewEvent(EventIdentifiers::MOUSE_MOVE);
   _dispatcher->registerNewEvent(EventIdentifiers::KEY);
+  _dispatcher->registerNewEvent(EventIdentifiers::GAME_EVENT);
   assert(_inputConfig != NULL && _availableCommands != NULL);
 
 
@@ -115,7 +117,8 @@ std::int32_t InputManager::init()
 
 
   KeyboardCallbacks::setDispatcher(_dispatcher);
-  MouseCallbacks::setDispatcher(_dispatcher);
+  MouseCallbacks::setDispatcher(_dispatcher); 
+  _dispatcher->init();
 
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();

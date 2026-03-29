@@ -24,7 +24,11 @@ public:
   void passDestinationPosition(glm::vec3 dest);
 
 private:
+  bool isPlayerturn() {
+    return _state == 0;
+  }
+
   std::shared_ptr<World> _world;
   std::shared_ptr<Camera> _cam;
-  std::int32_t _tileIdx;
+  std::int32_t _tileIdx, _state;
 };

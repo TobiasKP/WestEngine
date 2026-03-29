@@ -13,7 +13,8 @@ PlayerControl::PlayerControl(std::shared_ptr<EventDispatcher> d,
                              std::shared_ptr<Camera> c)
   : ISystem(d, l, r)
 {
-  _cam = c;
+  _cam   = c;
+  _state = 0;
   setName(Systems::PLAYER_CONTROL);
 #ifdef DEBUG
   _logger->log(Level::Info, std::format("{} *** Initialized debug information\n", getName()));
@@ -32,6 +33,8 @@ void PlayerControl::init(const std::shared_ptr<World>& w)
                          [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
   _dispatcher->subscribe(EventIdentifiers::MOUSE_RCLICK,
                          [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
+  _dispatcher->subscribe(EventIdentifiers::GAME_EVENT,
+                         [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
 }
 
 void PlayerControl::update()
@@ -43,7 +46,7 @@ void PlayerControl::update()
   std::uint32_t id  = controlUnits->getComponents()[0].entityId;
   Movement* movComp = _reg->getComponent<Movement>(id);
   assert(movComp != nullptr);
-  if (!movComp->destination.has_value())
+  if (!movComp->destination.has_value() && isPlayerturn())
   {
     Position* posComp = _reg->getComponent<Position>(id);
     assert(posComp != nullptr);
@@ -76,6 +79,10 @@ void PlayerControl::pollEvents()
       }
       case EventIdentifiers::MOUSE_RCLICK:
       {
+        if (!isPlayerturn())
+        {
+          break;
+        }
         std::uint32_t id = _world->getEntityByIdx(_tileIdx);
         if (id > 0)
         {
@@ -85,12 +92,22 @@ void PlayerControl::pollEvents()
       }
       case EventIdentifiers::MOUSE_LCLICK:
       {
+        if (!isPlayerturn())
+        {
+          break;
+        }
         std::uint32_t id                     = _world->getEntityByIdx(_tileIdx);
         std::optional<glm::vec3> destination = _world->tileToWorldPos(_tileIdx);
         if (destination.has_value() && id == 0)
         {
           passDestinationPosition(destination.value());
         }
+        break;
+      }
+      case EventIdentifiers::GAME_EVENT:
+      {
+        GamePayload* g = std::get_if<GamePayload>(&std::get<1>(event));
+        _state         = g->turn;
         break;
       }
       default:

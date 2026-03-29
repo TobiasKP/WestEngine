@@ -8,19 +8,19 @@ local EntityStates = {
 }
 
 local GameStates = { PLAYER_TURN = 0, AI_TURN = 1 }
-
 local GameState = GameStates.PLAYER_TURN
 local PlayerEntitiesState = {}
 local NpcEntitiesState = {}
 
-function SetGameState(state)
-  if state == GameStates.PLAYER_TURN then
-    GameState = GameStates.PLAYER_TURN
-  elseif state == GameStates.AI_TURN then
+function ToggleGameState()
+  if GameState == GameStates.PLAYER_TURN then
     GameState = GameStates.AI_TURN
+  elseif GameState == GameStates.AI_TURN then
+    GameState = GameStates.PLAYER_TURN
   else
     print("GGG - Invalid Game State")
   end
+  dispatchEvent(GameState)
 end
 
 function GetGameState()
@@ -78,9 +78,9 @@ function SetNpcState(id, current, state)
 end
 
 function TransitionEntityState(id, current, newState)
-  if PlayerEntitiesState[id] ~= nil then
+  if PlayerEntitiesState[id] ~= nil and GameState == GameStates.PLAYER_TURN then
     SetPlayerEntityState(id, current, newState)
-  elseif NpcEntitiesState[id] ~= nil then
+  elseif NpcEntitiesState[id] ~= nil and GameState == GameStates.AI_TURN then
     SetNpcState(id, current, newState)
   else
     print("GGG - Invalid State for Entity, no entry found for: " .. id)
@@ -96,7 +96,7 @@ function RegisterEntity(id, playable)
 end
 
 StateMachine.GetGameState = GetGameState
-StateMachine.SetGameState = SetGameState
+StateMachine.ToggleGameState = ToggleGameState
 StateMachine.GetEntityState = GetEntityState
 StateMachine.TransitionEntityState = TransitionEntityState
 StateMachine.RegisterEntity = RegisterEntity
