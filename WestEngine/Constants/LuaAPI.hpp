@@ -24,6 +24,7 @@ constexpr std::string_view C_BUILD_ENTITY  = "buildEntity";
 constexpr std::string_view C_LOAD_WORLD    = "loadWorld";
 
 // Entity Information
+constexpr std::string_view C_EVENT       = "dispatchEvent";
 constexpr std::string_view C_GETHEALTH   = "getHealth";
 constexpr std::string_view C_GETPOSITION = "getPosition";
 

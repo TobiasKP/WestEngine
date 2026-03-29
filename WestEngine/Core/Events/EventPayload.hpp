@@ -18,7 +18,9 @@ struct KeyboardPayload
 };
 
 struct GamePayload
-{};
+{
+  std::int32_t turn;
+};
 
 struct EmptyPayload
 {};

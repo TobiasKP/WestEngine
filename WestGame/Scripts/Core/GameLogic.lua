@@ -2,10 +2,14 @@ local Logic = {}
 
 local interface = require("Interface.InterfaceLogic")
 local builder = require("Interface.InterfaceBuilder")
+local state = require("Core.GameState")
 
 local switch = {
   ["closeinterface"] = function(id)
     interface.DestroyInterface(id);
+  end,
+  ["endturn"] = function()
+    state.ToggleGameState()
   end
 }
 
