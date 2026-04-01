@@ -35,14 +35,84 @@ void ComponentFactory::createComponent(lua_State* L, std::string& name, Entity& 
   {
     addPlayerControl(L, e);
   }
+  else if (Components::ACTIVE_UNIT.compare(name) == 0)
+  { 
+    e.toggleActivate(true);
+  }
   else if (Components::HEALTH.compare(name) == 0)
   {
     addHealth(L, e);
+  }
+  else if (Components::EQUIPMENT.compare(name) == 0)
+  {
+    addEquipment(L, e);
+  }
+  else if (Components::PROJECTILE.compare(name) == 0)
+  {
+    addProjectile(L, e);
   }
   else
   {
     WestLogger::getLoggerInstance().log(Level::Error, std::format("Unkown Component: {} \n", name));
   }
+}
+
+void ComponentFactory::addProjectile(lua_State* L, Entity& e)
+{
+  Projectile p = {};
+  lua_getfield(L, 2, "speed");
+  p.speed = lua_tointeger(L, -1);
+  lua_pop(L, 1);
+  lua_getfield(L, 2, "dmg");
+  p.damage = lua_tointeger(L, -1);
+  lua_pop(L, 1);
+  lua_getfield(L, 2, "destination");
+  p.destination = lua_tointeger(L, -1);
+  lua_pop(L, 1);
+  lua_getfield(L, 2, "hit");
+  p.hit = lua_toboolean(L, -1);
+  lua_pop(L, 1);
+  _registry->addComponent<Projectile>(e.getId(), std::move(p));
+};
+
+void ComponentFactory::addEquipment(lua_State* L, Entity& e)
+{
+  Equipment q           = {};
+  Weapon w              = {};
+  const auto fillWeapon = [](lua_State* L, Weapon w)
+  {
+    lua_getfield(L, -1, "id");
+    w.id = lua_tointeger(L, -1);
+    lua_pop(L, 1);
+    lua_getfield(L, -1, "dmg");
+    w.dmg = lua_tointeger(L, -1);
+    lua_pop(L, 1);
+    lua_getfield(L, -1, "range");
+    w.range = lua_tointeger(L, -1);
+    lua_pop(L, 1);
+    lua_getfield(L, -1, "accuracy");
+    w.accuracy = lua_tonumber(L, -1);
+    lua_pop(L, 1);
+    return w;
+  };
+
+
+  lua_getfield(L, 2, "primary");
+  if (lua_istable(L, -1))
+  {
+    q.primary = fillWeapon(L, w);
+    w         = {};
+  }
+  lua_pop(L, 1);
+  lua_getfield(L, 2, "secondary");
+  if (lua_istable(L, -1))
+  {
+    q.secondary = fillWeapon(L, w);
+    w           = {};
+  }
+  lua_pop(L, 1);
+
+  _registry->addComponent<Equipment>(e.getId(), std::move(q));
 }
 
 void ComponentFactory::addHealth(lua_State* L, Entity& e)

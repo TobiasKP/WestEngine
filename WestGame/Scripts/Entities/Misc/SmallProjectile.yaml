@@ -1,0 +1,7 @@
+name: "cube"
+model: "Cube.obj"
+shader: { v: "Vertex.vs", f: "Fragment.fs" , group: 0 }
+activeUnit: false
+components: 
+  - { name: "position", x: 0, y: 0, z: 0 }
+  - { name: "projectile", speed: 0, dmg: 0, hit: false, destination: 0 }

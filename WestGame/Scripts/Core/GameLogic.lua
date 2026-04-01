@@ -3,6 +3,7 @@ local Logic = {}
 local interface = require("Interface.InterfaceLogic")
 local builder = require("Interface.InterfaceBuilder")
 local state = require("Core.GameState")
+local entity = require("Core.EntityUtils")
 
 local switch = {
   ["closeinterface"] = function(id)
@@ -34,13 +35,23 @@ function RclickEntity(id)
         :color(142, 59, 70, 1.0)
         :span(4)
         :progress(health)
+        :attachEntity(id)
         :grid(5, 2)
         :flag(0x01))
       :build()
 end
 
-function LclickEntity(id)
-  print(id)
+function Attack(wRange, distanceToTarget, wDmg, wAccuracy, target, spawnX, spawnY)
+  if wRange < distanceToTarget then
+    wAccuracy = wAccuracy - (distanceToTarget - wRange) * 10
+  end
+  local ran = math.random(0, 100);
+  local hit = true
+  if ran > wAccuracy then
+    hit = false
+  end
+  entity.FillProjectileInfo(2.0, target, wDmg, hit, spawnX, spawnY)
+  entity.QueueEntity("../Entities/Misc/SmallProjectile")
 end
 
 function Internal(toCall, id)
@@ -52,7 +63,7 @@ function Internal(toCall, id)
 end
 
 Logic.RclickEntity = RclickEntity
-Logic.LclickEntity = LclickEntity
+Logic.Attack = Attack
 Logic.Internal = Internal
 
 return Logic

@@ -9,13 +9,14 @@ namespace LuaAPI
 constexpr std::string_view WORLD_POS_LCLICK = "Worldpos_lclick";
 constexpr std::string_view WORLD_POS_RCLICK = "Worldpos_rclick";
 constexpr std::string_view ENTITY_REGISTER  = "RegisterEntity";
-constexpr std::string_view ENTITY_LCLICK    = "Entity_lclick";
+constexpr std::string_view ENTITY_ATTACK    = "Entity_attack";
 constexpr std::string_view ENTITY_RCLICK    = "Entity_rclick";
 constexpr std::string_view STATE_CHANGE     = "EntityStateChange";
 constexpr std::string_view UI_REFRESH       = "RefreshInterfaces";
 constexpr std::string_view UI_DELETE        = "DestroyInterface";
 constexpr std::string_view GET_STATE        = "GetState";
 constexpr std::string_view INTERNAL         = "InterfaceInternalFunctionCall";
+constexpr std::string_view ENTITY_QUEUE     = "EntityQueue";
 
 // Entity Creation
 constexpr std::string_view C_CREATE_ENTITY = "createEntity";

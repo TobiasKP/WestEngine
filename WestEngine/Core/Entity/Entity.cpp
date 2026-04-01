@@ -6,20 +6,21 @@ Entity::Entity()
 {
   _destroyed   = false;
   _debugEntity = false;
+  _activeUnit  = false;
 }
 
 Entity::Entity(std::uint32_t id) : _id(id)
 {
   _destroyed   = false;
   _debugEntity = false;
+  _activeUnit  = false;
 }
 
 Entity::~Entity() {}
 
 
 Entity::Entity(const Entity& other)
-  : _id(other._id), _name(other._name), _destroyed(other._destroyed),
-    _debugEntity(other._debugEntity)
+  : _id(other._id), _name(other._name), _destroyed(other._destroyed), _debugEntity(other._debugEntity)
 {}
 
 Entity& Entity::operator=(const Entity& other)
@@ -35,8 +36,7 @@ Entity& Entity::operator=(const Entity& other)
 }
 
 Entity::Entity(Entity&& other) noexcept
-  : _id(other._id), _name(std::move(other._name)), _destroyed(other._destroyed),
-    _debugEntity(other._debugEntity)
+  : _id(other._id), _name(std::move(other._name)), _destroyed(other._destroyed), _debugEntity(other._debugEntity)
 {
   other._destroyed   = false;
   other._debugEntity = false;
@@ -46,10 +46,10 @@ Entity& Entity::operator=(Entity&& other) noexcept
 {
   if (this != &other)
   {
-    _id              = other._id;
-    _name            = other._name;
-    _destroyed       = other._destroyed;
-    _debugEntity     = other._debugEntity;
+    _id                = other._id;
+    _name              = other._name;
+    _destroyed         = other._destroyed;
+    _debugEntity       = other._debugEntity;
     other._destroyed   = false;
     other._debugEntity = false;
   }

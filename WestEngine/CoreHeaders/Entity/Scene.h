@@ -23,6 +23,7 @@ public:
   void addCamera(std::shared_ptr<Camera> cam);
   void addRegistry(std::shared_ptr<ComponentRegistry> reg);
   void removeEntity(const Entity& entity);
+  void removeEntity(std::uint32_t id);
   void deleteScene();
 
   // Getter

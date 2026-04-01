@@ -1,7 +1,11 @@
 #include "../../../CoreHeaders/Utils/Math/PositionCalculation.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include <Config.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/norm.hpp>
+
 
 glm::vec3 PositionCalculation::getWorldPosition(glm::vec2 screenPosition, const std::shared_ptr<Camera>& camera)
 {
@@ -40,4 +44,19 @@ glm::mat4 PositionCalculation::createTransformationMatrix(glm::vec3 position, gl
   mat           = glm::rotate(mat, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
   mat           = glm::scale(mat, glm::vec3(scale, scale, scale));
   return mat;
+}
+
+void PositionCalculation::updatePosition(glm::vec3 direction, Position* posComp)
+{
+  glm::vec3 update = direction - posComp->position;
+
+  if (glm::length2(update) <= 0.025f)
+  {
+    posComp->position = direction;
+  }
+  else
+  {
+    direction          = glm::normalize(update) * Config::GeneralConfig.SPEED * Config::GeneralConfig.DELTA;
+    posComp->position += direction;
+  }
 }

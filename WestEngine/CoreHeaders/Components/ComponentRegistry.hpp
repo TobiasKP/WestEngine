@@ -34,6 +34,14 @@ public:
     return std::static_pointer_cast<ComponentArray<T>>(array)->remove(entityId);
   };
 
+  void removeAllComponents(std::uint32_t entityId)
+  {
+    for (auto& [hash, array] : _componentArrays)
+    {
+      array->remove(entityId);
+    }
+  }
+
   template <typename T>
   T* getComponent(std::uint32_t entityId)
   {

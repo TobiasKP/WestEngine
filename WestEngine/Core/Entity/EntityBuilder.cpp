@@ -27,9 +27,10 @@ int EntityBuilder::createEntity(lua_State* L)
 {
   EntityBuilder* me = EntityBuilder::retrieveMeFromStack(L);
   me->_e            = Entity{};
-  std::string name  = lua_tostring(L, 1);
+  std::string name = lua_tostring(L, 1);
   me->_e.setId(Config::incEntityId());
   me->_e.setName(name);
+  me->_e.toggleActivate(false);
   return 0;
 }
 
@@ -55,7 +56,10 @@ int EntityBuilder::buildEntity(lua_State* L)
     me->_e = {};
     return 1;
   }
-  me->_scene->getWorld()->addEntityIdToIdx(p->position.x, p->position.z, me->_e.getId());
+  if (me->_e.isActiveUnit())
+  {
+    me->_scene->getWorld()->addEntityIdToIdx(p->position.x, p->position.z, me->_e.getId());
+  }
   me->_scene->addEntity(std::move(me->_e));
   return 0;
 }

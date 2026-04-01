@@ -9,13 +9,15 @@ public:
   CameraSystem(std::shared_ptr<EventDispatcher> d,
                WestLogger* l,
                std::shared_ptr<ComponentRegistry> r,
-               std::shared_ptr<Camera> c); 
+               std::shared_ptr<Camera> c);
   ~CameraSystem() override;
 
   void update() override;
   void updateDebuggingInfo() override;
   void init(const std::shared_ptr<World>& w) override;
-  void pollEvents() override;
+
+protected:
+  void handleEvent(std::tuple<EventIdentifiers, EventPayload> event) override;
 
 private:
   bool _dirty;

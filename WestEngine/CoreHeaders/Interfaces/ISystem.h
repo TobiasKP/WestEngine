@@ -1,7 +1,5 @@
 #pragma once
 
-#define GLM_ENABLE_EXPERIMENTAL
-
 #include "../Components/ComponentRegistry.hpp"
 #include "../Constants/InternalEvents.hpp"
 #include "../Core/Events/EventDispatcher.hpp"
@@ -9,7 +7,6 @@
 
 #include <CoreConstants.hpp>
 #include <glm/gtc/epsilon.hpp>
-#include <glm/gtx/norm.hpp>
 #include <string_view>
 #include <ThreadSafeQueue.hpp>
 #include <WestLogger.h>
@@ -37,12 +34,20 @@ public:
     _eventQueue.push(std::make_tuple<>(event, payload));
   }
 
-  virtual void update()                       = 0;
-  virtual void updateDebuggingInfo()          = 0;
+  virtual void update()                              = 0;
+  virtual void updateDebuggingInfo()                 = 0;
   virtual void init(const std::shared_ptr<World>& w) = 0;
-  virtual void pollEvents() {};
+  virtual void pollEvents()
+  {
+    std::vector<std::tuple<EventIdentifiers, EventPayload>> events = _eventQueue.drain();
+    for (std::tuple<EventIdentifiers, EventPayload> event : events)
+    {
+      handleEvent(event);
+    }
+  };
 
 protected:
+  virtual void handleEvent(std::tuple<EventIdentifiers, EventPayload> event) {};
   tQueue<std::tuple<EventIdentifiers, EventPayload>> _eventQueue;
   std::shared_ptr<EventDispatcher> _dispatcher;
   std::shared_ptr<ComponentRegistry> _reg;

@@ -1,6 +1,7 @@
 #include "../../CoreHeaders/Systems/MovementSystem.hpp"
 
 #include "../../Constants/Systems.hpp"
+#include "../../CoreHeaders/Utils/Math/PositionCalculation.h"
 #include "../Core/Scripting/LuaFacade.hpp"
 
 #include <format>
@@ -76,18 +77,8 @@ bool MovementSystem::destinationReached(Position* posComp, Movement* movComp)
 void MovementSystem::updatePosition(glm::vec3 local, Position* posComp, std::uint32_t id)
 {
   assert(posComp != nullptr);
-  glm::vec3 direction = local - posComp->position;
-
-  if (glm::length2(direction) <= 0.025f)
-  {
-    posComp->position = local;
-  }
-  else
-  {
-    direction          = glm::normalize(direction) * Config::GeneralConfig.SPEED * Config::GeneralConfig.DELTA;
-    posComp->position += direction;
-  }
-  _world->addEntityIdToIdx(posComp->position.x, posComp->position.z, id);
+  PositionCalculation::updatePosition(local, posComp); 
+  _world->updateEntityIdToIdx(posComp->position.x, posComp->position.z, id);
 }
 
 void MovementSystem::updateDebuggingInfo() {}

@@ -5,7 +5,8 @@
 
 struct Projectile
 {
-  std::int32_t speed;
-  std::int32_t damage;
-  glm::vec3 destionation;
+  std::uint32_t speed;
+  std::uint32_t damage;
+  std::uint32_t destination;
+  bool hit;
 };

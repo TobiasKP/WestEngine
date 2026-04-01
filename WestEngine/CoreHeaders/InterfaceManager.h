@@ -5,12 +5,13 @@
 #include "WindowManager.h"
 
 #include <WestInterfaceFacade.h>
+#include <unordered_map>
 
 class InterfaceManager : public IManager
 {
 public:
   InterfaceManager();
-  InterfaceManager(WestLogger* logger, WindowManager* manager,const std::shared_ptr<EventDispatcher>& d);
+  InterfaceManager(WestLogger* logger, WindowManager* manager, const std::shared_ptr<EventDispatcher>& d);
   ~InterfaceManager() override;
 
   std::int32_t startup() override;
@@ -24,7 +25,7 @@ public:
   static int destroyInterface(lua_State*);
 
 private:
-  static std::vector<WestInterface::ElementProxy*> fillInfo(lua_State* L, std::uint32_t id);
+  static std::vector<WestInterface::ElementProxy*> fillInfo(lua_State* L, std::uint32_t id, InterfaceManager* me);
   std::tuple<std::int16_t, bool> isInterfaceHovered();
   void refreshGameInterfaces();
 
@@ -36,6 +37,7 @@ private:
 
   std::vector<ElementBounds*> _elements;
   std::shared_ptr<EventDispatcher> _dispatcher;
+  std::unordered_map<std::uint32_t, std::uint32_t> _attachedEntities;
   WestInterface::WestInterfaceFacade* _facade;
   WindowManager* _windowManager;
 

@@ -24,6 +24,14 @@ public:
   bool onStateChange(std::int32_t entityId, std::int32_t oldState, std::int32_t newState);
   bool onUIRefresh();
   bool onUIDelete(std::int32_t uiId);
+  bool onAttack(std::uint32_t wRange,
+                std::uint32_t distanceToTarget,
+                std::uint32_t wDamage,
+                float wAccuracy,
+                std::uint32_t targetId,
+                float spawnX,
+                float spawnY);
+  bool entityQueue();
   bool internalCall(const std::string& toCall, std::int32_t callingId);
   LuaStates getState(std::int32_t calleeId);
 

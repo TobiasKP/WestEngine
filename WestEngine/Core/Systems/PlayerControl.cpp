@@ -6,7 +6,6 @@
 
 #include <Config.h>
 #include <format>
-#include <iostream>
 
 PlayerControl::PlayerControl(std::shared_ptr<EventDispatcher> d,
                              WestLogger* l,
@@ -44,7 +43,7 @@ void PlayerControl::update()
   std::shared_ptr<ComponentArray<Control>> controlUnits = _reg->getComponentArray<Control>();
   assert(controlUnits->getComponents().size() > 0);
   std::array<Control, CoreConstants::MAX_ENTITY_SIZE> res = controlUnits->getComponents();
-  std::uint32_t _me = std::find_if(res.begin(), res.end(), [](const Control& c) { return c.active; })->entityId;
+  _me = std::find_if(res.begin(), res.end(), [](const Control& c) { return c.active; })->entityId;
   pollEvents();
 
 
@@ -67,64 +66,59 @@ void PlayerControl::update()
   }
 }
 
-void PlayerControl::pollEvents()
+void PlayerControl::handleEvent(std::tuple<EventIdentifiers, EventPayload> event)
 {
-  std::vector<std::tuple<EventIdentifiers, EventPayload>> events = _eventQueue.drain();
-  for (std::tuple<EventIdentifiers, EventPayload> event : events)
+  switch (std::get<0>(event))
   {
-    switch (std::get<0>(event))
+    case EventIdentifiers::MOUSE_MOVE:
     {
-      case EventIdentifiers::MOUSE_MOVE:
-      {
-        MousePayload* p         = std::get_if<MousePayload>(&std::get<1>(event));
-        glm::vec3 hoverPosition = PositionCalculation::getWorldPosition(glm::vec2(p->x, p->y), _cam);
-        _tileIdx                = _world->worldPosToTile(hoverPosition.x, hoverPosition.z);
-        break;
-      }
-      case EventIdentifiers::MOUSE_RCLICK:
-      {
-        if (!isPlayerturn())
-        {
-          break;
-        }
-        std::uint32_t id = _world->getEntityByIdx(_tileIdx);
-        if (id > 0)
-        {
-          LuaFacade::getLuaFacadeInstance().onEntityClicked(id, LuaFacade::MouseAction::RMOUSE_CLICK);
-        }
-        break;
-      }
-      case EventIdentifiers::MOUSE_LCLICK:
-      {
-        if (!isPlayerturn())
-        {
-          break;
-        }
-        std::uint32_t id                     = _world->getEntityByIdx(_tileIdx);
-        std::optional<glm::vec3> destination = _world->tileToWorldPos(_tileIdx);
-        if (destination.has_value() && id == 0)
-        {
-          passDestinationPosition(destination.value());
-        }
-        else if (id != 0)
-        {
-          AttackPayload a = {};
-          a.target        = id;
-          a.attacker      = _me;
-          std::cout << _me << " pew pew " << id << std::endl;
-          _dispatcher->dispatchEvent(EventIdentifiers::ATTACK_EVENT, a);
-        }
-        break;
-      }
-      case EventIdentifiers::GAME_EVENT:
-      {
-        GamePayload* g = std::get_if<GamePayload>(&std::get<1>(event));
-        _state         = g->turn;
-        break;
-      }
-      default:
-        break;
+      MousePayload* p         = std::get_if<MousePayload>(&std::get<1>(event));
+      glm::vec3 hoverPosition = PositionCalculation::getWorldPosition(glm::vec2(p->x, p->y), _cam);
+      _tileIdx                = _world->worldPosToTile(hoverPosition.x, hoverPosition.z);
+      break;
     }
+    case EventIdentifiers::MOUSE_RCLICK:
+    {
+      if (!isPlayerturn())
+      {
+        break;
+      }
+      std::uint32_t id = _world->getEntityByIdx(_tileIdx);
+      if (id > 0)
+      {
+        LuaFacade::getLuaFacadeInstance().onEntityClicked(id, LuaFacade::MouseAction::RMOUSE_CLICK);
+      }
+      break;
+    }
+    case EventIdentifiers::MOUSE_LCLICK:
+    {
+      if (!isPlayerturn())
+      {
+        break;
+      }
+      std::uint32_t id                     = _world->getEntityByIdx(_tileIdx);
+      std::optional<glm::vec3> destination = _world->tileToWorldPos(_tileIdx);
+      if (destination.has_value() && id == 0)
+      {
+        passDestinationPosition(destination.value());
+      }
+      else if (id != 0)
+      {
+        AttackPayload a = {};
+        a.target        = id;
+        a.attacker      = _me;
+        _dispatcher->dispatchEvent(EventIdentifiers::ATTACK_EVENT, a);
+      }
+      break;
+    }
+    case EventIdentifiers::GAME_EVENT:
+    {
+      GamePayload* g = std::get_if<GamePayload>(&std::get<1>(event));
+      _state         = g->turn;
+      break;
+    }
+    default:
+      break;
   }
 }
 

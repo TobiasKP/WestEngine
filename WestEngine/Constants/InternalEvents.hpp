@@ -7,5 +7,6 @@ enum class EventIdentifiers {
   MOUSE_LCLICK,
   MOUSE_RCLICK,
   MOUSE_WHEEL,
-  KEY
+  KEY,
+  INTERFACE_UPDATE, 
 };  // namespace Events

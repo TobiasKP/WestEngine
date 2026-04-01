@@ -2,7 +2,9 @@ name: "cube"
 model: "Cube.obj"
 shader: { v: "Vertex.vs", f: "Fragment.fs" , group: 0 }
 playercontrol: true
+activeUnit: true
 components: 
   - { name: "position", x: 1.5, y: 0, z: 1.5 }
   - { name: "movement", r: 2, a: 0 }
   - { name: "health", m: 100, c: 100 }
+  - { name: "equipment", secondary: { id: 1, dmg: 50, range: 3, accuracy: 95 } }

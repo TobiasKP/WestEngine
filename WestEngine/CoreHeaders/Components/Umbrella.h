@@ -7,3 +7,4 @@
 #include "Position.h"
 #include "Shader.h"
 #include "Projectile.hpp"
+#include "Equipment.hpp"
