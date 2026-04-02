@@ -25,7 +25,8 @@ Unless expressly authorized in writing by Tobias Kasper, you may NOT:
 
 OWNERSHIP
 Tobias Kasper retains all right, title, and interest in and to the Software,
-including all intellectual property rights. No title to or ownership of the
+including all intellectual property rights, exceptions are mentioned
+in the THIRD-PARTY LICENSES area below. No title to or ownership of the
 Software is transferred to you under this agreement.
 
 TERMINATION
@@ -49,3 +50,103 @@ This agreement shall be governed by and construed in accordance with applicable
 copyright and intellectual property laws.
 
 For licensing inquiries, contact: Tobias Kasper
+
+---
+
+THIRD-PARTY LICENSES
+
+This project uses the following third-party libraries:
+
+---
+
+GLEW (OpenGL Extension Wrangler)
+License: BSD 3-Clause License
+Copyright (C) 2002-2007, Milan Ikits <milan ikits[]ieee org>
+Copyright (C) 2002-2007, Marcelo E. Magallon <mmagallo[]debian org>
+Copyright (C) 2002, Lev Povalahev
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice.
+2. Redistributions in binary form must reproduce the above copyright notice in documentation and/or other materials.
+3. The names of the authors may not be used to endorse or promote products derived from this software without prior written permission.
+
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+
+---
+
+GLFW
+License: zlib/libpng License
+Copyright (c) 2002-2006 Marcus Geelnard
+Copyright (c) 2006-2019 Camilla Löwy
+
+This software is provided 'as-is', without any express or implied warranty.
+Permission is granted to anyone to use this software for any purpose, including commercial applications, and to alter it and redistribute it freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented.
+2. Altered source versions must be plainly marked as such.
+3. This notice may not be removed or altered from any source distribution.
+
+---
+
+Lua
+License: MIT License
+Copyright (C) 1994-2024 Lua.org, PUC-Rio
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+
+---
+
+GLM (OpenGL Mathematics)
+License: MIT License
+Copyright (c) 2005 - G-Truc Creation
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software to deal in the Software without restriction.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+
+---
+
+stb libraries (stb_image, stb_truetype, etc.)
+License: Public Domain / MIT License
+Copyright (c) 2017 Sean Barrett
+
+This software is available under 2 licenses — choose whichever you prefer:
+Public Domain (unlicense) or MIT License.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+
+---
+
+Google Test (gtest)
+License: BSD 3-Clause License
+Copyright (c) 2008, Google Inc.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions must retain the above copyright notice.
+2. Redistributions in binary form must reproduce the above copyright notice.
+3. Neither the name of Google Inc. nor the names of its contributors may be used to endorse products derived from this software.
+
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+
+---
+
+Assimp (Open Asset Import Library)
+License: BSD 3-Clause License
+Copyright (c) 2006-2024, assimp team
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions must retain the above copyright notice.
+2. Redistributions in binary form must reproduce the above copyright notice.
+3. Neither the name of the assimp team nor the names of its contributors may be used to endorse products derived from this software.
+
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+
+---
+
+End of third-party licenses.
+
