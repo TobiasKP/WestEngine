@@ -29,6 +29,7 @@ public:
   {
     _name = name;
   }
+
   void pushEvent(EventIdentifiers event, EventPayload payload)
   {
     _eventQueue.push(std::make_tuple<>(event, payload));

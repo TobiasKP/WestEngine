@@ -33,7 +33,16 @@ void EventDispatcher::dispatchEvent(const EventIdentifiers name, EventPayload pa
 void EventDispatcher::subscribe(const EventIdentifiers name, Callback callback)
 {
   std::lock_guard<std::mutex> lock(_mutex);
-  std::int32_t idx = _nameToIdx[name];
+  auto it = _nameToIdx.find(name);
+  if (it == _nameToIdx.end())
+  {
+    _logger->log(
+      Level::Error,
+      std::format("Event not registered: {}, can not subscribe to it, make sure it was registered on startup!\n",
+                  static_cast<std::int32_t>(name)));
+    return;
+  }
+  std::int32_t idx = it->second;
   Event& e         = _events[idx];
   e.subscriber.push_back(callback);
 };

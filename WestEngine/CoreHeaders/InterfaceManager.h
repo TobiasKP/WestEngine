@@ -1,11 +1,13 @@
 #pragma once
 
+
+#include "../Constants/InternalEvents.hpp"
 #include "../Core/Events/EventDispatcher.hpp"
 #include "Interfaces/IManager.h"
 #include "WindowManager.h"
 
-#include <WestInterfaceFacade.h>
 #include <unordered_map>
+#include <WestInterfaceFacade.h>
 
 class InterfaceManager : public IManager
 {
@@ -24,6 +26,11 @@ public:
   static int updateInterfaceValue(lua_State*);
   static int destroyInterface(lua_State*);
 
+  void pushEvent(EventIdentifiers event, EventPayload payload)
+  { 
+    _eventQueue.push(std::make_tuple<>(event, payload));
+  }
+
 private:
   static std::vector<WestInterface::ElementProxy*> fillInfo(lua_State* L, std::uint32_t id, InterfaceManager* me);
   std::tuple<std::int16_t, bool> isInterfaceHovered();
@@ -35,6 +42,7 @@ private:
   glm::vec2 _currentPos;
   std::tuple<std::int16_t, bool> _currentHover;
 
+  tQueue<std::tuple<EventIdentifiers, EventPayload>> _eventQueue;
   std::vector<ElementBounds*> _elements;
   std::shared_ptr<EventDispatcher> _dispatcher;
   std::unordered_map<std::uint32_t, std::uint32_t> _attachedEntities;

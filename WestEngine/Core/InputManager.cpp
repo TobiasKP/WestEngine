@@ -49,6 +49,8 @@ std::int32_t InputManager::startup()
   _dispatcher->registerNewEvent(EventIdentifiers::MOUSE_MOVE);
   _dispatcher->registerNewEvent(EventIdentifiers::KEY);
   _dispatcher->registerNewEvent(EventIdentifiers::GAME_EVENT);
+  _dispatcher->registerNewEvent(EventIdentifiers::INTERFACE_UPDATE);
+  _dispatcher->registerNewEvent(EventIdentifiers::ATTACK_EVENT);
   assert(_inputConfig != NULL && _availableCommands != NULL);
 
 
@@ -117,7 +119,7 @@ std::int32_t InputManager::init()
 
 
   KeyboardCallbacks::setDispatcher(_dispatcher);
-  MouseCallbacks::setDispatcher(_dispatcher); 
+  MouseCallbacks::setDispatcher(_dispatcher);
   _dispatcher->init();
 
 #ifdef DEBUG

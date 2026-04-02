@@ -61,9 +61,6 @@ std::int32_t InterfaceManager::init()
 #endif
 
   std::int32_t result = 0;
-  LuaFacade::getLuaFacadeInstance().registerCFunction(registerInterface, LuaAPI::C_CREATE_INTERFACE.data(), this);
-  LuaFacade::getLuaFacadeInstance().registerCFunction(destroyInterface, LuaAPI::C_DESTROY_INTERFACE.data(), this);
-  LuaFacade::getLuaFacadeInstance().registerCFunction(updateInterfaceValue, LuaAPI::C_UPDATE_INTERFACE.data(), this);
   _dispatcher->subscribe(EventIdentifiers::MOUSE_MOVE,
                          [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
   _dispatcher->subscribe(EventIdentifiers::MOUSE_LCLICK,
@@ -72,6 +69,9 @@ std::int32_t InterfaceManager::init()
                          [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
   _dispatcher->subscribe(EventIdentifiers::INTERFACE_UPDATE,
                          [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
+  LuaFacade::getLuaFacadeInstance().registerCFunction(registerInterface, LuaAPI::C_CREATE_INTERFACE.data(), this);
+  LuaFacade::getLuaFacadeInstance().registerCFunction(destroyInterface, LuaAPI::C_DESTROY_INTERFACE.data(), this);
+  LuaFacade::getLuaFacadeInstance().registerCFunction(updateInterfaceValue, LuaAPI::C_UPDATE_INTERFACE.data(), this);
   result = _facade->init();
 
 #ifdef DEBUG
@@ -124,8 +124,7 @@ void InterfaceManager::update()
 void InterfaceManager::pollEvents()
 {
   std::vector<std::tuple<EventIdentifiers, EventPayload>> events = _eventQueue.drain();
-
-  for (std::tuple<EventIdentifiers, EventPayload> event : events)
+  for (std::tuple<EventIdentifiers, EventPayload>& event : events)
   {
     switch (std::get<0>(event))
     {
@@ -138,7 +137,6 @@ void InterfaceManager::pollEvents()
           _currentPos.y = p->y;
         }
         std::tuple<std::int16_t, bool> hover = isInterfaceHovered();
-
         if (std::get<0>(hover) != std::get<0>(_currentHover))
         {
           if (std::get<0>(_currentHover) != -1 && std::get<1>(_currentHover))
@@ -154,11 +152,13 @@ void InterfaceManager::pollEvents()
         break;
       }
       case EventIdentifiers::MOUSE_LCLICK:
+      {
         if (std::get<0>(_currentHover) != -1 && std::get<1>(_currentHover))
         {
           _facade->notify(std::get<0>(_currentHover), 0x04, -1, -1);
         }
         break;
+      }
       case EventIdentifiers::KEY:
       {
         KeyboardPayload* k = std::get_if<KeyboardPayload>(&std::get<1>(event));
@@ -190,11 +190,13 @@ void InterfaceManager::pollEvents()
         InterfacePayload* i = std::get_if<InterfacePayload>(&std::get<1>(event));
         if (_attachedEntities.contains(i->entityId))
         {
+#ifdef DEBUG
           logDebug(std::format("{} ### dispatching event: {} to: {}, with value: {}\n",
                                getName(),
                                i->event,
                                _attachedEntities[i->entityId],
                                i->newValue));
+#endif
           _facade->notify(_attachedEntities[i->entityId], i->event, i->newValue);
         }
         break;
