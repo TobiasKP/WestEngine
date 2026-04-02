@@ -24,7 +24,7 @@ protected:
 private:
   void travel(std::uint32_t id, Position* posComp, Projectile* p);
 
-  std::vector<std::uint32_t> _toRemove;
+  std::pmr::vector<std::uint32_t> _toRemove;
   std::shared_ptr<World> _world;
   std::shared_ptr<Scene> _scene;
 };

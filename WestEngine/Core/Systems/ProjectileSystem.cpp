@@ -89,8 +89,10 @@ void ProjectileSystem::handleEvent(std::tuple<EventIdentifiers, EventPayload> ev
     case EventIdentifiers::ATTACK_EVENT:
     {
       AttackPayload* a = std::get_if<AttackPayload>(&std::get<1>(event));
-      Equipment* e     = _reg->getComponent<Equipment>(a->attacker);
-      Weapon* active   = nullptr;
+      assert(a != nullptr);
+      Equipment* e = _reg->getComponent<Equipment>(a->attacker);
+      assert(e != nullptr);
+      Weapon* active = nullptr;
       if (e->active == 1)
       {
         active = &e->primary;
@@ -98,6 +100,12 @@ void ProjectileSystem::handleEvent(std::tuple<EventIdentifiers, EventPayload> ev
       else if (e->active == 2)
       {
         active = &e->secondary;
+      }
+      if (!active)
+      {
+        _logger->log(Level::Error,
+                     std::format("{} *** Entity: {} has no active weaponary to attack.", getName(), a->attacker));
+        break;
       }
 
       Position* aPosComp     = _reg->getComponent<Position>(a->attacker);

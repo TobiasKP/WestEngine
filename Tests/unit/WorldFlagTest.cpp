@@ -106,17 +106,47 @@ TEST_F(WorldFlagTest, GetEntityByIdxReturnsZeroForEmpty)
   EXPECT_EQ(world.getEntityByIdx(0), 0u);
 }
 
-TEST_F(WorldFlagTest, EntityMovesWhenReAdded)
+TEST_F(WorldFlagTest, UpdateEntityClearsOldTile)
 {
   world.addEntityIdToIdx(1.5f, 1.5f, 99);
   std::int32_t oldIdx = world.calculateIndex(1.5, 1.5);
 
-  // Move entity to new position
-  world.addEntityIdToIdx(5.5f, 5.5f, 99);
+  // Move entity to new position via update
+  world.updateEntityIdToIdx(5.5f, 5.5f, 99);
   std::int32_t newIdx = world.calculateIndex(5.5, 5.5);
 
   EXPECT_EQ(world.getEntityByIdx(newIdx), 99u);
   EXPECT_EQ(world.getEntityByIdx(oldIdx), 0u) << "Old tile should be cleared after move";
+}
+
+TEST_F(WorldFlagTest, UpdateEntityIgnoresUnknownId)
+{
+  world.addEntityIdToIdx(1.5f, 1.5f, 10);
+
+  // Entity 99 was never added — update should be a no-op
+  world.updateEntityIdToIdx(3.5f, 3.5f, 99);
+
+  EXPECT_EQ(world.getEntityByIdx(world.calculateIndex(1.5, 1.5)), 10u);
+  EXPECT_EQ(world.getEntityByIdx(world.calculateIndex(3.5, 3.5)), 0u);
+}
+
+TEST_F(WorldFlagTest, RemoveEntityFromGridClearsTile)
+{
+  world.addEntityIdToIdx(2.5f, 2.5f, 50);
+  std::int32_t idx = world.calculateIndex(2.5, 2.5);
+  EXPECT_EQ(world.getEntityByIdx(idx), 50u);
+
+  world.removeEntityFromGrid(50);
+  EXPECT_EQ(world.getEntityByIdx(idx), 0u);
+}
+
+TEST_F(WorldFlagTest, RemoveEntityFromGridUnknownIsNoOp)
+{
+  world.addEntityIdToIdx(2.5f, 2.5f, 50);
+
+  // Removing unknown entity should not affect existing entries
+  world.removeEntityFromGrid(999);
+  EXPECT_EQ(world.getEntityByIdx(world.calculateIndex(2.5, 2.5)), 50u);
 }
 
 TEST_F(WorldFlagTest, AddEntityOutOfBoundsIsIgnored)

@@ -79,7 +79,7 @@ void ComponentFactory::addEquipment(lua_State* L, Entity& e)
 {
   Equipment q           = {};
   Weapon w              = {};
-  const auto fillWeapon = [](lua_State* L, Weapon w)
+  const auto fillWeapon = [](lua_State* L, Weapon& w)
   {
     lua_getfield(L, -1, "id");
     w.id = lua_tointeger(L, -1);
