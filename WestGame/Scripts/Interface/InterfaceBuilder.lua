@@ -104,6 +104,7 @@ end
 ---@field stretch fun(self, x: number, y: number ): Label
 ---@field _type number
 ---@field _text string | nil
+---@field _attachedEntity number | nil
 local Label = {}
 Label.__index = Label
 
@@ -116,7 +117,13 @@ function Label.new(text)
     _grid = { row = 0, column = 0 },
     _stretch = { x = 1, y = 1 },
     _flags = 0,
+    _attachedEntity = 0,
   }, Label)
+end
+
+function Label:attachEntity(id)
+  self._attachedEntity = id
+  return self
 end
 
 function Label:flag(flag)
@@ -152,6 +159,7 @@ function Label:toElement()
     gridPosition = { row = self._grid.row, column = self._grid.column, count = self._span },
     text = self._text,
     flags = self._flags,
+    attachedEntity = self._attachedEntity
   }
 end
 

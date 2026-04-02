@@ -124,6 +124,7 @@ void Scene::removeEntity(const Entity& entity)
 
   if (entityIt != _entities.end())
   {
+    _world->removeEntityFromGrid(entity.getId());
     Config::freedEntityIds.push(entityIt->getId());
     _entities.erase(entityIt);
   }
@@ -141,4 +142,10 @@ void Scene::removeEntity(const Entity& entity)
     }
   }
 #endif
+}
+
+void Scene::removeEntity(std::uint32_t id)
+{
+  const Entity* e = getEntityById(id);
+  removeEntity(*e);
 }

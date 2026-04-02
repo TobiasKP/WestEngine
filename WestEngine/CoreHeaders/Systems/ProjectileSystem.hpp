@@ -1,30 +1,30 @@
 #pragma once
 
-#include "../Entity/Camera.h"
-#include "../Entity/World.hpp"
+#include "../Entity/Scene.h"
 #include "../Interfaces/ISystem.h"
 
-class PositionalSystem : public ISystem
+class ProjectileSystem : public ISystem
 {
 public:
-  PositionalSystem(std::shared_ptr<EventDispatcher> d,
+  ProjectileSystem(std::shared_ptr<EventDispatcher> d,
                    WestLogger* l,
                    std::shared_ptr<ComponentRegistry> r,
-                   std::shared_ptr<Camera> c);
-  ~PositionalSystem() override;
+                   std::shared_ptr<Scene> s);
+  ~ProjectileSystem() override;
 
   void update() override;
   void updateDebuggingInfo() override;
   void init(const std::shared_ptr<World>& w) override;
 
+  static int spawnProjectile(lua_State*);
+
 protected:
   void handleEvent(std::tuple<EventIdentifiers, EventPayload> event) override;
 
 private:
+  void travel(std::uint32_t id, Position* posComp, Projectile* p);
+
+  std::pmr::vector<std::uint32_t> _toRemove;
   std::shared_ptr<World> _world;
-  std::shared_ptr<Camera> _cam;
-  std::int32_t _tileIdx, _lastEntity;
-  bool _highlighted;
-  glm::vec3 _lastEmissive;
-  std::optional<MousePayload> _lastMouse;
+  std::shared_ptr<Scene> _scene;
 };

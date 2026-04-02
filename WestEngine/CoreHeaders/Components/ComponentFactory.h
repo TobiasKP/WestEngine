@@ -21,4 +21,6 @@ private:
   void addShader(lua_State* L, Entity& e);
   void addHealth(lua_State* L, Entity& e);
   void addPlayerControl(lua_State* L, Entity& e);
+  void addEquipment(lua_State* L, Entity& e);
+  void addProjectile(lua_State* L, Entity& e);
 };

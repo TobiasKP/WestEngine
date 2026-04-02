@@ -17,6 +17,8 @@ public:
   std::vector<std::int32_t>
   getReachableTiles(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a, void* callee);
   void addEntityIdToIdx(float x, float y, std::uint32_t id);
+  void updateEntityIdToIdx(float x, float y, std::uint32_t id);
+  void removeEntityFromGrid(std::uint32_t id);
   std::uint32_t getEntityByIdx(std::int32_t idx);
   void clearFlag(std::uint32_t flag);
   void setFlag(std::uint32_t flag, std::int32_t idx);

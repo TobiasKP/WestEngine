@@ -1,5 +1,7 @@
 #include "ValueObserver.h"
 
+#include <algorithm>
+
 void ValueObserver::registerElement(IElement* e)
 {
   _registeredElements[e->id] = e;
@@ -37,7 +39,8 @@ void ValueObserver::handleEvent(
 
 void ValueObserver::setProgress(ProgressBar* p, std::string& value)
 {
-  p->progresPerc = stoi(value);
+  std::int32_t v = stoi(value);
+  p->progresPerc = std::max(0, v);
 }
 
 

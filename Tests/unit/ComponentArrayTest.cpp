@@ -137,3 +137,64 @@ TEST_F(ComponentArrayTest, EntityIdByIdxInvalidReturnsMax)
 {
   EXPECT_EQ(getArray()->getEntityIdByIdx(999), UINT32_MAX);
 }
+
+// ─── removeAllComponents across multiple arrays ─────────────
+
+struct CompA { int a = 0; };
+struct CompB { int b = 0; };
+
+TEST(ComponentRegistry, RemoveAllComponentsClearsAllArrays)
+{
+  ComponentRegistry reg;
+  reg.registerComponent<CompA>();
+  reg.registerComponent<CompB>();
+
+  CompA ca; ca.a = 10;
+  CompB cb; cb.b = 20;
+  reg.addComponent<CompA>(1, std::move(ca));
+  reg.addComponent<CompB>(1, std::move(cb));
+
+  CompA ca2; ca2.a = 30;
+  CompB cb2; cb2.b = 40;
+  reg.addComponent<CompA>(2, std::move(ca2));
+  reg.addComponent<CompB>(2, std::move(cb2));
+
+  reg.removeAllComponents(1);
+
+  EXPECT_EQ(reg.getComponent<CompA>(1), nullptr);
+  EXPECT_EQ(reg.getComponent<CompB>(1), nullptr);
+
+  // Entity 2 unaffected
+  EXPECT_NE(reg.getComponent<CompA>(2), nullptr);
+  EXPECT_EQ(reg.getComponent<CompA>(2)->a, 30);
+  EXPECT_NE(reg.getComponent<CompB>(2), nullptr);
+  EXPECT_EQ(reg.getComponent<CompB>(2)->b, 40);
+}
+
+TEST(ComponentRegistry, RemoveAllComponentsOnMissingEntityIsNoOp)
+{
+  ComponentRegistry reg;
+  reg.registerComponent<CompA>();
+  reg.registerComponent<CompB>();
+
+  CompA ca; ca.a = 10;
+  reg.addComponent<CompA>(1, std::move(ca));
+
+  // Entity 99 has no components — should not crash
+  reg.removeAllComponents(99);
+
+  EXPECT_NE(reg.getComponent<CompA>(1), nullptr);
+}
+
+// ─── Remove and re-add same entity ID ─────────────────────────
+
+TEST_F(ComponentArrayTest, RemoveAndReAddSameId)
+{
+  addComp(1, 100);
+  registry.removeComponent<TestComp>(1);
+  EXPECT_EQ(registry.getComponent<TestComp>(1), nullptr);
+
+  addComp(1, 200);
+  EXPECT_NE(registry.getComponent<TestComp>(1), nullptr);
+  EXPECT_EQ(registry.getComponent<TestComp>(1)->value, 200);
+}

@@ -8,7 +8,7 @@ IntroScene = {}
 function load()
   utils.World(w)
   for _, entity in ipairs(entitiyList) do
-    local result = utils.LoadEntity(entity)
+    local result = utils.LoadEntity(entity, nil)
     if result == 1 then
       print("Error loading Entity")
     end

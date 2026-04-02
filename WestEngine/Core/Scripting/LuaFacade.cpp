@@ -56,7 +56,8 @@ bool LuaFacade::registerCFunction(int (*f)(lua_State*), std::string name, void* 
   {
     _logger->log(
       Level::Error,
-      std::format("Lua State error ::: Registering function to stack, function is nullptr or name is empty: {}\n", name));
+      std::format("Lua State error ::: Registering function to stack, function is nullptr or name is empty: {}\n",
+                  name));
     return 1;
   }
   lua_pushlightuserdata(L, me);
@@ -101,7 +102,7 @@ bool LuaFacade::onEntityClicked(std::int32_t entityId, MouseAction m)
   assert(entityId >= 0);
   if (m == LMOUSE_CLICK)
   {
-    lua_getglobal(L, LuaAPI::ENTITY_LCLICK.data());
+    return 0;
   }
   else if (m == RMOUSE_CLICK)
   {
@@ -110,8 +111,7 @@ bool LuaFacade::onEntityClicked(std::int32_t entityId, MouseAction m)
   if (!lua_isfunction(L, -1))
   {
     _logger->log(Level::Info,
-                 std::format("Lua State ::: function for called action is not defined.\n",
-                             m == LMOUSE_CLICK ? LuaAPI::ENTITY_LCLICK : LuaAPI::ENTITY_RCLICK));
+                 std::format("Lua State ::: function for called action is not defined.\n", LuaAPI::ENTITY_RCLICK));
     lua_pop(L, 1);
     return 1;
   }
@@ -142,6 +142,19 @@ bool LuaFacade::onEntityCreation(std::int32_t entityId, bool playable)
   }
   return 0;
 }
+
+bool LuaFacade::entityQueue()
+{
+  lua_getglobal(L, LuaAPI::ENTITY_QUEUE.data());
+  std::int32_t status = lua_pcall(L, 0, 0, 0);
+  if (status != 0)
+  {
+    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}", lua_tostring(L, -1)));
+    lua_pop(L, 1);
+    return 1;
+  }
+  return 0;
+};
 
 bool LuaFacade::onStateChange(std::int32_t entityId, std::int32_t oldState, std::int32_t newState)
 {
@@ -208,6 +221,34 @@ LuaFacade::LuaStates LuaFacade::getState(std::int32_t id)
   lua_remove(L, -1);
   return static_cast<LuaFacade::LuaStates>(result);
 }
+
+bool LuaFacade::onAttack(std::uint32_t wRange,
+                         std::uint32_t distanceToTarget,
+                         std::uint32_t wDamage,
+                         float wAccuracy,
+                         std::uint32_t targetId,
+                         float spawnX,
+                         float spawnY)
+{
+  lua_getglobal(L, LuaAPI::ENTITY_ATTACK.data());
+  lua_pushinteger(L, wRange);
+  lua_pushinteger(L, distanceToTarget);
+  lua_pushinteger(L, wDamage);
+  lua_pushnumber(L, wAccuracy);
+  lua_pushinteger(L, targetId);
+  lua_pushnumber(L, spawnX);
+  lua_pushnumber(L, spawnY);
+  std::int32_t status = lua_pcall(L, 7, 0, 0);
+  if (status != 0)
+  {
+    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
+    lua_pop(L, 1);
+    return IDLE;
+  }
+
+
+  return 0;
+};
 
 bool LuaFacade::loadAPI()
 {

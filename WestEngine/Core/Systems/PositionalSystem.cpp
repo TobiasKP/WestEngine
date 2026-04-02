@@ -20,6 +20,11 @@ PositionalSystem::~PositionalSystem() {};
 void PositionalSystem::update()
 {
   pollEvents();
+  if (_lastMouse.has_value())
+  {
+    glm::vec3 hoverPosition = PositionCalculation::getWorldPosition(glm::vec2(_lastMouse->x, _lastMouse->y), _cam);
+    _tileIdx                = _world->calculateIndex(hoverPosition.x, hoverPosition.z);
+  }
   std::shared_ptr<ComponentArray<Position>> pos = _reg->getComponentArray<Position>();
   std::uint32_t id                              = _world->getEntityByIdx(_tileIdx);
   Material* m;
@@ -28,18 +33,21 @@ void PositionalSystem::update()
   if (_lastEntity != -1 && _lastEntity != id)
   {
     m = _reg->getComponent<Material>(_lastEntity);
-    assert(m != nullptr);
-    m->emissiveColor = _lastEmissive;
-    _highlighted     = false;
+    if (m)
+    {
+      m->emissiveColor = _lastEmissive;
+    }
+    _lastEntity  = -1;
+    _highlighted = false;
   }
   if (id > 0 && !_highlighted)
   {
     m = _reg->getComponent<Material>(id);
     assert(m != nullptr);
-    _lastEmissive    = m->emissiveColor;
+    _lastEmissive     = m->emissiveColor;
     m->emissiveColor += glm::vec3(0.0, 0.5, 0.5);
-    _lastEntity      = id;
-    _highlighted     = true;
+    _lastEntity       = id;
+    _highlighted      = true;
   }
 };
 
@@ -52,23 +60,14 @@ void PositionalSystem::init(const std::shared_ptr<World>& w)
                          [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
 };
 
-void PositionalSystem::pollEvents()
+void PositionalSystem::handleEvent(std::tuple<EventIdentifiers, EventPayload> event)
 {
-  std::vector<std::tuple<EventIdentifiers, EventPayload>> events = _eventQueue.drain();
-
-  // Only the last mouse position matters for hover — skip redundant intermediate events
-  MousePayload* lastMouse = nullptr;
-  for (std::tuple<EventIdentifiers, EventPayload>& event : events)
+  if (std::get<0>(event) == EventIdentifiers::MOUSE_MOVE)
   {
-    if (std::get<0>(event) == EventIdentifiers::MOUSE_MOVE)
+    MousePayload* p = std::get_if<MousePayload>(&std::get<1>(event));
+    if (p)
     {
-      lastMouse = std::get_if<MousePayload>(&std::get<1>(event));
+      _lastMouse = *p;
     }
-  }
-
-  if (lastMouse)
-  {
-    glm::vec3 hoverPosition = PositionCalculation::getWorldPosition(glm::vec2(lastMouse->x, lastMouse->y), _cam);
-    _tileIdx                = _world->calculateIndex(hoverPosition.x, hoverPosition.z);
   }
 }

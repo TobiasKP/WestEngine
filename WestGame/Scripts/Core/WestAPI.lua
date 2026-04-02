@@ -1,10 +1,13 @@
 local StateMachine
 local Interfaces
+local Entitites
+local Logic
 
 function Init()
   StateMachine = require("Core.GameState")
   Logic = require("Core.GameLogic")
   Interfaces = require("Interface.InterfaceLogic")
+  Entities = require("Core.EntityUtils")
 end
 
 function GetGameState()
@@ -31,8 +34,8 @@ function RegisterEntity(id, playable)
   StateMachine.RegisterEntity(id, playable)
 end
 
-function Entity_lclick(targetId)
-  Logic.LclickEntity(targetId)
+function Entity_attack(wRange, distanceToTarget, wDmg, wAccuracy, target, spawnX, spawnY)
+  Logic.Attack(wRange, distanceToTarget, wDmg, wAccuracy, target, spawnX, spawnY)
 end
 
 function Entity_rclick(targetId)
@@ -45,6 +48,10 @@ end
 
 function RefreshInterfaces()
   Interfaces.RefreshInterfaces()
+end
+
+function EntityQueue()
+  Entities.DrainQueue()
 end
 
 function InterfaceInternalFunctionCall(functionToCall, callingButtonId)

@@ -30,14 +30,17 @@ public:
 //   - Position mutation (movement lerp)
 //   - Material mutation (emissive highlight)
 //   - World flag operations (setFlag, clearFlag)
+//   - Combat: 20 entities fire projectiles, hit resolution, damage
+//   - Entity destruction for killed targets
 //
 // Target: < 8ms on dev machine to leave headroom for rendering.
 // ──────────────────────────────────────────────────────────────
 
-static constexpr std::uint32_t ENTITY_COUNT   = 200;
-static constexpr std::uint32_t MOVING_COUNT   = 50;
-static constexpr std::uint32_t GRID_SIZE      = 50;
-static constexpr double TARGET_MS             = 8.0;
+static constexpr std::uint32_t ENTITY_COUNT     = 200;
+static constexpr std::uint32_t MOVING_COUNT     = 50;
+static constexpr std::uint32_t ATTACKING_COUNT  = 20;
+static constexpr std::uint32_t GRID_SIZE        = 50;
+static constexpr double TARGET_MS               = 8.0;
 
 class ECSStressTest : public ::testing::Test
 {
@@ -56,6 +59,9 @@ protected:
     registry.registerComponent<Movement>();
     registry.registerComponent<Material>();
     registry.registerComponent<Control>();
+    registry.registerComponent<Health>();
+    registry.registerComponent<Equipment>();
+    registry.registerComponent<Projectile>();
 
     std::uniform_real_distribution<float> posDist(1.0f, (float)(GRID_SIZE - 1));
     std::uniform_int_distribution<std::int32_t> rangeDist(1, 4);
@@ -76,6 +82,17 @@ protected:
       mat.diffuseColor  = glm::vec3(0.8f);
       mat.emissiveColor = glm::vec3(0.0f);
       registry.addComponent<Material>(i, std::move(mat));
+
+      Health h;
+      h.max     = 100;
+      h.current = 100;
+      registry.addComponent<Health>(i, std::move(h));
+
+      Equipment eq;
+      eq.primary   = {1, 25, 3, 85.0f};
+      eq.secondary = {2, 10, 5, 95.0f};
+      eq.active    = 1;
+      registry.addComponent<Equipment>(i, std::move(eq));
     }
 
     // One player-controlled entity
@@ -121,7 +138,6 @@ TEST_F(ECSStressTest, FullSystemsTickUnder8ms)
   auto start = std::chrono::steady_clock::now();
 
   // --- PlayerControl-like pass ---
-  // For the controlled entity: calculate reachable tiles
   auto controlArr = registry.getComponentArray<Control>();
   for (size_t i = 0; i < controlArr->getSize(); i++)
   {
@@ -137,7 +153,6 @@ TEST_F(ECSStressTest, FullSystemsTickUnder8ms)
   }
 
   // --- MovementSystem-like pass ---
-  // 50 entities have active destinations from SetUp (simulating mid-movement)
   auto movArr = registry.getComponentArray<Movement>();
   for (size_t i = 0; i < movArr->getSize(); i++)
   {
@@ -159,13 +174,101 @@ TEST_F(ECSStressTest, FullSystemsTickUnder8ms)
         mov->destination.reset();
       }
       pos->dirty.store(true);
-      world.addEntityIdToIdx(pos->position.x, pos->position.z, id);
+      world.updateEntityIdToIdx(pos->position.x, pos->position.z, id);
     }
   }
 
-  // --- PositionalSystem-like pass ---
-  // Hover highlight: look up entity at each tile, toggle emissive
+  // --- ProjectileSystem-like pass: attack resolution ---
+  // 20 entities fire at random targets
+  std::vector<std::uint32_t> toRemove;
+  std::uniform_int_distribution<std::uint32_t> targetDist(1, ENTITY_COUNT);
   auto posArr = registry.getComponentArray<Position>();
+
+  for (std::uint32_t attacker = 1; attacker <= ATTACKING_COUNT; attacker++)
+  {
+    std::uint32_t target = targetDist(rng);
+    if (target == attacker) continue;
+
+    Equipment* eq = registry.getComponent<Equipment>(attacker);
+    Weapon* active = (eq->active == 1) ? &eq->primary : &eq->secondary;
+
+    Position* aPosComp = registry.getComponent<Position>(attacker);
+    Position* tPosComp = registry.getComponent<Position>(target);
+
+    std::int32_t aTile     = world.calculateIndex(aPosComp->position.x, aPosComp->position.z);
+    std::int32_t tTile     = world.calculateIndex(tPosComp->position.x, tPosComp->position.z);
+    std::int32_t dimension = world.getGridSize();
+    std::int32_t dx        = std::abs(aTile % dimension - tTile % dimension);
+    std::int32_t dz        = std::abs(aTile / dimension - tTile / dimension);
+    std::int32_t distance  = std::max(dx, dz);
+
+    // Hit resolution (simulates Lua side)
+    float accuracy = active->accuracy;
+    if (active->range < (std::uint32_t)distance)
+    {
+      accuracy -= (distance - active->range) * 10.0f;
+    }
+
+    std::uniform_int_distribution<int> hitRoll(0, 100);
+    bool hit = hitRoll(rng) <= (int)accuracy;
+
+    // Spawn projectile component
+    Projectile proj;
+    proj.speed       = 2;
+    proj.damage      = active->dmg;
+    proj.destination = target;
+    proj.hit         = hit;
+    std::uint32_t projId = ENTITY_COUNT + attacker;
+    Position projPos;
+    projPos.position = aPosComp->position;
+    projPos.dirty.store(true);
+    registry.addComponent<Position>(projId, std::move(projPos));
+    registry.addComponent<Projectile>(projId, std::move(proj));
+  }
+
+  // --- ProjectileSystem-like pass: travel and impact ---
+  auto projectiles = registry.getComponentArray<Projectile>();
+  size_t projSize = projectiles->getSize();
+  size_t current = 0;
+  for (auto& p : projectiles->getComponents())
+  {
+    if (current >= projSize) break;
+    std::uint32_t id  = projectiles->getEntityIdByIdx(current);
+    Position* projPos = registry.getComponent<Position>(id);
+    Position* tgtPos  = registry.getComponent<Position>(p.destination);
+
+    if (tgtPos != nullptr)
+    {
+      glm::vec3 dir = tgtPos->position - projPos->position;
+      float len2    = glm::dot(dir, dir);
+      // Simulate instant arrival for stress test
+      projPos->position = tgtPos->position;
+
+      if (p.hit)
+      {
+        Health* h = registry.getComponent<Health>(p.destination);
+        if (h != nullptr)
+        {
+          h->current -= p.damage;
+          if (h->current <= 0)
+          {
+            toRemove.push_back(p.destination);
+          }
+        }
+      }
+      toRemove.push_back(id);
+    }
+    current++;
+  }
+
+  // --- Deferred entity removal ---
+  for (std::uint32_t id : toRemove)
+  {
+    registry.removeAllComponents(id);
+  }
+
+  // --- PositionalSystem-like pass ---
+  posArr = registry.getComponentArray<Position>();
   for (size_t i = 0; i < posArr->getSize(); i++)
   {
     Position* pos    = posArr->getComponentByIdx(i);
@@ -175,8 +278,11 @@ TEST_F(ECSStressTest, FullSystemsTickUnder8ms)
     std::uint32_t tileId = world.getEntityByIdx(idx);
     if (tileId > 0)
     {
-      Material* mat      = registry.getComponent<Material>(tileId);
-      mat->emissiveColor = glm::vec3(0.0f, 0.5f, 0.5f);
+      Material* mat = registry.getComponent<Material>(tileId);
+      if (mat != nullptr)
+      {
+        mat->emissiveColor = glm::vec3(0.0f, 0.5f, 0.5f);
+      }
     }
   }
 
@@ -186,7 +292,6 @@ TEST_F(ECSStressTest, FullSystemsTickUnder8ms)
     Position* pos = posArr->getComponentByIdx(i);
     if (pos->dirty.load())
     {
-      // Simulate transform matrix rebuild (mat4 multiply)
       pos->transform = glm::translate(glm::mat4(1.0f), pos->position);
       pos->dirty.store(false);
     }
@@ -198,7 +303,8 @@ TEST_F(ECSStressTest, FullSystemsTickUnder8ms)
   auto end       = std::chrono::steady_clock::now();
   double elapsed = std::chrono::duration<double, std::milli>(end - start).count();
 
-  std::cout << "[  PERF   ] Full systems tick (" << ENTITY_COUNT << " entities): "
+  std::cout << "[  PERF   ] Full systems tick (" << ENTITY_COUNT << " entities, "
+            << ATTACKING_COUNT << " attacks): "
             << elapsed << " ms" << std::endl;
 
   EXPECT_LT(elapsed, TARGET_MS) << "Systems tick exceeded " << TARGET_MS << "ms budget";
@@ -210,27 +316,30 @@ TEST_F(ECSStressTest, ComponentLookupScalability)
 {
   auto start = std::chrono::steady_clock::now();
 
-  // Simulate 200 entities × 3 component lookups × 60 fps = one second of lookups
+  // Simulate 200 entities × 5 component lookups × 60 fps = one second of lookups
   for (int frame = 0; frame < 60; frame++)
   {
     for (std::uint32_t id = 1; id <= ENTITY_COUNT; id++)
     {
-      volatile Position* p  = registry.getComponent<Position>(id);
-      volatile Movement* m  = registry.getComponent<Movement>(id);
-      volatile Material* mt = registry.getComponent<Material>(id);
+      volatile Position* p   = registry.getComponent<Position>(id);
+      volatile Movement* m   = registry.getComponent<Movement>(id);
+      volatile Material* mt  = registry.getComponent<Material>(id);
+      volatile Health* h     = registry.getComponent<Health>(id);
+      volatile Equipment* eq = registry.getComponent<Equipment>(id);
       (void)p;
       (void)m;
       (void)mt;
+      (void)h;
+      (void)eq;
     }
   }
 
   auto end       = std::chrono::steady_clock::now();
   double elapsed = std::chrono::duration<double, std::milli>(end - start).count();
 
-  std::cout << "[  PERF   ] 60 frames × " << ENTITY_COUNT << " entities × 3 lookups: "
+  std::cout << "[  PERF   ] 60 frames × " << ENTITY_COUNT << " entities × 5 lookups: "
             << elapsed << " ms (budget: " << 60 * TARGET_MS << " ms)" << std::endl;
 
-  // All 60 frames worth of lookups should fit in 60 × 8ms
   EXPECT_LT(elapsed, 60 * TARGET_MS);
 }
 
@@ -262,4 +371,48 @@ TEST_F(ECSStressTest, WorldQueryScalability)
             << elapsed << " ms" << std::endl;
 
   EXPECT_LT(elapsed, TARGET_MS);
+}
+
+// ─── Combat: mass damage and entity removal ──────────────────
+
+TEST_F(ECSStressTest, MassCombatRemovalStability)
+{
+  // All 200 entities shoot at entity 100, killing it many times over
+  std::uint32_t target = 100;
+  std::vector<std::uint32_t> toRemove;
+
+  for (std::uint32_t attacker = 1; attacker <= ENTITY_COUNT; attacker++)
+  {
+    if (attacker == target) continue;
+
+    Health* h = registry.getComponent<Health>(target);
+    if (h == nullptr) break;  // already removed
+
+    Equipment* eq  = registry.getComponent<Equipment>(attacker);
+    Weapon* active = &eq->primary;
+
+    h->current -= active->dmg;
+    if (h->current <= 0)
+    {
+      toRemove.push_back(target);
+      break;
+    }
+  }
+
+  for (std::uint32_t id : toRemove)
+  {
+    registry.removeAllComponents(id);
+  }
+
+  // Verify target is fully removed
+  EXPECT_EQ(registry.getComponent<Position>(target), nullptr);
+  EXPECT_EQ(registry.getComponent<Health>(target), nullptr);
+  EXPECT_EQ(registry.getComponent<Equipment>(target), nullptr);
+  EXPECT_EQ(registry.getComponent<Material>(target), nullptr);
+  EXPECT_EQ(registry.getComponent<Movement>(target), nullptr);
+
+  // Verify other entities still intact
+  EXPECT_NE(registry.getComponent<Position>(1), nullptr);
+  EXPECT_NE(registry.getComponent<Health>(1), nullptr);
+  EXPECT_NE(registry.getComponent<Position>(ENTITY_COUNT), nullptr);
 }

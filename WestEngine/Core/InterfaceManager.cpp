@@ -70,6 +70,8 @@ std::int32_t InterfaceManager::init()
                          [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
   _dispatcher->subscribe(EventIdentifiers::KEY,
                          [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
+  _dispatcher->subscribe(EventIdentifiers::INTERFACE_UPDATE,
+                         [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
   result = _facade->init();
 
 #ifdef DEBUG
@@ -183,6 +185,20 @@ void InterfaceManager::pollEvents()
         }
         break;
       }
+      case EventIdentifiers::INTERFACE_UPDATE:
+      {
+        InterfacePayload* i = std::get_if<InterfacePayload>(&std::get<1>(event));
+        if (_attachedEntities.contains(i->entityId))
+        {
+          logDebug(std::format("{} ### dispatching event: {} to: {}, with value: {}\n",
+                               getName(),
+                               i->event,
+                               _attachedEntities[i->entityId],
+                               i->newValue));
+          _facade->notify(_attachedEntities[i->entityId], i->event, i->newValue);
+        }
+        break;
+      }
       default:
         break;
     }
@@ -211,7 +227,7 @@ int InterfaceManager::registerInterface(lua_State* L)
 {
   InterfaceManager* me          = (InterfaceManager*)lua_touserdata(L, lua_upvalueindex(1));
   std::uint32_t id              = Config::incUiId();
-  std::vector<ElementProxy*> el = fillInfo(L, id);
+  std::vector<ElementProxy*> el = fillInfo(L, id, me);
   Container* c                  = new Container(el);
   c->elementId                  = id;
   c->colorR                     = 59.0f;
@@ -236,7 +252,7 @@ int InterfaceManager::registerInterface(lua_State* L)
   return 1;
 };
 
-std::vector<ElementProxy*> InterfaceManager::fillInfo(lua_State* L, std::uint32_t id)
+std::vector<ElementProxy*> InterfaceManager::fillInfo(lua_State* L, std::uint32_t id, InterfaceManager* me)
 {
   std::vector<ElementProxy*> result;
   lua_pushnil(L);
@@ -332,6 +348,18 @@ std::vector<ElementProxy*> InterfaceManager::fillInfo(lua_State* L, std::uint32_
       e->givenFlags |= lua_tointeger(L, -1);
     }
     lua_pop(L, 1);
+
+    lua_getfield(L, -1, "attachedEntity");
+    if (!lua_isnil(L, -1))
+    {
+      std::uint32_t id = lua_tointeger(L, -1);
+      if (id > 0)
+      {
+        me->_attachedEntities[id] = e->elementId;
+      }
+    }
+    lua_pop(L, 1);
+
     result.push_back(e);
     lua_pop(L, 1);
   }

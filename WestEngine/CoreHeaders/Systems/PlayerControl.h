@@ -19,9 +19,13 @@ public:
   void update() override;
   void updateDebuggingInfo() override;
   void init(const std::shared_ptr<World>& w) override;
-  void pollEvents() override;
 
   void passDestinationPosition(glm::vec3 dest);
+
+
+protected:
+  void handleEvent(std::tuple<EventIdentifiers, EventPayload> event) override;
+
 
 private:
   bool isPlayerturn() const {
@@ -31,4 +35,5 @@ private:
   std::shared_ptr<World> _world;
   std::shared_ptr<Camera> _cam;
   std::int32_t _tileIdx, _state;
+  std::uint32_t _me;
 };

@@ -6,7 +6,7 @@
 #include <Config.h>
 #include <format>
 
-std::array<ISystem*, 4> SystemManager::_systems = {};
+std::array<ISystem*, 5> SystemManager::_systems = {};
 
 SystemManager::SystemManager() : IManager(nullptr)
 {
@@ -14,7 +14,9 @@ SystemManager::SystemManager() : IManager(nullptr)
   setName(CoreConstants::ENTITY_SYSTEM_MANAGER);
 }
 
-SystemManager::SystemManager(WestLogger* logger, const std::shared_ptr<EventDispatcher>& d, const std::shared_ptr<Scene>& s)
+SystemManager::SystemManager(WestLogger* logger,
+                             const std::shared_ptr<EventDispatcher>& d,
+                             const std::shared_ptr<Scene>& s)
   : IManager(logger)
 {
   _scene      = s;
@@ -31,7 +33,8 @@ std::int32_t SystemManager::startup()
   _systems                             = {new PlayerControl(_dispatcher, getLogger(), r, c),
                                           new MovementSystem(_dispatcher, getLogger(), r),
                                           new CameraSystem(_dispatcher, getLogger(), r, c),
-                                          new PositionalSystem(_dispatcher, getLogger(), r, c)};
+                                          new PositionalSystem(_dispatcher, getLogger(), r, c),
+                                          new ProjectileSystem(_dispatcher, getLogger(), r, _scene )};
 
 
 #ifdef DEBUG
@@ -77,7 +80,7 @@ void SystemManager::update()
   {
     system->updateDebuggingInfo();
   }
-#endif 
+#endif
   std::vector<std::future<void>> futures;
   for (ISystem* system : _systems)
   {
@@ -88,7 +91,7 @@ void SystemManager::update()
         {
           logger->log(Level::Error, "System invalid null ptr check entity file or debug\n");
           return;
-        } 
+        }
         system->update();
       }));
   }

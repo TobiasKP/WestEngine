@@ -78,13 +78,7 @@ void World::setFlag(std::uint32_t flag, std::int32_t idx)
 }
 
 void World::addEntityIdToIdx(float x, float y, std::uint32_t id)
-{ 
-  if (_entityIdToIdx.contains(id))
-  {
-    std::uint16_t tile = _entityIdToIdx[id];
-    _idxToEntityId.erase(tile);
-    _entityIdToIdx.erase(id);
-  }
+{
   std::int32_t tile = calculateIndex(x, y);
   if (tile != -1)
   {
@@ -93,13 +87,33 @@ void World::addEntityIdToIdx(float x, float y, std::uint32_t id)
   }
 }
 
+void World::updateEntityIdToIdx(float x, float y, std::uint32_t id)
+{
+  if (!_entityIdToIdx.contains(id))
+  {
+    return;
+  }
+  removeEntityFromGrid(id);
+  addEntityIdToIdx(x, y, id);
+}
+
 std::uint32_t World::getEntityByIdx(std::int32_t idx)
-{ 
+{
   if (_idxToEntityId.contains(idx))
   {
     return _idxToEntityId[idx];
   }
   return 0;
+}
+
+void World::removeEntityFromGrid(std::uint32_t id)
+{
+  if (_entityIdToIdx.contains(id))
+  {
+    std::int32_t idx = _entityIdToIdx[id];
+    _entityIdToIdx.erase(id);
+    _idxToEntityId.erase(idx);
+  }
 }
 
 

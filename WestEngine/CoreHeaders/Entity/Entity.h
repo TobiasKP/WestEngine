@@ -59,6 +59,16 @@ public:
     _name = name;
   }
 
+  inline bool isActiveUnit()
+  {
+    return _activeUnit;
+  }
+
+  inline void toggleActivate(bool active)
+  {
+    _activeUnit = active;
+  }
+
   // Overrides
   static void* operator new(size_t size)
   {
@@ -73,7 +83,7 @@ public:
 private:
   static PoolAllocator* _allocator;
 
-  std::uint32_t _id = 0; 
-  bool _destroyed, _debugEntity;
+  std::uint32_t _id = 0;
+  bool _destroyed, _debugEntity, _activeUnit;
   std::string _name;
 };

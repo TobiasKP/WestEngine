@@ -82,6 +82,8 @@ std::int32_t SceneManager::init()
   _registry->registerComponent<AABB>();
   _registry->registerComponent<Control>();
   _registry->registerComponent<Health>();
+  _registry->registerComponent<Projectile>();
+  _registry->registerComponent<Equipment>();
   _facade->registerCFunction(getHealth, LuaAPI::C_GETHEALTH.data(), this);
   _facade->registerCFunction(getPosition, LuaAPI::C_GETPOSITION.data(), this);
   _scene->init();
@@ -119,6 +121,7 @@ std::int32_t SceneManager::init()
 
 void SceneManager::update()
 {
+  LuaFacade::getLuaFacadeInstance().entityQueue();
   std::vector<std::uint32_t> removedEntities;
   for (auto& entity : _scene->getEntities())
   {
@@ -137,30 +140,17 @@ void SceneManager::update()
 void SceneManager::removeEntityFromScene(const Entity& entity)
 {
 #ifdef DEBUG
-  logDebug(std::format("{} ### Removing Entitiy from Scene: {}\n", getName(), entity.getId()));
+  logDebug(std::format("{} ### Removing Entity from Scene: {}\n", getName(), entity.getId()));
 #endif
-  _scene->removeEntity(entity);
+
   if (!entity.isDebugEntity())
   {
     Model* mo    = _registry->getComponent<Model>(entity.getId());
     Material* ma = _registry->getComponent<Material>(entity.getId());
-    if (!_registry->removeComponent<Material>(entity.getId()))
-    {
-      logFailure(std::format("{} ### error deleting Material Component from entity: {}, might cause memory leaks "
-                             "program will continue running",
-                             getName(),
-                             entity.getId()));
-    }
-
-    if (!_registry->removeComponent<Model>(entity.getId()))
-    {
-      logFailure(std::format(
-        "{} ### error deleting Model Component from entity: {}, might cause memory leaks program will continue running",
-        getName(),
-        entity.getId()));
-    }
     _loader->unloadModel(mo, ma);
   }
+  _registry->removeAllComponents(entity.getId()); 
+  _scene->removeEntity(entity);
 }
 
 void SceneManager::deleteScene()

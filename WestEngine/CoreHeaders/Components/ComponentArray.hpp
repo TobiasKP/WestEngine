@@ -2,9 +2,9 @@
 
 #include "../Interfaces/IComponentArray.hpp"
 
+#include <array>
 #include <CoreConstants.hpp>
 #include <unordered_map>
-#include <array>
 
 template <typename T>
 class ComponentArray : public IComponentArray
@@ -43,12 +43,12 @@ public:
     _size++;
   };
 
-  bool remove(std::uint32_t id)
+  bool remove(std::uint32_t id) override
   {
     if (!_idToIdx.contains(id))
     {
       return false;
-    }
+    }                                       
     std::uint32_t idx          = _idToIdx[id];
     std::uint32_t lastIdx      = _size - 1;
     std::uint32_t lastEntityId = _idxToId[lastIdx];

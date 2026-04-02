@@ -43,6 +43,21 @@ TEST(Entity, DebugEntityFlag)
   EXPECT_TRUE(entity.isDebugEntity());
 }
 
+TEST(Entity, ActiveUnitDefaultsFalse)
+{
+  Entity entity(1);
+  EXPECT_FALSE(entity.isActiveUnit());
+}
+
+TEST(Entity, ToggleActivateWorks)
+{
+  Entity entity(1);
+  entity.toggleActivate(true);
+  EXPECT_TRUE(entity.isActiveUnit());
+  entity.toggleActivate(false);
+  EXPECT_FALSE(entity.isActiveUnit());
+}
+
 // --- ComponentRegistry tests ---
 
 TEST(ComponentRegistry, AddAndGetComponentRoundTrip)

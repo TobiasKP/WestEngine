@@ -39,56 +39,52 @@ void CameraSystem::init(const std::shared_ptr<World>& w)
                          [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
 };
 
-void CameraSystem::pollEvents()
+void CameraSystem::handleEvent(std::tuple<EventIdentifiers, EventPayload> event)
 {
-  std::vector<std::tuple<EventIdentifiers, EventPayload>> events = _eventQueue.drain();
-  for (std::tuple<EventIdentifiers, EventPayload> event : events)
+  switch (std::get<0>(event))
   {
-    switch (std::get<0>(event))
+    case EventIdentifiers::MOUSE_WHEEL:
     {
-      case EventIdentifiers::MOUSE_WHEEL:
-      {
-        MousePayload* p = std::get_if<MousePayload>(&std::get<1>(event));
-        _move.y         = p->scroll;
-        break;
-      }
-      case EventIdentifiers::KEY:
-      {
-        KeyboardPayload* k = std::get_if<KeyboardPayload>(&std::get<1>(event));
-        if (!InputManager::getInputMap().contains(k->key))
-        {
-          break;
-        }
-        std::string action = InputManager::getInputMap()[k->key];
-        float sign         = (k->action == GLFW_PRESS || k->action == GLFW_REPEAT) ? 1.0f : 0.0f;
-        if (action.compare("CameraUp") == 0)
-        {
-          _move.z = -sign;
-        }
-        else if (action.compare("CameraDown") == 0)
-        {
-          _move.z = sign;
-        }
-        else if (action.compare("CameraLeft") == 0)
-        {
-          _move.x = -sign;
-        }
-        else if (action.compare("CameraRight") == 0)
-        {
-          _move.x = sign;
-        }
-        else if (action.compare("CameraRotateRight") == 0)
-        {
-          _rot.y = -sign;
-        }
-        else if (action.compare("CameraRotateLeft") == 0)
-        {
-          _rot.y = sign;
-        }
-        break;
-      }
-      default:
-        break;
+      MousePayload* p = std::get_if<MousePayload>(&std::get<1>(event));
+      _move.y         = p->scroll;
+      break;
     }
+    case EventIdentifiers::KEY:
+    {
+      KeyboardPayload* k = std::get_if<KeyboardPayload>(&std::get<1>(event));
+      if (!InputManager::getInputMap().contains(k->key))
+      {
+        break;
+      }
+      std::string action = InputManager::getInputMap()[k->key];
+      float sign         = (k->action == GLFW_PRESS || k->action == GLFW_REPEAT) ? 1.0f : 0.0f;
+      if (action.compare("CameraUp") == 0)
+      {
+        _move.z = -sign;
+      }
+      else if (action.compare("CameraDown") == 0)
+      {
+        _move.z = sign;
+      }
+      else if (action.compare("CameraLeft") == 0)
+      {
+        _move.x = -sign;
+      }
+      else if (action.compare("CameraRight") == 0)
+      {
+        _move.x = sign;
+      }
+      else if (action.compare("CameraRotateRight") == 0)
+      {
+        _rot.y = -sign;
+      }
+      else if (action.compare("CameraRotateLeft") == 0)
+      {
+        _rot.y = sign;
+      }
+      break;
+    }
+    default:
+      break;
   }
-};
+}
