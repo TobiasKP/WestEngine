@@ -33,7 +33,8 @@ void EventDispatcher::dispatchEvent(const EventIdentifiers name, EventPayload pa
 void EventDispatcher::subscribe(const EventIdentifiers name, Callback callback)
 {
   std::lock_guard<std::mutex> lock(_mutex);
-  if (!_nameToIdx.contains(name))
+  auto it = _nameToIdx.find(name);
+  if (it == _nameToIdx.end())
   {
     _logger->log(
       Level::Error,
@@ -41,7 +42,7 @@ void EventDispatcher::subscribe(const EventIdentifiers name, Callback callback)
                   static_cast<std::int32_t>(name)));
     return;
   }
-  std::int32_t idx = _nameToIdx[name];
+  std::int32_t idx = it->second;
   Event& e         = _events[idx];
   e.subscriber.push_back(callback);
 };

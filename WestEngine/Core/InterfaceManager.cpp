@@ -124,7 +124,7 @@ void InterfaceManager::update()
 void InterfaceManager::pollEvents()
 {
   std::vector<std::tuple<EventIdentifiers, EventPayload>> events = _eventQueue.drain();
-  for (std::tuple<EventIdentifiers, EventPayload> event : events)
+  for (std::tuple<EventIdentifiers, EventPayload>& event : events)
   {
     switch (std::get<0>(event))
     {
