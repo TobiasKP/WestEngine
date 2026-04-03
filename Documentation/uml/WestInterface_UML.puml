@@ -1,0 +1,362 @@
+@startuml WestInterface
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 40
+
+' ==================== ENUMS & STRUCTS ====================
+
+enum ElementType {
+  LABEL
+  VLABEL
+  BUTTON
+  CONTAINER
+  ICON
+  DEBUG_ELEMENT
+  DROPDOWN
+  PROGESS_BAR
+}
+
+struct ComponentData {
+  +float vertices[2]
+  +float stretchX, stretchY
+  +float textureCoords[4]
+  +float colorR, colorG, colorB, colorA
+  +uint32_t flags
+  +uint32_t texture
+  +int8_t zIndex
+  +uint8_t containerIdx
+}
+
+struct ElementBounds {
+  +float xLeft, xRight, yBottom, yTop
+  +uint32_t id
+  +int8_t zIndex
+  +bool eventDriven
+  +bool isContainer
+}
+
+struct Text {
+  +string plaintext
+  +vector<float> coordinates
+  +vector<float> positions
+}
+
+struct TextureInformation {
+  +bool mipmap
+  +int32_t wrapping_x, wrapping_y
+  +const char* path
+}
+
+struct ElementProxy {
+  +ElementType type
+  +uint32_t elementId
+  +function<void()> eventHandler
+  +float colorR, colorG, colorB, colorA
+  +int8_t zIndex
+  +float xPosition, yPosition
+  +float stretchX, stretchY
+  +uint8_t rowElements, columnElements
+  +uint8_t row, column
+  +uint32_t givenFlags
+  +string text
+  +uint8_t progress
+  +TextureInformation* texture
+}
+
+struct Container {
+  +uint16_t xScreenPosition, yScreenPosition
+  +uint16_t rows, columns
+  +bool hiddenContainer
+  +vector<ElementProxy*>& elements
+  +TextureInformation* background
+}
+
+Container --|> ElementProxy
+
+' ==================== ELEMENT HIERARCHY ====================
+
+abstract class IElement {
+  #float xLL, yLL
+  #float stretchX, stretchY
+  #float colorR, colorG, colorB, colorA
+  #uint64_t flags
+  #int8_t zIndex
+  #bool changed
+  #bool supportsEvents
+  #bool hidden
+  #uint16_t rowElements, columnElements
+  #GLuint texture
+  #uint32_t id
+  #IElement* parent
+  #uint32_t poolPosition
+  #ComponentDataPool* dataPool
+  #unique_ptr<Text> text
+  #function<void()> eventHandler
+  --
+  +{abstract} void handler()
+  +{abstract} void getBoundaries(ElementBounds&)
+  +ComponentData* describe(uint8_t, uint8_t)
+  +float getElementWidth()
+  #void describeMyself(ComponentData*, uint8_t, uint8_t)
+}
+
+class Label {
+  +void handler()
+  +void getBoundaries(ElementBounds&)
+  #void describeMyself(ComponentData*, uint8_t, uint8_t)
+}
+
+class Button {
+  +uint8_t eventId
+  --
+  +void handler()
+  #void describeMyself(ComponentData*, uint8_t, uint8_t)
+}
+
+class Icon {
+}
+
+class ProgressBar {
+  -Label* progress
+  -uint8_t progresPerc
+  --
+  #void describeMyself(ComponentData*, uint8_t, uint8_t)
+}
+
+class DropDown {
+  -Label* label
+  -Button* button
+  --
+  +void handler()
+  +void getBoundaries(ElementBounds&)
+  #void describeMyself(ComponentData*, uint8_t, uint8_t)
+}
+
+class DebugElement {
+}
+
+class ContainerElement {
+  -vector<IElement*> children
+  --
+  +bool deleteChildById(uint32_t)
+  +void addChild(IElement*, uint8_t, uint8_t)
+  +vector<ComponentData*> describeContainer()
+  +void updatePositions(uint32_t, uint32_t)
+  +void getBoundaries(ElementBounds&)
+  #void describeMyself(ComponentData*, uint8_t, uint8_t)
+}
+
+Label --|> IElement
+Button --|> Label
+Icon --|> IElement
+ProgressBar --|> Label
+DropDown --|> IElement
+DebugElement --|> Label
+ContainerElement --|> IElement
+
+' Composition within elements
+ProgressBar *-- Label : progress
+DropDown *-- Label : label
+DropDown *-- Button : button
+ContainerElement o-- "0..*" IElement : children
+IElement --> IElement : parent
+
+' ==================== OBSERVER HIERARCHY ====================
+
+abstract class IObserver {
+  #WestLogger& logger
+  --
+  +{abstract} void handleEvent(int16_t, uint16_t, uint16_t, uint16_t, string)
+  +{abstract} void registerElement(IElement*)
+  +{abstract} void deregisterElement(IElement*)
+  -{abstract} void executeElement(IElement*)
+  -{abstract} void sort()
+}
+
+class EventObserver {
+  -unordered_map<int32_t, IElement*> _registeredElements
+  --
+  +void handleEvent(...)
+  +void registerElement(IElement*)
+  +void deregisterElement(IElement*)
+  -void executeElement(IElement*)
+}
+
+class ValueObserver {
+  -unordered_map<int32_t, IElement*> _registeredElements
+  --
+  +void handleEvent(...)
+  +void registerElement(IElement*)
+  +void deregisterElement(IElement*)
+  -void executeElement(IElement*)
+  -void recalcText(IElement*, string&)
+  -void setProgress(ProgressBar*, string&)
+}
+
+EventObserver --|> IObserver
+ValueObserver --|> IObserver
+
+IObserver ..> IElement : observes
+
+' ==================== RENDER MANAGEMENT ====================
+
+class ComponentDataPool {
+  -vector<ComponentData*> _poolingData
+  -vector<bool> _slotUsed
+  -mutex _poolMutex
+  -bool _dirty
+  -function<...> _positionUpdateCallback
+  --
+  +uint32_t reserveNew(uint32_t)
+  +bool deleteRange(uint32_t, uint32_t)
+  +void setPositionUpdateCallback(function<...>)
+  +ComponentData* getDataAtLocation(uint32_t)
+  -uint32_t findFit(uint32_t)
+  -void defragPool()
+}
+
+class UIRenderManager {
+  -vector<ComponentData*> _data
+  -vector<ElementBounds*> _boundaryData
+  -mutex _vectorMutex
+  -bool _dirty
+  --
+  +void updateRenderData(array<ContainerElement*, 32>&, size_t)
+  +vector<ComponentData*>& getRenderData()
+  +const vector<ElementBounds*>& getBoundaries()
+  +void toggleDirty()
+  -vector<ComponentData*> gatherUIData(...)
+  -vector<ElementBounds*> gatherBoundaryData(...)
+}
+
+class TextRenderManager {
+  -{static} unordered_map<char, GlyphData> _glyphCache
+  --
+  +void initializeFontAtlas()
+  +void precomputeGlyphData()
+  +{static} const unordered_map<char, GlyphData>& getGlyphCache()
+  +{static} vector<float> calculateTextPositions(string&, float)
+  +{static} float calculateTextWidth(string&, float)
+  +{static} array<float, 4> getTextureCoordinatesForChar(char)
+  -void calculateGlyphCoordinates(char, GlyphData&)
+}
+
+ComponentDataPool *-- "0..*" ComponentData
+UIRenderManager ..> ComponentData : collects
+UIRenderManager ..> ElementBounds : collects
+UIRenderManager ..> ContainerElement : reads
+
+' ==================== FACTORY & BUILDER ====================
+
+class ElementFactory {
+  -ValueObserver* _vObserver
+  -EventObserver* _eObserver
+  --
+  +IElement* createElement(ElementProxy*)
+  -IElement* createElementInternal(ElementProxy*)
+  -void registerElementEvent(ElementProxy*, IElement*)
+  -void registerElementValue(ElementProxy*, IElement*)
+  -void fillBasicInfos(ElementProxy*, IElement*)
+  -void fillText(ElementProxy*, IElement*)
+  -void fillTexture(ElementProxy*, IElement*)
+  -void fillDropdown(ElementProxy*, DropDown*)
+  -void fillProgressBar(ElementProxy*, ProgressBar*)
+}
+
+class InterfaceBuilder {
+  -ContainerElement* _current
+  -ElementFactory* _factory
+  -ComponentDataPool* _dataPool
+  -EventObserver* _eObserver
+  -ValueObserver* _vObserver
+  --
+  +void createNewInterface(Container*)
+  +void createBackground(TextureInformation*)
+  +void addElement(ElementProxy*)
+  +ContainerElement* build()
+  +IElement* transform(ElementProxy*)
+}
+
+ElementFactory ..> IElement : <<creates>>
+ElementFactory ..> ElementProxy : reads
+ElementFactory --> EventObserver : registers with
+ElementFactory --> ValueObserver : registers with
+InterfaceBuilder *-- ElementFactory
+InterfaceBuilder *-- ComponentDataPool
+InterfaceBuilder ..> ContainerElement : builds
+
+' ==================== SPECIALIZED INTERFACES ====================
+
+class SettingsInterface {
+  -InterfaceBuilder* _interfaceBuilder
+  -uint8_t _id, _resolutionId, _settingButtonId
+  -array<tuple<uint32_t, uint32_t>, 4> _supportedResolutions
+  --
+  +ContainerElement* init()
+  +void refreshInterface()
+  -Container* createSettingButton(vector<ElementProxy*>&)
+  -void createSettingInterface()
+  -ElementProxy* createResolutionSetting()
+  -ElementProxy* createQuitSettingsButton()
+  -void createResolutionOptions()
+  -int32_t writeSetting(unordered_map<string, int32_t>)
+}
+
+class DebugInfoInterface {
+  -InterfaceBuilder* _interfaceBuilder
+  --
+  +ContainerElement* init()
+  +void refreshInterface()
+  -Container* createElementInfo(vector<ElementProxy*>&)
+}
+
+SettingsInterface --> InterfaceBuilder : uses
+DebugInfoInterface --> InterfaceBuilder : uses
+
+' ==================== FACADE (SINGLETON) ====================
+
+class WestInterfaceFacade <<Singleton>> {
+  -array<ContainerElement*, 32> _interfaces
+  -ValueObserver* _valueObserver
+  -EventObserver* _eventObserver
+  -InterfaceBuilder* _builder
+  -UIRenderManager* _renderManager
+  -TextRenderManager* _textManager
+  -SettingsInterface* _settings
+  -DebugInfoInterface* _debugInfo
+  +GLuint _interfaceVAO, _interfaceVBO, _interfaceEBO
+  +GLuint _interfaceCOL, _interfaceOFFSET, _interfaceFLAGS
+  +GLuint _interfaceTEX, _interfaceUV, _interfaceFONT_TEXTURE_ID
+  --
+  +{static} WestInterfaceFacade& getInterfaceInstance()
+  +int32_t init()
+  +void shutdown()
+  +uint8_t createNewInterface(string)
+  +uint8_t createNewInterface(Container*)
+  +bool destroyInterface(uint8_t)
+  +void addElement(uint8_t, ElementProxy*)
+  +bool removeElement(uint8_t, uint32_t)
+  +void updateRenderData()
+  +const vector<ComponentData*>& getRenderData()
+  +void notify(int16_t, uint8_t, uint16_t, uint16_t)
+  +void notify(int16_t, uint8_t, string)
+  +bool resolutionChange(uint32_t, uint32_t)
+  +bool resize(int8_t, uint32_t, uint32_t)
+  +bool reposition(uint8_t, uint16_t, uint16_t)
+  +const vector<ElementBounds*>& getShownElementsBoundaries()
+}
+
+WestInterfaceFacade *-- ValueObserver
+WestInterfaceFacade *-- EventObserver
+WestInterfaceFacade *-- InterfaceBuilder
+WestInterfaceFacade *-- UIRenderManager
+WestInterfaceFacade *-- TextRenderManager
+WestInterfaceFacade *-- SettingsInterface
+WestInterfaceFacade *-- DebugInfoInterface
+WestInterfaceFacade o-- "0..32" ContainerElement : _interfaces
+
+IElement --> ComponentDataPool : uses
+
+@enduml
