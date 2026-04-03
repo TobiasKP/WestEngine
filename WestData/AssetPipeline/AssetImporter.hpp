@@ -15,7 +15,7 @@ public:
 
   void init();
   void shutdown();
-  void handleFile(const std::string& path);
+  Mesh& handleFile(const std::string& path);
 
 private:
   std::string generateUUID();
