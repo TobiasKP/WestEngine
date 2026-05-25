@@ -17,5 +17,5 @@ public:
 
 private:
   std::array<Model, Limit::projectilePoolsize> _projectiles;
-  std::array<Model, 1024> _placeholder;
+  std::array<Model, 1024> _sceneModels;
 };

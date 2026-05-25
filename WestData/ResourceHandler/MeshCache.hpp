@@ -2,10 +2,8 @@
 
 #include "../Constants/Limits.hpp"
 #include "../Data/Mesh.hpp"
-#include "../GPUDataHandler/OpenGLDataManager.hpp"
 
 #include <array>
-#include <memory>
 #include <optional>
 #include <unordered_map>
 
@@ -21,8 +19,6 @@ public:
   void clear();
 
 private:
-  std::unique_ptr<OpenGLDataManager> _manager;
-
   std::array<Mesh, Limit::cachesize> _cache;
   std::unordered_map<std::string, std::uint16_t> _guidToIdx;
 };

@@ -23,5 +23,4 @@ public:
 
 private:
   const std::string _guid;
-  std::uint32_t VAO, VBO, EBO;
 };

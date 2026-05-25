@@ -8,13 +8,13 @@
 class Model
 {
 public:
-  Model(const std::string& path);
+  Model();
   ~Model();
 
-  std::size_t getHash() const;
+  const std::size_t getGuid(); 
   const std::vector<Mesh>& getMeshes();
 
 private:
-  std::size_t _model;
+  std::string _uuid; 
   std::vector<Mesh> _meshes;
 };

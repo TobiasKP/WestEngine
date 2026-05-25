@@ -69,6 +69,10 @@ public:
 private:
   WestInterfaceFacade();
   ~WestInterfaceFacade();
+  WestInterfaceFacade(const WestInterfaceFacade& other)            = delete;
+  WestInterfaceFacade& operator=(const WestInterfaceFacade& other) = delete;
+  WestInterfaceFacade(WestInterfaceFacade&& other)                 = delete;
+  WestInterfaceFacade& operator=(WestInterfaceFacade&& other)      = delete;
 
   std::array<ContainerElement*, 32> _interfaces{nullptr};
 

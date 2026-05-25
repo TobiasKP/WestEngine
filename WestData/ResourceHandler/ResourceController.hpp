@@ -8,20 +8,21 @@
 #include <memory>
 #include <WestLogger.h>
 
-class ResourceHandler
+class ResourceController
 {
 public:
-  ResourceHandler(WestLogger* l);
-  ~ResourceHandler();
+  ResourceController(WestLogger* l);
+  ~ResourceController();
 
   void init();
   void shutdown();
+  const std::vector<Model>& getScene();
 
 private:
   WestLogger* _logger;
   std::unique_ptr<ModelBuilder> _builder;
   std::unique_ptr<DataPool> _pool;
-  std::unique_ptr<Converter> _converter;
+  std::unique_ptr<Converter> _converter; 
 
   std::vector<Model> _sceneModels;
 };

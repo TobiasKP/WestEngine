@@ -13,6 +13,7 @@ public:
   void init();
   void shutdown();
 
+  const bool exists(const std::string path);
   const Mesh& load(const std::string path);
 
 private:
