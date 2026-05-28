@@ -2,9 +2,9 @@
 
 #include "../Data/Mesh.hpp"
 #include "AssetPathScreener.hpp"
-#include "AssetQueue.hpp"
 
 #include <memory>
+#include <ThreadSafeQueue.hpp>
 #include <WestLogger.h>
 
 class AssetImporter
@@ -15,15 +15,15 @@ public:
 
   void init();
   void shutdown();
+  std::vector<Mesh> getMeshQueue(); 
 
 
 private:
   const void handlePath(const std::string& path);
-  std::string generateUUID(const std::string& path);
-  Mesh& handleFile(const std::string& path);
-  void push(const Mesh& m);
+  std::string generateGUID(const std::string& path);
+  Mesh handleFile(const std::string& path, const std::string uuid); 
 
   WestLogger* _logger;
-  std::shared_ptr<AssetQueue> _queue;
+  tQueue<Mesh> _queue;
   std::unique_ptr<AssetPathScreener> _screener;
 };

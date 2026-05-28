@@ -4,7 +4,7 @@
 #include <CoreConstants.hpp>
 #include <filesystem>
 
-AssetPathScreener::AssetPathScreener(WestLogger* l, const std::function<void*(const std::string& path)> callback)
+AssetPathScreener::AssetPathScreener(WestLogger* l, const std::function<void(const std::string& path)> callback)
 {
   _callback = callback;
   _logger   = l;

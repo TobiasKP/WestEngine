@@ -1,24 +1,22 @@
 #pragma once
 
-#include "../Data/Model.hpp"
-#include "AssetQueue.hpp"
+#include "AssetImporter.hpp"
 
-#include <memory>
 #include <WestLogger.h>
 
 class Converter
 {
 public:
-  Converter(const std::shared_ptr<AssetQueue> q, WestLogger* l);
+  Converter(WestLogger* l);
   ~Converter();
 
   void init();
   void shutdown();
-  void pop();
+  void convertQueueElements();
 
 private:
-  void bake(const Model& m);
+  void bake(const Mesh& m);
 
-  std::shared_ptr<AssetQueue> _queue;
+  std::shared_ptr<AssetImporter> _importer;
   WestLogger* _logger;
 };

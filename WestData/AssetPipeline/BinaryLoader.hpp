@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../Data/Mesh.hpp"
+#include "Converter.hpp"
+#include "AssetImporter.hpp"
 
 #include <WestLogger.h>
 
@@ -17,5 +19,7 @@ public:
   const Mesh& load(const std::string path);
 
 private:
+  std::shared_ptr<AssetImporter> _importer;
+  std::unique_ptr<Converter> _converter;
   WestLogger* _logger;
 };

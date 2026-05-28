@@ -15,6 +15,6 @@ public:
   const std::vector<Mesh>& getMeshes();
 
 private:
-  std::string _uuid; 
+  std::string _guid; 
   std::vector<Mesh> _meshes;
 };
