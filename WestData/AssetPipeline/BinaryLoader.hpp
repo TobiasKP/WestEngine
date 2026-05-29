@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Data/Mesh.hpp"
 #include "Converter.hpp"
 
 #include <WestLogger.h>
@@ -14,10 +13,12 @@ public:
   void init();
   void shutdown();
 
-  const bool exists(const std::string path);
-  const Mesh& load(const std::string path);
+  bool exists(const std::string& path);
+  std::optional<Model> load(const std::string& path);
 
-private: 
+private:
+  std::optional<Model> loadFromDisk(const std::string& path);
+
   std::unique_ptr<Converter> _converter;
   WestLogger* _logger;
 };
