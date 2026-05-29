@@ -23,8 +23,7 @@ public:
 private:
   void handlePath(const std::string& path);
   void processNode(aiNode* node, const aiScene* scene, const std::string& guid);
-  Mesh processMesh(aiMesh* mesh, const aiScene* scene, const std::string& guid);
-  std::string generateGUID(const std::string& path);
+  Mesh processMesh(aiMesh* mesh, const aiScene* scene, const std::string& guid, std::uint32_t count); 
   void handleFile(const std::string& path, const std::string& guid);
   std::vector<Vertex> processVertices(aiMesh* mesh);
   std::vector<std::uint32_t> processIndices(aiMesh* mesh);

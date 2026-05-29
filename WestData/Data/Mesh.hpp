@@ -19,7 +19,10 @@ public:
        std::vector<std::uint32_t>& indices,
        std::vector<Texture>& textures);
 
-  std::string getGuid();
+  const std::string& getGuid()
+  {
+    return _guid;
+  };
 
 private:
   std::string _guid;

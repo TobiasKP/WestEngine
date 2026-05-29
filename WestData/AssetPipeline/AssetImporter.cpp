@@ -1,11 +1,11 @@
 #include "AssetImporter.hpp"
 
+#include "../Utils/AssetUtils.hpp"
+
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <assimp/postprocess.h>
 #include <PathUtils.h>
-#include <random>
-#include <sstream>
 #include <stb_image.h>
 
 
@@ -35,7 +35,7 @@ void AssetImporter::shutdown()
 void AssetImporter::handlePath(const std::string& path)
 {
   assert(_logger != nullptr);
-  std::string guid = generateGUID(path);
+  std::string guid = AssetUtils::generateGUID(path);
   assert(guid.length() > 0);
 #ifdef DEBUG
   _logger->log(Level::Info, std::format("|*| Generated new uuid: {} for resource: {}\n", guid, path));
@@ -48,52 +48,12 @@ std::vector<Model> AssetImporter::getMeshQueue()
   return _queue.drain();
 }
 
-std::string AssetImporter::generateGUID(const std::string& path)
-{
-  std::vector<std::uint32_t> seed;
-  for (char c : path)
-  {
-    seed.push_back(static_cast<std::uint32_t>(c));
-  }
-  std::seed_seq seq(std::seed_seq(seed.begin(), seed.end()));
-  static std::mt19937_64 gen(seq);
-  static std::uniform_int_distribution<> dis(0, 15);
-  static std::uniform_int_distribution<> dis2(8, 11);
-
-  std::stringstream ss;
-  std::uint32_t i;
-  ss << std::hex;
-  for (i = 0; i < 8; i++)
-  {
-    ss << dis(gen);
-  }
-  ss << "-";
-  for (i = 0; i < 4; i++)
-  {
-    ss << dis(gen);
-  }
-  ss << "-4";
-  for (i = 0; i < 3; i++)
-  {
-    ss << dis(gen);
-  }
-  ss << "-" << dis2(gen);
-  for (i = 0; i < 3; i++)
-  {
-    ss << dis(gen);
-  }
-  ss << "-";
-  for (i = 0; i < 12; i++)
-  {
-    ss << dis(gen);
-  }
-  return ss.str();
-};
 
 void AssetImporter::handleFile(const std::string& path, const std::string& guid)
 {
   _model = {};
   _model.setGuid(guid);
+  _model.setName(path);
   const aiScene* scene = _importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
   {
@@ -103,13 +63,12 @@ void AssetImporter::handleFile(const std::string& path, const std::string& guid)
   processNode(scene->mRootNode, scene, guid);
   _queue.push(std::move(_model));
 };
-
 void AssetImporter::processNode(aiNode* node, const aiScene* scene, const std::string& guid)
 {
   for (std::uint32_t i = 0; i < node->mNumMeshes; i++)
   {
     aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-    _model.addMesh(processMesh(mesh, scene, guid));
+    _model.addMesh(processMesh(mesh, scene, guid, i));
   }
   for (std::uint32_t i = 0; i < node->mNumChildren; i++)
   {
@@ -117,12 +76,12 @@ void AssetImporter::processNode(aiNode* node, const aiScene* scene, const std::s
   }
 }
 
-Mesh AssetImporter::processMesh(aiMesh* mesh, const aiScene* scene, const std::string& guid)
+Mesh AssetImporter::processMesh(aiMesh* mesh, const aiScene* scene, const std::string& guid, std::uint32_t count)
 {
   std::vector<Vertex> vertices       = processVertices(mesh);
   std::vector<std::uint32_t> indices = processIndices(mesh);
   std::vector<Texture> textures      = processTextures(mesh, scene);
-  return Mesh(guid, vertices, indices, textures);
+  return Mesh(std::format("{}_{}", guid, count), vertices, indices, textures);
 }
 
 std::vector<Vertex> AssetImporter::processVertices(aiMesh* mesh)

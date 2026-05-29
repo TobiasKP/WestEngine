@@ -94,9 +94,9 @@ void AssetPathScreener::scanDir()
     std::filesystem::rename(oldName, newName, ec);
     if (ec.value() > 0)
     {
-      _files.pop_back();
       _logger->log(Level::Error,
                    std::format("Error renaming file from: {} to: {} with Error: {}\n", oldName, newName, ec.value()));
+      continue;
     }
     _files.push_back(newName);
     if (_files.size() == 25)
