@@ -15,7 +15,7 @@ public:
 
   void init();
   void shutdown();
-  const std::vector<Model>& getSceneModels();
+  std::array<Model, Limit::cachesize>& getSceneModels();
 
 private:
   WestLogger* _logger;

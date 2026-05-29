@@ -2,7 +2,6 @@
 
 #include "../Data/Mesh.hpp"
 #include "Converter.hpp"
-#include "AssetImporter.hpp"
 
 #include <WestLogger.h>
 
@@ -18,8 +17,7 @@ public:
   const bool exists(const std::string path);
   const Mesh& load(const std::string path);
 
-private:
-  std::shared_ptr<AssetImporter> _importer;
+private: 
   std::unique_ptr<Converter> _converter;
   WestLogger* _logger;
 };

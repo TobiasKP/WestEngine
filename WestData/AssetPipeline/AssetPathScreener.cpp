@@ -30,7 +30,6 @@ void AssetPathScreener::run()
   _stop = false;
   _files.reserve(25);
   _t = std::thread(&AssetPathScreener::notifyOnNew, this);
-  _t.detach();
 }
 
 void AssetPathScreener::stop()
@@ -41,6 +40,7 @@ void AssetPathScreener::stop()
     return;
   }
   _stop = true;
+  _t.join();
 }
 
 void AssetPathScreener::notifyOnNew()
@@ -51,9 +51,8 @@ void AssetPathScreener::notifyOnNew()
     {
       return;
     }
-    assert(_files.size() == 0);
-    std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(150));
 
+    std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(150));
 #ifdef DEBUG
     _logger->log(Level::Cycle, "Scanning for new assets ... \n");
 #endif
@@ -86,9 +85,9 @@ void AssetPathScreener::scanDir()
     if (std::end(_allowList) == std::find(std::begin(_allowList), std::end(_allowList), extension))
     {
       _logger->log(Level::Error, std::format("Extension: {} for file loading not allowed\n", extension));
-      return;
+      continue;
     }
-    _files.push_back(entry.path());
+
     std::error_code ec;
     const std::string newName = std::string(CoreConstants::ASSET_PATH) + "_" + entry.path().filename().string();
     const std::string oldName = entry.path().string();
@@ -99,6 +98,7 @@ void AssetPathScreener::scanDir()
       _logger->log(Level::Error,
                    std::format("Error renaming file from: {} to: {} with Error: {}\n", oldName, newName, ec.value()));
     }
+    _files.push_back(newName);
     if (_files.size() == 25)
     {
       return;

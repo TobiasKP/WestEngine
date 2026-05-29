@@ -9,10 +9,10 @@ class WestAssetFacade
 public:
   static WestAssetFacade& getAssetFacade();
 
-  const std::vector<Model>& getScene();
-  const Model& requestModel(const std::string& uuid);
-  const bool deleteModel(const std::string& uuid);
-  const void addModel(const std::string& path);
+  const std::vector<Model>& getSceneModels();
+  const Model& requestModelFromScene(const std::string& uuid);
+  const bool deleteModelFromScene(const std::string& uuid);
+  const std::string& addModelToScene(const std::string& path);
 
 private:
   WestAssetFacade();

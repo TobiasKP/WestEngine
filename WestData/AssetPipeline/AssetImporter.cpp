@@ -1,14 +1,19 @@
 #include "AssetImporter.hpp"
 
+#define STB_IMAGE_IMPLEMENTATION
+
+#include <assimp/postprocess.h>
+#include <PathUtils.h>
 #include <random>
 #include <sstream>
+#include <stb_image.h>
+
 
 AssetImporter::AssetImporter(WestLogger* l)
 {
   _logger   = l;
   _screener = std::make_unique<AssetPathScreener>(l, [this](const std::string& path) { handlePath(path); });
 }
-
 AssetImporter::~AssetImporter() {}
 
 void AssetImporter::init()
@@ -21,34 +26,37 @@ void AssetImporter::init()
 
 void AssetImporter::shutdown()
 {
-
 #ifdef DEBUG
   _logger->log(Level::Info, "|*| Stopping asset import machine\n");
 #endif
   _screener->stop();
 }
 
-const void AssetImporter::handlePath(const std::string& path)
+void AssetImporter::handlePath(const std::string& path)
 {
+  assert(_logger != nullptr);
   std::string guid = generateGUID(path);
   assert(guid.length() > 0);
 #ifdef DEBUG
   _logger->log(Level::Info, std::format("|*| Generated new uuid: {} for resource: {}\n", guid, path));
 #endif
-  Mesh mesh = handleFile(path, guid);
-  assert(mesh.getGuid().compare(guid) == 0);
-  _queue.push(std::move(mesh));
+  handleFile(path, guid);
 };
 
-std::vector<Mesh> AssetImporter::getMeshQueue()
+std::vector<Model> AssetImporter::getMeshQueue()
 {
   return _queue.drain();
 }
 
 std::string AssetImporter::generateGUID(const std::string& path)
 {
-  static std::random_device rd;
-  static std::mt19937_64 gen(rd());
+  std::vector<std::uint32_t> seed;
+  for (char c : path)
+  {
+    seed.push_back(static_cast<std::uint32_t>(c));
+  }
+  std::seed_seq seq(std::seed_seq(seed.begin(), seed.end()));
+  static std::mt19937_64 gen(seq);
   static std::uniform_int_distribution<> dis(0, 15);
   static std::uniform_int_distribution<> dis2(8, 11);
 
@@ -82,11 +90,137 @@ std::string AssetImporter::generateGUID(const std::string& path)
   return ss.str();
 };
 
-Mesh AssetImporter::handleFile(const std::string& path, const std::string uuid)
+void AssetImporter::handleFile(const std::string& path, const std::string& guid)
 {
-  std::vector<Vertex> v;
-  std::vector<std::uint32_t> i;
-  std::vector<Texture> t;
+  _model = {};
+  _model.setGuid(guid);
+  const aiScene* scene = _importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+  if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+  {
+    _logger->log(Level::Error, std::format("|*| Error importing file: {}", _importer.GetErrorString()));
+    return;
+  }
+  processNode(scene->mRootNode, scene, guid);
+  _queue.push(std::move(_model));
+};
 
-  return Mesh(uuid, v, i, t);
+void AssetImporter::processNode(aiNode* node, const aiScene* scene, const std::string& guid)
+{
+  for (std::uint32_t i = 0; i < node->mNumMeshes; i++)
+  {
+    aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+    _model.addMesh(processMesh(mesh, scene, guid));
+  }
+  for (std::uint32_t i = 0; i < node->mNumChildren; i++)
+  {
+    processNode(node->mChildren[i], scene, guid);
+  }
+}
+
+Mesh AssetImporter::processMesh(aiMesh* mesh, const aiScene* scene, const std::string& guid)
+{
+  std::vector<Vertex> vertices       = processVertices(mesh);
+  std::vector<std::uint32_t> indices = processIndices(mesh);
+  std::vector<Texture> textures      = processTextures(mesh, scene);
+  return Mesh(guid, vertices, indices, textures);
+}
+
+std::vector<Vertex> AssetImporter::processVertices(aiMesh* mesh)
+{
+  std::vector<Vertex> result;
+  for (std::uint32_t i = 0; i < mesh->mNumVertices; i++)
+  {
+    Vertex vertex;
+    glm::vec3 vector;
+    vector.x        = mesh->mVertices[i].x;
+    vector.y        = mesh->mVertices[i].y;
+    vector.z        = mesh->mVertices[i].z;
+    vertex.Position = vector;
+    vector.x        = mesh->mNormals[i].x;
+    vector.y        = mesh->mNormals[i].y;
+    vector.z        = mesh->mNormals[i].z;
+    vertex.Normal   = vector;
+    if (mesh->mTextureCoords[0])
+    {
+      glm::vec2 vec;
+      vec.x            = mesh->mTextureCoords[0][i].x;
+      vec.y            = mesh->mTextureCoords[0][i].y;
+      vertex.TexCoords = vec;
+    }
+    else
+    {
+      vertex.TexCoords = glm::vec2(0, 0);
+    }
+    result.push_back(std::move(vertex));
+  }
+
+  return result;
+};
+
+std::vector<std::uint32_t> AssetImporter::processIndices(aiMesh* mesh)
+{
+  std::vector<std::uint32_t> result;
+  for (std::uint32_t i = 0; i < mesh->mNumFaces; i++)
+  {
+    aiFace face = mesh->mFaces[i];
+    for (std::uint32_t j = 0; j < face.mNumIndices; j++)
+    {
+      result.push_back(face.mIndices[j]);
+    }
+  }
+  return result;
+};
+
+std::vector<Texture> AssetImporter::processTextures(aiMesh* mesh, const aiScene* scene)
+{
+  std::vector<Texture> result;
+  if (mesh->mMaterialIndex >= 0)
+  {
+    aiMaterial* mat                  = scene->mMaterials[mesh->mMaterialIndex];
+    std::vector<Texture> diffuseMaps = loadMaterialTextures(mat, aiTextureType_DIFFUSE, "texture_diffuse");
+    result.insert(result.end(), diffuseMaps.begin(), diffuseMaps.end());
+    std::vector<Texture> specularMaps = loadMaterialTextures(mat, aiTextureType_SPECULAR, "texture_specular");
+    result.insert(result.end(), specularMaps.begin(), specularMaps.end());
+  }
+
+  return result;
+};
+
+std::vector<Texture>
+AssetImporter::loadMaterialTextures(aiMaterial* mat, const aiTextureType type, const std::string typeName)
+{
+  std::vector<Texture> result;
+  for (std::uint32_t i = 0; i < mat->GetTextureCount(type); i++)
+  {
+    aiString str;
+    mat->GetTexture(type, i, &str);
+    result.push_back(textureFromFile(str.C_Str(), typeName));
+  }
+  return result;
+};
+
+Texture AssetImporter::textureFromFile(const std::string& file, const std::string& typeName)
+{
+  Texture tex;
+  tex.type = typeName;
+  std::int32_t width, height, numComponents;
+  std::string filePath = PathUtils::resolve("/" + file);
+#ifdef DEBUG
+  _logger->log(Level::Info, std::format("|*| Loading Texture: {}\n", filePath));
+#endif
+  unsigned char* imgData = stbi_load(filePath.c_str(), &width, &height, &numComponents, 0);
+  if (imgData == NULL)
+  {
+    _logger->log(
+      Level::Error,
+      std::format("|*| No Imagedata loaded for texture: {} - STBI Error: {}\n", filePath, stbi_failure_reason()));
+    tex.type = "Error";
+    return tex;
+  }
+  tex.width         = width;
+  tex.height        = height;
+  tex.numComponents = numComponents;
+  tex.imageData     = std::vector<unsigned char>(imgData, imgData + width * height * numComponents);
+  stbi_image_free(imgData);
+  return tex;
 };

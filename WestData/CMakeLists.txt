@@ -6,6 +6,7 @@ project(WestData VERSION 0.1.0)
 # Packages
 # ─────────────────────────────────────────────────────────────
 find_package(assimp CONFIG REQUIRED)
+find_package(Stb REQUIRED)
 
 # ─────────────────────────────────────────────────────────────
 # Sources
@@ -25,6 +26,8 @@ target_include_directories(WestData
     PUBLIC
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
         "$<INSTALL_INTERFACE:include>"
+    PRIVATE
+        ${Stb_INCLUDE_DIR}
 )
 
 target_link_libraries(WestData PUBLIC

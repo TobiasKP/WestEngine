@@ -17,6 +17,6 @@ public:
 private:
   void bake(const Mesh& m);
 
-  std::shared_ptr<AssetImporter> _importer;
+  std::unique_ptr<AssetImporter> _importer;
   WestLogger* _logger;
 };
