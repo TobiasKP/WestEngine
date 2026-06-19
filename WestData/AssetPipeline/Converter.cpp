@@ -2,7 +2,6 @@
 
 #include "../Constants/MagicNumbers.hpp"
 
-#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <PathUtils.h>
@@ -46,8 +45,8 @@ void Converter::bake(Model& m)
 #ifdef DEBUG
   _logger->log(Level::Info, std::format("|*| Backing mesh: {}\n", m.getName()));
 #endif
-  const std::filesystem::path p = m.getName();
-  std::string filename = std::format("{}/{}.west", PathUtils::getExecutableDir() + "/bin", p.filename().string());
+  const std::string& p = m.getName();
+  std::string filename = std::format("{}/{}.west", PathUtils::getExecutableDir() + "/bin", p);
   std::ofstream file(filename, std::ios::binary);
   if (!file)
   {
@@ -66,6 +65,7 @@ void Converter::bake(Model& m)
     file.write(MagicNumbers::VERTICE.data(), MagicNumbers::VERTICE.size());
     assert(std::is_trivially_copyable_v<Vertex>);
     write(file, me.vertices.size());
+    file.write(MagicNumbers::DELIMITER.data(), MagicNumbers::DELIMITER.size());
     file.write(reinterpret_cast<const char*>(me.vertices.data()), me.vertices.size() * sizeof(Vertex));
 
 #ifdef DEBUG
@@ -73,6 +73,7 @@ void Converter::bake(Model& m)
 #endif
     file.write(MagicNumbers::INDICE.data(), MagicNumbers::INDICE.size());
     write(file, me.indices.size());
+    file.write(MagicNumbers::DELIMITER.data(), MagicNumbers::DELIMITER.size());
     file.write(reinterpret_cast<const char*>(me.indices.data()), me.indices.size() * sizeof(std::uint32_t));
 
 #ifdef DEBUG
@@ -80,15 +81,24 @@ void Converter::bake(Model& m)
 #endif
     file.write(MagicNumbers::TEXTURE.data(), MagicNumbers::TEXTURE.size());
     write(file, me.textures.size());
+    file.write(MagicNumbers::DELIMITER.data(), MagicNumbers::DELIMITER.size());
     for (const Texture& t : me.textures)
     {
       write(file, t.width);
       write(file, t.height);
       write(file, t.numComponents);
+
+      file.write(MagicNumbers::IMG_DATA.data(), MagicNumbers::IMG_DATA.size());
       write(file, t.imageData.size());
+      file.write(MagicNumbers::DELIMITER.data(), MagicNumbers::DELIMITER.size());
       file.write(reinterpret_cast<const char*>(t.imageData.data()), t.imageData.size() * sizeof(unsigned char));
+
+      file.write(MagicNumbers::IMG_TYPE.data(), MagicNumbers::IMG_TYPE.size());
       write(file, t.type.length());
+      file.write(MagicNumbers::DELIMITER.data(), MagicNumbers::DELIMITER.size());
       file.write(reinterpret_cast<const char*>(t.type.data()), t.type.size());
+
+      file.write(MagicNumbers::DELIMITER.data(), MagicNumbers::DELIMITER.size());
     }
   }
 }
