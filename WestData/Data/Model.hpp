@@ -11,17 +11,17 @@ public:
   Model();
   ~Model();
 
-  std::string& getGuid()
+  const std::string& getGuid() const
   {
     return _guid;
   };
 
-  std::vector<Mesh>& getMeshes()
+  const std::vector<Mesh>& getMeshes() const
   {
     return _meshes;
   };
 
-  std::string& getName()
+  const std::string& getName() const
   {
     return _name;
   }

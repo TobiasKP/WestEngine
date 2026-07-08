@@ -14,9 +14,12 @@ public:
 
   void init();
   void shutdown();
-  const Model& getNextFree(const std::string& type);
-  const Model& getModelByGuid(const std::string& guid);
+  const Model* getNextFreeProjectile(const std::string& type);
+
   std::array<Model, Limit::cachesize>& getSceneModels();
+  bool addModelToScene(Model&& m);
+  bool deleteModelFromScene(const std::string& guid);
+  const Model* getModelByGuid(const std::string& guid);
 
 private:
   std::array<Model, Limit::projectilePoolsize> _projectiles;

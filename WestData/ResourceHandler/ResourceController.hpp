@@ -15,7 +15,10 @@ public:
 
   void init();
   void shutdown();
-  std::array<Model, Limit::cachesize>& getSceneModels();
+  const std::array<Model, Limit::cachesize>& getSceneModels() const;
+  std::string addModel(const std::string& path);
+  const Model* getModel(const std::string& guid);
+  bool deleteModel(const std::string& guid);
 
 private:
   WestLogger* _logger;
