@@ -55,7 +55,7 @@ void Converter::bake(Model& m)
   }
 
   file.write(MagicNumbers::MAGIC_NUMBER.data(), MagicNumbers::MAGIC_NUMBER.size());
-  for (Mesh& me : m.getMeshes())
+  for (const Mesh& me : m.getMeshes())
   {
     file.write(MagicNumbers::MESH.data(), MagicNumbers::MESH.size());
 
