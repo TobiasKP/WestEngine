@@ -2,6 +2,8 @@
 
 #include "../CoreHeaders/Utils/Math/PositionCalculation.h"
 
+#include <WestAssetFacade.hpp>
+
 PositionalSystem::PositionalSystem(std::shared_ptr<EventDispatcher> d,
                                    WestLogger* l,
                                    std::shared_ptr<ComponentRegistry> r,
@@ -27,27 +29,37 @@ void PositionalSystem::update()
   }
   std::shared_ptr<ComponentArray<Position>> pos = _reg->getComponentArray<Position>();
   std::uint32_t id                              = _world->getEntityByIdx(_tileIdx);
-  Material* m;
+  Object* o;
 
   // TODO: Bug -> if emissiveColor is ever used this will overwrite it
   if (_lastEntity != -1 && _lastEntity != id)
   {
-    m = _reg->getComponent<Material>(_lastEntity);
-    if (m)
+    o = _reg->getComponent<Object>(_lastEntity);
+    if (o)
     {
-      m->emissiveColor = _lastEmissive;
+      const Model* m = WestData::WestAssetFacade::getAssetFacade().requestModelFromScene(o->guid);
+      for (Mesh mesh : m->getMeshes())
+      {
+        mesh.emissiveColor = _lastEmissive;
+      }
     }
     _lastEntity  = -1;
     _highlighted = false;
   }
   if (id > 0 && !_highlighted)
   {
-    m = _reg->getComponent<Material>(id);
-    assert(m != nullptr);
-    _lastEmissive     = m->emissiveColor;
-    m->emissiveColor += glm::vec3(0.0, 0.5, 0.5);
-    _lastEntity       = id;
-    _highlighted      = true;
+    o = _reg->getComponent<Object>(id);
+    assert(o != nullptr);
+    const Model* m = WestData::WestAssetFacade::getAssetFacade().requestModelFromScene(o->guid);
+    for (Mesh mesh : m->getMeshes())
+    {
+      _lastEmissive       = mesh.emissiveColor;
+      mesh.emissiveColor += glm::vec3(0.0, 0.5, 0.5);
+    }
+
+
+    _lastEntity  = id;
+    _highlighted = true;
   }
 };
 

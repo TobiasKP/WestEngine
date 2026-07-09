@@ -13,10 +13,27 @@ const Model* DataPool::getNextFreeProjectile(const std::string& type)
   return nullptr;
 };
 
-const Model* DataPool::getModelByGuid(const std::string& guid) {};
+const Model* DataPool::getModelByGuid(const std::string& guid)
+{
+  return nullptr;
+};
 
-std::array<Model, Limit::cachesize>& DataPool::getSceneModels() {};
+const Model* DataPool::getModelByName(const std::string& name)
+{
+  return nullptr;
+}
 
-bool DataPool::addModelToScene(Model&& m) {};
+std::array<Model, Limit::cachesize>& DataPool::getSceneModels()
+{
+  return _sceneModels;
+};
 
-bool DataPool::deleteModelFromScene(const std::string& guid) {};
+bool DataPool::addModelToScene(Model&& m)
+{
+  return true;
+};
+
+bool DataPool::deleteModelFromScene(const std::string& guid)
+{
+  return true;
+};

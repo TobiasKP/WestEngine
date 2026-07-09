@@ -8,8 +8,8 @@
 class Model
 {
 public:
-  Model();
-  ~Model();
+  Model() {};
+  ~Model() {};
 
   const std::string& getGuid() const
   {

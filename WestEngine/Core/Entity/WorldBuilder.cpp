@@ -6,11 +6,8 @@
 #include <format>
 
 
-WorldBuilder::WorldBuilder(lua_State* l,
-                           ObjectLoader* o,
-                           std::shared_ptr<ComponentRegistry> r,
-                           std::shared_ptr<Scene> s)
-  : _registry(r), _loader(o), _scene(s)
+WorldBuilder::WorldBuilder(lua_State* l, std::shared_ptr<ComponentRegistry> r, std::shared_ptr<Scene> s)
+  : _registry(r), _scene(s)
 {
   LuaFacade::getLuaFacadeInstance().registerCFunction(loadWorld, LuaAPI::C_LOAD_WORLD.data(), this);
 };
@@ -65,40 +62,38 @@ void WorldBuilder::createWorld(World& w, lua_State* L)
   sqmap = sqrt(map.size());
   w.setCreationInformation(sqmap, 1, glm::vec2(-sqmap / 2.0f, -sqmap / 2.0f));
 
-  auto [model, material, aabb] = buildWorldMesh(map, sqmap);
-  material->diffuseColor       = glm::vec3(0.2f, 0.6f, 0.2f);
+  Model* m = buildWorldMesh(map, sqmap);
 
   Shader s           = {};
   s.vertexShaderFile = "/shader/worldshader.vs";
   s.fragShaderFile   = "/shader/worldshader.fs";
   s.shadergroup      = 1000;
-  _registry->addComponent<Shader>(w.getId(), std::move(s));
-  _registry->addComponent<Model>(w.getId(), std::move(*model));
-  _registry->addComponent<Material>(w.getId(), std::move(*material));
+  _registry->addComponent<Shader>(w.getId(), std::move(s)); 
 }
 
-std::tuple<std::unique_ptr<Model>, std::unique_ptr<Material>, std::unique_ptr<AABB>>
-WorldBuilder::buildWorldMesh(const std::vector<std::uint8_t>& map, std::int32_t sqmap)
+Model* WorldBuilder::buildWorldMesh(const std::vector<std::uint8_t>& map, std::int32_t sqmap)
 {
-  std::vector<float> vertices;
   std::vector<float> texCoords;
-  std::vector<std::int32_t> idx;
+  std::vector<std::uint32_t> idx;
+  std::vector<Texture> tex;
+  std::vector<Vertex> vert;
+  Model* m = new Model();
+  m->setGuid("world");
 
   for (std::int32_t row = 0; row < sqmap; ++row)
   {
     for (std::int32_t col = 0; col < sqmap; ++col)
     {
-      std::int32_t base = static_cast<std::int32_t>(vertices.size() / 3);
+      std::int32_t base = static_cast<std::int32_t>(vert.size() / 3);
       float height      = static_cast<float>(map[row * sqmap + col]);
 
       for (int v = 0; v < 4; ++v)
       {
-        vertices.push_back((baseQuad[v * 2] + static_cast<float>(col)) - (sqmap >> 1));
-        vertices.push_back(height);
-        vertices.push_back((baseQuad[v * 2 + 1] + static_cast<float>(row)) - (sqmap >> 1));
-
-        texCoords.push_back(baseQuad[v * 2]);
-        texCoords.push_back(baseQuad[v * 2 + 1]);
+        vert.push_back(Vertex(glm::vec3((baseQuad[v * 2] + static_cast<float>(col)) - (sqmap >> 1),
+                                        height,
+                                        (baseQuad[v * 2 + 1] + static_cast<float>(row)) - (sqmap >> 1)),
+                              glm::vec3(0),
+                              glm::vec2(baseQuad[v * 2], baseQuad[v * 2 + 1])));
       }
 
       for (int i = 0; i < 6; ++i)
@@ -108,15 +103,8 @@ WorldBuilder::buildWorldMesh(const std::vector<std::uint8_t>& map, std::int32_t 
     }
   }
 
-  return _loader->loadModel(vertices.data(),
-                            vertices.size() * sizeof(float),
-                            idx.data(),
-                            idx.size() * sizeof(std::int32_t),
-                            texCoords.data(),
-                            texCoords.size() * sizeof(float),
-                            nullptr,
-                            0,
-                            "",
-                            glm::vec3(0),
-                            glm::vec3(0));
+  Mesh mesh         = Mesh("world", vert, idx, tex);
+  mesh.diffuseColor = glm::vec3(0.2f, 0.6f, 0.2f);
+  m->addMesh(mesh);
+  return m;
 }

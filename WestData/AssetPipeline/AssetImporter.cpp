@@ -2,7 +2,10 @@
 
 #include "../Utils/AssetUtils.hpp"
 
+#define STB_IMAGE_STATIC
 #define STB_IMAGE_IMPLEMENTATION
+
+#include "../Data/Model.hpp"
 
 #include <assimp/postprocess.h>
 #include <filesystem>
@@ -54,7 +57,7 @@ void AssetImporter::handleFile(const std::string& path, const std::string& guid)
 {
   _model = {};
   _model.setGuid(guid);
-  _model.setName(std::filesystem::path(path).filename());
+  _model.setName(std::filesystem::path(path).stem());
   const aiScene* scene = _importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
   {
@@ -183,4 +186,9 @@ Texture AssetImporter::textureFromFile(const std::string& file, const std::strin
   tex.imageData     = std::vector<unsigned char>(imgData, imgData + width * height * numComponents);
   stbi_image_free(imgData);
   return tex;
+};
+
+void AssetImporter::addOnRequest(const std::string& path)
+{
+  _screener->addOnRequest(path);
 };

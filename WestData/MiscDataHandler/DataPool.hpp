@@ -20,9 +20,11 @@ public:
   bool addModelToScene(Model&& m);
   bool deleteModelFromScene(const std::string& guid);
   const Model* getModelByGuid(const std::string& guid);
+  const Model* getModelByName(const std::string& name);
 
 private:
   std::array<Model, Limit::projectilePoolsize> _projectiles;
   std::array<Model, Limit::cachesize> _sceneModels;
   std::unordered_map<std::string, std::uint32_t> _guidToIndex;
+  std::unordered_map<std::string, std::string> _nameToGuid;
 };

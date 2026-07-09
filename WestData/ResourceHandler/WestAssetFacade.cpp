@@ -1,5 +1,7 @@
 #include "../WestAssetFacade.hpp"
 
+using namespace WestData;
+
 WestAssetFacade& WestAssetFacade::getAssetFacade()
 {
   static WestAssetFacade instance;
@@ -9,6 +11,7 @@ WestAssetFacade& WestAssetFacade::getAssetFacade()
 
 WestAssetFacade::WestAssetFacade()
 {
+  _logger.log(Level::Info, "|*| Starting up AssetFacade");
   _controller = std::make_unique<ResourceController>(&_logger);
   _controller->init();
 };

@@ -38,3 +38,4 @@ target_link_libraries(WestData PUBLIC
 target_compile_definitions(WestData PRIVATE
     $<$<CONFIG:DEBUG>:DEBUG>
 )
+

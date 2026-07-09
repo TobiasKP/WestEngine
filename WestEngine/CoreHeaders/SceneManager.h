@@ -7,9 +7,9 @@
 #include "Entity/Scene.h"
 #include "Entity/WorldBuilder.hpp"
 #include "Interfaces/IManager.h"
-#include "Utils/DataUtils/ObjectLoader.h"
 
 #include <lua.hpp>
+#include <WestAssetFacade.hpp>
 
 class SceneManager : public IManager
 {
@@ -27,7 +27,7 @@ public:
 private:
   LuaFacade* _facade;
 
-  ObjectLoader* _loader;
+  WestData::WestAssetFacade* _dataFacade; 
   lua_State* L;
 
   std::unique_ptr<WorldBuilder> _wbuilder;

@@ -28,17 +28,26 @@ const std::array<Model, Limit::cachesize>& ResourceController::getSceneModels() 
 
 std::string ResourceController::addModel(const std::string& path)
 {
+  const Model* old = _pool->getModelByName(path);
+  if (old != nullptr)
+  {
+    return old->getGuid();
+  }
   std::optional<Model> m = _builder->createModel(path);
 
   if (!m.has_value())
   {
     // TODO: Error handling
+    _logger->log(Level::Error,
+                 std::format("|*| Error creating Model for: {} look at trace for more information.\n", path));
     return "";
   }
   std::string guid = m.value().getGuid();
   bool res         = _pool->addModelToScene(std::move(m.value()));
   if (!res)
   {
+    _logger->log(Level::Error,
+                 std::format("|*| Error adding Model to Scene: {} look at trace for more information.\n", path));
     return "";
   }
   return guid;

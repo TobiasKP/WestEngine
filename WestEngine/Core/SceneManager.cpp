@@ -12,7 +12,6 @@ SceneManager::SceneManager() : IManager(nullptr)
 {
   setName(CoreConstants::SCENE_MANAGER);
   _scene    = nullptr;
-  _loader   = nullptr;
   _ebuilder = nullptr;
   _wbuilder = nullptr;
   _registry = nullptr;
@@ -27,7 +26,6 @@ SceneManager::SceneManager(WestLogger* logger,
   setName(CoreConstants::SCENE_MANAGER);
   _dispatcher = d;
   _scene      = s;
-  _loader     = nullptr;
   _ebuilder   = nullptr;
   _wbuilder   = nullptr;
   _registry   = nullptr;
@@ -38,9 +36,9 @@ SceneManager::~SceneManager() {}
 
 std::int32_t SceneManager::startup()
 {
+  _dataFacade               = &WestData::WestAssetFacade::getAssetFacade();
   std::shared_ptr<Camera> c = std::make_shared<Camera>(glm::vec3(0.0, 3.0, 5.0), glm::vec3(25.0f, 0, 0));
   _registry                 = std::make_shared<ComponentRegistry>();
-  _loader                   = new ObjectLoader(getLogger());
 
   _scene->addRegistry(_registry);
   _scene->addCamera(std::move(c));
@@ -49,9 +47,9 @@ std::int32_t SceneManager::startup()
   _facade->startup(getLogger());
   L = _facade->getLuaState();
 
-  _ebuilder = std::make_unique<EntityBuilder>(L, _loader, _registry, _scene);
-  _wbuilder = std::make_unique<WorldBuilder>(L, _loader, _registry, _scene);
-  assert(_loader != nullptr && _scene != nullptr && _wbuilder != nullptr && _ebuilder != nullptr);
+  _ebuilder = std::make_unique<EntityBuilder>(L, _registry, _scene);
+  _wbuilder = std::make_unique<WorldBuilder>(L, _registry, _scene);
+  assert(_scene != nullptr && _wbuilder != nullptr && _ebuilder != nullptr);
 #ifdef DEBUG
   logDebug(std::format("{} ### instantiated Lua state\n", getName()));
 #endif
@@ -74,8 +72,6 @@ std::int32_t SceneManager::init()
 #ifdef DEBUG
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
-  _registry->registerComponent<Model>();
-  _registry->registerComponent<Material>();
   _registry->registerComponent<Shader>();
   _registry->registerComponent<Movement>();
   _registry->registerComponent<Position>();
@@ -144,18 +140,13 @@ void SceneManager::removeEntityFromScene(const Entity& entity)
 #endif
 
   if (!entity.isDebugEntity())
-  {
-    Model* mo    = _registry->getComponent<Model>(entity.getId());
-    Material* ma = _registry->getComponent<Material>(entity.getId());
-    _loader->unloadModel(mo, ma);
-  }
-  _registry->removeAllComponents(entity.getId()); 
+  {}
+  _registry->removeAllComponents(entity.getId());
   _scene->removeEntity(entity);
 }
 
 void SceneManager::deleteScene()
 {
-  _loader->cleanup();
 #ifdef DEBUG
   logDebug(std::format("{} ### Cleaned up GPU memory\n", getName()));
 #endif

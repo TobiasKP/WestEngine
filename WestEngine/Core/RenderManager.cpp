@@ -6,6 +6,7 @@
 #include <Config.h>
 #include <format>
 #include <glm/ext/matrix_clip_space.hpp>
+#include <WestAssetFacade.hpp>
 
 using namespace WestInterface;
 
@@ -145,29 +146,31 @@ void RenderManager::renderMainLoop(const Entity& entity)
   }
 
 
-  Model* model       = reg->getComponent<Model>(entity.getId());
-  Material* material = reg->getComponent<Material>(entity.getId());
-  assert(model != nullptr && material != nullptr);
+  Object* object     = reg->getComponent<Object>(entity.getId());
+  const Model* model = WestData::WestAssetFacade::getAssetFacade().requestModelFromScene(object->guid);
+  assert(object != nullptr && model != nullptr);
   if (!Config::PAUSE)
   {
-    updateUniforms(entity, model, material);
+    updateUniforms(entity, object, model);
   }
-
-  glBindVertexArray(model->id);
+  for (openGLHandle handle : object->handles)
+  {
+    glBindVertexArray(handle.meshId);
 #ifdef DEBUG
-  if (entity.isDebugEntity())
-  {
-    glDisable(GL_DEPTH_TEST);
-    glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, 0);
-    glEnable(GL_DEPTH_TEST);
-  }
-  else
-  {
-    glDrawElements(GL_TRIANGLES, model->vertexCount, GL_UNSIGNED_INT, 0);
-  }
+    if (entity.isDebugEntity())
+    {
+      glDisable(GL_DEPTH_TEST);
+      glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, 0);
+      glEnable(GL_DEPTH_TEST);
+    }
+    else
+    {
+      glDrawElements(GL_TRIANGLES, handle.verticeSize, GL_UNSIGNED_INT, 0);
+    }
 #else
-  glDrawElements(GL_TRIANGLES, model->vertexCount, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, model->vertexCount, GL_UNSIGNED_INT, 0);
 #endif
+  }
 }
 
 
@@ -195,13 +198,13 @@ void RenderManager::renderWorld()
   GLuint shaderProgramId = s->programId;
   glUseProgram(shaderProgramId);
 
-  Material* mat = reg->getComponent<Material>(world->getId());
-  if (mat != nullptr && mat->diffuseColorUniform > -1)
+ 
+  //const Model* model = WestData::WestAssetFacade::getAssetFacade().requestModelFromScene(obj->guid);
+  /*if (obj != nullptr && obj->diffuseColorUniform > -1)
   {
-    UniformUtils::setUniform(mat->diffuseColorUniform, mat->diffuseColor);
-  }
+    //UniformUtils::setUniform(obj->diffuseColorUniform, model->getMeshes().front().diffuseColor);
+  }*/
 
-  Model* model = reg->getComponent<Model>(world->getId());
   if (model == nullptr)
   {
 #ifdef DEBUG
@@ -214,7 +217,10 @@ void RenderManager::renderWorld()
   std::uint8_t cycle = getLogger()->getCycleLength();
   if (cycle == 0)
   {
-    logCycle(std::format("{} ### Rendering world. VAO: {}, vertices: {}.\n", getName(), model->id, model->vertexCount));
+    logCycle(std::format("{} ### Rendering world. VAO: {}, vertices: {}.\n",
+                         getName(),
+                         model->getGuid(),
+                         model->getMeshes().front().vertices.size()));
   }
 #endif
 
@@ -223,15 +229,15 @@ void RenderManager::renderWorld()
     std::vector<std::uint32_t> flags = world->getFlagData();
     std::int32_t dimension           = world->getGridSize();
     glm::vec2 origin                 = world->getOrigin();
-    UniformUtils::setUniform(world->getFlagUniform(), flags);
-    UniformUtils::setUniform(world->getGridUniform(), dimension);
-    UniformUtils::setUniform(world->getGridOriginUniform(), origin);
+    //UniformUtils::setUniform(world->getFlagUniform(), flags);
+    //UniformUtils::setUniform(world->getGridUniform(), dimension);
+    //UniformUtils::setUniform(world->getGridOriginUniform(), origin);
     world->resetDirty();
   }
 
 
-  glBindVertexArray(model->id);
-  glDrawElements(GL_TRIANGLES, model->vertexCount, GL_UNSIGNED_INT, 0);
+  // glBindVertexArray(obj.modelHandle);
+  // glDrawElements(GL_TRIANGLES, model->vertexCount, GL_UNSIGNED_INT, 0);
   glUseProgram(_usedShaderProgram);
 }
 
@@ -318,82 +324,20 @@ void RenderManager::renderUserInterfaces()
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   glActiveTexture(GL_TEXTURE0);
-  UniformUtils::setUniform(Config::interfaceFontTextureUniform, 0);
+  //UniformUtils::setUniform(Config::interfaceFontTextureUniform, 0);
   glBindTexture(GL_TEXTURE_2D, _facade->_interfaceFONT_TEXTURE_ID);
 
   glActiveTexture(GL_TEXTURE1);
-  UniformUtils::setUniform(Config::interfaceTextureOneUniform, 1);
+  //UniformUtils::setUniform(Config::interfaceTextureOneUniform, 1);
   glBindTexture(GL_TEXTURE_2D, texture);
 
   glm::mat4 ortho = glm::ortho(0.0f, (float)Config::GeneralConfig.WIDTH, 0.0f, (float)Config::GeneralConfig.HEIGHT);
-  UniformUtils::setUniform(Config::interfaceOrthoUniform, ortho);
+  //UniformUtils::setUniform(Config::interfaceOrthoUniform, ortho);
   glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, renderData.size());
   glDisable(GL_BLEND);
   glUseProgram(_usedShaderProgram);
 }
 
-void RenderManager::updateUniforms(const Entity& e, Model* model, Material* material)
-{
-  std::shared_ptr<ComponentRegistry> reg = _scene->getRegistry();
-  Position* p                            = reg->getComponent<Position>(e.getId());
-  Texture* t                             = material->diffuseTexture;
-#ifdef DEBUG
-  if (e.isDebugEntity())
-  {
-    UniformUtils::setUniform(model->debugColorUniform, material->diffuseColor);
-    assert(model->debugColorUniform != -1);
-  }
-  Movement* m = reg->getComponent<Movement>(e.getId());
-  if (m != nullptr && m->removeDebugInfo)
-  {
-    Entity* e = _scene->getEntityById(m->debugEntity);
-    if (e != nullptr)
-    {
-      _debugUtils->unloadModel(*e);
-      _scene->removeEntity(*e);
-    }
-    m->removeDebugInfo = false;
-  }
-  else if (m != nullptr && !m->debugInfoDisplayed && m->destination.has_value())
-  {
-    m->debugEntity        = _debugUtils->addLine(p->position, *m->destination - p->position);
-    m->debugInfoDisplayed = true;
-  }
-#endif
-
-  if (!e.isDebugEntity() && material != nullptr)
-  {
-    if (material->diffuseColorUniform > -1)
-    {
-      UniformUtils::setUniform(material->diffuseColorUniform, material->diffuseColor);
-    }
-    if (material->emissiveColorUniform > -1)
-    {
-      UniformUtils::setUniform(material->emissiveColorUniform, material->emissiveColor);
-    }
-  }
-
-
-  if (t != nullptr)
-  {
-    UniformUtils::setUniform(t->uniform, 0);
-    assert(t->uniform != -1);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, t->id);
-  }
-
-
-  if (p != nullptr)
-  {
-    if (p->dirty.load())
-    {
-      p->transform = PositionCalculation::createTransformationMatrix(p->position, p->rotation, p->scale);
-      p->dirty.store(false);
-    }
-    assert(p->uniform != -1);
-    UniformUtils::setUniform(p->uniform, p->transform);
-  }
-}
 
 bool RenderManager::AABBcheck(const Entity& e)
 {

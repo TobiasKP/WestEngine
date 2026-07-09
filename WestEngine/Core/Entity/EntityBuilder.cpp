@@ -6,7 +6,7 @@
 #include <format>
 
 EntityBuilder::EntityBuilder(lua_State* state,
-                             ObjectLoader* loader,
+                             GpuUploader* loader,
                              std::shared_ptr<ComponentRegistry> r,
                              std::shared_ptr<Scene> s)
   : _registry(r), _scene(s)
@@ -27,7 +27,7 @@ int EntityBuilder::createEntity(lua_State* L)
 {
   EntityBuilder* me = EntityBuilder::retrieveMeFromStack(L);
   me->_e            = Entity{};
-  std::string name = lua_tostring(L, 1);
+  std::string name  = lua_tostring(L, 1);
   me->_e.setId(Config::incEntityId());
   me->_e.setName(name);
   me->_e.toggleActivate(false);

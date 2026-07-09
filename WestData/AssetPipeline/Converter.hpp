@@ -13,6 +13,7 @@ public:
   void init();
   void shutdown();
   void convertQueueElements();
+  void addOnRequest(const std::string& path);
 
 private:
   void bake(Model& m);

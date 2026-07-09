@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Entity/Entity.h"
-#include "../Utils/DataUtils/ObjectLoader.h"
 #include "ComponentRegistry.hpp"
 
 #include <lua.hpp>
@@ -9,12 +8,11 @@
 class ComponentFactory
 {
 public:
-  ComponentFactory(std::shared_ptr<ComponentRegistry> r, ObjectLoader* l) : _registry(r), _loader(l) {};
+  ComponentFactory(std::shared_ptr<ComponentRegistry> r) : _registry(r) {};
   void createComponent(lua_State* L, std::string& name, Entity& e);
 
 private:
   std::shared_ptr<ComponentRegistry> _registry;
-  ObjectLoader* _loader;
 
   void addPosition(lua_State* L, Entity& e);
   void addMovement(lua_State* L, Entity& e);

@@ -12,6 +12,7 @@ public:
 
   void run();
   void stop();
+  void addOnRequest(const std::string& file);
 
   inline bool isRunning()
   {
@@ -20,7 +21,7 @@ public:
 
 private:
   void notifyOnNew();
-  void scanDir();
+  void scanDir(); 
 
   std::function<void(const std::string& path)> _callback;
   std::array<std::string, 1> _allowList = {".obj"};

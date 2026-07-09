@@ -27,7 +27,7 @@ void BinaryLoader::shutdown()
 
 bool BinaryLoader::exists(const std::string& modelname)
 {
-  std::string filename = std::format("{}/{}.west", PathUtils::getExecutableDir() + "/bin", modelname);
+  std::string filename = std::format("{}/{}.west", PathUtils::getExecutableDir() + "/bin", "_" + modelname);
   return std::filesystem::exists(filename);
 }
 
@@ -39,6 +39,8 @@ std::optional<Model> BinaryLoader::load(const std::string& modelname)
   }
   else
   {
+    _logger->log(Level::Info, std::format("|*| Need to bake model {}, this could take a while ...  \n", modelname));
+    _converter->addOnRequest(modelname);
     _converter->convertQueueElements();
     return loadFromDisk(modelname);
   }
@@ -46,8 +48,10 @@ std::optional<Model> BinaryLoader::load(const std::string& modelname)
 
 std::optional<Model> BinaryLoader::loadFromDisk(const std::string& modelname)
 {
-  std::string filename = std::format("{}/{}.west", PathUtils::getExecutableDir() + "/bin", modelname);
-  std::string guid     = AssetUtils::generateGUID(filename);
+  std::string filename = std::format(
+    "{}/{}.west", PathUtils::getExecutableDir() + "/bin", "_" + std::filesystem::path(modelname).stem().string());
+  std::string guid = AssetUtils::generateGUID(filename);
+  _logger->log(Level::Info, std::format("|*| Loading binary model {} from disk\n ", filename));
   assert(std::filesystem::exists(filename));
   std::ifstream file(filename, std::ios::binary);
   if (!file)

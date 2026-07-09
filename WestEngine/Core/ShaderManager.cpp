@@ -188,7 +188,7 @@ void ShaderManager::initWorldShader()
   logDebug(std::format("{} ### World shader initialized. ProgramID: {}.\n", getName(), programId));
 #endif
 
-  Material* mat = reg->getComponent<Material>(world->getId());
+  MMaterial* mat = reg->getComponent<MMaterial>(world->getId());
   if (mat != nullptr)
   {
     mat->diffuseColorUniform = UniformUtils::createUniform(UniformConstants::DCOLOR, programId);
@@ -295,8 +295,8 @@ GLuint ShaderManager::initShader(Shader* s, const Entity& entity)
 void ShaderManager::addUniforms(GLuint programId, const Entity& entity)
 {
   std::shared_ptr<ComponentRegistry> reg = _scene->getRegistry();
-  Model* m                               = reg->getComponent<Model>(entity.getId());
-  Material* m2                           = reg->getComponent<Material>(entity.getId());
+  MModel* m                               = reg->getComponent<MModel>(entity.getId());
+  MMaterial* m2                           = reg->getComponent<MMaterial>(entity.getId());
   if (m2 != nullptr && m2->diffuseTexture != nullptr)
   {
     m2->diffuseTexture->uniform = UniformUtils::createUniform(UniformConstants::TEXTURE_SAMPLER, programId);

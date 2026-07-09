@@ -37,8 +37,7 @@ private:
   void renderUserInterfaces();
   void renderGameEntities();
   void renderWorld();
-  void renderMainLoop(const Entity& e);
-  void updateUniforms(const Entity& e, Model* m, Material* m2);
+  void renderMainLoop(const Entity& e); 
   bool AABBcheck(const Entity& e);
 
 #ifdef DEBUG

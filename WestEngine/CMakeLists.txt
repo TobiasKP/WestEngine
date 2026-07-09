@@ -51,6 +51,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
     WestUtils
     WestInterface
+    WestData
     GLEW::GLEW
     glfw
     ${LUA_LIBRARIES}
@@ -95,7 +96,7 @@ set(ENGINE_DIR "${RESOURCE_BASE}/engine")
 file(GLOB CONFIG_FILES "${CMAKE_SOURCE_DIR}/WestGame/Config/*")
 
 # General file copy post-build
-foreach(FOLDER lua assets shader engine config libs libs/STB libs/GLM)
+foreach(FOLDER lua assets shader engine config libs libs/STB libs/GLM bin)
 if(NOT EXISTS "${RESOURCE_BASE}/${FOLDER}")
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${RESOURCE_BASE}/${FOLDER}"

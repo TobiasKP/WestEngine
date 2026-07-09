@@ -60,7 +60,7 @@ void Converter::bake(Model& m)
     file.write(MagicNumbers::MESH.data(), MagicNumbers::MESH.size());
 
 #ifdef DEBUG
-    _logger->log(Level::Cycle, std::format("|*| writing vertices for {}", m.getGuid()));
+    _logger->log(Level::Cycle, std::format("|*| writing vertices for {}\n", m.getGuid()));
 #endif
     file.write(MagicNumbers::VERTICE.data(), MagicNumbers::VERTICE.size());
     assert(std::is_trivially_copyable_v<Vertex>);
@@ -69,7 +69,7 @@ void Converter::bake(Model& m)
     file.write(reinterpret_cast<const char*>(me.vertices.data()), me.vertices.size() * sizeof(Vertex));
 
 #ifdef DEBUG
-    _logger->log(Level::Cycle, std::format("|*| writing indices for {}", m.getGuid()));
+    _logger->log(Level::Cycle, std::format("|*| writing indices for {}\n", m.getGuid()));
 #endif
     file.write(MagicNumbers::INDICE.data(), MagicNumbers::INDICE.size());
     write(file, me.indices.size());
@@ -77,7 +77,7 @@ void Converter::bake(Model& m)
     file.write(reinterpret_cast<const char*>(me.indices.data()), me.indices.size() * sizeof(std::uint32_t));
 
 #ifdef DEBUG
-    _logger->log(Level::Cycle, std::format("|*| writing textures for {}", m.getGuid()));
+    _logger->log(Level::Cycle, std::format("|*| writing textures for {}\n", m.getGuid()));
 #endif
     file.write(MagicNumbers::TEXTURE.data(), MagicNumbers::TEXTURE.size());
     write(file, me.textures.size());
@@ -102,3 +102,8 @@ void Converter::bake(Model& m)
     }
   }
 }
+
+void Converter::addOnRequest(const std::string& path)
+{
+  _importer->addOnRequest(path);
+};

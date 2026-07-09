@@ -3,6 +3,7 @@
 #include <cassert>
 #include <CoreConstants.hpp>
 #include <filesystem>
+#include <PathUtils.h>
 
 AssetPathScreener::AssetPathScreener(WestLogger* l, const std::function<void(const std::string& path)> callback)
 {
@@ -63,7 +64,7 @@ void AssetPathScreener::notifyOnNew()
       continue;
     }
 
-    _logger->log(Level::Info, std::format("AAA : Found {} new files, adding to import queue\n", _files.size()));
+    _logger->log(Level::Info, std::format("|*| : Found {} new files, adding to import queue\n", _files.size()));
     for (const std::string& file : _files)
     {
       _callback(file);
@@ -74,8 +75,16 @@ void AssetPathScreener::notifyOnNew()
 
 void AssetPathScreener::scanDir()
 {
-  for (const auto& entry : std::filesystem::directory_iterator(CoreConstants::ASSET_PATH))
+  std::string path = std::format("{}{}", PathUtils::getExecutableDir(), CoreConstants::ASSET_PATH);
+  for (const auto& entry : std::filesystem::directory_iterator(path))
   {
+    if (std::filesystem::is_directory(entry))
+    {
+      _logger->log(Level::Error,
+                   std::format("Entry: {} for file loading is a directory not a file\n", entry.path().string()));
+      continue;
+    }
+    _logger->log(Level::Cycle, std::format("|*| Reading: {} for import\n", entry.path().filename().string()));
     const std::string filename  = entry.path().stem().string();
     const std::string extension = entry.path().extension();
     if (filename.starts_with("_"))
@@ -89,7 +98,7 @@ void AssetPathScreener::scanDir()
     }
 
     std::error_code ec;
-    const std::string newName = std::string(CoreConstants::ASSET_PATH) + "_" + entry.path().filename().string();
+    const std::string newName = path + "_" + entry.path().filename().string();
     const std::string oldName = entry.path().string();
     std::filesystem::rename(oldName, newName, ec);
     if (ec.value() > 0)
@@ -105,3 +114,27 @@ void AssetPathScreener::scanDir()
     }
   }
 };
+
+void AssetPathScreener::addOnRequest(const std::string& file)
+{
+  _logger->log(Level::Cycle, std::format("|*| Reading: {} for import\n", file));
+  std::string path     = std::format("{}{}", PathUtils::getExecutableDir(), CoreConstants::ASSET_PATH);
+  std::string fullfile = std::format("{}{}{}", PathUtils::getExecutableDir(), CoreConstants::ASSET_PATH, "_" + file);
+  if (std::filesystem::exists(fullfile))
+  {
+    _logger->log(Level::Info, std::format("|*| Requested file: {} is already processed or in process\n", file));
+    return;
+  };
+
+  std::error_code ec;
+  const std::string newName = path + "_" + file;
+  const std::string oldName = path + file;
+  std::filesystem::rename(oldName, newName, ec);
+  if (ec.value() > 0)
+  {
+    _logger->log(Level::Error,
+                 std::format("Error renaming file from: {} to: {} with Error: {}\n", oldName, newName, ec.value()));
+    return;
+  }
+  _callback(newName);
+}

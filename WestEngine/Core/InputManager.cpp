@@ -37,7 +37,7 @@ InputManager::~InputManager() {}
 std::int32_t InputManager::startup()
 {
 #ifdef DEBUG
-  logDebug(std::format("{} ### Executable dir: {}", getName(), PathUtils::getExecutableDir()));
+  logDebug(std::format("{} ### Executable dir: {}\n", getName(), PathUtils::getExecutableDir()));
 #endif
 
   std::int32_t fd;

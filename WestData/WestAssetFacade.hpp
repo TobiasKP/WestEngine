@@ -3,7 +3,8 @@
 #include "Data/Model.hpp"
 #include "ResourceHandler/ResourceController.hpp"
 
-#include <vector>
+namespace WestData
+{
 
 class WestAssetFacade
 {
@@ -23,6 +24,8 @@ private:
   WestAssetFacade(WestAssetFacade&& other)                 = delete;
   WestAssetFacade& operator=(WestAssetFacade&& other)      = delete;
 
-  WestLogger& _logger             = WestLogger::getLoggerInstance(); 
+  WestLogger& _logger = WestLogger::getLoggerInstance();
   std::unique_ptr<ResourceController> _controller;
 };
+
+};  // namespace WestData

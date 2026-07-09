@@ -3,20 +3,21 @@
 #include "../../../CoreHeaders/Entity/Entity.h"
 
 #include <Config.h>
+#include <WestAssetFacade.hpp>
 
 DebugDrawUtils::DebugDrawUtils(WestLogger* logger, std::shared_ptr<Scene> s)
-{
-  _loader = new ObjectLoader(logger);
+{ 
   _scene  = s;
 }
 
 std::uint32_t DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction)
 {
   glm::vec3 end                = start + direction;
-  GLfloat vertices[]           = {start.x, start.y, start.z, end.x, end.y, end.z};
-  std::int32_t indices[]       = {0, 1};
-  auto [model, material, aabb] = _loader->loadModel(
-    vertices, sizeof(vertices), indices, sizeof(indices), 0, 0, 0, 0, "", glm::vec3(0), glm::vec3(0));
+  std::vector<Vertex> vertices = {Vertex{start, glm::vec3(0), glm::vec2(0)}, Vertex{end, glm::vec3(0), glm::vec2(0)}};
+  std::vector<std::uint32_t> indices = {0, 1};
+  std::vector<Texture> texs;
+  Model model = {};
+  model.addMesh(Mesh(std::format("{}_{}", "debug", 0), vertices, indices, texs));
 
   Shader* s           = new Shader();
   s->vertexShaderFile = CoreConstants::DEBUG_V_SHADER;
@@ -27,8 +28,7 @@ std::uint32_t DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction)
   e.setId(Config::incEntityId());
   std::shared_ptr<ComponentRegistry> reg = _scene->getRegistry();
   reg->addComponent<Shader>(e.getId(), std::move(*s));
-  reg->addComponent<Model>(e.getId(), std::move(*model));
-  reg->addComponent<Material>(e.getId(), std::move(*material));
+
   e.debugEntity();
 
   _scene->addDebugEntity(std::move(e));
@@ -38,5 +38,4 @@ std::uint32_t DebugDrawUtils::addLine(glm::vec3 start, glm::vec3 direction)
 void DebugDrawUtils::unloadModel(const Entity& entity)
 {
   std::shared_ptr<ComponentRegistry> reg = _scene->getRegistry();
-  _loader->unloadModel(reg->getComponent<Model>(entity.getId()), reg->getComponent<Material>(entity.getId()));
 }

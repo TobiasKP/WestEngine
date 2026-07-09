@@ -10,7 +10,7 @@
 class EntityBuilder
 {
 public:
-  EntityBuilder(lua_State* state, ObjectLoader* loader, std::shared_ptr<ComponentRegistry> r, std::shared_ptr<Scene> s);
+  EntityBuilder(lua_State* state, std::shared_ptr<ComponentRegistry> r, std::shared_ptr<Scene> s);
   ~EntityBuilder();
 
   static int createEntity(lua_State*);
