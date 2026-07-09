@@ -5,13 +5,10 @@
 
 #include <format>
 
-EntityBuilder::EntityBuilder(lua_State* state,
-                             GpuUploader* loader,
-                             std::shared_ptr<ComponentRegistry> r,
-                             std::shared_ptr<Scene> s)
+EntityBuilder::EntityBuilder(lua_State* state, std::shared_ptr<ComponentRegistry> r, std::shared_ptr<Scene> s)
   : _registry(r), _scene(s)
 {
-  _cFac = std::make_unique<ComponentFactory>(r, loader);
+  _cFac = std::make_unique<ComponentFactory>(r);
   LuaFacade::getLuaFacadeInstance().registerCFunction(createEntity, LuaAPI::C_CREATE_ENTITY.data(), this);
   LuaFacade::getLuaFacadeInstance().registerCFunction(addComponent, LuaAPI::C_ADD_COMPONENT.data(), this);
   LuaFacade::getLuaFacadeInstance().registerCFunction(buildEntity, LuaAPI::C_BUILD_ENTITY.data(), this);

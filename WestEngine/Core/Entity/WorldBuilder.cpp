@@ -63,12 +63,13 @@ void WorldBuilder::createWorld(World& w, lua_State* L)
   w.setCreationInformation(sqmap, 1, glm::vec2(-sqmap / 2.0f, -sqmap / 2.0f));
 
   Model* m = buildWorldMesh(map, sqmap);
+  w.setGuid("world");
 
   Shader s           = {};
   s.vertexShaderFile = "/shader/worldshader.vs";
   s.fragShaderFile   = "/shader/worldshader.fs";
   s.shadergroup      = 1000;
-  _registry->addComponent<Shader>(w.getId(), std::move(s)); 
+  _registry->addComponent<Shader>(w.getId(), std::move(s));
 }
 
 Model* WorldBuilder::buildWorldMesh(const std::vector<std::uint8_t>& map, std::int32_t sqmap)

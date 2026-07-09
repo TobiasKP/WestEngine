@@ -52,6 +52,7 @@ target_link_libraries(${PROJECT_NAME}
     WestUtils
     WestInterface
     WestData
+    WestRenderer
     GLEW::GLEW
     glfw
     ${LUA_LIBRARIES}

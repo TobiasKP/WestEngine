@@ -1,23 +1,13 @@
 #include "../CoreHeaders/RenderManager.h"
 
-#include "../CoreHeaders/Utils/DataUtils/UniformUtils.h"
-#include "../CoreHeaders/Utils/Math/PositionCalculation.h"
-
 #include <Config.h>
 #include <format>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <WestAssetFacade.hpp>
 
-using namespace WestInterface;
-
-GLuint RenderManager::_usedShaderProgram = 0;
-
 RenderManager::RenderManager() : IManager(nullptr)
 {
   setName(CoreConstants::RENDER_MANAGER);
-#ifdef DEBUG
-  _debugUtils = new DebugDrawUtils(nullptr, nullptr);
-#endif
   _facade = nullptr;
   _scene  = nullptr;
 }
@@ -25,9 +15,6 @@ RenderManager::RenderManager() : IManager(nullptr)
 RenderManager::RenderManager(WestLogger* logger, const std::shared_ptr<Scene>& s) : IManager(logger)
 {
   setName(CoreConstants::RENDER_MANAGER);
-#ifdef DEBUG
-  _debugUtils = new DebugDrawUtils(logger, s);
-#endif
   _facade = nullptr;
   _scene  = s;
 }
@@ -52,7 +39,7 @@ std::int32_t RenderManager::init()
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
 
-  _facade = &WestInterfaceFacade::getInterfaceInstance();
+  _facade = &WestRendererFacade::getRendererFacade();
   assert(_scene != nullptr && _facade != nullptr);
 
 #ifdef DEBUG
@@ -69,307 +56,14 @@ void RenderManager::update()
 #ifdef DEBUG
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
-  clearColor();
-  renderWorld();
-  renderGameEntities();
-  renderUserInterfaces();
+  _facade->clearColor();
+  _facade->renderWorld();
+  _facade->renderEntity();
+  _facade->renderInterface();
+  _facade->renderDebugEntities();
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
   logCycle(std::format("{} ### render time for all entites in scene: {} ms.\n", getName(), res));
 #endif
-}
-
-void RenderManager::clearColor()
-{
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void RenderManager::renderGameEntities()
-{
-  if (!Config::PAUSE)
-  {
-    _scene->getCamera()->update();
-  }
-
-  std::int32_t size = _scene->getEntities().size(), skipped = 0;
-  for (const Entity& entity : _scene->getEntities())
-  {
-    if (AABBcheck(entity))
-    {
-      renderMainLoop(entity);
-    }
-    else
-    {
-      skipped++;
-#ifdef DEBUG
-      logCycle(std::format("{} ### skipped rendering entity: {}, did not pass AABB.\n", getName(), entity.getId()));
-#endif
-    }
-  }
-  Config::GeneralInfo.TOTAL_ENTITIES  = size;
-  Config::GeneralInfo.CULLED_ENTITIES = skipped;
-
-#ifdef DEBUG
-  for (const Entity& entity : _scene->getDebugEntities())
-  {
-    renderMainLoop(entity);
-  }
-#endif
-}
-
-void RenderManager::renderMainLoop(const Entity& entity)
-{
-  const std::shared_ptr<ComponentRegistry>& reg = _scene->getRegistry();
-  Shader* s                                     = reg->getComponent<Shader>(entity.getId());
-  assert(s != nullptr);
-  if (!s->initialized)
-  {
-#ifdef DEBUG
-    logDebug(std::format("!!! Entity shader not initialized! Entity: {}\n", entity.getId()));
-#endif
-    glUseProgram(0);
-    _usedShaderProgram = 0;
-    return;
-  }
-
-  GLuint shaderProgramId = s->programId;
-  if (_usedShaderProgram != shaderProgramId)
-  {
-    glUseProgram(shaderProgramId);
-    _usedShaderProgram = shaderProgramId;
-#ifdef DEBUG
-    GLint linked;
-    glGetProgramiv(shaderProgramId, GL_LINK_STATUS, &linked);
-    assert(linked == GL_TRUE);
-#endif
-  }
-
-
-  Object* object     = reg->getComponent<Object>(entity.getId());
-  const Model* model = WestData::WestAssetFacade::getAssetFacade().requestModelFromScene(object->guid);
-  assert(object != nullptr && model != nullptr);
-  if (!Config::PAUSE)
-  {
-    updateUniforms(entity, object, model);
-  }
-  for (openGLHandle handle : object->handles)
-  {
-    glBindVertexArray(handle.meshId);
-#ifdef DEBUG
-    if (entity.isDebugEntity())
-    {
-      glDisable(GL_DEPTH_TEST);
-      glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, 0);
-      glEnable(GL_DEPTH_TEST);
-    }
-    else
-    {
-      glDrawElements(GL_TRIANGLES, handle.verticeSize, GL_UNSIGNED_INT, 0);
-    }
-#else
-    glDrawElements(GL_TRIANGLES, model->vertexCount, GL_UNSIGNED_INT, 0);
-#endif
-  }
-}
-
-
-void RenderManager::renderWorld()
-{
-  glEnable(GL_DEPTH_TEST);
-
-  std::shared_ptr<World> world = _scene->getWorld();
-  if (world == nullptr)
-  {
-    logFailure(std::format("{} ### No World found, something went horribly wrong", getName()));
-    return;
-  }
-
-  std::shared_ptr<ComponentRegistry> reg = _scene->getRegistry();
-  Shader* s                              = reg->getComponent<Shader>(world->getId());
-  if (s == nullptr || !s->initialized)
-  {
-#ifdef DEBUG
-    logCycle(std::format("{} ### World shader not yet initialized, skipping world render.\n", getName()));
-#endif
-    return;
-  }
-
-  GLuint shaderProgramId = s->programId;
-  glUseProgram(shaderProgramId);
-
- 
-  //const Model* model = WestData::WestAssetFacade::getAssetFacade().requestModelFromScene(obj->guid);
-  /*if (obj != nullptr && obj->diffuseColorUniform > -1)
-  {
-    //UniformUtils::setUniform(obj->diffuseColorUniform, model->getMeshes().front().diffuseColor);
-  }*/
-
-  if (model == nullptr)
-  {
-#ifdef DEBUG
-    logFailure(std::format("{} ### World model is null, skipping world render.\n", getName()));
-#endif
-    return;
-  }
-
-#ifdef DEBUG
-  std::uint8_t cycle = getLogger()->getCycleLength();
-  if (cycle == 0)
-  {
-    logCycle(std::format("{} ### Rendering world. VAO: {}, vertices: {}.\n",
-                         getName(),
-                         model->getGuid(),
-                         model->getMeshes().front().vertices.size()));
-  }
-#endif
-
-  if (world->isDirty())
-  {
-    std::vector<std::uint32_t> flags = world->getFlagData();
-    std::int32_t dimension           = world->getGridSize();
-    glm::vec2 origin                 = world->getOrigin();
-    //UniformUtils::setUniform(world->getFlagUniform(), flags);
-    //UniformUtils::setUniform(world->getGridUniform(), dimension);
-    //UniformUtils::setUniform(world->getGridOriginUniform(), origin);
-    world->resetDirty();
-  }
-
-
-  // glBindVertexArray(obj.modelHandle);
-  // glDrawElements(GL_TRIANGLES, model->vertexCount, GL_UNSIGNED_INT, 0);
-  glUseProgram(_usedShaderProgram);
-}
-
-void RenderManager::renderUserInterfaces()
-{
-  assert(Config::interfaceShaderProgram != -1);
-  std::vector<ComponentData*> renderData = _facade->getRenderData();
-  if (renderData.size() == 0)
-  {
-    logFailure(std::format("{} ### No render data for interfaces gathered skipping rendering\n", getName()));
-    return;
-  }
-
-  // TODO: 4 vectors recreated per frame, use GL_STREAM_DRAW or persistent mapped buffers
-  const size_t dataSize = renderData.size();
-  std::vector<float> instanceOffsets;
-  std::vector<float> colors;
-  std::vector<float> textCoords;
-  std::vector<std::uint32_t> flags;
-
-  instanceOffsets.reserve(dataSize * 4);
-  colors.reserve(dataSize * 4);
-  textCoords.reserve(dataSize * 4);
-  flags.reserve(dataSize);
-
-  GLuint texture = 0;
-  for (ComponentData* cd : renderData)
-  {
-    instanceOffsets.emplace_back(cd->vertices[0]);
-    instanceOffsets.emplace_back(cd->vertices[1]);
-    instanceOffsets.emplace_back(cd->stretchX);
-    instanceOffsets.emplace_back(cd->stretchY);
-
-    colors.emplace_back(cd->colorR);
-    colors.emplace_back(cd->colorG);
-    colors.emplace_back(cd->colorB);
-    colors.emplace_back(cd->colorA);
-
-    flags.emplace_back(cd->flags);
-
-    textCoords.emplace_back(cd->textureCoords[0]);
-    textCoords.emplace_back(cd->textureCoords[1]);
-    textCoords.emplace_back(cd->textureCoords[2]);
-    textCoords.emplace_back(cd->textureCoords[3]);
-
-    if (cd->texture > 0)
-    {
-      texture = cd->texture;
-    }
-  }
-
-  if (instanceOffsets.size() <= 0)
-  {
-    logFailure(std::format("{} ### No instance data for interfaces gathered skipping rendering\n", getName()));
-    return;
-  }
-
-#ifdef DEBUG
-  std::uint8_t cycle = getLogger()->getCycleLength();
-  if (cycle == 0)
-  {
-    logCycle(std::format("{} ### Rendering Interfaces ...\n", getName()));
-  }
-#endif
-
-  glUseProgram(Config::interfaceShaderProgram);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glEnable(GL_BLEND);
-  glDisable(GL_DEPTH_TEST);
-  glBindVertexArray(_facade->_interfaceVAO);
-
-  glBindBuffer(GL_ARRAY_BUFFER, _facade->_interfaceCOL);
-  glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_DYNAMIC_DRAW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, _facade->_interfaceOFFSET);
-  glBufferData(GL_ARRAY_BUFFER, instanceOffsets.size() * sizeof(float), instanceOffsets.data(), GL_DYNAMIC_DRAW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, _facade->_interfaceFLAGS);
-  glBufferData(GL_ARRAY_BUFFER, flags.size() * sizeof(std::uint32_t), flags.data(), GL_DYNAMIC_DRAW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, _facade->_interfaceUV);
-  glBufferData(GL_ARRAY_BUFFER, textCoords.size() * sizeof(float), textCoords.data(), GL_DYNAMIC_DRAW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-  glActiveTexture(GL_TEXTURE0);
-  //UniformUtils::setUniform(Config::interfaceFontTextureUniform, 0);
-  glBindTexture(GL_TEXTURE_2D, _facade->_interfaceFONT_TEXTURE_ID);
-
-  glActiveTexture(GL_TEXTURE1);
-  //UniformUtils::setUniform(Config::interfaceTextureOneUniform, 1);
-  glBindTexture(GL_TEXTURE_2D, texture);
-
-  glm::mat4 ortho = glm::ortho(0.0f, (float)Config::GeneralConfig.WIDTH, 0.0f, (float)Config::GeneralConfig.HEIGHT);
-  //UniformUtils::setUniform(Config::interfaceOrthoUniform, ortho);
-  glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, renderData.size());
-  glDisable(GL_BLEND);
-  glUseProgram(_usedShaderProgram);
-}
-
-
-bool RenderManager::AABBcheck(const Entity& e)
-{
-  const Frustum& f                       = _scene->getCamera()->getFrustum();
-  std::shared_ptr<ComponentRegistry> reg = _scene->getRegistry();
-  Position* p                            = reg->getComponent<Position>(e.getId());
-  AABB* aabb                             = reg->getComponent<AABB>(e.getId());
-  assert(p != nullptr && aabb != nullptr);
-  glm::vec3 min = aabb->min * p->scale + p->position;
-  glm::vec3 max = aabb->max * p->scale + p->position;
-  return f.near.getSignedDistance(glm::vec3(f.near.normal.x > 0 ? max.x : min.x,
-                                            f.near.normal.y > 0 ? max.y : min.y,
-                                            f.near.normal.z > 0 ? max.z : min.z))
-           >= 0
-         && f.bottom.getSignedDistance(glm::vec3(f.bottom.normal.x > 0 ? max.x : min.x,
-                                                 f.bottom.normal.y > 0 ? max.y : min.y,
-                                                 f.bottom.normal.z > 0 ? max.z : min.z))
-              >= 0
-         && f.far.getSignedDistance(glm::vec3(f.far.normal.x > 0 ? max.x : min.x,
-                                              f.far.normal.y > 0 ? max.y : min.y,
-                                              f.far.normal.z > 0 ? max.z : min.z))
-              >= 0
-         && f.left.getSignedDistance(glm::vec3(f.left.normal.x > 0 ? max.x : min.x,
-                                               f.left.normal.y > 0 ? max.y : min.y,
-                                               f.left.normal.z > 0 ? max.z : min.z))
-              >= 0
-         && f.right.getSignedDistance(glm::vec3(f.right.normal.x > 0 ? max.x : min.x,
-                                                f.right.normal.y > 0 ? max.y : min.y,
-                                                f.right.normal.z > 0 ? max.z : min.z))
-              >= 0
-         && f.top.getSignedDistance(glm::vec3(f.top.normal.x > 0 ? max.x : min.x,
-                                              f.top.normal.y > 0 ? max.y : min.y,
-                                              f.top.normal.z > 0 ? max.z : min.z))
-              >= 0;
 }

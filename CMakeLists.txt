@@ -13,6 +13,7 @@ option(BUILD_UTILS "Build Utility Modul" OFF)
 option(BUILD_UI "Build User Interface Module" OFF)
 option(BUILD_DATA "Build data pipeline" OFF)
 option(BUILD_TESTS "Build Unit Tests" OFF)
+option(BUILD_RENDERER "Build Renderer" OFF)
 
 if(BUILD_UTILS) 
   add_subdirectory(WestUtils/)
@@ -24,6 +25,10 @@ endif()
 
 if(BUILD_DATA)
   add_subdirectory(WestData/)
+endif()
+
+if(BUILD_RENDERER) 
+  add_subdirectory(WestRenderer/)
 endif()
 
 if(BUILD_CORE)

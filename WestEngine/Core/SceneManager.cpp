@@ -140,7 +140,9 @@ void SceneManager::removeEntityFromScene(const Entity& entity)
 #endif
 
   if (!entity.isDebugEntity())
-  {}
+  {
+    _dataFacade->deleteModelFromScene(entity.getGuid());
+  }
   _registry->removeAllComponents(entity.getId());
   _scene->removeEntity(entity);
 }

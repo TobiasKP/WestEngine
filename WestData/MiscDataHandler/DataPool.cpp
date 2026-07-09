@@ -37,3 +37,10 @@ bool DataPool::deleteModelFromScene(const std::string& guid)
 {
   return true;
 };
+
+/*
+  std::array<Model, Limit::projectilePoolsize> _projectiles;
+  std::array<Model, Limit::cachesize> _sceneModels;
+  std::unordered_map<std::string, std::uint32_t> _guidToIndex;
+  std::unordered_map<std::string, std::string> _nameToGuid;
+*/

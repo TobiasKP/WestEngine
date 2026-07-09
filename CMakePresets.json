@@ -29,7 +29,8 @@
         "BUILD_CORE": "ON",
         "BUILD_UI": "ON",
         "BUILD_UTILS": "ON",
-        "BUILD_DATA": "ON"
+        "BUILD_DATA": "ON",
+        "BUILD_RENDERER": "ON"
       },
       "condition": {
         "type": "equals",
@@ -50,6 +51,7 @@
         "BUILD_UI": "ON",
         "BUILD_UTILS": "ON",
         "BUILD_DATA": "ON",
+        "BUILD_RENDERER": "ON",
         "CMAKE_CXX_FLAGS": "-Wpedantic"
       },
       "condition": {
@@ -137,7 +139,8 @@
         "CMAKE_BUILD_TYPE": "Release",
         "BUILD_CORE": "ON",
         "BUILD_UI": "ON",
-        "BUILD_DATA": "ON"
+        "BUILD_DATA": "ON",
+        "BUILD_RENDERER": "ON"
       }
     },
     {
@@ -151,6 +154,7 @@
         "BUILD_CORE": "ON",
         "BUILD_UI": "ON",
         "BUILD_DATA": "ON",
+        "BUILD_RENDERER": "ON",
         "CMAKE_CXX_FLAGS": "-Wpedantic"
       }
     },
@@ -215,7 +219,8 @@
       "cacheVariables": {
         "BUILD_CORE": "ON",
         "BUILD_UI": "ON",
-        "BUILD_DATA": "ON"
+        "BUILD_DATA": "ON",
+        "BUILD_RENDERER": "ON"
       }
     },
     {
@@ -229,6 +234,7 @@
         "BUILD_CORE": "ON",
         "BUILD_UI": "ON",
         "BUILD_DATA": "ON",
+        "BUILD_RENDERER": "ON",
         "CMAKE_CXX_FLAGS": "/W3 /Zi"
       }
     },

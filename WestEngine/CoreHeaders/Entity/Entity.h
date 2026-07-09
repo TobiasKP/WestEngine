@@ -23,6 +23,11 @@ public:
     return _id;
   }
 
+  inline std::string getGuid() const
+  {
+    return _guid;
+  }
+
   inline bool isDestroyed() const
   {
     return _destroyed;
@@ -59,6 +64,11 @@ public:
     _name = name;
   }
 
+  inline void setGuid(std::string guid)
+  {
+    _guid = guid;
+  }
+
   inline bool isActiveUnit()
   {
     return _activeUnit;
@@ -85,5 +95,5 @@ private:
 
   std::uint32_t _id = 0;
   bool _destroyed, _debugEntity, _activeUnit;
-  std::string _name;
+  std::string _name, _guid;
 };

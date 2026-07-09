@@ -15,8 +15,7 @@ void ComponentFactory::createComponent(lua_State* L, std::string& name, Entity& 
   {
     std::string file        = lua_tostring(L, 2);
     const std::string& guid = WestData::WestAssetFacade::getAssetFacade().addModelToScene(file);
-    const Model* m          = WestData::WestAssetFacade::getAssetFacade().requestModelFromScene(guid);
-    //_registry->addComponent<AABB>(e.getId(), std::move(*aabb));
+    e.setGuid(guid); 
   }
   else if (Components::POSITION.compare(name) == 0)
   {
