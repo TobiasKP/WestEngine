@@ -71,8 +71,7 @@ std::int32_t SceneManager::init()
 {
 #ifdef DEBUG
   double start = TimeUtils::getCurrentTimeAsTime();
-#endif
-  _registry->registerComponent<Shader>();
+#endif 
   _registry->registerComponent<Movement>();
   _registry->registerComponent<Position>();
   _registry->registerComponent<AABB>();
@@ -141,7 +140,7 @@ void SceneManager::removeEntityFromScene(const Entity& entity)
 
   if (!entity.isDebugEntity())
   {
-    _dataFacade->deleteModelFromScene(entity.getGuid());
+    _dataFacade->deleteModelFromScene(entity.getModelGuid());
   }
   _registry->removeAllComponents(entity.getId());
   _scene->removeEntity(entity);
