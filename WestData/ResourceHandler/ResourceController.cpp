@@ -4,7 +4,7 @@ ResourceController::ResourceController(WestLogger* l)
 {
   _logger  = l;
   _builder = std::make_unique<ModelBuilder>(l);
-  _pool    = std::make_unique<DataPool>();
+  _pool    = std::make_unique<DataPool>(l);
 }
 
 ResourceController::~ResourceController() {}

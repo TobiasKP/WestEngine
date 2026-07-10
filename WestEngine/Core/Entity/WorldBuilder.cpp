@@ -20,7 +20,6 @@ int WorldBuilder::loadWorld(lua_State* L)
   std::int32_t n   = lua_gettop(L);
   WorldBuilder* me = (WorldBuilder*)lua_touserdata(L, lua_upvalueindex(1));
   assert(me != nullptr);
-
   std::shared_ptr<World> w = std::make_shared<World>();
   w->setId(Config::incEntityId());
   me->createWorld(*w, L);

@@ -1,6 +1,6 @@
 name: "cube"
 model: "Cube.obj"
-shader: { v: "Vertex.vs", f: "Fragment.fs" , group: 0 }
+shader: { v: "Vertex.vs", f: "Fragment.fs" }
 playercontrol: true
 activeUnit: true
 components: 

@@ -14,6 +14,7 @@ public:
 private:
   std::shared_ptr<ComponentRegistry> _registry;
 
+  void addModel(lua_State* L, Entity& e);
   void addPosition(lua_State* L, Entity& e);
   void addMovement(lua_State* L, Entity& e);
   void addShader(lua_State* L, Entity& e);

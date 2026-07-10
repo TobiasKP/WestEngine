@@ -29,9 +29,8 @@ void PositionalSystem::update()
   }
   std::shared_ptr<ComponentArray<Position>> pos = _reg->getComponentArray<Position>();
   std::uint32_t id                              = _world->getEntityByIdx(_tileIdx);
-  Object* o;
 
-  // TODO: Bug -> if emissiveColor is ever used this will overwrite it
+  /* TODO: Bug -> if emissiveColor is ever used this will overwrite it
   if (_lastEntity != -1 && _lastEntity != id)
   {
     o = _reg->getComponent<Object>(_lastEntity);
@@ -60,7 +59,7 @@ void PositionalSystem::update()
 
     _lastEntity  = id;
     _highlighted = true;
-  }
+  }*/
 };
 
 void PositionalSystem::updateDebuggingInfo() {};

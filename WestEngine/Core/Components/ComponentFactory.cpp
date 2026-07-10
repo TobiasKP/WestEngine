@@ -5,6 +5,7 @@
 
 #include <format>
 #include <WestAssetFacade.hpp>
+#include <WestRendererFacade.hpp>
 
 void ComponentFactory::createComponent(lua_State* L, std::string& name, Entity& e)
 {
@@ -13,9 +14,7 @@ void ComponentFactory::createComponent(lua_State* L, std::string& name, Entity& 
 #endif
   if (Components::MMA_COMBINATION.compare(name) == 0)
   {
-    std::string file        = lua_tostring(L, 2);
-    const std::string& guid = WestData::WestAssetFacade::getAssetFacade().addModelToScene(file);
-    e.setGuid(guid); 
+    addModel(L, e);
   }
   else if (Components::POSITION.compare(name) == 0)
   {
@@ -167,15 +166,18 @@ void ComponentFactory::addMovement(lua_State* L, Entity& e)
 
 void ComponentFactory::addShader(lua_State* L, Entity& e)
 {
-  Shader s = {};
   lua_getfield(L, 2, "v");
-  s.vertexShaderFile = std::format("/shader/{}", lua_tostring(L, -1));
+  std::string vertexShaderFile = std::format("/shader/{}", lua_tostring(L, -1));
   lua_pop(L, 1);
   lua_getfield(L, 2, "f");
-  s.fragShaderFile = std::format("/shader/{}", lua_tostring(L, -1));
+  std::string fragShaderFile = std::format("/shader/{}", lua_tostring(L, -1));
   lua_pop(L, 1);
-  lua_getfield(L, 2, "group");
-  s.shadergroup = lua_tointeger(L, -1);
-  lua_pop(L, 1);
-  _registry->addComponent<Shader>(e.getId(), std::move(s));
+  e.setShaderId(WestRendererFacade::getRendererFacade().registerShader(vertexShaderFile, fragShaderFile));
 };
+
+void ComponentFactory::addModel(lua_State* L, Entity& e)
+{
+  std::string file        = lua_tostring(L, 2);
+  const std::string& guid = WestData::WestAssetFacade::getAssetFacade().addModelToScene(file);
+  e.setModelGuid(guid);
+}

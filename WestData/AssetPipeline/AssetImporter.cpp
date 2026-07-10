@@ -85,7 +85,7 @@ Mesh AssetImporter::processMesh(aiMesh* mesh, const aiScene* scene, const std::s
   std::vector<Vertex> vertices       = processVertices(mesh);
   std::vector<std::uint32_t> indices = processIndices(mesh);
   std::vector<Texture> textures      = processTextures(mesh, scene);
-  return Mesh(std::format("{}_{}", guid, count), vertices, indices, textures);
+  return Mesh(std::format("{}_{}", guid, count), vertices, indices, textures, AABB());
 }
 
 std::vector<Vertex> AssetImporter::processVertices(aiMesh* mesh)

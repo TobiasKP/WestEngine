@@ -80,6 +80,8 @@ std::optional<Model> BinaryLoader::convertToModel(std::ifstream& is, const std::
 
   while (true)
   {
+    glm::vec3 aabbMin(FLT_MAX);
+    glm::vec3 aabbMax(-FLT_MAX);
     is.seekg(MagicNumbers::MESH.size() + MagicNumbers::VERTICE.size(), std::ios::cur);
     size_t verticeSize = 0;
     is.read(reinterpret_cast<char*>(&verticeSize), sizeof(size_t));
@@ -91,6 +93,11 @@ std::optional<Model> BinaryLoader::convertToModel(std::ifstream& is, const std::
     is.seekg(MagicNumbers::DELIMITER.size(), std::ios::cur);
     std::vector<Vertex> vertices(verticeSize);
     is.read(reinterpret_cast<char*>(vertices.data()), verticeSize * sizeof(Vertex));
+    for (const Vertex& v : vertices)
+    {
+      aabbMin = glm::min(aabbMin, v.Position);
+      aabbMax = glm::max(aabbMax, v.Position);
+    }
 
 #ifdef DEBUG
     char* buffer = new char[MagicNumbers::INDICE.size()];
@@ -165,7 +172,7 @@ std::optional<Model> BinaryLoader::convertToModel(std::ifstream& is, const std::
       }
     }
 
-    m.addMesh(Mesh(std::format("{}_{}", guid, count), vertices, indices, textures));
+    m.addMesh(Mesh(std::format("{}_{}", guid, count), vertices, indices, textures, AABB(aabbMin, aabbMax)));
     if (is.peek() == EOF)
     {
       break;

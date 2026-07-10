@@ -1,8 +1,6 @@
-#include "AABB.hpp"
 #include "Control.hpp"
 #include "Health.hpp"
 #include "Movement.hpp"
 #include "Position.h"
-#include "Shader.h"
 #include "Projectile.hpp"
 #include "Equipment.hpp"
