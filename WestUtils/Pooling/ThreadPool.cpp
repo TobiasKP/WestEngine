@@ -2,9 +2,8 @@
 
 ThreadPool::ThreadPool()
 {
-  _logger->log(Level::Info, "--- Creating worker threads for engine\n");
-
   std::size_t numThreads = getDefaultThreadCount();
+  _logger->log(Level::Info, std::format("--- Creating {} worker threads for engine\n", numThreads));
   for (size_t i = 0; i < numThreads; ++i)
   {
     _threads.emplace_back(

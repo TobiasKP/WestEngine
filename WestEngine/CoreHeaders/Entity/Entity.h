@@ -11,9 +11,7 @@ public:
 
   // Copy constructor and assignment
   Entity(const Entity& other);
-  Entity& operator=(const Entity& other);
-
-  // Move constructor and assignment
+  Entity& operator=(const Entity& other);  // Move constructor and assignment
   Entity(Entity&& other) noexcept;
   Entity& operator=(Entity&& other) noexcept;
 
@@ -21,6 +19,11 @@ public:
   inline std::uint32_t getId() const
   {
     return _id;
+  }
+
+  inline std::string getModelGuid() const
+  {
+    return _modelGuid;
   }
 
   inline bool isDestroyed() const
@@ -36,6 +39,11 @@ public:
   inline std::string getName() const
   {
     return _name;
+  }
+
+  inline std::uint32_t getShaderId() const
+  {
+    return _shaderId;
   }
 
   // Setter
@@ -59,6 +67,16 @@ public:
     _name = name;
   }
 
+  inline void setShaderId(std::uint32_t id)
+  {
+    _shaderId = id;
+  }
+
+  inline void setModelGuid(std::string guid)
+  {
+    _modelGuid = guid;
+  }
+
   inline bool isActiveUnit()
   {
     return _activeUnit;
@@ -67,6 +85,16 @@ public:
   inline void toggleActivate(bool active)
   {
     _activeUnit = active;
+  }
+
+  inline bool isInitialized()
+  {
+    return _initialized;
+  }
+
+  inline void initialize()
+  {
+    _initialized = true;
   }
 
   // Overrides
@@ -83,7 +111,7 @@ public:
 private:
   static PoolAllocator* _allocator;
 
-  std::uint32_t _id = 0;
-  bool _destroyed, _debugEntity, _activeUnit;
-  std::string _name;
+  std::uint32_t _id = 0, _shaderId;
+  bool _destroyed, _debugEntity, _activeUnit, _initialized;
+  std::string _name, _modelGuid;
 };

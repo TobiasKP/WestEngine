@@ -1,6 +1,6 @@
 name: "EnemyCube"
 model: "Cube.obj"
-shader: { v: "Vertex.vs", f: "Fragment.fs" , group: 0 }
+shader: { v: "Vertex.vs", f: "Fragment.fs" }
 activeUnit: true
 components: 
   - { name: "position", x: -1.5, y: 0, z: -1.5 }

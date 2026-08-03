@@ -6,6 +6,9 @@
 #include <GLFW/glfw3.h>
 #include <PathUtils.h>
 #include <stb_image.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+
 using namespace WestInterface;
 
 WestInterfaceFacade& WestInterfaceFacade::getInterfaceInstance()

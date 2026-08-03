@@ -31,7 +31,6 @@ void TextRenderManager::calculateGlyphCoordinates(char character, GlyphData& gly
   std::int32_t charIndex = static_cast<std::int32_t>(character);
   std::int32_t col       = charIndex % COLUMNS;
   std::int32_t row       = charIndex / ROWS - 1;
-
   // Normalize texture coordinates
   float left   = static_cast<float>(col * CHAR_W) / BITMAP_WIDTH;
   float right  = static_cast<float>((col + 1) * CHAR_W) / BITMAP_WIDTH;
@@ -129,7 +128,8 @@ std::array<float, 4> TextRenderManager::getTextureCoordinatesForChar(char charac
 {
   const std::unordered_map<char, TextRenderManager::GlyphData>& res = TextRenderManager::getGlyphCache();
 
-  assert(character >= 32 && character <= 126 && res.size() > 0);
+  assert(character >= 32 && character <= 126);
+  assert(res.size() > 0);
 
   auto it = res.find(character);
   if (it != res.end())

@@ -15,6 +15,10 @@ UserInterface/build/
 compile_commands.json
 .luarc.json
 
+# JetBrains IDE files
+.idea/
+*.iml
+
 # Claude Code files and directories
 .claude/
 CLAUDE.md

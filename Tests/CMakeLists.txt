@@ -17,6 +17,10 @@ if(NOT TARGET WestUtils)
   add_subdirectory(${CMAKE_SOURCE_DIR}/WestUtils ${CMAKE_BINARY_DIR}/WestUtils)
 endif()
 
+if(NOT TARGET WestData)
+  add_subdirectory(${CMAKE_SOURCE_DIR}/WestData ${CMAKE_BINARY_DIR}/WestData)
+endif()
+
 # ─────────────────────────────────────────────────────────────
 # Engine source files needed for Tier 2 tests
 # ─────────────────────────────────────────────────────────────
@@ -41,6 +45,8 @@ set(TEST_SOURCES
     unit/ComponentArrayTest.cpp
     unit/ThreadSafeQueueTest.cpp
     unit/ECSStressTest.cpp
+    unit/DataPoolTest.cpp
+    unit/ModelTest.cpp
 )
 
 # ─────────────────────────────────────────────────────────────
@@ -53,6 +59,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/WestEngine/Core
     ${CMAKE_SOURCE_DIR}/WestEngine/Constants
     ${CMAKE_SOURCE_DIR}/WestEngine
+    ${CMAKE_SOURCE_DIR}/WestData
     ${LUA_INCLUDE_DIR}
 )
 
@@ -60,6 +67,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     GTest::gtest
     GTest::gtest_main
     WestUtils
+    WestData
     glm::glm
 )
 

@@ -7,6 +7,7 @@
 
 #include <map>
 #include <WestInterfaceFacade.h>
+#include <WestRendererFacade.hpp>
 
 class ShaderManager : public IManager
 {
@@ -30,23 +31,12 @@ private:
   std::int32_t _lastEntityCount;
   std::shared_ptr<Scene> _scene;
   WestInterface::WestInterfaceFacade* _facade;
+  WestRenderer::WestRendererFacade* _rendererFacade;
 
   GLuint initInterfaceShader();
   void initWorldShader();
-  void initEntityShader(const Entity& entity);
-  GLuint initShader(Shader* s, const Entity& entity);
-  GLuint createShader(const std::string shaderFile, std::int32_t shaderTyp, GLuint programId);
-  GLchar* readShaderSource(const std::string shaderFile);
-  void link(GLuint programId, GLuint vertexId, GLuint fragmentId);
+  void initEntityShader(Entity& entity);
 
   // Functions
-  GLuint createVertexShader(const std::string file, GLuint programId)
-  {
-    return createShader(file, GL_VERTEX_SHADER, programId);
-  }
-  GLuint createFragmentShader(const std::string file, GLuint programId)
-  {
-    return createShader(file, GL_FRAGMENT_SHADER, programId);
-  }
   void addUniforms(GLuint programId, const Entity& entity);
 };

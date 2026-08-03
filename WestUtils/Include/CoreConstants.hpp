@@ -14,7 +14,8 @@ inline constexpr char AVAILABLE_INPUTS_FILE_NAME[] = "/engine/AvailableInputComm
 inline constexpr char DEBUG_V_SHADER[]             = "/shader/Debug/DebugVShader.vs";
 inline constexpr char DEBUG_F_SHADER[]             = "/shader/Debug/DebugFShader.fs";
 inline constexpr std::string_view LUA_INIT_FILE    = "/lua/Core/Main.lua";
-inline constexpr char LUA_API_FILE[]               = "/lua/Core/WestAPI.lua";
+inline constexpr std::string_view LUA_API_FILE     = "/lua/Core/WestAPI.lua";
+inline constexpr std::string_view ASSET_PATH       = "/assets/Models/";
 
 inline constexpr std::uint8_t MAX_Q_SIZE         = 7;
 inline constexpr std::uint16_t MAX_ENTITY_SIZE   = 1024;

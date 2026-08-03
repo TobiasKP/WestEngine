@@ -271,12 +271,12 @@ std::int32_t EngineManager::executeCycle(CYCLE code, IManager& item)
 std::int32_t EngineManager::initializeSettings()
 {
 #ifdef DEBUG
-  logDebug(std::format("{} ### Initialized Settings from saved Configuration file.", getName()));
+  logDebug(std::format("{} ### Initialized Settings from saved Configuration file.\n", getName()));
 #endif
   std::int32_t success = 0;
 
 #ifdef DEBUG
-  logDebug(std::format("{} ### Executable dir: {}", getName(), PathUtils::getExecutableDir()));
+  logDebug(std::format("{} ### Executable dir: {}\n", getName(), PathUtils::getExecutableDir()));
 #endif
 
   Config::GeneralConfig.SETTINGS = PathUtils::openFile(CoreConstants::SETTING_FILE_NAME, true);

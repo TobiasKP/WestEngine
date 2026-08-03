@@ -27,10 +27,12 @@ public:
   void deleteScene();
 
   // Getter
-  const std::vector<Entity>& getEntities() const;
+  std::vector<Entity>& getEntities();
+
 #ifdef DEBUG
-  const std::vector<Entity>& getDebugEntities() const;
+  std::vector<Entity>& getDebugEntities();
 #endif
+
   // TODO: register ID in hashmap saving index in vector to have faster access if a specific Entity is searched
   Entity* getEntityById(std::uint32_t id);
 
@@ -43,10 +45,12 @@ public:
   {
     return _world;
   }
+
   inline std::shared_ptr<ComponentRegistry> getRegistry()
   {
     return _registry;
   }
+
   inline std::shared_ptr<Camera> getCamera()
   {
     return _camera;

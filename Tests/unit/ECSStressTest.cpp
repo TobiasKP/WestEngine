@@ -25,10 +25,10 @@ public:
 // ─── ECS Stress Test ──────────────────────────────────────────
 //
 // Simulates a game tick for 200 entities:
-//   - ComponentRegistry lookups (Position, Movement, Material)
+//   - ComponentRegistry lookups (Position, Movement, Appearance)
 //   - World tile queries (calculateIndex, getReachableTiles)
 //   - Position mutation (movement lerp)
-//   - Material mutation (emissive highlight)
+//   - Appearance mutation (emissive highlight)
 //   - World flag operations (setFlag, clearFlag)
 //   - Combat: 20 entities fire projectiles, hit resolution, damage
 //   - Entity destruction for killed targets
@@ -57,7 +57,7 @@ protected:
 
     registry.registerComponent<Position>();
     registry.registerComponent<Movement>();
-    registry.registerComponent<Material>();
+    registry.registerComponent<Appearance>();
     registry.registerComponent<Control>();
     registry.registerComponent<Health>();
     registry.registerComponent<Equipment>();
@@ -78,10 +78,8 @@ protected:
       mov.a     = algorithm::MANHATTAN;
       registry.addComponent<Movement>(i, std::move(mov));
 
-      Material mat;
-      mat.diffuseColor  = glm::vec3(0.8f);
-      mat.emissiveColor = glm::vec3(0.0f);
-      registry.addComponent<Material>(i, std::move(mat));
+      Appearance app;
+      registry.addComponent<Appearance>(i, std::move(app));
 
       Health h;
       h.max     = 100;
@@ -239,8 +237,6 @@ TEST_F(ECSStressTest, FullSystemsTickUnder8ms)
 
     if (tgtPos != nullptr)
     {
-      glm::vec3 dir = tgtPos->position - projPos->position;
-      float len2    = glm::dot(dir, dir);
       // Simulate instant arrival for stress test
       projPos->position = tgtPos->position;
 
@@ -267,7 +263,7 @@ TEST_F(ECSStressTest, FullSystemsTickUnder8ms)
     registry.removeAllComponents(id);
   }
 
-  // --- PositionalSystem-like pass ---
+  // --- PositionalSystem-like pass (hover highlight via Appearance) ---
   posArr = registry.getComponentArray<Position>();
   for (size_t i = 0; i < posArr->getSize(); i++)
   {
@@ -278,10 +274,10 @@ TEST_F(ECSStressTest, FullSystemsTickUnder8ms)
     std::uint32_t tileId = world.getEntityByIdx(idx);
     if (tileId > 0)
     {
-      Material* mat = registry.getComponent<Material>(tileId);
-      if (mat != nullptr)
+      Appearance* app = registry.getComponent<Appearance>(tileId);
+      if (app != nullptr)
       {
-        mat->emissiveColor = glm::vec3(0.0f, 0.5f, 0.5f);
+        app->emissiveOverride = glm::vec3(0.0f, 0.5f, 0.5f);
       }
     }
   }
@@ -321,14 +317,14 @@ TEST_F(ECSStressTest, ComponentLookupScalability)
   {
     for (std::uint32_t id = 1; id <= ENTITY_COUNT; id++)
     {
-      volatile Position* p   = registry.getComponent<Position>(id);
-      volatile Movement* m   = registry.getComponent<Movement>(id);
-      volatile Material* mt  = registry.getComponent<Material>(id);
-      volatile Health* h     = registry.getComponent<Health>(id);
-      volatile Equipment* eq = registry.getComponent<Equipment>(id);
+      volatile Position* p    = registry.getComponent<Position>(id);
+      volatile Movement* m    = registry.getComponent<Movement>(id);
+      volatile Appearance* ap = registry.getComponent<Appearance>(id);
+      volatile Health* h      = registry.getComponent<Health>(id);
+      volatile Equipment* eq  = registry.getComponent<Equipment>(id);
       (void)p;
       (void)m;
-      (void)mt;
+      (void)ap;
       (void)h;
       (void)eq;
     }
@@ -408,7 +404,7 @@ TEST_F(ECSStressTest, MassCombatRemovalStability)
   EXPECT_EQ(registry.getComponent<Position>(target), nullptr);
   EXPECT_EQ(registry.getComponent<Health>(target), nullptr);
   EXPECT_EQ(registry.getComponent<Equipment>(target), nullptr);
-  EXPECT_EQ(registry.getComponent<Material>(target), nullptr);
+  EXPECT_EQ(registry.getComponent<Appearance>(target), nullptr);
   EXPECT_EQ(registry.getComponent<Movement>(target), nullptr);
 
   // Verify other entities still intact

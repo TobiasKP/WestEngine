@@ -28,7 +28,9 @@
         "CMAKE_BUILD_TYPE": "Release",
         "BUILD_CORE": "ON",
         "BUILD_UI": "ON",
-        "BUILD_UTILS": "ON"
+        "BUILD_UTILS": "ON",
+        "BUILD_DATA": "ON",
+        "BUILD_RENDERER": "ON"
       },
       "condition": {
         "type": "equals",
@@ -48,6 +50,27 @@
         "BUILD_CORE": "ON",
         "BUILD_UI": "ON",
         "BUILD_UTILS": "ON",
+        "BUILD_DATA": "ON",
+        "BUILD_RENDERER": "ON",
+        "CMAKE_CXX_FLAGS": "-Wpedantic"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "linux-debug-data",
+      "inherits": "base",
+      "generator": "Unix Makefiles",
+      "description": "Linux Debug Build WestData only",
+      "binaryDir": "${sourceDir}/build/linux-debug-data",
+      "hidden": false,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_UTILS": "ON",
+        "BUILD_DATA": "ON",
         "CMAKE_CXX_FLAGS": "-Wpedantic"
       },
       "condition": {
@@ -115,7 +138,9 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "BUILD_CORE": "ON",
-        "BUILD_UI": "ON"
+        "BUILD_UI": "ON",
+        "BUILD_DATA": "ON",
+        "BUILD_RENDERER": "ON"
       }
     },
     {
@@ -128,6 +153,20 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "BUILD_CORE": "ON",
         "BUILD_UI": "ON",
+        "BUILD_DATA": "ON",
+        "BUILD_RENDERER": "ON",
+        "CMAKE_CXX_FLAGS": "-Wpedantic"
+      }
+    },
+    {
+      "name": "macos-debug-data",
+      "inherits": "macos-base",
+      "description": "macOS Debug Build WestData only",
+      "binaryDir": "${sourceDir}/build/macos-debug-data",
+      "hidden": false,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_DATA": "ON",
         "CMAKE_CXX_FLAGS": "-Wpedantic"
       }
     },
@@ -179,7 +218,9 @@
       "hidden": false,
       "cacheVariables": {
         "BUILD_CORE": "ON",
-        "BUILD_UI": "ON"
+        "BUILD_UI": "ON",
+        "BUILD_DATA": "ON",
+        "BUILD_RENDERER": "ON"
       }
     },
     {
@@ -192,6 +233,20 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "BUILD_CORE": "ON",
         "BUILD_UI": "ON",
+        "BUILD_DATA": "ON",
+        "BUILD_RENDERER": "ON",
+        "CMAKE_CXX_FLAGS": "/W3 /Zi"
+      }
+    },
+    {
+      "name": "windows-debug-data",
+      "inherits": "windows-base",
+      "description": "Windows Debug Build WestData only",
+      "binaryDir": "${sourceDir}/build/windows-debug-data",
+      "hidden": false,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_DATA": "ON",
         "CMAKE_CXX_FLAGS": "/W3 /Zi"
       }
     },
@@ -331,6 +386,28 @@
       "name": "windows-release",
       "configurePreset": "windows-release",
       "configuration": "Release",
+      "cleanFirst": true
+    },
+    {
+      "name": "linux-debug-data",
+      "configurePreset": "linux-debug-data",
+      "cleanFirst": true,
+      "environment": {
+        "VERBOSE": "1"
+      }
+    },
+    {
+      "name": "macos-debug-data",
+      "configurePreset": "macos-debug-data",
+      "cleanFirst": true,
+      "environment": {
+        "VERBOSE": "1"
+      }
+    },
+    {
+      "name": "windows-debug-data",
+      "configurePreset": "windows-debug-data",
+      "configuration": "Debug",
       "cleanFirst": true
     },
     {

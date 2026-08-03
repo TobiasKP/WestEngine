@@ -4,6 +4,8 @@
 #include "../../CoreHeaders/Components/Umbrella.h"
 
 #include <format>
+#include <WestAssetFacade.hpp>
+#include <WestRendererFacade.hpp>
 
 void ComponentFactory::createComponent(lua_State* L, std::string& name, Entity& e)
 {
@@ -12,11 +14,7 @@ void ComponentFactory::createComponent(lua_State* L, std::string& name, Entity& 
 #endif
   if (Components::MMA_COMBINATION.compare(name) == 0)
   {
-    std::string path             = std::format("/assets/Models/{}", lua_tostring(L, 2));
-    auto [model, material, aabb] = _loader->loadModel(path);
-    _registry->addComponent<Model>(e.getId(), std::move(*model));
-    _registry->addComponent<Material>(e.getId(), std::move(*material));
-    _registry->addComponent<AABB>(e.getId(), std::move(*aabb));
+    addModel(L, e);
   }
   else if (Components::POSITION.compare(name) == 0)
   {
@@ -36,7 +34,7 @@ void ComponentFactory::createComponent(lua_State* L, std::string& name, Entity& 
     addPlayerControl(L, e);
   }
   else if (Components::ACTIVE_UNIT.compare(name) == 0)
-  { 
+  {
     e.toggleActivate(true);
   }
   else if (Components::HEALTH.compare(name) == 0)
@@ -151,6 +149,7 @@ void ComponentFactory::addPosition(lua_State* L, Entity& e)
   p.scale    = 1.0f;
   p.rotation = glm::vec3(1.0f);
   _registry->addComponent<Position>(e.getId(), std::move(p));
+  _registry->addComponent<Appearance>(e.getId(), Appearance{});
 };
 
 void ComponentFactory::addMovement(lua_State* L, Entity& e)
@@ -168,15 +167,18 @@ void ComponentFactory::addMovement(lua_State* L, Entity& e)
 
 void ComponentFactory::addShader(lua_State* L, Entity& e)
 {
-  Shader s = {};
   lua_getfield(L, 2, "v");
-  s.vertexShaderFile = std::format("/shader/{}", lua_tostring(L, -1));
+  std::string vertexShaderFile = std::format("/shader/{}", lua_tostring(L, -1));
   lua_pop(L, 1);
   lua_getfield(L, 2, "f");
-  s.fragShaderFile = std::format("/shader/{}", lua_tostring(L, -1));
+  std::string fragShaderFile = std::format("/shader/{}", lua_tostring(L, -1));
   lua_pop(L, 1);
-  lua_getfield(L, 2, "group");
-  s.shadergroup = lua_tointeger(L, -1);
-  lua_pop(L, 1);
-  _registry->addComponent<Shader>(e.getId(), std::move(s));
+  e.setShaderId(WestRenderer::WestRendererFacade::getRendererFacade().registerShader(vertexShaderFile, fragShaderFile));
 };
+
+void ComponentFactory::addModel(lua_State* L, Entity& e)
+{
+  std::string file        = lua_tostring(L, 2);
+  const std::string& guid = WestData::WestAssetFacade::getAssetFacade().addModelToScene(file);
+  e.setModelGuid(guid);
+}

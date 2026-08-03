@@ -8,11 +8,10 @@ PositionalSystem::PositionalSystem(std::shared_ptr<EventDispatcher> d,
                                    std::shared_ptr<Camera> c)
   : ISystem(d, l, r)
 {
-  _cam          = c;
-  _lastEntity   = -1;
-  _tileIdx      = -1;
-  _lastEmissive = glm::vec3(0);
-  _highlighted  = false;
+  _cam         = c;
+  _lastEntity  = -1;
+  _tileIdx     = -1;
+  _highlighted = false;
 };
 
 PositionalSystem::~PositionalSystem() {};
@@ -27,27 +26,26 @@ void PositionalSystem::update()
   }
   std::shared_ptr<ComponentArray<Position>> pos = _reg->getComponentArray<Position>();
   std::uint32_t id                              = _world->getEntityByIdx(_tileIdx);
-  Material* m;
 
-  // TODO: Bug -> if emissiveColor is ever used this will overwrite it
   if (_lastEntity != -1 && _lastEntity != id)
   {
-    m = _reg->getComponent<Material>(_lastEntity);
-    if (m)
+    Appearance* a = _reg->getComponent<Appearance>(_lastEntity);
+    if (a)
     {
-      m->emissiveColor = _lastEmissive;
+      a->emissiveOverride = glm::vec3(0.0f);
     }
     _lastEntity  = -1;
     _highlighted = false;
   }
   if (id > 0 && !_highlighted)
   {
-    m = _reg->getComponent<Material>(id);
-    assert(m != nullptr);
-    _lastEmissive     = m->emissiveColor;
-    m->emissiveColor += glm::vec3(0.0, 0.5, 0.5);
-    _lastEntity       = id;
-    _highlighted      = true;
+    Appearance* a = _reg->getComponent<Appearance>(id);
+    if (a)
+    {
+      a->emissiveOverride = glm::vec3(0.0, 0.5, 0.5);
+      _lastEntity         = id;
+      _highlighted        = true;
+    }
   }
 };
 

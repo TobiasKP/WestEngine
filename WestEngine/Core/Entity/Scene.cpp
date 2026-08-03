@@ -1,7 +1,5 @@
 #include "../../CoreHeaders/Entity/Scene.h"
 
-#include "../../CoreHeaders/Components/Shader.h"
-
 #include <algorithm>
 #include <format>
 
@@ -32,13 +30,13 @@ void Scene::init()
 #endif
 }
 
-const std::vector<Entity>& Scene::getEntities() const
+std::vector<Entity>& Scene::getEntities()
 {
   return _entities;
 }
 
 #ifdef DEBUG
-const std::vector<Entity>& Scene::getDebugEntities() const
+std::vector<Entity>& Scene::getDebugEntities()
 {
   return _debugEntities;
 }
@@ -105,13 +103,10 @@ void Scene::addRegistry(std::shared_ptr<ComponentRegistry> r)
 
 void Scene::insertEntityByGroup(Entity&& entity)
 {
-  GLint group = _registry->getComponent<Shader>(entity.getId())->shadergroup;
+  GLint group = entity.getShaderId();
 
-  auto pos = std::upper_bound(_entities.begin(),
-                              _entities.end(),
-                              group,
-                              [&](GLint g, const Entity& e)
-                              { return g < _registry->getComponent<Shader>(e.getId())->shadergroup; });
+  auto pos = std::upper_bound(
+    _entities.begin(), _entities.end(), group, [&](GLint g, const Entity& e) { return g < e.getShaderId(); });
   _entities.insert(pos, std::move(entity));
 }
 

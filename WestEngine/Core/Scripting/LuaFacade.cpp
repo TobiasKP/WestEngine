@@ -252,7 +252,7 @@ bool LuaFacade::onAttack(std::uint32_t wRange,
 
 bool LuaFacade::loadAPI()
 {
-  std::string filePath = PathUtils::resolve(CoreConstants::LUA_API_FILE);
+  std::string filePath = PathUtils::resolve(std::string(CoreConstants::LUA_API_FILE));
   if (!std::filesystem::exists(filePath))
   {
     _logger->log(Level::Error, std::format("Lua State error ::: Lua API file: {} - not found!\n", filePath));
