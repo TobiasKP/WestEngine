@@ -2,7 +2,7 @@ Utils = {}
 
 local yaml = require("Lib.yaml")
 local builder = require("Interface.InterfaceBuilder")
-local root = debug.getinfo(1, 'S').source:sub(2):gsub("[^/]+$", "")
+local root = debug.getinfo(1, 'S').source:sub(2):gsub("[^/\\]+$", "")
 local projectile = {};
 local entityPos = {};
 local entityQueue = {};
@@ -73,7 +73,7 @@ function loadFile(name)
 
   if file == nil then
     print("Error opening file")
-    return 1
+    return nil
   end
 
   local content = file:read("*all")

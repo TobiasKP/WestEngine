@@ -8,11 +8,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 message(STATUS "C++ Standard = ${CMAKE_CXX_STANDARD}")
 
-# Ensure all MSVC targets use the same CRT (dynamic by default). This avoids
-# linker errors caused by mixing /MT and /MD runtimes across objects.
+# Ensure all MSVC targets use the same CRT to avoid linker errors caused by
+# mixing /MT and /MD runtimes across objects. Force the static CRT
+# (MultiThreaded / MultiThreadedDebug) for all targets.
 if(MSVC)
-  # Use MD / MDd (MultiThreaded DLL) for release/debug respectively.
-  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL" CACHE STRING "MSVC runtime library" FORCE)
+  # Use /MT for Release and /MTd for Debug respectively (static CRT).
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "MSVC runtime library" FORCE)
 endif()
 
 option(BUILD_CORE "Build Core Module" ON)
