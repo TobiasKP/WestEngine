@@ -161,18 +161,6 @@ void EngineManager::update()
 #endif
     }
 
-    double endTime    = TimeUtils::getNanoseconds();
-    double elapsed    = endTime - startTime;
-    double frameNanos = _FRAMETIME * _NANOSECOND;
-    double sleepTime  = frameNanos - elapsed;
-    if (sleepTime > 0)
-    {
-#ifdef DEBUG
-      logCycle(std::format("Sleeping main loop for: {}ms \n", sleepTime));
-#endif
-      std::this_thread::sleep_for(std::chrono::nanoseconds(static_cast<std::int64_t>(sleepTime)));
-    }
-
     if (Config::requestedWidth > 0 && Config::requestedHeight > 0)
     {
 #ifdef DEBUG
