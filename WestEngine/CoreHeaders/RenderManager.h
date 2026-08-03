@@ -6,6 +6,10 @@
 
 #include <WestRendererFacade.hpp>
 
+#ifdef DEBUG
+#include "Systems/DebugDrawSystem.h"
+#endif
+
 class RenderManager : public IManager
 {
 public:
@@ -24,4 +28,9 @@ private:
 
   WestRenderer::WestRendererFacade* _facade;
   std::shared_ptr<Scene> _scene;
+
+#ifdef DEBUG
+  void renderDebugEntities();
+  std::unique_ptr<DebugDrawSystem> _debugDrawSystem;
+#endif
 };

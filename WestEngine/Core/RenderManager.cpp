@@ -5,6 +5,7 @@
 #include <Config.h>
 #include <format>
 #include <glm/ext/matrix_clip_space.hpp>
+#include <UniformConstants.hpp>
 #include <UniformParams.hpp>
 #include <WestAssetFacade.hpp>
 
@@ -46,6 +47,8 @@ std::int32_t RenderManager::init()
   assert(_scene != nullptr && _facade != nullptr);
 
 #ifdef DEBUG
+  _debugDrawSystem = std::make_unique<DebugDrawSystem>(_scene, _facade);
+  _debugDrawSystem->init();
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
   logDebug(std::format("{} ### RenderManager init time: {} ms.\n", getName(), res));
@@ -101,9 +104,10 @@ void RenderManager::update()
   Config::GeneralInfo.TOTAL_ENTITIES  = _scene->getEntities().size();
   Config::GeneralInfo.CULLED_ENTITIES = skipped;
   _facade->renderInterface();
-  _facade->renderDebugEntities();
 
 #ifdef DEBUG
+  _debugDrawSystem->update();
+  renderDebugEntities();
   double end = TimeUtils::getCurrentTimeAsTime();
   double res = TimeUtils::getDuration(start, end);
   logCycle(std::format("{} ### render time for all entites in scene: {} ms.\n", getName(), res));
@@ -157,3 +161,19 @@ bool RenderManager::AABBcheck(const Entity& e)
   }
   return true;
 }
+
+#ifdef DEBUG
+
+void RenderManager::renderDebugEntities()
+{
+  std::vector<std::tuple<std::string, std::uint32_t, GLuint, EntityUniformParams>> debugData;
+  for (const Entity& entity : _scene->getDebugEntities())
+  {
+    EntityUniformParams params = {};
+    params.diffuseColor = glm::vec3(1.0f, 0.0f, 0.0f);
+    debugData.emplace_back(entity.getModelGuid(), entity.getId(), entity.getShaderId(), params);
+  }
+  _facade->renderDebugEntities(debugData);
+}
+
+#endif

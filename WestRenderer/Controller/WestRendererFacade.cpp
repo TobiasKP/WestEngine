@@ -48,7 +48,15 @@ void WestRendererFacade::renderWorld(
   _cycle->renderWorld(uniforms, programId, modelGuid, dirty, params);
 };
 
-void WestRendererFacade::renderDebugEntities() {};
+void WestRendererFacade::renderDebugEntities(
+  std::vector<std::tuple<std::string, std::uint32_t, GLuint, EntityUniformParams>>& debugData)
+{
+  for (auto& [guid, entityId, programId, params] : debugData)
+  {
+    std::unordered_map<std::string, GLuint> uniforms = _entityToUniforms[entityId];
+    _cycle->renderEntity(guid, programId, uniforms, &params, true);
+  }
+};
 
 void WestRendererFacade::cleanupModel(const std::string& modelGuid)
 {

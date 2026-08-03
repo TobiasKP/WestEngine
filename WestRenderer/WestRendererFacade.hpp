@@ -7,7 +7,9 @@
 
 #include <GL/glew.h>
 #include <string>
+#include <tuple>
 #include <unordered_map>
+#include <vector>
 
 namespace WestRenderer
 {
@@ -24,7 +26,7 @@ public:
   void renderInterface();
   void
   renderWorld(std::string modelGuid, std::uint32_t entityId, GLuint programId, bool dirty, WorldUniformParams* params);
-  void renderDebugEntities();
+  void renderDebugEntities(std::vector<std::tuple<std::string, std::uint32_t, GLuint, EntityUniformParams>>& debugData);
   void createUniform(const char* name, GLuint programId, std::uint32_t entityId);
   void createUniformBufferObject(const char* name, size_t size, GLuint bindingPoint, std::uint32_t entityId);
 

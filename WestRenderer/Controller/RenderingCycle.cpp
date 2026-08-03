@@ -43,6 +43,13 @@ void RenderingCycle::renderEntity(std::string guid,
     _utils->setUniform(uniforms[UniformConstants::COLOR], params->diffuseColor);
   }
 
+#ifdef DEBUG
+  if (debug && uniforms.contains(UniformConstants::DCOLOR))
+  {
+    _utils->setUniform(uniforms[UniformConstants::DCOLOR], params->diffuseColor);
+  }
+#endif
+
   if (uniforms.contains(UniformConstants::ECOLOR))
   {
     _utils->setUniform(uniforms[UniformConstants::ECOLOR], params->emissiveColor);
