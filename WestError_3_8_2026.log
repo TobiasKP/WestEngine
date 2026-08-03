@@ -1,0 +1,9 @@
+Could not create Uniform: dColor Location not found.
+Could not create Uniform: keColor Location not found.
+Could not create Uniform: transformationMatrix Location not found.
+Could not create Uniform: dColor Location not found.
+Could not create Uniform: keColor Location not found.
+Could not create Uniform: transformationMatrix Location not found.
+|><| Can not retrieve World model for guid: 8998c9d1-8be2-49b4-a79c-ef1e43508a49
+|*| Error getting Model: 3b76947d-85d6-4a6a-b24c-7490aa6b0fba, something went wrong.
+|><| Can not retrieve World model for guid: 3b76947d-85d6-4a6a-b24c-7490aa6b0fba

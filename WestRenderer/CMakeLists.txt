@@ -30,6 +30,8 @@ target_include_directories(WestRenderer
 
 target_link_libraries(WestRenderer PUBLIC 
     WestUtils
+    WestData
+    WestInterface
 )
 
 target_compile_definitions(WestRenderer PRIVATE

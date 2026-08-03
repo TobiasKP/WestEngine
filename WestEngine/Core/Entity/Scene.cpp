@@ -30,13 +30,13 @@ void Scene::init()
 #endif
 }
 
-const std::vector<Entity>& Scene::getEntities() const
+std::vector<Entity>& Scene::getEntities()
 {
   return _entities;
 }
 
 #ifdef DEBUG
-const std::vector<Entity>& Scene::getDebugEntities() const
+std::vector<Entity>& Scene::getDebugEntities()
 {
   return _debugEntities;
 }

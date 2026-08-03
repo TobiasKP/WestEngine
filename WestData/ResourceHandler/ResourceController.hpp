@@ -17,6 +17,7 @@ public:
   void shutdown();
   const std::array<Model, Limit::cachesize>& getSceneModels() const;
   std::string addModel(const std::string& path);
+  std::string addModel(Model& m);
   const Model* getModel(const std::string& guid);
   bool deleteModel(const std::string& guid);
 

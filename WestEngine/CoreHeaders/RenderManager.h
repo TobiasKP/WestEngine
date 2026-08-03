@@ -19,7 +19,9 @@ public:
   void update() override;
   std::int32_t init() override;
 
-private: 
-  WestRendererFacade* _facade;
+private:
+  bool AABBcheck(const Entity& e);
+
+  WestRenderer::WestRendererFacade* _facade;
   std::shared_ptr<Scene> _scene;
 };

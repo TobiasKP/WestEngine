@@ -1,31 +1,31 @@
 #include "../../CoreHeaders/Entity/Camera.h"
 
-#include "glm/gtc/type_ptr.hpp"
-
 #include <Config.h>
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <WestRendererFacade.hpp>
 
 
-Camera::Camera(glm::vec3 pos, glm::vec3 rot) : _rotation(rot), _position(pos), _cameraUniforms(-1), _dirty(true) {}
+Camera::Camera(glm::vec3 pos, glm::vec3 rot) : _rotation(rot), _position(pos), _dirty(true)
+{
+  _id = Config::incEntityId();
+}
 
 Camera::~Camera() {}
 
 void Camera::update()
 {
-  assert(_cameraUniforms != -1);
   if (!_dirty.load())
   {
     return;
   }
+
+  // TODO update Camera inside Renderer;
   _dirty.store(false);
   _projection = getProjectionMatrix();
   _view       = getViewMatrix();
   createFrustumFromCamera();
-  glBindBuffer(GL_UNIFORM_BUFFER, _cameraUniforms);
-  glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(_view));
-  glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(_projection));
-  glBindBuffer(GL_UNIFORM_BUFFER, 0);
+  WestRenderer::WestRendererFacade::getRendererFacade().updateCamera(getId(), _view, _projection);
 }
 
 glm::mat4 Camera::getProjectionMatrix()

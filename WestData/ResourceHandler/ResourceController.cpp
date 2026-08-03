@@ -1,5 +1,7 @@
 #include "ResourceController.hpp"
 
+#include "../Utils/AssetUtils.hpp"
+
 ResourceController::ResourceController(WestLogger* l)
 {
   _logger  = l;
@@ -53,13 +55,29 @@ std::string ResourceController::addModel(const std::string& path)
   return guid;
 }
 
+std::string ResourceController::addModel(Model& m)
+{
+  std::stringstream ss;
+  ss << &m;
+  std::string guid = AssetUtils::generateGUID(ss.str());
+  m.setGuid(guid);
+  bool res         = _pool->addModelToScene(std::move(m));
+  if (!res)
+  {
+    _logger->log(Level::Error, std::format("|*| Error adding Model to Scene: Artificially created...\n"));
+    return "";
+  }
+  return guid;
+}
+
 const Model* ResourceController::getModel(const std::string& guid)
 {
   const Model* m = _pool->getModelByGuid(guid);
   if (m != nullptr)
   {
     return m;
-  }
+  } 
+  _logger->log(Level::Error, std::format("|*| Error getting Model: {}, something went wrong.\n", guid));
   // TODO: Error handling;
   return {};
 }

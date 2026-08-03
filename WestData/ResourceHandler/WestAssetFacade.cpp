@@ -40,3 +40,7 @@ const std::string WestAssetFacade::addModelToScene(const std::string& path)
 {
   return _controller->addModel(path);
 };
+
+const std::string WestAssetFacade::addModelToScene(Model& m) {
+  return _controller->addModel(m);
+}

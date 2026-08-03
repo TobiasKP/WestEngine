@@ -15,6 +15,7 @@ public:
   const Model* requestModelFromScene(const std::string& uuid);
   const bool deleteModelFromScene(const std::string& uuid);
   const std::string addModelToScene(const std::string& path);
+  const std::string addModelToScene(Model& m);
 
 private:
   WestAssetFacade();

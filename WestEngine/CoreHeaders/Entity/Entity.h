@@ -11,8 +11,7 @@ public:
 
   // Copy constructor and assignment
   Entity(const Entity& other);
-  Entity& operator=(const Entity& other);
-  // Move constructor and assignment
+  Entity& operator=(const Entity& other);  // Move constructor and assignment
   Entity(Entity&& other) noexcept;
   Entity& operator=(Entity&& other) noexcept;
 
@@ -88,6 +87,16 @@ public:
     _activeUnit = active;
   }
 
+  inline bool isInitialized()
+  {
+    return _initialized;
+  }
+
+  inline void initialize()
+  {
+    _initialized = true;
+  }
+
   // Overrides
   static void* operator new(size_t size)
   {
@@ -103,6 +112,6 @@ private:
   static PoolAllocator* _allocator;
 
   std::uint32_t _id = 0, _shaderId;
-  bool _destroyed, _debugEntity, _activeUnit;
+  bool _destroyed, _debugEntity, _activeUnit, _initialized;
   std::string _name, _modelGuid;
 };

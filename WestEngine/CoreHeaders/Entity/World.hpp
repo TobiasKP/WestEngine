@@ -4,7 +4,6 @@
 #include "Entity.h"
 
 #include <optional>
-
 class World : public Entity
 {
 public:
@@ -27,18 +26,6 @@ public:
     _dirty.store(false);
   }
 
-  inline GLuint getFlagUniform()
-  {
-    return _utileFlags;
-  }
-  inline GLuint getGridUniform()
-  {
-    return _ugridSize;
-  }
-  inline GLuint getGridOriginUniform()
-  {
-    return _uGridOrigin;
-  }
   inline std::int32_t getGridSize()
   {
     return _dimension;
@@ -64,18 +51,6 @@ public:
     _vflags.resize(_dimension * _dimension);
     std::fill(_vflags.begin(), _vflags.end(), 0);
   };
-  inline void setFlagUniform(GLuint u)
-  {
-    _utileFlags = u;
-  }
-  inline void setGridUniform(GLuint u)
-  {
-    _ugridSize = u;
-  }
-  inline void setGridOriginUniform(GLuint u)
-  {
-    _uGridOrigin = u;
-  }
 
 private:
   std::mutex _mutex;
@@ -83,7 +58,6 @@ private:
   std::int32_t _lastIdx;
   glm::vec2 _origin;
   std::vector<std::uint32_t> _vflags;
-  GLuint _ugridSize, _utileFlags, _uGridOrigin;
   std::unordered_map<std::int32_t, std::uint32_t> _idxToEntityId;
   std::unordered_map<std::uint32_t, std::int32_t> _entityIdToIdx;
   std::atomic<bool> _dirty;

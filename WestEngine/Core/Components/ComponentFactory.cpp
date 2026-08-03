@@ -172,7 +172,7 @@ void ComponentFactory::addShader(lua_State* L, Entity& e)
   lua_getfield(L, 2, "f");
   std::string fragShaderFile = std::format("/shader/{}", lua_tostring(L, -1));
   lua_pop(L, 1);
-  e.setShaderId(WestRendererFacade::getRendererFacade().registerShader(vertexShaderFile, fragShaderFile));
+  e.setShaderId(WestRenderer::WestRendererFacade::getRendererFacade().registerShader(vertexShaderFile, fragShaderFile));
 };
 
 void ComponentFactory::addModel(lua_State* L, Entity& e)

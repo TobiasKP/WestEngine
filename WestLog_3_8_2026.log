@@ -1,0 +1,664 @@
+--- Creating 10 worker threads for engine
+ENGINGE_MANAGER ### Initialized Settings from saved Configuration file.
+ENGINGE_MANAGER ### Executable dir: /home/tobias/Documents/Privat/Engine/build/linux-debug/WestEngine
+ENGINGE_MANAGER ### Reading Setting: width=1920;
+ENGINGE_MANAGER ### Reading Setting: height=1080;
+ENGINGE_MANAGER ### Reading Setting: fps=60;
+INPUT_MANAGER ### Executable dir: /home/tobias/Documents/Privat/Engine/build/linux-debug/WestEngine
+INPUT_MANAGER ### Loaded files for Input Configuration /config/Game.ini...
+WINDOW_MANAGER ### primary monitor resolution: 1920 x 1200, setting to 1920 x 1080
+WINDOW_MANAGER ### Instantiating GL debug callback
+WINDOW_MANAGER ### Instantiating GL error callback
+|*| Starting up AssetFacade|*| Starting up Converter ... 
+|*| Starting up asset import machine
+SCENE_MANAGER ### instantiated Lua state
+PlayerControl *** Initialized debug information
+SYSTEM_MANAGER ### Instantiated critical game systems
+ENGINGE_MANAGER ### Startup complete
+ENGINGE_MANAGER ### All Managers started! startup time: 206 ms.
+Successfull startup
+INPUT_MANAGER ### Reading input from cfg: P=Pause
+INPUT_MANAGER ### Reading input from cfg: ESC=OpenMenu
+INPUT_MANAGER ### Reading input from cfg: F2=Info
+INPUT_MANAGER ### Reading input from cfg: W=CameraUp
+INPUT_MANAGER ### Reading input from cfg: A=CameraLeft
+INPUT_MANAGER ### Reading input from cfg: S=CameraDown
+INPUT_MANAGER ### Reading input from cfg: D=CameraRight
+INPUT_MANAGER ### Reading input from cfg: Q=CameraRotateRight
+INPUT_MANAGER ### Reading input from cfg: E=CameraRotateLeft
+INPUT_MANAGER ### InputManager init time: 0 ms.
+WINDOW_MANAGER: initialized with 
+		Width: 1920
+		Height: 1080
+WINDOW_MANAGER ### WindowManager init time: 0 ms.
+|><| ### Creating new Shader.
+|><| ### Created Shader for ProgramID: 1.
+|><| Created Shader: 2 for File: shader/InterfaceVertexShader.vs.
+|><| Created Shader: 3 for File: shader/InterfaceFragementShader.fs.
+|><| ### Linked program: 1.
+|><| ### Uniform Block not found for shader: shader/InterfaceVertexShader.vs and shader/InterfaceFragementShader.fs. Check if the Entity uses a Shader with Camera uniforms
+SHADER_MANAGER ### Created Shader for Interfaces. ProgramID: 1.
+SHADER_MANAGER ### ShaderManager init time: 1 ms.
+$$$ GL CALLBACK:  type = 0x33361, severity = 0x33387, message = Buffer detailed info: Buffer object 1 (bound to GL_ARRAY_BUFFER_ARB, usage hint is GL_STATIC_DRAW) will use VIDEO memory as the source for buffer object operations.
+$$$ GL CALLBACK:  type = 0x33361, severity = 0x33387, message = Buffer detailed info: Buffer object 2 (bound to GL_ELEMENT_ARRAY_BUFFER_ARB, usage hint is GL_STATIC_DRAW) will use VIDEO memory as the source for buffer object operations.
+$$$ GL CALLBACK:  type = 0x33361, severity = 0x33387, message = Buffer detailed info: Buffer object 6 (bound to GL_ARRAY_BUFFER_ARB, usage hint is GL_STATIC_DRAW) will use VIDEO memory as the source for buffer object operations.
+@@@ Initializing font atlas
+	:   -> [0, 0.0625, 0.0625, 0]
+	: ! -> [0.0625, 0.0625, 0.125, 0]
+	: " -> [0.125, 0.0625, 0.1875, 0]
+	: # -> [0.1875, 0.0625, 0.25, 0]
+	: $ -> [0.25, 0.0625, 0.3125, 0]
+	: % -> [0.3125, 0.0625, 0.375, 0]
+	: & -> [0.375, 0.0625, 0.4375, 0]
+	: ' -> [0.4375, 0.0625, 0.5, 0]
+	: ( -> [0.5, 0.0625, 0.5625, 0]
+	: ) -> [0.5625, 0.0625, 0.625, 0]
+	: * -> [0.625, 0.0625, 0.6875, 0]
+	: + -> [0.6875, 0.0625, 0.75, 0]
+	: , -> [0.75, 0.0625, 0.8125, 0]
+	: - -> [0.8125, 0.0625, 0.875, 0]
+	: . -> [0.875, 0.0625, 0.9375, 0]
+	: / -> [0.9375, 0.0625, 1, 0]
+	: 0 -> [0, 0.125, 0.0625, 0.0625]
+	: 1 -> [0.0625, 0.125, 0.125, 0.0625]
+	: 2 -> [0.125, 0.125, 0.1875, 0.0625]
+	: 3 -> [0.1875, 0.125, 0.25, 0.0625]
+	: 4 -> [0.25, 0.125, 0.3125, 0.0625]
+	: 5 -> [0.3125, 0.125, 0.375, 0.0625]
+	: 6 -> [0.375, 0.125, 0.4375, 0.0625]
+	: 7 -> [0.4375, 0.125, 0.5, 0.0625]
+	: 8 -> [0.5, 0.125, 0.5625, 0.0625]
+	: 9 -> [0.5625, 0.125, 0.625, 0.0625]
+	: : -> [0.625, 0.125, 0.6875, 0.0625]
+	: ; -> [0.6875, 0.125, 0.75, 0.0625]
+	: < -> [0.75, 0.125, 0.8125, 0.0625]
+	: = -> [0.8125, 0.125, 0.875, 0.0625]
+	: > -> [0.875, 0.125, 0.9375, 0.0625]
+	: ? -> [0.9375, 0.125, 1, 0.0625]
+	: @ -> [0, 0.1875, 0.0625, 0.125]
+	: A -> [0.0625, 0.1875, 0.125, 0.125]
+	: B -> [0.125, 0.1875, 0.1875, 0.125]
+	: C -> [0.1875, 0.1875, 0.25, 0.125]
+	: D -> [0.25, 0.1875, 0.3125, 0.125]
+	: E -> [0.3125, 0.1875, 0.375, 0.125]
+	: F -> [0.375, 0.1875, 0.4375, 0.125]
+	: G -> [0.4375, 0.1875, 0.5, 0.125]
+	: H -> [0.5, 0.1875, 0.5625, 0.125]
+	: I -> [0.5625, 0.1875, 0.625, 0.125]
+	: J -> [0.625, 0.1875, 0.6875, 0.125]
+	: K -> [0.6875, 0.1875, 0.75, 0.125]
+	: L -> [0.75, 0.1875, 0.8125, 0.125]
+	: M -> [0.8125, 0.1875, 0.875, 0.125]
+	: N -> [0.875, 0.1875, 0.9375, 0.125]
+	: O -> [0.9375, 0.1875, 1, 0.125]
+	: P -> [0, 0.25, 0.0625, 0.1875]
+	: Q -> [0.0625, 0.25, 0.125, 0.1875]
+	: R -> [0.125, 0.25, 0.1875, 0.1875]
+	: S -> [0.1875, 0.25, 0.25, 0.1875]
+	: T -> [0.25, 0.25, 0.3125, 0.1875]
+	: U -> [0.3125, 0.25, 0.375, 0.1875]
+	: V -> [0.375, 0.25, 0.4375, 0.1875]
+	: W -> [0.4375, 0.25, 0.5, 0.1875]
+	: X -> [0.5, 0.25, 0.5625, 0.1875]
+	: Y -> [0.5625, 0.25, 0.625, 0.1875]
+	: Z -> [0.625, 0.25, 0.6875, 0.1875]
+	: [ -> [0.6875, 0.25, 0.75, 0.1875]
+	: \ -> [0.75, 0.25, 0.8125, 0.1875]
+	: ] -> [0.8125, 0.25, 0.875, 0.1875]
+	: ^ -> [0.875, 0.25, 0.9375, 0.1875]
+	: _ -> [0.9375, 0.25, 1, 0.1875]
+	: ` -> [0, 0.3125, 0.0625, 0.25]
+	: a -> [0.0625, 0.3125, 0.125, 0.25]
+	: b -> [0.125, 0.3125, 0.1875, 0.25]
+	: c -> [0.1875, 0.3125, 0.25, 0.25]
+	: d -> [0.25, 0.3125, 0.3125, 0.25]
+	: e -> [0.3125, 0.3125, 0.375, 0.25]
+	: f -> [0.375, 0.3125, 0.4375, 0.25]
+	: g -> [0.4375, 0.3125, 0.5, 0.25]
+	: h -> [0.5, 0.3125, 0.5625, 0.25]
+	: i -> [0.5625, 0.3125, 0.625, 0.25]
+	: j -> [0.625, 0.3125, 0.6875, 0.25]
+	: k -> [0.6875, 0.3125, 0.75, 0.25]
+	: l -> [0.75, 0.3125, 0.8125, 0.25]
+	: m -> [0.8125, 0.3125, 0.875, 0.25]
+	: n -> [0.875, 0.3125, 0.9375, 0.25]
+	: o -> [0.9375, 0.3125, 1, 0.25]
+	: p -> [0, 0.375, 0.0625, 0.3125]
+	: q -> [0.0625, 0.375, 0.125, 0.3125]
+	: r -> [0.125, 0.375, 0.1875, 0.3125]
+	: s -> [0.1875, 0.375, 0.25, 0.3125]
+	: t -> [0.25, 0.375, 0.3125, 0.3125]
+	: u -> [0.3125, 0.375, 0.375, 0.3125]
+	: v -> [0.375, 0.375, 0.4375, 0.3125]
+	: w -> [0.4375, 0.375, 0.5, 0.3125]
+	: x -> [0.5, 0.375, 0.5625, 0.3125]
+	: y -> [0.5625, 0.375, 0.625, 0.3125]
+	: z -> [0.625, 0.375, 0.6875, 0.3125]
+	: { -> [0.6875, 0.375, 0.75, 0.3125]
+	: | -> [0.75, 0.375, 0.8125, 0.3125]
+	: } -> [0.8125, 0.375, 0.875, 0.3125]
+	: ~ -> [0.875, 0.375, 0.9375, 0.3125]
+@@@ Instructions for basic settings menu created.
+@@@ Creating new Interface -> 1880 : 1040
+@@@ Element lower Left -> 1880:1040 - max Size -> 1920:1080
+@@@ Adding element: 1 to children of interface: 2
+@@@ Interface build complete returning Parent container
+@@@ Instructions for info text created.
+@@@ Creating new Interface -> 0 : 1000
+@@@ Element lower Left -> 0:1000 - max Size -> 80:2200
+@@@ Adding element: 3 to children of interface: 5
+@@@ Element lower Left -> 0:1040 - max Size -> 80:2200
+@@@ Adding element: 4 to children of interface: 5
+@@@ Interface build complete returning Parent container
+INTERFA_MANAGER ### Creating Tech Demo interface footer
+@@@ Creating new Interface -> 0 : 0
+@@@ Element lower Left -> 0:0 - max Size -> 1920:40
+@@@ Adding element: 6 to children of interface: 8
+@@@ Element lower Left -> 1820:0 - max Size -> 1920:40
+@@@ Adding element: 7 to children of interface: 8
+@@@ Interface build complete returning Parent container
+INTERFA_MANAGER ### Created Tech Demo footer -> 8
+INTERFA_MANAGER ### INTERFA_MANAGER init time: 47 ms.
+RENDER_MANAGER ### RenderManager init time: 0 ms.
+Loading World
+Adding component: object to: 3
+|*| Need to bake model Cube.obj, this could take a while ...  
+|*| Requested file: Cube.obj is already processed or in process
+|*| Loading binary model /home/tobias/Documents/Privat/Engine/build/linux-debug/WestEngine/bin/_Cube.west from disk
+ |*| Info: Read 0 textures for given model
+Adding component: shader to: 3
+|><| ### Creating new Shader.
+|><| ### Created Shader for ProgramID: 4.
+|><| Created Shader: 5 for File: /shader/Vertex.vs.
+|><| Created Shader: 6 for File: /shader/Fragment.fs.
+|><| ### Linked program: 4.
+Adding component: playercontrol to: 3
+@@@ Creating new Interface -> 1505 : 60
+@@@ Element lower Left -> 1505:60 - max Size -> 1905:100
+@@@ Adding element: 10 to children of interface: 9
+@@@ Element lower Left -> 1505:60 - max Size -> 1905:100
+@@@ Adding element: 11 to children of interface: 9
+@@@ Interface build complete returning Parent container
+INTERFA_MANAGER ### created a new game Interface from lua with id: 9Adding component: activeUnit to: 3
+Adding component: position to: 3
+Adding component: movement to: 3
+Adding component: health to: 3
+Adding component: equipment to: 3
+Adding component: object to: 4
+|*| Need to bake model Cube.obj, this could take a while ...  
+|*| Requested file: Cube.obj is already processed or in process
+|*| Loading binary model /home/tobias/Documents/Privat/Engine/build/linux-debug/WestEngine/bin/_Cube.west from disk
+ |*| Info: Read 0 textures for given model
+Adding component: shader to: 4
+|><| ### Creating new Shader.
+|><| ### Created Shader for ProgramID: 7.
+|><| Created Shader: 8 for File: /shader/Vertex.vs.
+|><| Created Shader: 9 for File: /shader/Fragment.fs.
+|><| ### Linked program: 7.
+Adding component: activeUnit to: 4
+Adding component: position to: 4
+Adding component: movement to: 4
+Adding component: health to: 4
+@@@ Creating new Interface -> 960 : 1000
+@@@ Element lower Left -> 1000:1040 - max Size -> 1040:1080
+@@@ Adding element: 13 to children of interface: 12
+@@@ Interface build complete returning Parent container
+INTERFA_MANAGER ### created a new game Interface from lua with id: 12SCENE_MANAGER ### Scene Initialized
+SCENE_MANAGER ### SCENE_MANAGER init time: 7 ms.
+SYSTEM_MANAGER ### EntitySystemManager init time: 0 ms.
+ENGINGE_MANAGER ### All Managers initialized! init time: 55 ms.
+Successfull initialization
+ENGINGE_MANAGER ### STARTING MAIN GAME LOOP.
+--- Creating 10 worker threads for engine
+ENGINGE_MANAGER ### Initialized Settings from saved Configuration file.
+ENGINGE_MANAGER ### Executable dir: /home/tobias/Documents/Privat/Engine/build/linux-debug/WestEngine
+ENGINGE_MANAGER ### Reading Setting: width=1920;
+ENGINGE_MANAGER ### Reading Setting: height=1080;
+ENGINGE_MANAGER ### Reading Setting: fps=60;
+INPUT_MANAGER ### Executable dir: /home/tobias/Documents/Privat/Engine/build/linux-debug/WestEngine
+INPUT_MANAGER ### Loaded files for Input Configuration /config/Game.ini...
+WINDOW_MANAGER ### primary monitor resolution: 1920 x 1200, setting to 1920 x 1080
+WINDOW_MANAGER ### Instantiating GL debug callback
+WINDOW_MANAGER ### Instantiating GL error callback
+|*| Starting up AssetFacade|*| Starting up Converter ... 
+|*| Starting up asset import machine
+SCENE_MANAGER ### instantiated Lua state
+PlayerControl *** Initialized debug information
+SYSTEM_MANAGER ### Instantiated critical game systems
+ENGINGE_MANAGER ### Startup complete
+ENGINGE_MANAGER ### All Managers started! startup time: 169 ms.
+Successfull startup
+INPUT_MANAGER ### Reading input from cfg: P=Pause
+INPUT_MANAGER ### Reading input from cfg: ESC=OpenMenu
+INPUT_MANAGER ### Reading input from cfg: F2=Info
+INPUT_MANAGER ### Reading input from cfg: W=CameraUp
+INPUT_MANAGER ### Reading input from cfg: A=CameraLeft
+INPUT_MANAGER ### Reading input from cfg: S=CameraDown
+INPUT_MANAGER ### Reading input from cfg: D=CameraRight
+INPUT_MANAGER ### Reading input from cfg: Q=CameraRotateRight
+INPUT_MANAGER ### Reading input from cfg: E=CameraRotateLeft
+INPUT_MANAGER ### InputManager init time: 0 ms.
+WINDOW_MANAGER: initialized with 
+		Width: 1920
+		Height: 1080
+WINDOW_MANAGER ### WindowManager init time: 0 ms.
+|><| ### Creating new Shader.
+|><| ### Created Shader for ProgramID: 1.
+|><| Created Shader: 2 for File: shader/InterfaceVertexShader.vs.
+|><| Created Shader: 3 for File: shader/InterfaceFragementShader.fs.
+|><| ### Linked program: 1.
+|><| ### Uniform Block not found for shader: shader/InterfaceVertexShader.vs and shader/InterfaceFragementShader.fs. Check if the Entity uses a Shader with Camera uniforms
+SHADER_MANAGER ### Created Shader for Interfaces. ProgramID: 1.
+SHADER_MANAGER ### ShaderManager init time: 0 ms.
+$$$ GL CALLBACK:  type = 0x33361, severity = 0x33387, message = Buffer detailed info: Buffer object 1 (bound to GL_ARRAY_BUFFER_ARB, usage hint is GL_STATIC_DRAW) will use VIDEO memory as the source for buffer object operations.
+$$$ GL CALLBACK:  type = 0x33361, severity = 0x33387, message = Buffer detailed info: Buffer object 2 (bound to GL_ELEMENT_ARRAY_BUFFER_ARB, usage hint is GL_STATIC_DRAW) will use VIDEO memory as the source for buffer object operations.
+$$$ GL CALLBACK:  type = 0x33361, severity = 0x33387, message = Buffer detailed info: Buffer object 6 (bound to GL_ARRAY_BUFFER_ARB, usage hint is GL_STATIC_DRAW) will use VIDEO memory as the source for buffer object operations.
+@@@ Initializing font atlas
+	:   -> [0, 0.0625, 0.0625, 0]
+	: ! -> [0.0625, 0.0625, 0.125, 0]
+	: " -> [0.125, 0.0625, 0.1875, 0]
+	: # -> [0.1875, 0.0625, 0.25, 0]
+	: $ -> [0.25, 0.0625, 0.3125, 0]
+	: % -> [0.3125, 0.0625, 0.375, 0]
+	: & -> [0.375, 0.0625, 0.4375, 0]
+	: ' -> [0.4375, 0.0625, 0.5, 0]
+	: ( -> [0.5, 0.0625, 0.5625, 0]
+	: ) -> [0.5625, 0.0625, 0.625, 0]
+	: * -> [0.625, 0.0625, 0.6875, 0]
+	: + -> [0.6875, 0.0625, 0.75, 0]
+	: , -> [0.75, 0.0625, 0.8125, 0]
+	: - -> [0.8125, 0.0625, 0.875, 0]
+	: . -> [0.875, 0.0625, 0.9375, 0]
+	: / -> [0.9375, 0.0625, 1, 0]
+	: 0 -> [0, 0.125, 0.0625, 0.0625]
+	: 1 -> [0.0625, 0.125, 0.125, 0.0625]
+	: 2 -> [0.125, 0.125, 0.1875, 0.0625]
+	: 3 -> [0.1875, 0.125, 0.25, 0.0625]
+	: 4 -> [0.25, 0.125, 0.3125, 0.0625]
+	: 5 -> [0.3125, 0.125, 0.375, 0.0625]
+	: 6 -> [0.375, 0.125, 0.4375, 0.0625]
+	: 7 -> [0.4375, 0.125, 0.5, 0.0625]
+	: 8 -> [0.5, 0.125, 0.5625, 0.0625]
+	: 9 -> [0.5625, 0.125, 0.625, 0.0625]
+	: : -> [0.625, 0.125, 0.6875, 0.0625]
+	: ; -> [0.6875, 0.125, 0.75, 0.0625]
+	: < -> [0.75, 0.125, 0.8125, 0.0625]
+	: = -> [0.8125, 0.125, 0.875, 0.0625]
+	: > -> [0.875, 0.125, 0.9375, 0.0625]
+	: ? -> [0.9375, 0.125, 1, 0.0625]
+	: @ -> [0, 0.1875, 0.0625, 0.125]
+	: A -> [0.0625, 0.1875, 0.125, 0.125]
+	: B -> [0.125, 0.1875, 0.1875, 0.125]
+	: C -> [0.1875, 0.1875, 0.25, 0.125]
+	: D -> [0.25, 0.1875, 0.3125, 0.125]
+	: E -> [0.3125, 0.1875, 0.375, 0.125]
+	: F -> [0.375, 0.1875, 0.4375, 0.125]
+	: G -> [0.4375, 0.1875, 0.5, 0.125]
+	: H -> [0.5, 0.1875, 0.5625, 0.125]
+	: I -> [0.5625, 0.1875, 0.625, 0.125]
+	: J -> [0.625, 0.1875, 0.6875, 0.125]
+	: K -> [0.6875, 0.1875, 0.75, 0.125]
+	: L -> [0.75, 0.1875, 0.8125, 0.125]
+	: M -> [0.8125, 0.1875, 0.875, 0.125]
+	: N -> [0.875, 0.1875, 0.9375, 0.125]
+	: O -> [0.9375, 0.1875, 1, 0.125]
+	: P -> [0, 0.25, 0.0625, 0.1875]
+	: Q -> [0.0625, 0.25, 0.125, 0.1875]
+	: R -> [0.125, 0.25, 0.1875, 0.1875]
+	: S -> [0.1875, 0.25, 0.25, 0.1875]
+	: T -> [0.25, 0.25, 0.3125, 0.1875]
+	: U -> [0.3125, 0.25, 0.375, 0.1875]
+	: V -> [0.375, 0.25, 0.4375, 0.1875]
+	: W -> [0.4375, 0.25, 0.5, 0.1875]
+	: X -> [0.5, 0.25, 0.5625, 0.1875]
+	: Y -> [0.5625, 0.25, 0.625, 0.1875]
+	: Z -> [0.625, 0.25, 0.6875, 0.1875]
+	: [ -> [0.6875, 0.25, 0.75, 0.1875]
+	: \ -> [0.75, 0.25, 0.8125, 0.1875]
+	: ] -> [0.8125, 0.25, 0.875, 0.1875]
+	: ^ -> [0.875, 0.25, 0.9375, 0.1875]
+	: _ -> [0.9375, 0.25, 1, 0.1875]
+	: ` -> [0, 0.3125, 0.0625, 0.25]
+	: a -> [0.0625, 0.3125, 0.125, 0.25]
+	: b -> [0.125, 0.3125, 0.1875, 0.25]
+	: c -> [0.1875, 0.3125, 0.25, 0.25]
+	: d -> [0.25, 0.3125, 0.3125, 0.25]
+	: e -> [0.3125, 0.3125, 0.375, 0.25]
+	: f -> [0.375, 0.3125, 0.4375, 0.25]
+	: g -> [0.4375, 0.3125, 0.5, 0.25]
+	: h -> [0.5, 0.3125, 0.5625, 0.25]
+	: i -> [0.5625, 0.3125, 0.625, 0.25]
+	: j -> [0.625, 0.3125, 0.6875, 0.25]
+	: k -> [0.6875, 0.3125, 0.75, 0.25]
+	: l -> [0.75, 0.3125, 0.8125, 0.25]
+	: m -> [0.8125, 0.3125, 0.875, 0.25]
+	: n -> [0.875, 0.3125, 0.9375, 0.25]
+	: o -> [0.9375, 0.3125, 1, 0.25]
+	: p -> [0, 0.375, 0.0625, 0.3125]
+	: q -> [0.0625, 0.375, 0.125, 0.3125]
+	: r -> [0.125, 0.375, 0.1875, 0.3125]
+	: s -> [0.1875, 0.375, 0.25, 0.3125]
+	: t -> [0.25, 0.375, 0.3125, 0.3125]
+	: u -> [0.3125, 0.375, 0.375, 0.3125]
+	: v -> [0.375, 0.375, 0.4375, 0.3125]
+	: w -> [0.4375, 0.375, 0.5, 0.3125]
+	: x -> [0.5, 0.375, 0.5625, 0.3125]
+	: y -> [0.5625, 0.375, 0.625, 0.3125]
+	: z -> [0.625, 0.375, 0.6875, 0.3125]
+	: { -> [0.6875, 0.375, 0.75, 0.3125]
+	: | -> [0.75, 0.375, 0.8125, 0.3125]
+	: } -> [0.8125, 0.375, 0.875, 0.3125]
+	: ~ -> [0.875, 0.375, 0.9375, 0.3125]
+@@@ Instructions for basic settings menu created.
+@@@ Creating new Interface -> 1880 : 1040
+@@@ Element lower Left -> 1880:1040 - max Size -> 1920:1080
+@@@ Adding element: 1 to children of interface: 2
+@@@ Interface build complete returning Parent container
+@@@ Instructions for info text created.
+@@@ Creating new Interface -> 0 : 1000
+@@@ Element lower Left -> 0:1000 - max Size -> 80:2200
+@@@ Adding element: 3 to children of interface: 5
+@@@ Element lower Left -> 0:1040 - max Size -> 80:2200
+@@@ Adding element: 4 to children of interface: 5
+@@@ Interface build complete returning Parent container
+INTERFA_MANAGER ### Creating Tech Demo interface footer
+@@@ Creating new Interface -> 0 : 0
+@@@ Element lower Left -> 0:0 - max Size -> 1920:40
+@@@ Adding element: 6 to children of interface: 8
+@@@ Element lower Left -> 1820:0 - max Size -> 1920:40
+@@@ Adding element: 7 to children of interface: 8
+@@@ Interface build complete returning Parent container
+INTERFA_MANAGER ### Created Tech Demo footer -> 8
+INTERFA_MANAGER ### INTERFA_MANAGER init time: 48 ms.
+RENDER_MANAGER ### RenderManager init time: 0 ms.
+Loading World
+Adding component: object to: 3
+|*| Need to bake model Cube.obj, this could take a while ...  
+|*| Requested file: Cube.obj is already processed or in process
+|*| Loading binary model /home/tobias/Documents/Privat/Engine/build/linux-debug/WestEngine/bin/_Cube.west from disk
+ |*| Info: Read 0 textures for given model
+Adding component: shader to: 3
+|><| ### Creating new Shader.
+|><| ### Created Shader for ProgramID: 4.
+|><| Created Shader: 5 for File: /shader/Vertex.vs.
+|><| Created Shader: 6 for File: /shader/Fragment.fs.
+|><| ### Linked program: 4.
+Adding component: playercontrol to: 3
+@@@ Creating new Interface -> 1505 : 60
+@@@ Element lower Left -> 1505:60 - max Size -> 1905:100
+@@@ Adding element: 10 to children of interface: 9
+@@@ Element lower Left -> 1505:60 - max Size -> 1905:100
+@@@ Adding element: 11 to children of interface: 9
+@@@ Interface build complete returning Parent container
+INTERFA_MANAGER ### created a new game Interface from lua with id: 9Adding component: activeUnit to: 3
+Adding component: position to: 3
+Adding component: movement to: 3
+Adding component: health to: 3
+Adding component: equipment to: 3
+Adding component: object to: 4
+|*| Need to bake model Cube.obj, this could take a while ...  
+|*| Requested file: Cube.obj is already processed or in process
+|*| Loading binary model /home/tobias/Documents/Privat/Engine/build/linux-debug/WestEngine/bin/_Cube.west from disk
+ |*| Info: Read 0 textures for given model
+Adding component: shader to: 4
+|><| ### Creating new Shader.
+|><| ### Created Shader for ProgramID: 7.
+|><| Created Shader: 8 for File: /shader/Vertex.vs.
+|><| Created Shader: 9 for File: /shader/Fragment.fs.
+|><| ### Linked program: 7.
+Adding component: activeUnit to: 4
+Adding component: position to: 4
+Adding component: movement to: 4
+Adding component: health to: 4
+@@@ Creating new Interface -> 960 : 1000
+@@@ Element lower Left -> 1000:1040 - max Size -> 1040:1080
+@@@ Adding element: 13 to children of interface: 12
+@@@ Interface build complete returning Parent container
+INTERFA_MANAGER ### created a new game Interface from lua with id: 12SCENE_MANAGER ### Scene Initialized
+SCENE_MANAGER ### SCENE_MANAGER init time: 7 ms.
+SYSTEM_MANAGER ### EntitySystemManager init time: 0 ms.
+ENGINGE_MANAGER ### All Managers initialized! init time: 55 ms.
+Successfull initialization
+ENGINGE_MANAGER ### STARTING MAIN GAME LOOP.
+$$$ GL CALLBACK: ** GL ERROR ** type = 0x33356, severity = 0x37190, message = GL_INVALID_VALUE error generated. Program handle does not refer to an object generated by OpenGL.
+$$$ GL CALLBACK: ** GL ERROR ** type = 0x33356, severity = 0x37190, message = GL_INVALID_VALUE error generated. Program handle does not refer to an object generated by OpenGL.
+$$$ GL CALLBACK: ** GL ERROR ** type = 0x33356, severity = 0x37190, message = GL_INVALID_VALUE error generated. Program handle does not refer to an object generated by OpenGL.
+$$$ GL CALLBACK: ** GL ERROR ** type = 0x33356, severity = 0x37190, message = GL_INVALID_VALUE error generated. Program handle does not refer to an object generated by OpenGL.
+$$$ GL CALLBACK: ** GL ERROR ** type = 0x33356, severity = 0x37190, message = GL_INVALID_VALUE error generated. Program handle does not refer to an object generated by OpenGL.
+$$$ GL CALLBACK: ** GL ERROR ** type = 0x33356, severity = 0x37190, message = GL_INVALID_VALUE error generated. Program handle does not refer to an object generated by OpenGL.
+SHADER_MANAGER ### Initializing world shader.
+|><| ### Creating new Shader.
+|><| ### Created Shader for ProgramID: 10.
+|><| Created Shader: 11 for File: /shader/worldshader.vs.
+|><| Created Shader: 12 for File: /shader/worldshader.fs.
+|><| ### Linked program: 10.
+SHADER_MANAGER ### World shader initialized. ProgramID: 10.
+--- Creating 10 worker threads for engine
+ENGINGE_MANAGER ### Initialized Settings from saved Configuration file.
+ENGINGE_MANAGER ### Executable dir: /home/tobias/Documents/Privat/Engine/build/linux-debug/WestEngine
+ENGINGE_MANAGER ### Reading Setting: width=1920;
+ENGINGE_MANAGER ### Reading Setting: height=1080;
+ENGINGE_MANAGER ### Reading Setting: fps=60;
+INPUT_MANAGER ### Executable dir: /home/tobias/Documents/Privat/Engine/build/linux-debug/WestEngine
+INPUT_MANAGER ### Loaded files for Input Configuration /config/Game.ini...
+WINDOW_MANAGER ### primary monitor resolution: 3440 x 1440, setting to 1920 x 1080
+WINDOW_MANAGER ### Instantiating GL debug callback
+WINDOW_MANAGER ### Instantiating GL error callback
+|*| Starting up AssetFacade|*| Starting up Converter ... 
+|*| Starting up asset import machine
+SCENE_MANAGER ### instantiated Lua state
+PlayerControl *** Initialized debug information
+SYSTEM_MANAGER ### Instantiated critical game systems
+ENGINGE_MANAGER ### Startup complete
+ENGINGE_MANAGER ### All Managers started! startup time: 178 ms.
+Successfull startup
+INPUT_MANAGER ### Reading input from cfg: P=Pause
+INPUT_MANAGER ### Reading input from cfg: ESC=OpenMenu
+INPUT_MANAGER ### Reading input from cfg: F2=Info
+INPUT_MANAGER ### Reading input from cfg: W=CameraUp
+INPUT_MANAGER ### Reading input from cfg: A=CameraLeft
+INPUT_MANAGER ### Reading input from cfg: S=CameraDown
+INPUT_MANAGER ### Reading input from cfg: D=CameraRight
+INPUT_MANAGER ### Reading input from cfg: Q=CameraRotateRight
+INPUT_MANAGER ### Reading input from cfg: E=CameraRotateLeft
+INPUT_MANAGER ### InputManager init time: 0 ms.
+WINDOW_MANAGER: initialized with 
+		Width: 1920
+		Height: 1080
+WINDOW_MANAGER ### WindowManager init time: 0 ms.
+|><| ### Creating new Shader.
+|><| ### Created Shader for ProgramID: 1.
+|><| Created Shader: 2 for File: shader/InterfaceVertexShader.vs.
+|><| Created Shader: 3 for File: shader/InterfaceFragementShader.fs.
+|><| ### Linked program: 1.
+|><| ### Uniform Block not found for shader: shader/InterfaceVertexShader.vs and shader/InterfaceFragementShader.fs. Check if the Entity uses a Shader with Camera uniforms
+SHADER_MANAGER ### Created Shader for Interfaces. ProgramID: 1.
+SHADER_MANAGER ### ShaderManager init time: 0 ms.
+$$$ GL CALLBACK:  type = 0x33361, severity = 0x33387, message = Buffer detailed info: Buffer object 1 (bound to GL_ARRAY_BUFFER_ARB, usage hint is GL_STATIC_DRAW) will use VIDEO memory as the source for buffer object operations.
+$$$ GL CALLBACK:  type = 0x33361, severity = 0x33387, message = Buffer detailed info: Buffer object 2 (bound to GL_ELEMENT_ARRAY_BUFFER_ARB, usage hint is GL_STATIC_DRAW) will use VIDEO memory as the source for buffer object operations.
+$$$ GL CALLBACK:  type = 0x33361, severity = 0x33387, message = Buffer detailed info: Buffer object 6 (bound to GL_ARRAY_BUFFER_ARB, usage hint is GL_STATIC_DRAW) will use VIDEO memory as the source for buffer object operations.
+@@@ Initializing font atlas
+	:   -> [0, 0.0625, 0.0625, 0]
+	: ! -> [0.0625, 0.0625, 0.125, 0]
+	: " -> [0.125, 0.0625, 0.1875, 0]
+	: # -> [0.1875, 0.0625, 0.25, 0]
+	: $ -> [0.25, 0.0625, 0.3125, 0]
+	: % -> [0.3125, 0.0625, 0.375, 0]
+	: & -> [0.375, 0.0625, 0.4375, 0]
+	: ' -> [0.4375, 0.0625, 0.5, 0]
+	: ( -> [0.5, 0.0625, 0.5625, 0]
+	: ) -> [0.5625, 0.0625, 0.625, 0]
+	: * -> [0.625, 0.0625, 0.6875, 0]
+	: + -> [0.6875, 0.0625, 0.75, 0]
+	: , -> [0.75, 0.0625, 0.8125, 0]
+	: - -> [0.8125, 0.0625, 0.875, 0]
+	: . -> [0.875, 0.0625, 0.9375, 0]
+	: / -> [0.9375, 0.0625, 1, 0]
+	: 0 -> [0, 0.125, 0.0625, 0.0625]
+	: 1 -> [0.0625, 0.125, 0.125, 0.0625]
+	: 2 -> [0.125, 0.125, 0.1875, 0.0625]
+	: 3 -> [0.1875, 0.125, 0.25, 0.0625]
+	: 4 -> [0.25, 0.125, 0.3125, 0.0625]
+	: 5 -> [0.3125, 0.125, 0.375, 0.0625]
+	: 6 -> [0.375, 0.125, 0.4375, 0.0625]
+	: 7 -> [0.4375, 0.125, 0.5, 0.0625]
+	: 8 -> [0.5, 0.125, 0.5625, 0.0625]
+	: 9 -> [0.5625, 0.125, 0.625, 0.0625]
+	: : -> [0.625, 0.125, 0.6875, 0.0625]
+	: ; -> [0.6875, 0.125, 0.75, 0.0625]
+	: < -> [0.75, 0.125, 0.8125, 0.0625]
+	: = -> [0.8125, 0.125, 0.875, 0.0625]
+	: > -> [0.875, 0.125, 0.9375, 0.0625]
+	: ? -> [0.9375, 0.125, 1, 0.0625]
+	: @ -> [0, 0.1875, 0.0625, 0.125]
+	: A -> [0.0625, 0.1875, 0.125, 0.125]
+	: B -> [0.125, 0.1875, 0.1875, 0.125]
+	: C -> [0.1875, 0.1875, 0.25, 0.125]
+	: D -> [0.25, 0.1875, 0.3125, 0.125]
+	: E -> [0.3125, 0.1875, 0.375, 0.125]
+	: F -> [0.375, 0.1875, 0.4375, 0.125]
+	: G -> [0.4375, 0.1875, 0.5, 0.125]
+	: H -> [0.5, 0.1875, 0.5625, 0.125]
+	: I -> [0.5625, 0.1875, 0.625, 0.125]
+	: J -> [0.625, 0.1875, 0.6875, 0.125]
+	: K -> [0.6875, 0.1875, 0.75, 0.125]
+	: L -> [0.75, 0.1875, 0.8125, 0.125]
+	: M -> [0.8125, 0.1875, 0.875, 0.125]
+	: N -> [0.875, 0.1875, 0.9375, 0.125]
+	: O -> [0.9375, 0.1875, 1, 0.125]
+	: P -> [0, 0.25, 0.0625, 0.1875]
+	: Q -> [0.0625, 0.25, 0.125, 0.1875]
+	: R -> [0.125, 0.25, 0.1875, 0.1875]
+	: S -> [0.1875, 0.25, 0.25, 0.1875]
+	: T -> [0.25, 0.25, 0.3125, 0.1875]
+	: U -> [0.3125, 0.25, 0.375, 0.1875]
+	: V -> [0.375, 0.25, 0.4375, 0.1875]
+	: W -> [0.4375, 0.25, 0.5, 0.1875]
+	: X -> [0.5, 0.25, 0.5625, 0.1875]
+	: Y -> [0.5625, 0.25, 0.625, 0.1875]
+	: Z -> [0.625, 0.25, 0.6875, 0.1875]
+	: [ -> [0.6875, 0.25, 0.75, 0.1875]
+	: \ -> [0.75, 0.25, 0.8125, 0.1875]
+	: ] -> [0.8125, 0.25, 0.875, 0.1875]
+	: ^ -> [0.875, 0.25, 0.9375, 0.1875]
+	: _ -> [0.9375, 0.25, 1, 0.1875]
+	: ` -> [0, 0.3125, 0.0625, 0.25]
+	: a -> [0.0625, 0.3125, 0.125, 0.25]
+	: b -> [0.125, 0.3125, 0.1875, 0.25]
+	: c -> [0.1875, 0.3125, 0.25, 0.25]
+	: d -> [0.25, 0.3125, 0.3125, 0.25]
+	: e -> [0.3125, 0.3125, 0.375, 0.25]
+	: f -> [0.375, 0.3125, 0.4375, 0.25]
+	: g -> [0.4375, 0.3125, 0.5, 0.25]
+	: h -> [0.5, 0.3125, 0.5625, 0.25]
+	: i -> [0.5625, 0.3125, 0.625, 0.25]
+	: j -> [0.625, 0.3125, 0.6875, 0.25]
+	: k -> [0.6875, 0.3125, 0.75, 0.25]
+	: l -> [0.75, 0.3125, 0.8125, 0.25]
+	: m -> [0.8125, 0.3125, 0.875, 0.25]
+	: n -> [0.875, 0.3125, 0.9375, 0.25]
+	: o -> [0.9375, 0.3125, 1, 0.25]
+	: p -> [0, 0.375, 0.0625, 0.3125]
+	: q -> [0.0625, 0.375, 0.125, 0.3125]
+	: r -> [0.125, 0.375, 0.1875, 0.3125]
+	: s -> [0.1875, 0.375, 0.25, 0.3125]
+	: t -> [0.25, 0.375, 0.3125, 0.3125]
+	: u -> [0.3125, 0.375, 0.375, 0.3125]
+	: v -> [0.375, 0.375, 0.4375, 0.3125]
+	: w -> [0.4375, 0.375, 0.5, 0.3125]
+	: x -> [0.5, 0.375, 0.5625, 0.3125]
+	: y -> [0.5625, 0.375, 0.625, 0.3125]
+	: z -> [0.625, 0.375, 0.6875, 0.3125]
+	: { -> [0.6875, 0.375, 0.75, 0.3125]
+	: | -> [0.75, 0.375, 0.8125, 0.3125]
+	: } -> [0.8125, 0.375, 0.875, 0.3125]
+	: ~ -> [0.875, 0.375, 0.9375, 0.3125]
+@@@ Instructions for basic settings menu created.
+@@@ Creating new Interface -> 1880 : 1040
+@@@ Element lower Left -> 1880:1040 - max Size -> 1920:1080
+@@@ Adding element: 1 to children of interface: 2
+@@@ Interface build complete returning Parent container
+@@@ Instructions for info text created.
+@@@ Creating new Interface -> 0 : 1000
+@@@ Element lower Left -> 0:1000 - max Size -> 80:2200
+@@@ Adding element: 3 to children of interface: 5
+@@@ Element lower Left -> 0:1040 - max Size -> 80:2200
+@@@ Adding element: 4 to children of interface: 5
+@@@ Interface build complete returning Parent container
+INTERFA_MANAGER ### Creating Tech Demo interface footer
+@@@ Creating new Interface -> 0 : 0
+@@@ Element lower Left -> 0:0 - max Size -> 1920:40
+@@@ Adding element: 6 to children of interface: 8
+@@@ Element lower Left -> 1820:0 - max Size -> 1920:40
+@@@ Adding element: 7 to children of interface: 8
+@@@ Interface build complete returning Parent container
+INTERFA_MANAGER ### Created Tech Demo footer -> 8
+INTERFA_MANAGER ### INTERFA_MANAGER init time: 50 ms.
+RENDER_MANAGER ### RenderManager init time: 0 ms.
+Loading World
+Adding component: object to: 3
+|*| Models in scene: 1.
+|*| Need to bake model Cube.obj, this could take a while ...  
+|*| Requested file: Cube.obj is already processed or in process
+|*| Loading binary model /home/tobias/Documents/Privat/Engine/build/linux-debug/WestEngine/bin/_Cube.west from disk
+ |*| Info: Read 0 textures for given model
+Adding component: shader to: 3
+|><| ### Creating new Shader.
+|><| ### Created Shader for ProgramID: 4.
+|><| Created Shader: 5 for File: /shader/Vertex.vs.
+|><| Created Shader: 6 for File: /shader/Fragment.fs.
+|><| ### Linked program: 4.
+Adding component: playercontrol to: 3
+@@@ Creating new Interface -> 1505 : 60
+@@@ Element lower Left -> 1505:60 - max Size -> 1905:100
+@@@ Adding element: 10 to children of interface: 9
+@@@ Element lower Left -> 1505:60 - max Size -> 1905:100
+@@@ Adding element: 11 to children of interface: 9
+@@@ Interface build complete returning Parent container
+INTERFA_MANAGER ### created a new game Interface from lua with id: 9Adding component: activeUnit to: 3
+Adding component: position to: 3
+Adding component: movement to: 3
+Adding component: health to: 3
+Adding component: equipment to: 3
+Adding component: object to: 4
+|*| Models in scene: 2.
+|*| Need to bake model Cube.obj, this could take a while ...  
+|*| Requested file: Cube.obj is already processed or in process
+|*| Loading binary model /home/tobias/Documents/Privat/Engine/build/linux-debug/WestEngine/bin/_Cube.west from disk
+ |*| Info: Read 0 textures for given model
+Adding component: shader to: 4
+|><| ### Creating new Shader.
+|><| ### Created Shader for ProgramID: 7.
+|><| Created Shader: 8 for File: /shader/Vertex.vs.
+|><| Created Shader: 9 for File: /shader/Fragment.fs.
+|><| ### Linked program: 7.
+Adding component: activeUnit to: 4
+Adding component: position to: 4
+Adding component: movement to: 4
+Adding component: health to: 4
+@@@ Creating new Interface -> 960 : 1000
+@@@ Element lower Left -> 1000:1040 - max Size -> 1040:1080
+@@@ Adding element: 13 to children of interface: 12
+@@@ Interface build complete returning Parent container
+INTERFA_MANAGER ### created a new game Interface from lua with id: 12SCENE_MANAGER ### Scene Initialized
+SCENE_MANAGER ### SCENE_MANAGER init time: 7 ms.
+SYSTEM_MANAGER ### EntitySystemManager init time: 0 ms.
+ENGINGE_MANAGER ### All Managers initialized! init time: 57 ms.
+Successfull initialization
+ENGINGE_MANAGER ### STARTING MAIN GAME LOOP.
+|*| Models in scene: 2.
+|*| Models in scene: 2.
+SHADER_MANAGER ### Initializing world shader.
+|><| ### Creating new Shader.
+|><| ### Created Shader for ProgramID: 10.
+|><| Created Shader: 11 for File: /shader/worldshader.vs.
+|><| Created Shader: 12 for File: /shader/worldshader.fs.
+|><| ### Linked program: 10.
+SHADER_MANAGER ### World shader initialized. ProgramID: 10.
+|*| Models in scene: 2.
+|*| Models in scene: 2.
+|*| Models in scene: 2.
+$$$ GL CALLBACK:  type = 0x33361, severity = 0x33387, message = Buffer detailed info: Buffer object 9 (bound to GL_ELEMENT_ARRAY_BUFFER_ARB, usage hint is GL_STATIC_DRAW) will use VIDEO memory as the source for buffer object operations.
+$$$ GL CALLBACK:  type = 0x33361, severity = 0x33387, message = Buffer detailed info: Buffer object 10 (bound to GL_ARRAY_BUFFER_ARB, usage hint is GL_STATIC_DRAW) will use VIDEO memory as the source for buffer object operations.
+$$$ GL CALLBACK:  type = 0x33361, severity = 0x33387, message = Buffer detailed info: Buffer object 11 (bound to GL_ARRAY_BUFFER_ARB, usage hint is GL_STATIC_DRAW) will use VIDEO memory as the source for buffer object operations.
+$$$ GL CALLBACK:  type = 0x33361, severity = 0x33387, message = Buffer detailed info: Buffer object 12 (bound to GL_ARRAY_BUFFER_ARB, usage hint is GL_STATIC_DRAW) will use VIDEO memory as the source for buffer object operations.

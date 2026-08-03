@@ -71,7 +71,7 @@ std::int32_t SceneManager::init()
 {
 #ifdef DEBUG
   double start = TimeUtils::getCurrentTimeAsTime();
-#endif 
+#endif
   _registry->registerComponent<Movement>();
   _registry->registerComponent<Position>();
   _registry->registerComponent<AABB>();
@@ -151,6 +151,10 @@ void SceneManager::deleteScene()
 #ifdef DEBUG
   logDebug(std::format("{} ### Cleaned up GPU memory\n", getName()));
 #endif
+  for (auto& entity : _scene->getEntities())
+  {
+    removeEntityFromScene(entity);
+  }
   _scene->deleteScene();
 #ifdef DEBUG
   logDebug(std::format("{} ### Deleted Scene\n", getName()));

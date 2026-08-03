@@ -20,6 +20,9 @@ const Model* DataPool::getNextFreeProjectile(const std::string& type)
 const Model* DataPool::getModelByGuid(const std::string& guid)
 {
   auto idx = _guidToIndex.find(guid);
+#ifdef DEBUG
+  _logger->log(Level::Info, std::format("|*| Models in scene: {}. Looking for: {}\n", _guidToIndex.size(), guid));
+#endif
   if (idx == _guidToIndex.end())
   {
     return nullptr;
@@ -30,6 +33,9 @@ const Model* DataPool::getModelByGuid(const std::string& guid)
 const Model* DataPool::getModelByName(const std::string& name)
 {
   auto guid = _nameToGuid.find(name);
+#ifdef DEBUG
+  _logger->log(Level::Info, std::format("|*| Models in scene: {}.\n", _guidToIndex.size()));
+#endif
   if (guid == _nameToGuid.end())
   {
     return nullptr;
@@ -51,6 +57,9 @@ bool DataPool::addModelToScene(Model&& m)
   }
   _guidToIndex[m.getGuid()] = _currentIdx;
   _nameToGuid[m.getName()]  = m.getGuid();
+#ifdef DEBUG
+  _logger->log(Level::Info, std::format("|*| Adding model '{}' with GUID '{}' at index {}\n", m.getName(), m.getGuid(), _currentIdx));
+#endif
   _sceneModels[_currentIdx] = std::move(m);
   _currentIdx++;
   return true;

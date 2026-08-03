@@ -4,6 +4,7 @@
 #include "../Scripting/LuaFacade.hpp"
 
 #include <format>
+#include <WestAssetFacade.hpp>
 
 
 WorldBuilder::WorldBuilder(lua_State* l, std::shared_ptr<ComponentRegistry> r, std::shared_ptr<Scene> s)
@@ -61,14 +62,9 @@ void WorldBuilder::createWorld(World& w, lua_State* L)
   sqmap = sqrt(map.size());
   w.setCreationInformation(sqmap, 1, glm::vec2(-sqmap / 2.0f, -sqmap / 2.0f));
 
-  Model* m = buildWorldMesh(map, sqmap);
-  w.setGuid("world");
-
-  Shader s           = {};
-  s.vertexShaderFile = "/shader/worldshader.vs";
-  s.fragShaderFile   = "/shader/worldshader.fs";
-  s.shadergroup      = 1000;
-  _registry->addComponent<Shader>(w.getId(), std::move(s));
+  Model* m                = buildWorldMesh(map, sqmap);
+  const std::string& guid = WestData::WestAssetFacade::getAssetFacade().addModelToScene(*m);
+  w.setModelGuid(guid);
 }
 
 Model* WorldBuilder::buildWorldMesh(const std::vector<std::uint8_t>& map, std::int32_t sqmap)
@@ -103,8 +99,8 @@ Model* WorldBuilder::buildWorldMesh(const std::vector<std::uint8_t>& map, std::i
     }
   }
 
-  Mesh mesh         = Mesh("world", vert, idx, tex);
-  mesh.diffuseColor = glm::vec3(0.2f, 0.6f, 0.2f);
+  Mesh mesh                  = Mesh("world", vert, idx, tex, AABB());
+  mesh.material.diffuseColor = glm::vec3(0.2f, 0.6f, 0.2f);
   m->addMesh(mesh);
   return m;
 }

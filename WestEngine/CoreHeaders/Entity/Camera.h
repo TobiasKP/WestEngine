@@ -15,7 +15,7 @@ struct Frustum
 class Camera
 {
 public:
-  Camera() : _rotation(glm::vec3(0)), _position(glm::vec3(0)), _cameraUniforms(-1), _dirty(true) {};
+  Camera() : _rotation(glm::vec3(0)), _position(glm::vec3(0)), _dirty(true) {};
   Camera(glm::vec3 pos, glm::vec3 rot);
   ~Camera();
 
@@ -33,10 +33,6 @@ public:
   {
     _rotation = rot;
   }
-  inline void setCameraUniforms(GLuint u)
-  {
-    _cameraUniforms = u;
-  }
   inline glm::vec3& getPosition()
   {
     return _position;
@@ -45,12 +41,15 @@ public:
   {
     return _FRUSTUM;
   }
+  inline std::uint32_t getId()
+  {
+    return _id;
+  }
 
 private:
   void createFrustumFromCamera();
 
-
-  GLuint _cameraUniforms;
+  std::uint32_t _id;
   glm::vec3 _move;
   glm::vec3 _position;
   glm::vec3 _rotation;
