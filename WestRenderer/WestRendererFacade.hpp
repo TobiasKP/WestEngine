@@ -40,7 +40,7 @@ private:
 
   std::unordered_map<std::string, GLuint> _vshaderToProgramId;
   std::unordered_map<std::string, GLuint> _fshaderToProgramId;
-  std::unordered_map<std::uint32_t, std::unordered_map<const char*, GLuint>> _entityToUniforms;
+  std::unordered_map<std::uint32_t, std::unordered_map<std::string, GLuint>> _entityToUniforms;
   std::unique_ptr<ShaderController> _controller;
   std::shared_ptr<UniformUtils> _utils;
   std::unique_ptr<RenderingCycle> _cycle;

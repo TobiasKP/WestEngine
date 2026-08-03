@@ -73,8 +73,14 @@ void RenderManager::update()
     if (AABBcheck(entity))
     {
       Position* p                = _scene->getRegistry()->getComponent<Position>(entity.getId());
+      const Model* model         = WestData::WestAssetFacade::getAssetFacade().requestModelFromScene(entity.getModelGuid());
       EntityUniformParams params = {};
       params.transform           = PositionCalculation::createTransformationMatrix(p->position, p->rotation, p->scale);
+      if (model)
+      {
+        params.diffuseColor  = model->getMeshes().front().material.diffuseColor;
+        params.emissiveColor = model->getMeshes().front().material.emissiveColor + p->emissiveOverride;
+      }
       _facade->renderEntity(entity.getModelGuid(), entity.getId(), entity.getShaderId(), &params, false);
     }
     else
@@ -101,6 +107,10 @@ void RenderManager::update()
 bool RenderManager::AABBcheck(const Entity& e)
 {
   const Model* model = WestData::WestAssetFacade::getAssetFacade().requestModelFromScene(e.getModelGuid());
+  if (model == nullptr)
+  {
+    return false;
+  }
   const Frustum& f   = _scene->getCamera()->getFrustum();
   Position* p        = _scene->getRegistry()->getComponent<Position>(e.getId());
 

@@ -2,19 +2,16 @@
 
 #include "../CoreHeaders/Utils/Math/PositionCalculation.h"
 
-#include <WestAssetFacade.hpp>
-
 PositionalSystem::PositionalSystem(std::shared_ptr<EventDispatcher> d,
                                    WestLogger* l,
                                    std::shared_ptr<ComponentRegistry> r,
                                    std::shared_ptr<Camera> c)
   : ISystem(d, l, r)
 {
-  _cam          = c;
-  _lastEntity   = -1;
-  _tileIdx      = -1;
-  _lastEmissive = glm::vec3(0);
-  _highlighted  = false;
+  _cam         = c;
+  _lastEntity  = -1;
+  _tileIdx     = -1;
+  _highlighted = false;
 };
 
 PositionalSystem::~PositionalSystem() {};
@@ -30,36 +27,26 @@ void PositionalSystem::update()
   std::shared_ptr<ComponentArray<Position>> pos = _reg->getComponentArray<Position>();
   std::uint32_t id                              = _world->getEntityByIdx(_tileIdx);
 
-  /* TODO: Bug -> if emissiveColor is ever used this will overwrite it
   if (_lastEntity != -1 && _lastEntity != id)
   {
-    o = _reg->getComponent<Object>(_lastEntity);
-    if (o)
+    Position* p = _reg->getComponent<Position>(_lastEntity);
+    if (p)
     {
-      const Model* m = WestData::WestAssetFacade::getAssetFacade().requestModelFromScene(o->guid);
-      for (Mesh mesh : m->getMeshes())
-      {
-        mesh.emissiveColor = _lastEmissive;
-      }
+      p->emissiveOverride = glm::vec3(0.0f);
     }
     _lastEntity  = -1;
     _highlighted = false;
   }
   if (id > 0 && !_highlighted)
   {
-    o = _reg->getComponent<Object>(id);
-    assert(o != nullptr);
-    const Model* m = WestData::WestAssetFacade::getAssetFacade().requestModelFromScene(o->guid);
-    for (Mesh mesh : m->getMeshes())
+    Position* p = _reg->getComponent<Position>(id);
+    if (p)
     {
-      _lastEmissive       = mesh.emissiveColor;
-      mesh.emissiveColor += glm::vec3(0.0, 0.5, 0.5);
+      p->emissiveOverride = glm::vec3(0.0, 0.5, 0.5);
+      _lastEntity         = id;
+      _highlighted        = true;
     }
-
-
-    _lastEntity  = id;
-    _highlighted = true;
-  }*/
+  }
 };
 
 void PositionalSystem::updateDebuggingInfo() {};

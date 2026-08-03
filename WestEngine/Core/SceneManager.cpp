@@ -140,7 +140,20 @@ void SceneManager::removeEntityFromScene(const Entity& entity)
 
   if (!entity.isDebugEntity())
   {
-    _dataFacade->deleteModelFromScene(entity.getModelGuid());
+    const std::string& guid = entity.getModelGuid();
+    bool stillInUse         = false;
+    for (const Entity& e : _scene->getEntities())
+    {
+      if (e.getId() != entity.getId() && e.getModelGuid() == guid)
+      {
+        stillInUse = true;
+        break;
+      }
+    }
+    if (!stillInUse)
+    {
+      _dataFacade->deleteModelFromScene(guid);
+    }
   }
   _registry->removeAllComponents(entity.getId());
   _scene->removeEntity(entity);

@@ -7,7 +7,7 @@
 
 void RenderingCycle::renderEntity(std::string guid,
                                   GLuint programId,
-                                  std::unordered_map<const char*, GLuint> uniforms,
+                                  std::unordered_map<std::string, GLuint> uniforms,
                                   EntityUniformParams* params,
                                   bool debug)
 {
@@ -40,12 +40,12 @@ void RenderingCycle::renderEntity(std::string guid,
 
   if (uniforms.contains(UniformConstants::COLOR))
   {
-    _utils->setUniform(uniforms[UniformConstants::COLOR], model->getMeshes().front().material.diffuseColor);
+    _utils->setUniform(uniforms[UniformConstants::COLOR], params->diffuseColor);
   }
 
   if (uniforms.contains(UniformConstants::ECOLOR))
   {
-    _utils->setUniform(uniforms[UniformConstants::ECOLOR], model->getMeshes().front().material.emissiveColor);
+    _utils->setUniform(uniforms[UniformConstants::ECOLOR], params->emissiveColor);
   }
 
   if (uniforms.contains(UniformConstants::TEXTURE_SAMPLER))
@@ -80,7 +80,7 @@ void RenderingCycle::renderEntity(std::string guid,
 #endif
 };
 
-void RenderingCycle::renderWorld(std::unordered_map<const char*, GLuint> uniforms,
+void RenderingCycle::renderWorld(std::unordered_map<std::string, GLuint> uniforms,
                                  GLuint programId,
                                  std::string modelGuid,
                                  bool dirty,
@@ -103,6 +103,11 @@ void RenderingCycle::renderWorld(std::unordered_map<const char*, GLuint> uniform
   if (!_uuidToVAO.contains(modelGuid))
   {
     registerModel(model, modelGuid);
+  }
+
+  if (uniforms.contains(UniformConstants::DCOLOR))
+  {
+    _utils->setUniform(uniforms[UniformConstants::DCOLOR], model->getMeshes().front().material.diffuseColor);
   }
 
   if (dirty)

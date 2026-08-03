@@ -21,6 +21,11 @@ public:
     return _meshes;
   };
 
+  std::vector<Mesh>& getMeshes()
+  {
+    return _meshes;
+  };
+
   const std::string& getName() const
   {
     return _name;

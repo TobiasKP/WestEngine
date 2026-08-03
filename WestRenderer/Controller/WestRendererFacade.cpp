@@ -32,8 +32,7 @@ void WestRendererFacade::clearColor()
 void WestRendererFacade::renderEntity(
   std::string guid, std::uint32_t entityId, GLuint programId, EntityUniformParams* params, bool debug)
 {
-  std::unordered_map<const char*, GLuint> uniforms = _entityToUniforms[entityId];
-  _logger->log(Level::Info, std::format("|><| renderEntity entityId={} programId={} uniforms.size={}\n", entityId, programId, uniforms.size()));
+  std::unordered_map<std::string, GLuint> uniforms = _entityToUniforms[entityId];
   _cycle->renderEntity(guid, programId, uniforms, params, debug);
 };
 
@@ -45,7 +44,7 @@ void WestRendererFacade::renderInterface()
 void WestRendererFacade::renderWorld(
   std::string modelGuid, std::uint32_t entityId, GLuint programId, bool dirty, WorldUniformParams* params)
 {
-  std::unordered_map<const char*, GLuint> uniforms = _entityToUniforms[entityId];
+  std::unordered_map<std::string, GLuint> uniforms = _entityToUniforms[entityId];
   _cycle->renderWorld(uniforms, programId, modelGuid, dirty, params);
 };
 
@@ -54,8 +53,7 @@ void WestRendererFacade::renderDebugEntities() {};
 void WestRendererFacade::updateCamera(std::uint32_t entityId, glm::mat4 view, glm::mat4 projection)
 {
   const char* key                                  = UniformConstants::CAMERA_UNIFORMS;
-  std::unordered_map<const char*, GLuint> uniforms = _entityToUniforms[entityId];
-  _logger->log(Level::Info, std::format("|><| updateCamera entityId={} uniforms.size={}\n", entityId, uniforms.size()));
+  std::unordered_map<std::string, GLuint> uniforms = _entityToUniforms[entityId];
   if (uniforms.contains(key))
   {
     glBindBuffer(GL_UNIFORM_BUFFER, uniforms[key]);

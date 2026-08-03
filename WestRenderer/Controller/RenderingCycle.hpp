@@ -16,10 +16,10 @@ public:
 
   void renderEntity(std::string guid,
                     GLuint programId,
-                    std::unordered_map<const char*, GLuint> uniforms,
+                    std::unordered_map<std::string, GLuint> uniforms,
                     EntityUniformParams* params,
                     bool debug);
-  void renderWorld(std::unordered_map<const char*, GLuint> uniforms,
+  void renderWorld(std::unordered_map<std::string, GLuint> uniforms,
                    GLuint programId,
                    std::string modelGuid,
                    bool dirty,

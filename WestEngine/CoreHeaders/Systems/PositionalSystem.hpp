@@ -25,6 +25,5 @@ private:
   std::shared_ptr<Camera> _cam;
   std::int32_t _tileIdx, _lastEntity;
   bool _highlighted;
-  glm::vec3 _lastEmissive;
   std::optional<MousePayload> _lastMouse;
 };

@@ -80,7 +80,7 @@ Model* WorldBuilder::buildWorldMesh(const std::vector<std::uint8_t>& map, std::i
   {
     for (std::int32_t col = 0; col < sqmap; ++col)
     {
-      std::int32_t base = static_cast<std::int32_t>(vert.size() / 3);
+      std::int32_t base = static_cast<std::int32_t>(vert.size());
       float height      = static_cast<float>(map[row * sqmap + col]);
 
       for (int v = 0; v < 4; ++v)
