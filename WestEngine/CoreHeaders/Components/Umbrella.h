@@ -1,3 +1,4 @@
+#include "Appearance.h"
 #include "Control.hpp"
 #include "Health.hpp"
 #include "Movement.hpp"

@@ -225,6 +225,7 @@ void RenderingCycle::registerModel(const Model* model, std::string modelGuid)
 {
   createVAO();
   _uuidToVAO[modelGuid] = _vaos.size() - 1;
+  size_t vboStart        = _vbos.size();
   for (const Mesh& m : model->getMeshes())
   {
     storeIndicesBuffer(m.indices.data(), m.indices.size());
@@ -234,7 +235,7 @@ void RenderingCycle::registerModel(const Model* model, std::string modelGuid)
     std::vector<float> texCoords;
     texCoords.reserve(m.vertices.size() * 2);
     std::vector<float> normals;
-    positions.reserve(m.vertices.size() * 3);
+    normals.reserve(m.vertices.size() * 3);
     for (const Vertex& v : m.vertices)
     {
       positions.insert(positions.end(), {v.Position.x, v.Position.y, v.Position.z});
@@ -245,6 +246,30 @@ void RenderingCycle::registerModel(const Model* model, std::string modelGuid)
     storeDataInAttribList(1, 2, texCoords.data(), texCoords.size());
     storeDataInAttribList(2, 3, normals.data(), normals.size());
   }
+  _uuidToVBOs[modelGuid] = std::vector<GLuint>(_vbos.begin() + vboStart, _vbos.end());
+}
+
+void RenderingCycle::cleanupModel(const std::string& modelGuid)
+{
+  auto vaoIt = _uuidToVAO.find(modelGuid);
+  if (vaoIt == _uuidToVAO.end())
+  {
+    return;
+  }
+
+  GLuint vao = _vaos[vaoIt->second];
+  glDeleteVertexArrays(1, &vao);
+
+  auto vboIt = _uuidToVBOs.find(modelGuid);
+  if (vboIt != _uuidToVBOs.end())
+  {
+    glDeleteBuffers(vboIt->second.size(), vboIt->second.data());
+    _uuidToVBOs.erase(vboIt);
+  }
+
+  _uuidToVAO.erase(vaoIt);
+  _uuidToVertexCount.erase(modelGuid);
+  _uuidToTexture.erase(modelGuid);
 }
 
 void RenderingCycle::createVAO()

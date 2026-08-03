@@ -50,6 +50,11 @@ void WestRendererFacade::renderWorld(
 
 void WestRendererFacade::renderDebugEntities() {};
 
+void WestRendererFacade::cleanupModel(const std::string& modelGuid)
+{
+  _cycle->cleanupModel(modelGuid);
+};
+
 void WestRendererFacade::updateCamera(std::uint32_t entityId, glm::mat4 view, glm::mat4 projection)
 {
   const char* key                                  = UniformConstants::CAMERA_UNIFORMS;

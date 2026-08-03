@@ -28,6 +28,7 @@ public:
   void createUniform(const char* name, GLuint programId, std::uint32_t entityId);
   void createUniformBufferObject(const char* name, size_t size, GLuint bindingPoint, std::uint32_t entityId);
 
+  void cleanupModel(const std::string& modelGuid);
   GLuint registerShader(const std::string& vshader, const std::string& fshader);
 
 private:

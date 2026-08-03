@@ -73,13 +73,19 @@ void RenderManager::update()
     if (AABBcheck(entity))
     {
       Position* p                = _scene->getRegistry()->getComponent<Position>(entity.getId());
+      Appearance* appearance     = _scene->getRegistry()->getComponent<Appearance>(entity.getId());
       const Model* model         = WestData::WestAssetFacade::getAssetFacade().requestModelFromScene(entity.getModelGuid());
       EntityUniformParams params = {};
       params.transform           = PositionCalculation::createTransformationMatrix(p->position, p->rotation, p->scale);
       if (model)
       {
         params.diffuseColor  = model->getMeshes().front().material.diffuseColor;
-        params.emissiveColor = model->getMeshes().front().material.emissiveColor + p->emissiveOverride;
+        params.emissiveColor = model->getMeshes().front().material.emissiveColor;
+        if (appearance)
+        {
+          params.diffuseColor  += appearance->diffuseOverride;
+          params.emissiveColor += appearance->emissiveOverride;
+        }
       }
       _facade->renderEntity(entity.getModelGuid(), entity.getId(), entity.getShaderId(), &params, false);
     }

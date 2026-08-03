@@ -7,6 +7,7 @@
 #include <format>
 #include <lua.hpp>
 #include <PathUtils.h>
+#include <WestRendererFacade.hpp>
 
 SceneManager::SceneManager() : IManager(nullptr)
 {
@@ -79,6 +80,7 @@ std::int32_t SceneManager::init()
   _registry->registerComponent<Health>();
   _registry->registerComponent<Projectile>();
   _registry->registerComponent<Equipment>();
+  _registry->registerComponent<Appearance>();
   _facade->registerCFunction(getHealth, LuaAPI::C_GETHEALTH.data(), this);
   _facade->registerCFunction(getPosition, LuaAPI::C_GETPOSITION.data(), this);
   _scene->init();
@@ -152,6 +154,7 @@ void SceneManager::removeEntityFromScene(const Entity& entity)
     }
     if (!stillInUse)
     {
+      WestRenderer::WestRendererFacade::getRendererFacade().cleanupModel(guid);
       _dataFacade->deleteModelFromScene(guid);
     }
   }

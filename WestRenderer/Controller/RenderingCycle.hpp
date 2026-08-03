@@ -25,6 +25,7 @@ public:
                    bool dirty,
                    WorldUniformParams* params);
   void renderInterfaces();
+  void cleanupModel(const std::string& modelGuid);
 
 private:
   void registerModel(const Model* model, std::string modelGuid);
@@ -39,6 +40,7 @@ private:
   std::unordered_map<std::string, std::uint32_t> _uuidToVAO;
   std::unordered_map<std::string, std::uint32_t> _uuidToVertexCount;
   std::unordered_map<std::string, GLint> _uuidToTexture;
+  std::unordered_map<std::string, std::vector<GLuint>> _uuidToVBOs;
   std::vector<GLuint> _vaos;
   std::vector<GLuint> _vbos;
 };

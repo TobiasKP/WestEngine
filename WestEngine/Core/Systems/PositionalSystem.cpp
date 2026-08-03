@@ -29,20 +29,20 @@ void PositionalSystem::update()
 
   if (_lastEntity != -1 && _lastEntity != id)
   {
-    Position* p = _reg->getComponent<Position>(_lastEntity);
-    if (p)
+    Appearance* a = _reg->getComponent<Appearance>(_lastEntity);
+    if (a)
     {
-      p->emissiveOverride = glm::vec3(0.0f);
+      a->emissiveOverride = glm::vec3(0.0f);
     }
     _lastEntity  = -1;
     _highlighted = false;
   }
   if (id > 0 && !_highlighted)
   {
-    Position* p = _reg->getComponent<Position>(id);
-    if (p)
+    Appearance* a = _reg->getComponent<Appearance>(id);
+    if (a)
     {
-      p->emissiveOverride = glm::vec3(0.0, 0.5, 0.5);
+      a->emissiveOverride = glm::vec3(0.0, 0.5, 0.5);
       _lastEntity         = id;
       _highlighted        = true;
     }
