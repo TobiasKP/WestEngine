@@ -3,6 +3,8 @@
 #include "../../Constants/LuaAPI.hpp"
 #include "../Scripting/LuaFacade.hpp"
 
+#include <format>
+
 void EventDispatcher::init()
 {
   LuaFacade::getLuaFacadeInstance().registerCFunction(event, LuaAPI::C_EVENT.data(), this);

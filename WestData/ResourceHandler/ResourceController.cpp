@@ -1,6 +1,7 @@
 #include "ResourceController.hpp"
 
 #include "../Utils/AssetUtils.hpp"
+#include <format>
 
 ResourceController::ResourceController(WestLogger* l)
 {

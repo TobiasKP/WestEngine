@@ -1,6 +1,7 @@
 #include "ShaderController.hpp"
 
 #include <PathUtils.h>
+#include <format>
 
 GLuint ShaderController::createShader(const std::string shaderFile, std::int32_t shaderType, GLuint programId)
 {

@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <PathUtils.h>
 #include <stb_image.h>
+#include <format>
 
 
 AssetImporter::AssetImporter(WestLogger* l)
@@ -56,7 +57,7 @@ void AssetImporter::handleFile(const std::string& path, const std::string& guid)
 {
   _model = {};
   _model.setGuid(guid);
-  _model.setName(std::filesystem::path(path).stem());
+  _model.setName(std::filesystem::path(path).stem().string());
   const aiScene* scene = _importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
   {

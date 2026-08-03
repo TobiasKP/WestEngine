@@ -4,6 +4,9 @@
 #include <CoreConstants.hpp>
 #include <filesystem>
 #include <PathUtils.h>
+#include <format>
+#include <string>
+#include <algorithm>
 
 AssetPathScreener::AssetPathScreener(WestLogger* l, const std::function<void(const std::string& path)> callback)
 {
@@ -86,7 +89,7 @@ void AssetPathScreener::scanDir()
     }
     _logger->log(Level::Cycle, std::format("|*| Reading: {} for import\n", entry.path().filename().string()));
     const std::string filename  = entry.path().stem().string();
-    const std::string extension = entry.path().extension();
+    const std::string extension = entry.path().extension().string();
     if (filename.starts_with("_"))
     {
       continue;

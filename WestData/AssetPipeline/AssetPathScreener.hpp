@@ -2,6 +2,10 @@
 
 #include <functional>
 #include <thread>
+#include <array>
+#include <string>
+#include <vector>
+#include <atomic>
 #include <WestLogger.h>
 
 class AssetPathScreener

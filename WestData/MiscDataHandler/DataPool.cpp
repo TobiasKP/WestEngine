@@ -1,4 +1,5 @@
 #include "DataPool.hpp"
+#include <format>
 
 DataPool::DataPool(WestLogger* l)
 {
