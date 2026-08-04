@@ -17,4 +17,5 @@ inline constexpr std::string_view HEALTH          = "health";
 inline constexpr std::string_view EQUIPMENT       = "equipment";
 inline constexpr std::string_view PROJECTILE      = "projectile";
 inline constexpr std::string_view ACTIVE_UNIT     = "activeUnit";
+inline constexpr std::string_view ACTIONS         = "actions";
 }  // namespace Components

@@ -222,7 +222,26 @@ LuaFacade::LuaStates LuaFacade::getState(std::int32_t id)
   return static_cast<LuaFacade::LuaStates>(result);
 }
 
-bool LuaFacade::onAttack(std::uint32_t wRange,
+std::int32_t LuaFacade::getActionPoints(std::int32_t id)
+{
+  lua_getglobal(L, LuaAPI::GET_ACTION_POINTS.data());
+  lua_pushinteger(L, id);
+  std::int32_t status = lua_pcall(L, 1, 1, 0);
+  if (status != 0)
+  {
+    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
+    lua_pop(L, 1);
+    return IDLE;
+  }
+
+  std::int32_t result = lua_tointeger(L, -1);
+  lua_remove(L, -1);
+  return result;
+}
+
+bool LuaFacade::onAttack(std::uint32_t attackerId,
+                         std::uint32_t bulletType,
+                         std::uint32_t wRange,
                          std::uint32_t distanceToTarget,
                          std::uint32_t wDamage,
                          float wAccuracy,
@@ -231,6 +250,8 @@ bool LuaFacade::onAttack(std::uint32_t wRange,
                          float spawnY)
 {
   lua_getglobal(L, LuaAPI::ENTITY_ATTACK.data());
+  lua_pushinteger(L, attackerId);
+  lua_pushinteger(L, bulletType);
   lua_pushinteger(L, wRange);
   lua_pushinteger(L, distanceToTarget);
   lua_pushinteger(L, wDamage);
@@ -238,7 +259,7 @@ bool LuaFacade::onAttack(std::uint32_t wRange,
   lua_pushinteger(L, targetId);
   lua_pushnumber(L, spawnX);
   lua_pushnumber(L, spawnY);
-  std::int32_t status = lua_pcall(L, 7, 0, 0);
+  std::int32_t status = lua_pcall(L, 9, 0, 0);
   if (status != 0)
   {
     _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));

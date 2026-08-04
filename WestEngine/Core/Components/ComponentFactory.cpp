@@ -82,6 +82,9 @@ void ComponentFactory::addEquipment(lua_State* L, Entity& e)
     lua_getfield(L, -1, "id");
     w.id = lua_tointeger(L, -1);
     lua_pop(L, 1);
+    lua_getfield(L, -1, "bulletType");
+    w.bulletType = lua_tointeger(L, -1);
+    lua_pop(L, 1);
     lua_getfield(L, -1, "dmg");
     w.dmg = lua_tointeger(L, -1);
     lua_pop(L, 1);

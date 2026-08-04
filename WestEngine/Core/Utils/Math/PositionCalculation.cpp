@@ -46,7 +46,7 @@ glm::mat4 PositionCalculation::createTransformationMatrix(glm::vec3 position, gl
   return mat;
 }
 
-void PositionCalculation::updatePosition(glm::vec3 direction, Position* posComp)
+void PositionCalculation::updatePosition(glm::vec3 direction, Position* posComp, float travelSpeed)
 {
   glm::vec3 update = direction - posComp->position;
 
@@ -56,7 +56,7 @@ void PositionCalculation::updatePosition(glm::vec3 direction, Position* posComp)
   }
   else
   {
-    direction          = glm::normalize(update) * Config::GeneralConfig.SPEED * Config::GeneralConfig.DELTA;
+    direction = (glm::normalize(update) * Config::GeneralConfig.SPEED * Config::GeneralConfig.DELTA) * travelSpeed;
     posComp->position += direction;
   }
 }

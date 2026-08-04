@@ -265,6 +265,8 @@ std::vector<ElementProxy*> InterfaceManager::fillInfo(lua_State* L, std::uint32_
     e->type      = (ElementType)lua_tointeger(L, -1);
     e->elementId = Config::incUiId();
     lua_pop(L, 1);
+    lua_pushinteger(L, e->elementId);
+    lua_setfield(L, -2, "id");
 
     lua_getfield(L, -1, "position");
     if (lua_istable(L, -1))

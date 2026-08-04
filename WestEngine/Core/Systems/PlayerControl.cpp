@@ -20,7 +20,6 @@ PlayerControl::PlayerControl(std::shared_ptr<EventDispatcher> d,
   _logger->log(Level::Info, std::format("{} *** Initialized debug information\n", getName()));
 #endif
 };
-
 PlayerControl::~PlayerControl() {}
 
 void PlayerControl::init(const std::shared_ptr<World>& w)
@@ -98,16 +97,18 @@ void PlayerControl::handleEvent(std::tuple<EventIdentifiers, EventPayload> event
       }
       std::uint32_t id                     = _world->getEntityByIdx(_tileIdx);
       std::optional<glm::vec3> destination = _world->tileToWorldPos(_tileIdx);
+
       if (destination.has_value() && id == 0)
       {
-        passDestinationPosition(destination.value());
+        std::int32_t allowed = LuaFacade::getLuaFacadeInstance().getActionPoints(_me);
+        if (allowed > 0)
+        {
+          passDestinationPosition(destination.value(), _me);
+        }
       }
       else if (id != 0)
       {
-        AttackPayload a = {};
-        a.target        = id;
-        a.attacker      = _me;
-        _dispatcher->dispatchEvent(EventIdentifiers::ATTACK_EVENT, a);
+        passAttackInformation(id);
       }
       break;
     }
@@ -124,12 +125,16 @@ void PlayerControl::handleEvent(std::tuple<EventIdentifiers, EventPayload> event
 
 void PlayerControl::updateDebuggingInfo() {}
 
-void PlayerControl::passDestinationPosition(glm::vec3 dest)
+void PlayerControl::passAttackInformation(std::uint32_t id)
 {
-  std::shared_ptr<ComponentArray<Control>> controlUnits = _reg->getComponentArray<Control>();
-  std::uint32_t id                                      = controlUnits->getComponents()[0].entityId;
+  AttackPayload a = {};
+  a.target        = id;
+  a.attacker      = _me;
+  _dispatcher->dispatchEvent(EventIdentifiers::ATTACK_EVENT, a);
+}
 
-  assert(controlUnits->getComponents().size() > 0);
+void PlayerControl::passDestinationPosition(glm::vec3 dest, std::uint32_t id)
+{
   Movement* movComp = _reg->getComponent<Movement>(id);
   assert(movComp != nullptr);
 

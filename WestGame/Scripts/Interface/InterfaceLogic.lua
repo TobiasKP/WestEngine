@@ -1,6 +1,7 @@
 local InterfaceLogic = {}
 
 local uimanager = require("Interface.GameUIRegistry")
+local builder = require("Interface.InterfaceBuilder")
 
 function DestroyInterface(id)
   local result = destroyInterface(id)
@@ -42,7 +43,60 @@ function RefreshInterfaces()
   end
 end
 
+function ConstructInfoPanel(id)
+  local health = getHealth(id);
+  local screenX, screenY = getPosition(id);
+  builder.Panel("npcinfo")
+      :anchor("none", screenX, screenY)
+      :size(7, 7)
+      :alpha(0.8)
+      :add(builder.Button("X")
+        :handler("closeinterface")
+        :color(215, 207, 196, 1.0)
+        :span(1)
+        :grid(6, 6))
+      :add(builder.Label("HP")
+        :span(2)
+        :grid(5, 0)
+        :color(215, 207, 196, 1.0))
+      :add(builder.ProgressBar()
+        :color(142, 59, 70, 1.0)
+        :span(4)
+        :progress(health)
+        :attachEntity(id)
+        :grid(5, 2)
+        :flag(0x01))
+      :build()
+end
+
+function SetActionPoints(id, points)
+  local uiId = uimanager.getByParent("actionpoints_" .. id);
+  if not uiId or not uiId[1] then
+    return
+  end
+  local res = uimanager.getElement(uiId[1], "actionpoints")
+  if res == -1 or res == nil then
+    return
+  end
+  updateInterfaceValue(res, 0x10, tostring(math.ceil((points / 3) * 100)))
+end
+
+function AddActionPointsUI(id)
+  builder.Panel("actionpoints_" .. id)
+      :anchor("bottom-left", 15, 45)
+      :size(3, 1)
+      :alpha(0.5)
+      :add(builder.ProgressBar(100)
+        :color(142, 59, 70, 1.0)
+        :span(3)
+        :tag("actionpoints"))
+      :build()
+end
+
 InterfaceLogic.DestroyInterface = DestroyInterface
 InterfaceLogic.RefreshInterfaces = RefreshInterfaces
+InterfaceLogic.SetActionPoints = SetActionPoints
+InterfaceLogic.AddActionPointsUI = AddActionPointsUI
+InterfaceLogic.ConstructInfoPanel = ConstructInfoPanel
 
 return InterfaceLogic

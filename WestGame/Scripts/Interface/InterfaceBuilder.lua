@@ -84,12 +84,14 @@ end
 
 function Panel:_resolveAnchor(w, h)
   local anchors = {
-    ["top-right"]    = function() return w - self._offsetX, h + self._offsetY end,
-    ["top-left"]     = function() return self._offsetX, h + self._offsetY end,
-    ["bottom-right"] = function() return w - self._offsetX, self._offsetY end,
-    ["bottom-left"]  = function() return self._offsetX, self._offsetY end,
-    ["center"]       = function() return w / 2 + self._offsetX, h / 2 + self._offsetY end,
-    ["none"]         = function() return self._offsetX, self._offsetY end,
+    ["top-right"]     = function() return w - self._offsetX, h + self._offsetY end,
+    ["top-left"]      = function() return self._offsetX, h + self._offsetY end,
+    ["bottom-right"]  = function() return w - self._offsetX, self._offsetY end,
+    ["bottom-left"]   = function() return self._offsetX, self._offsetY end,
+    ["center"]        = function() return w / 2 + self._offsetX, h / 2 + self._offsetY end,
+    ["top-middle"]    = function() return w / 2 - self._offsetX, h + self._offsetY end,
+    ["bottom-middle"] = function() return w / 2 - self._offsetX, self._offsetY end,
+    ["none"]          = function() return self._offsetX, self._offsetY end,
   }
   local fn = anchors[self._anchor]
   if fn then return fn() end
@@ -105,6 +107,7 @@ end
 ---@field _type number
 ---@field _text string | nil
 ---@field _attachedEntity number | nil
+---@field _tag string | nil
 local Label = {}
 Label.__index = Label
 
@@ -118,6 +121,7 @@ function Label.new(text)
     _stretch = { x = 1, y = 1 },
     _flags = 0,
     _attachedEntity = 0,
+    _tag = "",
   }, Label)
 end
 
@@ -151,6 +155,11 @@ function Label:stretch(x, y)
   return self
 end
 
+function Label:tag(tag)
+  self._tag = tag
+  return self
+end
+
 function Label:toElement()
   return {
     type = self._type,
@@ -159,7 +168,8 @@ function Label:toElement()
     gridPosition = { row = self._grid.row, column = self._grid.column, count = self._span },
     text = self._text,
     flags = self._flags,
-    attachedEntity = self._attachedEntity
+    attachedEntity = self._attachedEntity,
+    tag = self._tag
   }
 end
 

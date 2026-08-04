@@ -4,4 +4,4 @@ shader: { v: "Vertex.vs", f: "Fragment.fs" }
 activeUnit: false
 components: 
   - { name: "position", x: 0, y: 0, z: 0 }
-  - { name: "projectile", speed: 1, dmg: 0, hit: false, destination: 0 }
+  - { name: "projectile", speed: 3, dmg: 0, hit: false, destination: 0 }

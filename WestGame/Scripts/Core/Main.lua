@@ -14,16 +14,15 @@ function LoadScene(name)
 end
 
 function EndTurnButton()
-  local height, width = getScreenResolution();
-  builder.Panel("npcinfo")
-      :anchor("none", width / 2, height - 80)
-      :size(2, 2)
+  builder.Panel("endturn")
+      :anchor("bottom-middle", 0, 80)
+      :size(1, 1)
       :alpha(1.0)
       :add(builder.Button("E")
         :handler("endturn")
         :color(215, 207, 196, 1.0)
         :span(1)
-        :grid(1, 1))
+        :grid(0, 0))
       :build()
 end
 

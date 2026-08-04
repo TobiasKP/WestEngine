@@ -20,7 +20,8 @@ public:
   void updateDebuggingInfo() override;
   void init(const std::shared_ptr<World>& w) override;
 
-  void passDestinationPosition(glm::vec3 dest);
+  void passDestinationPosition(glm::vec3 dest, std::uint32_t id);
+  void passAttackInformation(std::uint32_t id);
 
 
 protected:

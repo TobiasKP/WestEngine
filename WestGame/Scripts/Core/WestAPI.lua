@@ -1,6 +1,5 @@
 local StateMachine
 local Interfaces
-local Entitites
 local Logic
 
 function Init()
@@ -16,6 +15,10 @@ end
 
 function GetState(id)
   return StateMachine.GetEntityState(id)
+end
+
+function GetActionPoints(id)
+  return StateMachine.EntityHasActionPointsLeft(id)
 end
 
 function EntityStateChange(id, oldState, newState)
@@ -34,8 +37,13 @@ function RegisterEntity(id, playable)
   StateMachine.RegisterEntity(id, playable)
 end
 
-function Entity_attack(wRange, distanceToTarget, wDmg, wAccuracy, target, spawnX, spawnY)
-  Logic.Attack(wRange, distanceToTarget, wDmg, wAccuracy, target, spawnX, spawnY)
+function Entity_attack(attackerId, bulletType, wRange, distanceToTarget, wDmg, wAccuracy, target, spawnX, spawnY)
+  StateMachine.TransitionEntityState(attackerId, StateMachine.GetEntityState(attackerId),
+    StateMachine.EntityStates.ATTACKING)
+  if GetState(attackerId) == StateMachine.EntityStates.ATTACKING then
+    Logic.Attack(bulletType, wRange, distanceToTarget, wDmg, wAccuracy, target, spawnX, spawnY)
+    EntityStateChange(attackerId, StateMachine.EntityStates.ATTACKING, StateMachine.EntityStates.IDLE)
+  end
 end
 
 function Entity_rclick(targetId)

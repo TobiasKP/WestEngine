@@ -32,21 +32,7 @@ local function interpreteData(data, qPos)
 
   if data.playercontrol then
     addComponent("playercontrol");
-    if health ~= nil then
-      builder.Panel("playercontrol")
-          :anchor("bottom-right", 415, 60)
-          :size(10, 1)
-          :alpha(0.5)
-          :add(builder.Label(tostring(health.c))
-            :color(215, 207, 196, 1.0)
-            :span(string.len(tostring(health.c))))
-          :add(builder.ProgressBar(100)
-            :color(142, 59, 70, 1.0)
-            :span(10))
-          :build()
-    end
-  else
-    --createInterface(npcHealthUI)
+    AddPlayerHealth(health);
   end
 
   if data.activeUnit then
@@ -60,9 +46,26 @@ local function interpreteData(data, qPos)
     end
   end
 
-  buildEntity();
   if DEBUG then
     print("Creating Entity " .. data.name);
+  end
+
+  buildEntity()
+end
+
+function AddPlayerHealth(health)
+  if health ~= nil then
+    builder.Panel("playerhealth")
+        :anchor("bottom-right", 415, 60)
+        :size(10, 1)
+        :alpha(0.5)
+        :add(builder.Label(tostring(health.c))
+          :color(215, 207, 196, 1.0)
+          :span(string.len(tostring(health.c))))
+        :add(builder.ProgressBar(100)
+          :color(142, 59, 70, 1.0)
+          :span(10))
+        :build()
   end
 end
 

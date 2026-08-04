@@ -69,7 +69,7 @@ void ProjectileSystem::travel(std::uint32_t id, Position* posComp, Projectile* p
   }
   else
   {
-    PositionCalculation::updatePosition(targetPos, posComp);
+    PositionCalculation::updatePosition(targetPos, posComp, p->speed);
   }
 }
 
@@ -115,7 +115,9 @@ void ProjectileSystem::handleEvent(std::tuple<EventIdentifiers, EventPayload> ev
       std::int32_t dimension = _world->getGridSize();
       std::int32_t dx        = std::abs(aTile % dimension - tTile % dimension);
       std::int32_t dz        = std::abs(aTile / dimension - tTile / dimension);
-      LuaFacade::getLuaFacadeInstance().onAttack(active->range,
+      LuaFacade::getLuaFacadeInstance().onAttack(a->attacker, 
+                                                 active->bulletType,
+                                                 active->range,
                                                  std::max(dx, dz),
                                                  active->dmg,
                                                  active->accuracy,

@@ -37,6 +37,17 @@ function GetUIs()
   return { registeredUIs, additionalInfo };
 end
 
+function GetElement(panelId, tag)
+  if not registeredUIs[panelId] then
+    return -1;
+  end
+  for _, value in ipairs(registeredUIs[panelId]) do
+    if value.tag == tag then
+      return value.id
+    end
+  end
+end
+
 function GetUiByParent(parent)
   return uiIdToParent[parent];
 end
@@ -46,5 +57,6 @@ UIManager.unregister = UnregisterUI;
 UIManager.update = UpdateUIState;
 UIManager.get = GetUIs;
 UIManager.getByParent = GetUiByParent;
+UIManager.getElement = GetElement;
 
 return UIManager;
