@@ -47,8 +47,8 @@ public:
   {
     const std::type_info& t = typeid(T);
     assert(_componentArrays.contains(t.hash_code()));
-    std::shared_ptr<IComponentArray> array = _componentArrays[t.hash_code()];
-    return std::static_pointer_cast<ComponentArray<T>>(array)->getComponentById(entityId);
+    const auto& array = _componentArrays.at(t.hash_code());
+    return static_cast<ComponentArray<T>*>(array.get())->getComponentById(entityId);
   };
 
 
@@ -56,7 +56,7 @@ public:
   std::shared_ptr<ComponentArray<T>> getComponentArray()
   {
     const std::type_info& t = typeid(T);
-    return std::static_pointer_cast<ComponentArray<T>>(_componentArrays[t.hash_code()]);
+    return std::static_pointer_cast<ComponentArray<T>>(_componentArrays.at(t.hash_code()));
   };
 
 private:

@@ -62,42 +62,76 @@ void RenderManager::update()
 #ifdef DEBUG
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
-  std::shared_ptr<World> world = _scene->getWorld();
-  WorldUniformParams params    = {world->getFlagData(), world->getGridSize(), world->getOrigin()};
-  std::int32_t skipped         = 0;
+  std::shared_ptr<World> world      = _scene->getWorld();
+  WorldUniformParams params         = {world->getFlagData(), world->getGridSize(), world->getOrigin()};
+  std::atomic<std::int32_t> skipped = 0;
   if (!Config::PAUSE)
   {
     _scene->getCamera()->update();
   }
   _facade->clearColor();
   _facade->renderWorld(world->getModelGuid(), world->getId(), world->getShaderId(), world->isDirty(), &params);
-  for (const Entity& entity : _scene->getEntities())
+  _entitiesToRender.assign(_scene->getEntities().size(), 0);
+  const Frustum& frustum      = _scene->getCamera()->getFrustum();
+  ComponentRegistry* registry = _scene->getRegistry().get();
+  std::vector<std::future<void>> futures;
+
+  for (size_t i = 0; i < _scene->getEntities().size(); i += 20)
   {
-    if (AABBcheck(entity))
-    {
-      Position* p                = _scene->getRegistry()->getComponent<Position>(entity.getId());
-      Appearance* appearance     = _scene->getRegistry()->getComponent<Appearance>(entity.getId());
-      const Model* model         = WestData::WestAssetFacade::getAssetFacade().requestModelFromScene(entity.getModelGuid());
-      EntityUniformParams params = {};
-      params.transform           = PositionCalculation::createTransformationMatrix(p->position, p->rotation, p->scale);
-      if (model)
+    futures.emplace_back(Config::THREADPOOL->enqueue(
+      [this, i, &skipped, &frustum, registry, entities = &_scene->getEntities()]
       {
-        params.diffuseColor  = model->getMeshes().front().material.diffuseColor;
-        params.emissiveColor = model->getMeshes().front().material.emissiveColor;
-        if (appearance)
+        for (size_t j = 0; j < 20; j++)
         {
-          params.diffuseColor  += appearance->diffuseOverride;
-          params.emissiveColor += appearance->emissiveOverride;
-        }
-      }
-      _facade->renderEntity(entity.getModelGuid(), entity.getId(), entity.getShaderId(), &params, false);
-    }
-    else
-    {
-      skipped++;
+          if (i + j >= entities->size())
+          {
+            return;
+          }
+          const Entity& entity = entities->at(i + j);
+
+
+          _entitiesToRender[i + j] = AABBcheck(entity, frustum, registry);
+          if (!_entitiesToRender[i + j])
+          {
+            skipped++;
 #ifdef DEBUG
-      logCycle(std::format("{} ### skipped rendering entity: {}, did not pass AABB.\n", getName(), entity.getId()));
+            logCycle(
+              std::format("{} ### skipped rendering entity: {}, did not pass AABB.\n", getName(), entity.getId()));
 #endif
+          }
+        }
+      }));
+  }
+
+  for (auto& f : futures)
+  {
+    f.wait();
+  }
+
+
+  for (size_t i = 0; i < _scene->getEntities().size(); i++)
+  {
+    if (!_entitiesToRender[i])
+    {
+      continue;
+    }
+    const Entity& entity   = _scene->getEntities().at(i);
+    Position* p            = _scene->getRegistry()->getComponent<Position>(entity.getId());
+    Appearance* appearance = _scene->getRegistry()->getComponent<Appearance>(entity.getId());
+    const Model* model     = WestData::WestAssetFacade::getAssetFacade().requestModelFromScene(entity.getModelGuid());
+    EntityUniformParams params = {};
+    params.transform           = PositionCalculation::createTransformationMatrix(p->position, p->rotation, p->scale);
+    if (model)
+    {
+      params.diffuseColor  = model->getMeshes().front().material.diffuseColor;
+      params.emissiveColor = model->getMeshes().front().material.emissiveColor;
+      if (appearance)
+      {
+        params.diffuseColor  += appearance->diffuseOverride;
+        params.emissiveColor += appearance->emissiveOverride;
+      }
+
+      _facade->renderEntity(entity.getModelGuid(), entity.getId(), entity.getShaderId(), &params, false);
     }
   }
 
@@ -114,21 +148,19 @@ void RenderManager::update()
 #endif
 }
 
-bool RenderManager::AABBcheck(const Entity& e)
+bool RenderManager::AABBcheck(const Entity& e, const Frustum& f, ComponentRegistry* reg)
 {
   const Model* model = WestData::WestAssetFacade::getAssetFacade().requestModelFromScene(e.getModelGuid());
   if (model == nullptr)
   {
     return false;
   }
-  const Frustum& f   = _scene->getCamera()->getFrustum();
-  Position* p        = _scene->getRegistry()->getComponent<Position>(e.getId());
-
+  Position* p = reg->getComponent<Position>(e.getId());
   for (const Mesh& m : model->getMeshes())
   {
-    const AABB aabb = m.aabb;
-    glm::vec3 min   = aabb.min * p->scale + p->position;
-    glm::vec3 max   = aabb.max * p->scale + p->position;
+    const AABB aabb = m.aabb; 
+    glm::vec3 min = aabb.min * p->scale + p->position;
+    glm::vec3 max = aabb.max * p->scale + p->position;
 
     bool res =
       f.near.getSignedDistance(glm::vec3(
@@ -170,7 +202,7 @@ void RenderManager::renderDebugEntities()
   for (const Entity& entity : _scene->getDebugEntities())
   {
     EntityUniformParams params = {};
-    params.diffuseColor = glm::vec3(1.0f, 0.0f, 0.0f);
+    params.diffuseColor        = glm::vec3(1.0f, 0.0f, 0.0f);
     debugData.emplace_back(entity.getModelGuid(), entity.getId(), entity.getShaderId(), params);
   }
   _facade->renderDebugEntities(debugData);

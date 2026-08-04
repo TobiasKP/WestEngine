@@ -24,10 +24,11 @@ public:
   std::int32_t init() override;
 
 private:
-  bool AABBcheck(const Entity& e);
+  bool AABBcheck(const Entity& e, const Frustum& f, ComponentRegistry* reg);
 
   WestRenderer::WestRendererFacade* _facade;
   std::shared_ptr<Scene> _scene;
+  std::vector<std::uint8_t> _entitiesToRender;
 
 #ifdef DEBUG
   void renderDebugEntities();
