@@ -48,3 +48,7 @@ if(BUILD_TESTS)
   add_subdirectory(Tests/)
 endif()
 
+# Game scripts (Lua linting). Added last: it hooks the WestCore target and
+# registers ctest tests, so both must already exist.
+add_subdirectory(WestGame/)
+

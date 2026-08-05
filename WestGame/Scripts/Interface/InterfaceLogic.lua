@@ -33,7 +33,9 @@ function RefreshInterfaces()
     end
     local newId = createInterface(uis, x, y, stretchX, stretchY, alpha, rows, columns, hidden);
     table.insert(tmpUnregister, id);
-    table.insert(tmpRegister, { newId, uis, { func, stretchX, stretchY, alpha, rows, columns, hidden, parent = parent } })
+    table.insert(tmpRegister, { newId, uis,
+      { func, stretchX, stretchY, alpha, rows, columns, hidden, parent = parent }
+    })
   end
   for _, id in ipairs(tmpUnregister) do
     uimanager.unregister(id)
@@ -105,8 +107,6 @@ function EndTurnButton()
         :grid(0, 0))
       :build()
 end
-
-
 
 InterfaceLogic.DestroyInterface = DestroyInterface
 InterfaceLogic.RefreshInterfaces = RefreshInterfaces

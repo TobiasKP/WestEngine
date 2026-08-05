@@ -70,9 +70,7 @@ function AddPlayerHealth(health)
 end
 
 function loadFile(name)
-  local file = nil
-
-  file = io.open(root .. name .. ".yaml")
+  local file = io.open(root .. name .. ".yaml")
 
   if file == nil then
     print("Error opening file")
