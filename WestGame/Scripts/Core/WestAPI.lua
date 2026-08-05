@@ -1,6 +1,7 @@
 local StateMachine
 local Interfaces
 local Logic
+local Entities
 
 function Init()
   StateMachine = require("Core.GameState")

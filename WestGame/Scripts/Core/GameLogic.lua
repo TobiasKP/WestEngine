@@ -8,8 +8,10 @@ local switch = {
   ["closeinterface"] = function(id)
     interface.DestroyInterface(id);
   end,
-  ["endturn"] = function()
+  ["endturn"] = function(id)
     state.ToggleGameState()
+    interface.DestroyInterface(id);
+    ExecuteAI()
   end
 }
 
@@ -37,6 +39,10 @@ function Attack(bulletType, wRange, distanceToTarget, wDmg, wAccuracy, target, s
   end
 end
 
+function ExecuteAI()
+
+end
+
 function Internal(toCall, id)
   if switch[toCall] then
     switch[toCall](id)
@@ -48,6 +54,5 @@ end
 Logic.RclickEntity = RclickEntity
 Logic.Attack = Attack
 Logic.Internal = Internal
-
 
 return Logic

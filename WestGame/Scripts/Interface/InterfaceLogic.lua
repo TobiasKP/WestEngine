@@ -93,10 +93,26 @@ function AddActionPointsUI(id)
       :build()
 end
 
+function EndTurnButton()
+  builder.Panel("endturn")
+      :anchor("bottom-middle", 0, 80)
+      :size(1, 1)
+      :alpha(1.0)
+      :add(builder.Button("E")
+        :handler("endturn")
+        :color(215, 207, 196, 1.0)
+        :span(1)
+        :grid(0, 0))
+      :build()
+end
+
+
+
 InterfaceLogic.DestroyInterface = DestroyInterface
 InterfaceLogic.RefreshInterfaces = RefreshInterfaces
 InterfaceLogic.SetActionPoints = SetActionPoints
 InterfaceLogic.AddActionPointsUI = AddActionPointsUI
 InterfaceLogic.ConstructInfoPanel = ConstructInfoPanel
+InterfaceLogic.EndTurnButton = EndTurnButton
 
 return InterfaceLogic
