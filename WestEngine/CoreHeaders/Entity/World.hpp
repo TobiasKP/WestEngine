@@ -15,6 +15,8 @@ public:
   std::int32_t calculateIndex(double x, double y);
   std::vector<std::int32_t>
   getReachableTiles(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a, void* callee);
+  std::vector<std::int32_t>
+  getEntitiesInRange(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a, std::int32_t me);
   void addEntityIdToIdx(float x, float y, std::uint32_t id);
   void updateEntityIdToIdx(float x, float y, std::uint32_t id);
   void removeEntityFromGrid(std::uint32_t id);
@@ -53,6 +55,8 @@ public:
   };
 
 private:
+  std::vector<std::int32_t> getTilesByAlgorithm(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a);
+
   std::mutex _mutex;
   std::uint32_t _dimension, _tileSize;
   std::int32_t _lastIdx;

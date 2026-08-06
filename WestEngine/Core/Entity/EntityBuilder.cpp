@@ -45,14 +45,21 @@ int EntityBuilder::buildEntity(lua_State* L)
   EntityBuilder* me = EntityBuilder::retrieveMeFromStack(L);
   Position* p       = me->_registry->getComponent<Position>(me->_e.getId());
   Control* c        = me->_registry->getComponent<Control>(me->_e.getId());
-  bool result       = LuaFacade::getLuaFacadeInstance().onEntityCreation(me->_e.getId(), c != nullptr ? true : false);
-  if (result != 0)
+  Health* h         = me->_registry->getComponent<Health>(me->_e.getId());
+  bool playable     = c != nullptr && c->aiControl == false ? true : false;
+  if (c != nullptr)
   {
-    WestLogger::getLoggerInstance().log(
-      Level::Error, std::format("Error creating Entity, can not add to lua registration aborting scene addition."));
-    me->_e = {};
-    return 1;
+    assert(h != nullptr);
+    bool result = LuaFacade::getLuaFacadeInstance().onEntityCreation(me->_e.getId(), playable, h->current);
+    if (result != 0)
+    {
+      WestLogger::getLoggerInstance().log(
+        Level::Error, std::format("Error creating Entity, can not add to lua registration aborting scene addition."));
+      me->_e = {};
+      return 1;
+    }
   }
+
   if (me->_e.isActiveUnit())
   {
     me->_scene->getWorld()->addEntityIdToIdx(p->position.x, p->position.z, me->_e.getId());

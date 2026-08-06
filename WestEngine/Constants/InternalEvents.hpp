@@ -9,4 +9,5 @@ enum class EventIdentifiers {
   MOUSE_WHEEL,
   KEY,
   INTERFACE_UPDATE, 
+  ACTION_FINISHED,
 };  // namespace Events

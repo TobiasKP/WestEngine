@@ -57,6 +57,14 @@ struct Label : public IElement
     {
       cd->texture = texture;
     }
+    else
+    {
+      std::array<float, 4> coords = TextRenderManager::getTextureCoordinatesForChar(' ');  
+      cd->textureCoords[0] = coords[0];
+      cd->textureCoords[1] = coords[1];
+      cd->textureCoords[2] = coords[2];
+      cd->textureCoords[3] = coords[3];
+    }
   };
 
   void getBoundaries(ElementBounds& bounds) override

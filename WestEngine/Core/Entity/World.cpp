@@ -36,7 +36,6 @@ std::int32_t World::worldPosToTile(double x, double y)
     return index;
   }
 }
-
 std::optional<glm::vec3> World::tileToWorldPos(std::int32_t idx)
 {
   if (idx == -1)
@@ -120,6 +119,38 @@ void World::removeEntityFromGrid(std::uint32_t id)
 std::vector<std::int32_t>
 World::getReachableTiles(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a, void* callee)
 {
+  std::vector<std::int32_t> result = getTilesByAlgorithm(row, col, range, a);
+  ISystem* c                       = (ISystem*)callee;
+  if (c->getName() != Systems::PLAYER_CONTROL)
+  {
+    return result;
+  }
+  for (std::int32_t idx : result)
+  {
+    setFlag(0x0002u, idx);
+  }
+  return result;
+}
+
+std::vector<std::int32_t>
+World::getEntitiesInRange(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a, std::int32_t me)
+{
+  std::vector<std::int32_t> out;
+  std::vector<std::int32_t> result = getTilesByAlgorithm(row, col, range, a);
+  for (std::int32_t idx : result)
+  {
+    if (_idxToEntityId.contains(idx) && me != _idxToEntityId[idx])
+    {
+      out.push_back(idx);
+    }
+  }
+
+  return out;
+}
+
+std::vector<std::int32_t>
+World::getTilesByAlgorithm(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a)
+{
   std::vector<std::int32_t> result;
   if (static_cast<std::int32_t>(a) == static_cast<std::int32_t>(algorithm::MANHATTAN))
   {
@@ -132,11 +163,6 @@ World::getReachableTiles(std::int32_t row, std::int32_t col, std::int32_t range,
         {
           std::int32_t idx = r * _dimension + c;
           result.push_back(idx);
-          ISystem* c = (ISystem*)callee;
-          if (c->getName() == Systems::PLAYER_CONTROL)
-          {
-            setFlag(0x0002u, idx);
-          }
         }
       }
     }

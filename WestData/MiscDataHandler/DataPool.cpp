@@ -22,7 +22,7 @@ const Model* DataPool::getModelByGuid(const std::string& guid)
 {
   auto idx = _guidToIndex.find(guid);
 #ifdef DEBUG
-  _logger->log(Level::Info, std::format("|*| Models in scene: {}. Looking for: {}\n", _guidToIndex.size(), guid));
+  _logger->log(Level::Cycle, std::format("|*| Models in scene: {}. Looking for: {}\n", _guidToIndex.size(), guid));
 #endif
   if (idx == _guidToIndex.end())
   {

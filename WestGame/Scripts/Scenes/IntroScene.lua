@@ -5,7 +5,7 @@ local utils = require("Core.EntityUtils")
 
 IntroScene = {}
 
-function load()
+function Load()
   utils.World(w)
   for _, entity in ipairs(entitiyList) do
     local result = utils.LoadEntity(entity, nil)
@@ -15,6 +15,6 @@ function load()
   end
 end
 
-IntroScene.load = load
+IntroScene.load = Load
 
 return IntroScene

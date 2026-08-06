@@ -5,5 +5,5 @@
 struct Control
 {
   std::uint32_t entityId;
-  bool active = true;
+  bool active = true, aiControl = false;
 };

@@ -59,7 +59,8 @@ void MovementSystem::moveToDestination(std::uint32_t id, Position* posComp, Move
                    std::format("{} *** Error calling lua function state change with state: {}\n",
                                getName(),
                                (std::int32_t)LuaFacade::LuaStates::IDLE));
-    }
+    } 
+    _dispatcher->dispatchEvent(EventIdentifiers::ACTION_FINISHED, ActionFinishedPayload{id});
     movComp->destination.reset();
 #ifdef DEBUG
     movComp->debugInfoDisplayed = false;
@@ -77,7 +78,7 @@ bool MovementSystem::destinationReached(Position* posComp, Movement* movComp)
 void MovementSystem::updatePosition(glm::vec3 local, Position* posComp, std::uint32_t id)
 {
   assert(posComp != nullptr);
-  PositionCalculation::updatePosition(local, posComp); 
+  PositionCalculation::updatePosition(local, posComp);
   _world->updateEntityIdToIdx(posComp->position.x, posComp->position.z, id);
 }
 

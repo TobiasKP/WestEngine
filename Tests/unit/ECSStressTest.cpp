@@ -1,10 +1,9 @@
+#include <chrono>
 #include <Components/ComponentRegistry.hpp>
 #include <Entity/World.hpp>
-#include <Interfaces/ISystem.h>
-#include <gtest/gtest.h>
-
-#include <chrono>
 #include <glm/gtc/matrix_transform.hpp>
+#include <gtest/gtest.h>
+#include <Interfaces/ISystem.h>
 #include <random>
 
 namespace
@@ -36,11 +35,11 @@ public:
 // Target: < 8ms on dev machine to leave headroom for rendering.
 // ──────────────────────────────────────────────────────────────
 
-static constexpr std::uint32_t ENTITY_COUNT     = 200;
-static constexpr std::uint32_t MOVING_COUNT     = 50;
-static constexpr std::uint32_t ATTACKING_COUNT  = 20;
-static constexpr std::uint32_t GRID_SIZE        = 50;
-static constexpr double TARGET_MS               = 8.0;
+static constexpr std::uint32_t ENTITY_COUNT    = 200;
+static constexpr std::uint32_t MOVING_COUNT    = 50;
+static constexpr std::uint32_t ATTACKING_COUNT = 20;
+static constexpr std::uint32_t GRID_SIZE       = 50;
+static constexpr double TARGET_MS              = 8.0;
 
 class ECSStressTest : public ::testing::Test
 {
@@ -87,8 +86,8 @@ protected:
       registry.addComponent<Health>(i, std::move(h));
 
       Equipment eq;
-      eq.primary   = {1, 25, 3, 85.0f};
-      eq.secondary = {2, 10, 5, 95.0f};
+      eq.primary   = {1, 1, 25, 3, 85.0f};
+      eq.secondary = {2, 2, 10, 5, 95.0f};
       eq.active    = 1;
       registry.addComponent<Equipment>(i, std::move(eq));
     }
@@ -112,8 +111,7 @@ protected:
     auto movArr = registry.getComponentArray<Movement>();
     for (size_t i = 0; i < MOVING_COUNT && i < movArr->getSize(); i++)
     {
-      movArr->getComponentByIdx(i)->destination =
-        glm::vec3(destDist(rng), 0.0f, destDist(rng));
+      movArr->getComponentByIdx(i)->destination = glm::vec3(destDist(rng), 0.0f, destDist(rng));
 
       // Mark position dirty so transform rebuild fires
       std::uint32_t id = movArr->getEntityIdByIdx(i);
@@ -158,9 +156,9 @@ TEST_F(ECSStressTest, FullSystemsTickUnder8ms)
     std::uint32_t id = movArr->getEntityIdByIdx(i);
     if (mov->destination.has_value())
     {
-      Position* pos     = registry.getComponent<Position>(id);
-      glm::vec3 dir     = *mov->destination - pos->position;
-      float len2        = glm::dot(dir, dir);
+      Position* pos = registry.getComponent<Position>(id);
+      glm::vec3 dir = *mov->destination - pos->position;
+      float len2    = glm::dot(dir, dir);
       if (len2 > 0.025f)
       {
         dir            = glm::normalize(dir) * 2.5f * 0.016f;  // speed * delta
@@ -185,9 +183,12 @@ TEST_F(ECSStressTest, FullSystemsTickUnder8ms)
   for (std::uint32_t attacker = 1; attacker <= ATTACKING_COUNT; attacker++)
   {
     std::uint32_t target = targetDist(rng);
-    if (target == attacker) continue;
+    if (target == attacker)
+    {
+      continue;
+    }
 
-    Equipment* eq = registry.getComponent<Equipment>(attacker);
+    Equipment* eq  = registry.getComponent<Equipment>(attacker);
     Weapon* active = (eq->active == 1) ? &eq->primary : &eq->secondary;
 
     Position* aPosComp = registry.getComponent<Position>(attacker);
@@ -212,10 +213,10 @@ TEST_F(ECSStressTest, FullSystemsTickUnder8ms)
 
     // Spawn projectile component
     Projectile proj;
-    proj.speed       = 2;
-    proj.damage      = active->dmg;
-    proj.destination = target;
-    proj.hit         = hit;
+    proj.speed           = 2;
+    proj.damage          = active->dmg;
+    proj.destination     = target;
+    proj.hit             = hit;
     std::uint32_t projId = ENTITY_COUNT + attacker;
     Position projPos;
     projPos.position = aPosComp->position;
@@ -226,11 +227,14 @@ TEST_F(ECSStressTest, FullSystemsTickUnder8ms)
 
   // --- ProjectileSystem-like pass: travel and impact ---
   auto projectiles = registry.getComponentArray<Projectile>();
-  size_t projSize = projectiles->getSize();
-  size_t current = 0;
+  size_t projSize  = projectiles->getSize();
+  size_t current   = 0;
   for (auto& p : projectiles->getComponents())
   {
-    if (current >= projSize) break;
+    if (current >= projSize)
+    {
+      break;
+    }
     std::uint32_t id  = projectiles->getEntityIdByIdx(current);
     Position* projPos = registry.getComponent<Position>(id);
     Position* tgtPos  = registry.getComponent<Position>(p.destination);
@@ -299,9 +303,8 @@ TEST_F(ECSStressTest, FullSystemsTickUnder8ms)
   auto end       = std::chrono::steady_clock::now();
   double elapsed = std::chrono::duration<double, std::milli>(end - start).count();
 
-  std::cout << "[  PERF   ] Full systems tick (" << ENTITY_COUNT << " entities, "
-            << ATTACKING_COUNT << " attacks): "
-            << elapsed << " ms" << std::endl;
+  std::cout << "[  PERF   ] Full systems tick (" << ENTITY_COUNT << " entities, " << ATTACKING_COUNT
+            << " attacks): " << elapsed << " ms" << std::endl;
 
   EXPECT_LT(elapsed, TARGET_MS) << "Systems tick exceeded " << TARGET_MS << "ms budget";
 }
@@ -333,8 +336,8 @@ TEST_F(ECSStressTest, ComponentLookupScalability)
   auto end       = std::chrono::steady_clock::now();
   double elapsed = std::chrono::duration<double, std::milli>(end - start).count();
 
-  std::cout << "[  PERF   ] 60 frames × " << ENTITY_COUNT << " entities × 5 lookups: "
-            << elapsed << " ms (budget: " << 60 * TARGET_MS << " ms)" << std::endl;
+  std::cout << "[  PERF   ] 60 frames × " << ENTITY_COUNT << " entities × 5 lookups: " << elapsed
+            << " ms (budget: " << 60 * TARGET_MS << " ms)" << std::endl;
 
   EXPECT_LT(elapsed, 60 * TARGET_MS);
 }
@@ -363,8 +366,7 @@ TEST_F(ECSStressTest, WorldQueryScalability)
   auto end       = std::chrono::steady_clock::now();
   double elapsed = std::chrono::duration<double, std::milli>(end - start).count();
 
-  std::cout << "[  PERF   ] getReachableTiles for " << ENTITY_COUNT << " entities: "
-            << elapsed << " ms" << std::endl;
+  std::cout << "[  PERF   ] getReachableTiles for " << ENTITY_COUNT << " entities: " << elapsed << " ms" << std::endl;
 
   EXPECT_LT(elapsed, TARGET_MS);
 }
@@ -379,10 +381,16 @@ TEST_F(ECSStressTest, MassCombatRemovalStability)
 
   for (std::uint32_t attacker = 1; attacker <= ENTITY_COUNT; attacker++)
   {
-    if (attacker == target) continue;
+    if (attacker == target)
+    {
+      continue;
+    }
 
     Health* h = registry.getComponent<Health>(target);
-    if (h == nullptr) break;  // already removed
+    if (h == nullptr)
+    {
+      break;  // already removed
+    }
 
     Equipment* eq  = registry.getComponent<Equipment>(attacker);
     Weapon* active = &eq->primary;

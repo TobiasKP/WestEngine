@@ -16,14 +16,14 @@ public:
     {
       return nullptr;
     }
-    std::uint32_t idx = _idToIdx[id];
+    std::uint32_t idx = _idToIdx.at(id);
 
-    return &_components[idx];
+    return &_components.at(idx);
   };
 
   T* getComponentByIdx(std::uint32_t idx)
   {
-    return &_components[idx];
+    return &_components.at(idx);
   };
 
   std::uint32_t getEntityIdByIdx(size_t idx)
@@ -32,7 +32,7 @@ public:
     {
       return UINT32_MAX;
     }
-    return _idxToId[idx];
+    return _idxToId.at(idx);
   };
 
   void addComponent(std::uint32_t id, T&& component)
@@ -48,7 +48,7 @@ public:
     if (!_idToIdx.contains(id))
     {
       return false;
-    }                                       
+    }
     std::uint32_t idx          = _idToIdx[id];
     std::uint32_t lastIdx      = _size - 1;
     std::uint32_t lastEntityId = _idxToId[lastIdx];

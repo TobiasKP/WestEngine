@@ -34,8 +34,13 @@ struct InterfacePayload
   std::string newValue;
 };
 
+struct ActionFinishedPayload
+{
+  std::uint32_t entityId;
+};
+
 struct EmptyPayload
 {};
 
 using EventPayload =
-  std::variant<MousePayload, KeyboardPayload, GamePayload, AttackPayload, EmptyPayload, InterfacePayload>;
+  std::variant<MousePayload, KeyboardPayload, GamePayload, AttackPayload, EmptyPayload, InterfacePayload, ActionFinishedPayload>;

@@ -3,7 +3,6 @@
 #include "../../CoreHeaders/Systems/DebugDrawSystem.h"
 
 #include <Config.h>
-#include <format>
 #include <UniformConstants.hpp>
 
 DebugDrawSystem::DebugDrawSystem(std::shared_ptr<Scene> scene, WestRenderer::WestRendererFacade* renderer)

@@ -47,7 +47,17 @@ void ProjectileSystem::update()
 
 void ProjectileSystem::travel(std::uint32_t id, Position* posComp, Projectile* p)
 {
-  glm::vec3 targetPos = _reg->getComponent<Position>(p->destination)->position;
+  if (p == nullptr)
+  {
+    return;
+  }
+  const Position* pos = _reg->getComponent<Position>(p->destination);
+  if (pos == nullptr)
+  {
+    _toRemove.push_back(id);
+  }
+
+  glm::vec3 targetPos = pos->position;
   bool reached        = glm::all(glm::epsilonEqual(posComp->position, targetPos, Config::GeneralConfig.EPSILON));
   if (reached)
   {
@@ -60,16 +70,19 @@ void ProjectileSystem::travel(std::uint32_t id, Position* posComp, Projectile* p
       i.entityId          = p->destination;
       i.newValue          = std::to_string(health->current);
       _dispatcher->dispatchEvent(EventIdentifiers::INTERFACE_UPDATE, i);
+      i.event = 0x08;
+      _dispatcher->dispatchEvent(EventIdentifiers::INTERFACE_UPDATE, i);
       if (health->current <= 0)
       {
         _toRemove.push_back(p->destination);
       }
     }
     _toRemove.push_back(id);
+    _dispatcher->dispatchEvent(EventIdentifiers::ACTION_FINISHED, ActionFinishedPayload{p->owner});
   }
   else
   {
-    PositionCalculation::updatePosition(targetPos, posComp);
+    PositionCalculation::updatePosition(targetPos, posComp, p->speed);
   }
 }
 
@@ -115,7 +128,9 @@ void ProjectileSystem::handleEvent(std::tuple<EventIdentifiers, EventPayload> ev
       std::int32_t dimension = _world->getGridSize();
       std::int32_t dx        = std::abs(aTile % dimension - tTile % dimension);
       std::int32_t dz        = std::abs(aTile / dimension - tTile / dimension);
-      LuaFacade::getLuaFacadeInstance().onAttack(active->range,
+      LuaFacade::getLuaFacadeInstance().onAttack(a->attacker,
+                                                 active->bulletType,
+                                                 active->range,
                                                  std::max(dx, dz),
                                                  active->dmg,
                                                  active->accuracy,

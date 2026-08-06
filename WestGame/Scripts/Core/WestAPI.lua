@@ -1,13 +1,15 @@
 local StateMachine
 local Interfaces
-local Entitites
 local Logic
+local Entities
+local AIController
 
 function Init()
   StateMachine = require("Core.GameState")
   Logic = require("Core.GameLogic")
   Interfaces = require("Interface.InterfaceLogic")
   Entities = require("Core.EntityUtils")
+  AIController = require("ArtificialIntelligence.AIController")
 end
 
 function GetGameState()
@@ -16,6 +18,10 @@ end
 
 function GetState(id)
   return StateMachine.GetEntityState(id)
+end
+
+function GetActionPoints(id)
+  return StateMachine.EntityHasActionPointsLeft(id)
 end
 
 function EntityStateChange(id, oldState, newState)
@@ -30,12 +36,21 @@ function Worldpos_rclick(targetId)
   print(targetId)
 end
 
-function RegisterEntity(id, playable)
-  StateMachine.RegisterEntity(id, playable)
+function RegisterEntity(id, playable, health)
+  StateMachine.RegisterEntity(id, playable, health)
 end
 
-function Entity_attack(wRange, distanceToTarget, wDmg, wAccuracy, target, spawnX, spawnY)
-  Logic.Attack(wRange, distanceToTarget, wDmg, wAccuracy, target, spawnX, spawnY)
+function RemoveEntity(id)
+  StateMachine.RemoveEntity(id)
+end
+
+function Entity_attack(attackerId, bulletType, wRange, distanceToTarget, wDmg, wAccuracy, target, spawnX, spawnY)
+  StateMachine.TransitionEntityState(attackerId, StateMachine.GetEntityState(attackerId),
+    StateMachine.EntityStates.ATTACKING)
+  if GetState(attackerId) == StateMachine.EntityStates.ATTACKING then
+    Logic.Attack(attackerId, bulletType, wRange, distanceToTarget, wDmg, wAccuracy, target, spawnX, spawnY)
+    EntityStateChange(attackerId, StateMachine.EntityStates.ATTACKING, StateMachine.EntityStates.IDLE)
+  end
 end
 
 function Entity_rclick(targetId)
@@ -56,4 +71,12 @@ end
 
 function InterfaceInternalFunctionCall(functionToCall, callingButtonId)
   Logic.Internal(functionToCall, callingButtonId)
+end
+
+function AIThink(entityId)
+  AIController.execute(entityId)
+end
+
+function LevelEnd()
+  return StateMachine.LevelEnd()
 end

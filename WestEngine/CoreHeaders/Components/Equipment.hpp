@@ -7,6 +7,7 @@ struct Weapon
   std::uint32_t id;
   std::uint32_t dmg;
   std::uint32_t range;
+  std::uint32_t bulletType;
   float accuracy;
 };
 

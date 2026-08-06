@@ -6,7 +6,7 @@
 #include <Config.h>
 #include <format>
 
-std::array<ISystem*, 5> SystemManager::_systems = {};
+std::array<ISystem*, 6> SystemManager::_systems = {};
 
 SystemManager::SystemManager() : IManager(nullptr)
 {
@@ -31,10 +31,11 @@ std::int32_t SystemManager::startup()
   std::shared_ptr<Camera> c            = _scene->getCamera();
   std::shared_ptr<ComponentRegistry> r = _scene->getRegistry();
   _systems                             = {new PlayerControl(_dispatcher, getLogger(), r, c),
+                                          new AISystem(_dispatcher, getLogger(), r),
                                           new MovementSystem(_dispatcher, getLogger(), r),
                                           new CameraSystem(_dispatcher, getLogger(), r, c),
                                           new PositionalSystem(_dispatcher, getLogger(), r, c),
-                                          new ProjectileSystem(_dispatcher, getLogger(), r, _scene )};
+                                          new ProjectileSystem(_dispatcher, getLogger(), r, _scene)};
 
 
 #ifdef DEBUG
@@ -81,30 +82,11 @@ void SystemManager::update()
     system->updateDebuggingInfo();
   }
 #endif
-  std::vector<std::future<void>> futures;
+
   for (ISystem* system : _systems)
   {
-    futures.emplace_back(Config::THREADPOOL->enqueue(
-      [system, logger = getLogger()]
-      {
-        if (system == nullptr)
-        {
-          logger->log(Level::Error, "System invalid null ptr check entity file or debug\n");
-          return;
-        }
-        system->update();
-      }));
+    system->update();
   }
-
-#ifdef DEBUG
-  std::int32_t count = futures.size();
-#endif
-
-  for (auto& future : futures)
-  {
-    future.wait();
-  }
-
 #ifdef DEBUG
   double end  = TimeUtils::getCurrentTimeAsTime();
   double res  = TimeUtils::getDuration(start, end);
@@ -112,10 +94,10 @@ void SystemManager::update()
   if (cycle == 0)
   {
     logCycle(std::format("{} ### EntitySystemManager run {} cycles for all "
-                         "entities: (number of entites) {} - average time per cycle: {} ms.\n",
+                         "Systems: (number of systems) {} - average time per cycle: {} ms.\n",
                          getName(),
                          cycle,
-                         count,
+                         _systems.size(),
                          _avgTime / cycle));
     _avgTime = 0;
   }

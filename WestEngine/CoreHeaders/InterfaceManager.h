@@ -6,7 +6,7 @@
 #include "Interfaces/IManager.h"
 #include "WindowManager.h"
 
-#include <unordered_map>
+#include <map>
 #include <WestInterfaceFacade.h>
 
 class InterfaceManager : public IManager
@@ -27,7 +27,7 @@ public:
   static int destroyInterface(lua_State*);
 
   void pushEvent(EventIdentifiers event, EventPayload payload)
-  { 
+  {
     _eventQueue.push(std::make_tuple<>(event, payload));
   }
 
@@ -45,7 +45,7 @@ private:
   tQueue<std::tuple<EventIdentifiers, EventPayload>> _eventQueue;
   std::vector<ElementBounds*> _elements;
   std::shared_ptr<EventDispatcher> _dispatcher;
-  std::unordered_map<std::uint32_t, std::uint32_t> _attachedEntities;
+  std::map<std::pair<std::uint32_t, std::int32_t>, std::uint32_t> _attachedEntities;
   WestInterface::WestInterfaceFacade* _facade;
   WindowManager* _windowManager;
 
