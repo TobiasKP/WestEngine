@@ -25,7 +25,7 @@ public:
   static ISystem* getSystemByName(const std::string_view name);
 
 private:
-  static std::array<ISystem*, 5> _systems;
+  static std::array<ISystem*, 6> _systems;
 
   std::shared_ptr<Scene> _scene;
   std::shared_ptr<EventDispatcher> _dispatcher;

@@ -127,6 +127,9 @@ end
 
 function Label:attachEntity(id)
   self._attachedEntity = id
+  if (self._type == 0) then
+    self._type = 1
+  end
   return self
 end
 

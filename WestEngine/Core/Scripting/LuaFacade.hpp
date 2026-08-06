@@ -18,7 +18,8 @@ public:
   bool registerCFunction(int (*f)(lua_State*), std::string name, void* me);
 
   //
-  bool onEntityCreation(std::int32_t entityId, bool playable);
+  bool onEntityCreation(std::int32_t entityId, bool playable, std::int32_t health);
+  bool onEntityDestroy(std::int32_t entityId);
   bool onTileClicked(std::int32_t entityId, MouseAction m);
   bool onEntityClicked(std::int32_t entityId, MouseAction m);
   bool onStateChange(std::int32_t entityId, std::int32_t oldState, std::int32_t newState);
@@ -35,6 +36,8 @@ public:
                 float spawnY);
   bool entityQueue();
   bool internalCall(const std::string& toCall, std::int32_t callingId);
+  bool aiCall(std::int32_t entityId);
+  bool levelEnd();
   LuaStates getState(std::int32_t calleeId);
   std::int32_t getActionPoints(std::int32_t id);
 

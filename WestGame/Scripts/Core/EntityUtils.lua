@@ -1,7 +1,7 @@
 Utils = {}
 
 local yaml = require("Lib.yaml")
-local builder = require("Interface.InterfaceBuilder")
+
 local root = debug.getinfo(1, 'S').source:sub(2):gsub("[^/\\]+$", "")
 local projectile = {};
 local entityPos = {};
@@ -17,11 +17,7 @@ local function interpreteData(data, qPos)
   addComponent("object", data.model);
   addComponent("shader", data.shader);
 
-  local health = nil
   for i, component in ipairs(data.components) do
-    if component.name == "health" then
-      health = component
-    end
     if component.name == "projectile" and qPos ~= nil then
       data.components[i] = projectile[qPos]
     end
@@ -30,9 +26,10 @@ local function interpreteData(data, qPos)
     end
   end
 
-  if data.playercontrol then
+  if data.playercontrol == true then
     addComponent("playercontrol");
-    AddPlayerHealth(health);
+  elseif data.playercontrol == false then
+    addComponent("aicontrol");
   end
 
   if data.activeUnit then
@@ -51,22 +48,6 @@ local function interpreteData(data, qPos)
   end
 
   buildEntity()
-end
-
-function AddPlayerHealth(health)
-  if health ~= nil then
-    builder.Panel("playerhealth")
-        :anchor("bottom-right", 415, 60)
-        :size(10, 1)
-        :alpha(0.5)
-        :add(builder.Label(tostring(health.c))
-          :color(215, 207, 196, 1.0)
-          :span(string.len(tostring(health.c))))
-        :add(builder.ProgressBar(100)
-          :color(142, 59, 70, 1.0)
-          :span(10))
-        :build()
-  end
 end
 
 function loadFile(name)
@@ -103,8 +84,9 @@ function world(name)
   loadWorld(data.world);
 end
 
-function FillProjectileInfo(speed, target, dmg, hit, x, z)
-  table.insert(projectile, { name = "projectile", speed = speed, destination = target, dmg = dmg, hit = hit })
+function FillProjectileInfo(attacker, speed, target, dmg, hit, x, z)
+  table.insert(projectile,
+    { name = "projectile", attacker = attacker, speed = speed, destination = target, dmg = dmg, hit = hit })
   table.insert(entityPos, { name = "position", x = x, y = 0, z = z })
 end
 

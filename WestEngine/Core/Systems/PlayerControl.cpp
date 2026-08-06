@@ -15,6 +15,7 @@ PlayerControl::PlayerControl(std::shared_ptr<EventDispatcher> d,
 {
   _cam   = c;
   _state = 0;
+  _busy  = false;
   setName(Systems::PLAYER_CONTROL);
 #ifdef DEBUG
   _logger->log(Level::Info, std::format("{} *** Initialized debug information\n", getName()));
@@ -35,17 +36,21 @@ void PlayerControl::init(const std::shared_ptr<World>& w)
                          [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
   _dispatcher->subscribe(EventIdentifiers::GAME_EVENT,
                          [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
+  _dispatcher->subscribe(EventIdentifiers::ACTION_FINISHED,
+                         [this](EventIdentifiers event, EventPayload payload) { pushEvent(event, payload); });
 }
 
 void PlayerControl::update()
 {
-  std::shared_ptr<ComponentArray<Control>> controlUnits = _reg->getComponentArray<Control>();
-  assert(controlUnits->getComponents().size() > 0);
-  std::array<Control, CoreConstants::MAX_ENTITY_SIZE> res = controlUnits->getComponents();
-  _me = std::find_if(res.begin(), res.end(), [](const Control& c) { return c.active; })->entityId;
+  if (_me == 0)
+  {
+    std::shared_ptr<ComponentArray<Control>> controlUnits = _reg->getComponentArray<Control>();
+    assert(controlUnits->getComponents().size() > 0);
+    std::array<Control, CoreConstants::MAX_ENTITY_SIZE> res = controlUnits->getComponents();
+    _me = std::find_if(res.begin(), res.end(), [](const Control& c) { return c.active && !c.aiControl; })->entityId;
+  }
+
   pollEvents();
-
-
   Movement* movComp = _reg->getComponent<Movement>(_me);
   assert(movComp != nullptr);
   if (!movComp->destination.has_value() && isPlayerturn())
@@ -91,7 +96,7 @@ void PlayerControl::handleEvent(std::tuple<EventIdentifiers, EventPayload> event
     }
     case EventIdentifiers::MOUSE_LCLICK:
     {
-      if (!isPlayerturn())
+      if (!isPlayerturn() || _busy)
       {
         break;
       }
@@ -110,12 +115,23 @@ void PlayerControl::handleEvent(std::tuple<EventIdentifiers, EventPayload> event
       {
         passAttackInformation(id);
       }
+
       break;
     }
     case EventIdentifiers::GAME_EVENT:
     {
       GamePayload* g = std::get_if<GamePayload>(&std::get<1>(event));
       _state         = g->turn;
+      break;
+    }
+    case EventIdentifiers::ACTION_FINISHED:
+    {
+      ActionFinishedPayload* a = std::get_if<ActionFinishedPayload>(&std::get<1>(event));
+      if (a->entityId == _me)
+      { 
+        assert(_busy == true);
+        _busy = false;
+      }
       break;
     }
     default:
@@ -130,6 +146,7 @@ void PlayerControl::passAttackInformation(std::uint32_t id)
   AttackPayload a = {};
   a.target        = id;
   a.attacker      = _me;
+  _busy           = true;
   _dispatcher->dispatchEvent(EventIdentifiers::ATTACK_EVENT, a);
 }
 
@@ -151,6 +168,7 @@ void PlayerControl::passDestinationPosition(glm::vec3 dest, std::uint32_t id)
                                getName(),
                                (std::int32_t)LuaFacade::MouseAction::LMOUSE_CLICK));
     }
+    _busy                = true;
     movComp->destination = dest;
   }
 }

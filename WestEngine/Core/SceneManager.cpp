@@ -80,7 +80,7 @@ std::int32_t SceneManager::init()
   _registry->registerComponent<Health>();
   _registry->registerComponent<Projectile>();
   _registry->registerComponent<Equipment>();
-  _registry->registerComponent<Appearance>(); 
+  _registry->registerComponent<Appearance>();
   _facade->registerCFunction(getHealth, LuaAPI::C_GETHEALTH.data(), this);
   _facade->registerCFunction(getPosition, LuaAPI::C_GETPOSITION.data(), this);
   _scene->init();
@@ -118,7 +118,13 @@ std::int32_t SceneManager::init()
 
 void SceneManager::update()
 {
-  LuaFacade::getLuaFacadeInstance().entityQueue();
+  bool result = _facade->levelEnd();
+  result      = _facade->entityQueue();
+  if (result == 1)
+  {
+    logFailure(std::format("{} ### failure calling lua frame game updates.\n", getName()));
+    return;
+  }
   std::vector<std::uint32_t> removedEntities;
   for (auto& entity : _scene->getEntities())
   {
@@ -157,6 +163,7 @@ void SceneManager::removeEntityFromScene(const Entity& entity)
       WestRenderer::WestRendererFacade::getRendererFacade().cleanupModel(guid);
       _dataFacade->deleteModelFromScene(guid);
     }
+    LuaFacade::getLuaFacadeInstance().onEntityDestroy(entity.getId()); 
   }
   _registry->removeAllComponents(entity.getId());
   _scene->removeEntity(entity);

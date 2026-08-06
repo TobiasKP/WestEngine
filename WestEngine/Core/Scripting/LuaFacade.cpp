@@ -97,6 +97,20 @@ bool LuaFacade::onTileClicked(std::int32_t entityId, MouseAction m)
   return 0;
 }
 
+bool LuaFacade::onEntityDestroy(std::int32_t entityId)
+{
+  lua_getglobal(L, LuaAPI::ENTITY_REMOVE.data());
+  lua_pushinteger(L, entityId);
+  std::int32_t status = lua_pcall(L, 1, 0, 0);
+  if (status != 0)
+  {
+    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
+    lua_pop(L, 1);
+    return 1;
+  }
+  return 0;
+}
+
 bool LuaFacade::onEntityClicked(std::int32_t entityId, MouseAction m)
 {
   assert(entityId >= 0);
@@ -128,15 +142,16 @@ bool LuaFacade::onEntityClicked(std::int32_t entityId, MouseAction m)
   return 0;
 }
 
-bool LuaFacade::onEntityCreation(std::int32_t entityId, bool playable)
+bool LuaFacade::onEntityCreation(std::int32_t entityId, bool playable, std::int32_t health)
 {
   lua_getglobal(L, LuaAPI::ENTITY_REGISTER.data());
   lua_pushinteger(L, entityId);
   lua_pushboolean(L, playable);
-  std::int32_t status = lua_pcall(L, 2, 0, 0);
+  lua_pushinteger(L, health);
+  std::int32_t status = lua_pcall(L, 3, 0, 0);
   if (status != 0)
   {
-    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}", lua_tostring(L, -1)));
+    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
     lua_pop(L, 1);
     return 1;
   }
@@ -149,12 +164,25 @@ bool LuaFacade::entityQueue()
   std::int32_t status = lua_pcall(L, 0, 0, 0);
   if (status != 0)
   {
-    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}", lua_tostring(L, -1)));
+    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
     lua_pop(L, 1);
     return 1;
   }
   return 0;
 };
+
+bool LuaFacade::levelEnd()
+{
+  lua_getglobal(L, LuaAPI::LEVEL_END.data());
+  std::int32_t status = lua_pcall(L, 0, 0, 0);
+  if (status != 0)
+  {
+    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
+    lua_pop(L, 1);
+    return 1;
+  }
+  return 0;
+}
 
 bool LuaFacade::onStateChange(std::int32_t entityId, std::int32_t oldState, std::int32_t newState)
 {
@@ -222,6 +250,21 @@ LuaFacade::LuaStates LuaFacade::getState(std::int32_t id)
   return static_cast<LuaFacade::LuaStates>(result);
 }
 
+bool LuaFacade::aiCall(std::int32_t id)
+{
+  lua_getglobal(L, LuaAPI::AI_THINK.data());
+  lua_pushinteger(L, id);
+  std::int32_t status = lua_pcall(L, 1, 1, 0);
+  if (status != 0)
+  {
+    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
+    lua_pop(L, 1);
+    return 1;
+  }
+  return 0;
+}
+
+
 std::int32_t LuaFacade::getActionPoints(std::int32_t id)
 {
   lua_getglobal(L, LuaAPI::GET_ACTION_POINTS.data());
@@ -231,7 +274,7 @@ std::int32_t LuaFacade::getActionPoints(std::int32_t id)
   {
     _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
     lua_pop(L, 1);
-    return IDLE;
+    return 1;
   }
 
   std::int32_t result = lua_tointeger(L, -1);

@@ -31,7 +31,11 @@ void ComponentFactory::createComponent(lua_State* L, std::string& name, Entity& 
   }
   else if (Components::CONTROL.compare(name) == 0)
   {
-    addPlayerControl(L, e);
+    addPlayerControl(e);
+  }
+  else if (Components::AI_CONTROL.compare(name) == 0)
+  {
+    addAIControl(e);
   }
   else if (Components::ACTIVE_UNIT.compare(name) == 0)
   {
@@ -58,6 +62,9 @@ void ComponentFactory::createComponent(lua_State* L, std::string& name, Entity& 
 void ComponentFactory::addProjectile(lua_State* L, Entity& e)
 {
   Projectile p = {};
+  lua_getfield(L, 2, "attacker");
+  p.owner = lua_tointeger(L, -1);
+  lua_pop(L, 1);
   lua_getfield(L, 2, "speed");
   p.speed = lua_tointeger(L, -1);
   lua_pop(L, 1);
@@ -128,11 +135,20 @@ void ComponentFactory::addHealth(lua_State* L, Entity& e)
   _registry->addComponent<Health>(e.getId(), std::move(h));
 }
 
-void ComponentFactory::addPlayerControl(lua_State* L, Entity& e)
+void ComponentFactory::addPlayerControl(Entity& e)
 {
   Control p  = {};
   p.entityId = e.getId();
   _registry->addComponent<Control>(e.getId(), std::move(p));
+}
+
+void ComponentFactory::addAIControl(Entity& e)
+{
+  Control c   = {};
+  c.entityId  = e.getId();
+  c.active    = false;
+  c.aiControl = true;
+  _registry->addComponent<Control>(e.getId(), std::move(c));
 }
 
 void ComponentFactory::addPosition(lua_State* L, Entity& e)

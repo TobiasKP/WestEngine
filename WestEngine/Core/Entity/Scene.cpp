@@ -59,7 +59,7 @@ Entity* Scene::getEntityById(std::uint32_t id)
     return &(*debugEntityIt);
   }
 #endif
-  WestLogger::getLoggerInstance().log(Level::Error, std::format("Can not receive Entity for id: {} from Scene", id));
+  WestLogger::getLoggerInstance().log(Level::Error, std::format("Can not receive Entity for id: {} from Scene\n", id));
   return nullptr;
 }
 

@@ -74,12 +74,15 @@ end
 function SetActionPoints(id, points)
   local uiId = uimanager.getByParent("actionpoints_" .. id);
   if not uiId or not uiId[1] then
+    print("GGG - Ation UI not found")
     return
   end
   local res = uimanager.getElement(uiId[1], "actionpoints")
   if res == -1 or res == nil then
+    print("GGG - Action UI does not contain element actionpoints")
     return
   end
+  print("GGG - Updating Action UI")
   updateInterfaceValue(res, 0x10, tostring(math.ceil((points / 3) * 100)))
 end
 
@@ -95,6 +98,24 @@ function AddActionPointsUI(id)
       :build()
 end
 
+function AddPlayerHealth(id, health)
+  if health ~= nil then
+    builder.Panel("playerhealth")
+        :anchor("bottom-right", 415, 60)
+        :size(10, 1)
+        :alpha(0.5)
+        :add(builder.Label(tostring(health))
+          :color(215, 207, 196, 1.0)
+          :attachEntity(id)
+          :span(string.len(tostring(health))))
+        :add(builder.ProgressBar(100)
+          :color(142, 59, 70, 1.0)
+          :span(10)
+          :attachEntity(id))
+        :build()
+  end
+end
+
 function EndTurnButton()
   builder.Panel("endturn")
       :anchor("bottom-middle", 0, 80)
@@ -108,11 +129,36 @@ function EndTurnButton()
       :build()
 end
 
+function LevelEndScreen(won)
+  print("GGG - Level ended")
+  if won == true then
+    builder.Panel("end")
+        :anchor("center", 0, 0)
+        :size(7, 1)
+        :alpha(1.0)
+        :add(builder.Label("You won")
+          :color(215, 207, 196, 1.0)
+          :span(7))
+        :build()
+  else
+    builder.Panel("end")
+        :anchor("center", 0, 0)
+        :size(8, 1)
+        :alpha(1.0)
+        :add(builder.Label("You lost")
+          :color(215, 207, 196, 1.0)
+          :span(8))
+        :build()
+  end
+end
+
 InterfaceLogic.DestroyInterface = DestroyInterface
 InterfaceLogic.RefreshInterfaces = RefreshInterfaces
 InterfaceLogic.SetActionPoints = SetActionPoints
 InterfaceLogic.AddActionPointsUI = AddActionPointsUI
 InterfaceLogic.ConstructInfoPanel = ConstructInfoPanel
 InterfaceLogic.EndTurnButton = EndTurnButton
+InterfaceLogic.AddPlayerHealth = AddPlayerHealth
+InterfaceLogic.LevelEndScreen = LevelEndScreen
 
 return InterfaceLogic

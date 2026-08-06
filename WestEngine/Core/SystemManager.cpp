@@ -6,7 +6,7 @@
 #include <Config.h>
 #include <format>
 
-std::array<ISystem*, 5> SystemManager::_systems = {};
+std::array<ISystem*, 6> SystemManager::_systems = {};
 
 SystemManager::SystemManager() : IManager(nullptr)
 {
@@ -31,6 +31,7 @@ std::int32_t SystemManager::startup()
   std::shared_ptr<Camera> c            = _scene->getCamera();
   std::shared_ptr<ComponentRegistry> r = _scene->getRegistry();
   _systems                             = {new PlayerControl(_dispatcher, getLogger(), r, c),
+                                          new AISystem(_dispatcher, getLogger(), r),
                                           new MovementSystem(_dispatcher, getLogger(), r),
                                           new CameraSystem(_dispatcher, getLogger(), r, c),
                                           new PositionalSystem(_dispatcher, getLogger(), r, c),

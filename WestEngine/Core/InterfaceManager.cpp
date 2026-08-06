@@ -188,16 +188,16 @@ void InterfaceManager::pollEvents()
       case EventIdentifiers::INTERFACE_UPDATE:
       {
         InterfacePayload* i = std::get_if<InterfacePayload>(&std::get<1>(event));
-        if (_attachedEntities.contains(i->entityId))
+        if (_attachedEntities.contains({i->entityId, i->event}))
         {
 #ifdef DEBUG
           logDebug(std::format("{} ### dispatching event: {} to: {}, with value: {}\n",
                                getName(),
                                i->event,
-                               _attachedEntities[i->entityId],
+                               _attachedEntities[{i->entityId, i->event}],
                                i->newValue));
 #endif
-          _facade->notify(_attachedEntities[i->entityId], i->event, i->newValue);
+          _facade->notify(_attachedEntities[{i->entityId, i->event}], i->event, i->newValue);
         }
         break;
       }
@@ -359,7 +359,17 @@ std::vector<ElementProxy*> InterfaceManager::fillInfo(lua_State* L, std::uint32_
       std::uint32_t id = lua_tointeger(L, -1);
       if (id > 0)
       {
-        me->_attachedEntities[id] = e->elementId;
+        std::int32_t type = -1;
+        if (e->type == ElementType::VLABEL)
+        {
+          type = 0x08;
+        }
+        else if (e->type == ElementType::PROGESS_BAR)
+        {
+          type = 0x10;
+        }
+        assert(type != -1);
+        me->_attachedEntities[{id, type}] = e->elementId;
       }
     }
     lua_pop(L, 1);

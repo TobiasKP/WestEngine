@@ -51,6 +51,7 @@ std::int32_t InputManager::startup()
   _dispatcher->registerNewEvent(EventIdentifiers::GAME_EVENT);
   _dispatcher->registerNewEvent(EventIdentifiers::INTERFACE_UPDATE);
   _dispatcher->registerNewEvent(EventIdentifiers::ATTACK_EVENT);
+  _dispatcher->registerNewEvent(EventIdentifiers::ACTION_FINISHED);
   assert(_inputConfig != NULL && _availableCommands != NULL);
 
 

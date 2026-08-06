@@ -11,7 +11,6 @@ local switch = {
   ["endturn"] = function(id)
     state.ToggleGameState()
     interface.DestroyInterface(id);
-    ExecuteAI()
   end
 }
 
@@ -19,7 +18,7 @@ function RclickEntity(id)
   interface.ConstructInfoPanel(id)
 end
 
-function Attack(bulletType, wRange, distanceToTarget, wDmg, wAccuracy, target, spawnX, spawnY)
+function Attack(attackerId, bulletType, wRange, distanceToTarget, wDmg, wAccuracy, target, spawnX, spawnY)
   if wRange < distanceToTarget then
     wAccuracy = wAccuracy - (distanceToTarget - wRange) * 10
   end
@@ -29,18 +28,14 @@ function Attack(bulletType, wRange, distanceToTarget, wDmg, wAccuracy, target, s
     hit = false
   end
   if bulletType == 1 then
-    entity.FillProjectileInfo(2.0, target, wDmg, hit, spawnX, spawnY)
+    entity.FillProjectileInfo(attackerId, 2.0, target, wDmg, hit, spawnX, spawnY)
     entity.QueueEntity("../Entities/Misc/SmallProjectile")
   elseif bulletType == 2 then
-    entity.FillProjectileInfo(4.0, target, wDmg, hit, spawnX, spawnY)
+    entity.FillProjectileInfo(attackerId, 4.0, target, wDmg, hit, spawnX, spawnY)
     entity.QueueEntity("../Entities/Misc/MediumProjectile")
   else
     print("Error defining projectile, dismissed call...")
   end
-end
-
-function ExecuteAI()
-
 end
 
 function Internal(toCall, id)
