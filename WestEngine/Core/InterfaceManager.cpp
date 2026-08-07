@@ -247,7 +247,7 @@ int InterfaceManager::registerInterface(lua_State* L)
   std::uint8_t cid = me->_facade->createNewInterface(c);
   assert(cid == id);
 #ifdef DEBUG
-  me->logDebug(std::format("{} ### created a new game Interface from lua with id: {}", me->getName(), id));
+  me->logDebug(std::format("{} ### created a new game Interface from lua with id: {}\n", me->getName(), id));
 #endif
   assert(id > 0);
   lua_pushinteger(L, id);

@@ -46,7 +46,7 @@ void PlayerControl::update()
   {
     std::shared_ptr<ComponentArray<Control>> controlUnits = _reg->getComponentArray<Control>();
     assert(controlUnits->getComponents().size() > 0);
-    std::array<Control, CoreConstants::MAX_ENTITY_SIZE> res = controlUnits->getComponents();
+    auto& res = controlUnits->getComponents();
     _me = std::find_if(res.begin(), res.end(), [](const Control& c) { return c.active && !c.aiControl; })->entityId;
   }
 
@@ -128,7 +128,7 @@ void PlayerControl::handleEvent(std::tuple<EventIdentifiers, EventPayload> event
     {
       ActionFinishedPayload* a = std::get_if<ActionFinishedPayload>(&std::get<1>(event));
       if (a->entityId == _me)
-      { 
+      {
         assert(_busy == true);
         _busy = false;
       }

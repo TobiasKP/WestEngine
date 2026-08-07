@@ -64,8 +64,8 @@ void SceneManager::shutdown()
 #endif
   _ebuilder.reset();
   _wbuilder.reset();
-  _facade->shutdown();
   deleteScene();
+  _facade->shutdown();
 }
 
 std::int32_t SceneManager::init()
@@ -163,7 +163,7 @@ void SceneManager::removeEntityFromScene(const Entity& entity)
       WestRenderer::WestRendererFacade::getRendererFacade().cleanupModel(guid);
       _dataFacade->deleteModelFromScene(guid);
     }
-    LuaFacade::getLuaFacadeInstance().onEntityDestroy(entity.getId()); 
+    LuaFacade::getLuaFacadeInstance().onEntityDestroy(entity.getId());
   }
   _registry->removeAllComponents(entity.getId());
   _scene->removeEntity(entity);
@@ -174,10 +174,17 @@ void SceneManager::deleteScene()
 #ifdef DEBUG
   logDebug(std::format("{} ### Cleaned up GPU memory\n", getName()));
 #endif
+  std::vector<std::uint32_t> removedEntities;
   for (auto& entity : _scene->getEntities())
   {
-    removeEntityFromScene(entity);
+    removedEntities.push_back(entity.getId());
   }
+  for (std::uint32_t id : removedEntities)
+  {
+    Entity* e = _scene->getEntityById(id);
+    removeEntityFromScene(*e);
+  }
+
   _scene->deleteScene();
 #ifdef DEBUG
   logDebug(std::format("{} ### Deleted Scene\n", getName()));

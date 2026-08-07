@@ -39,8 +39,7 @@ void AISystem::update()
   }
 
   std::shared_ptr<ComponentArray<Control>> controlUnits = _reg->getComponentArray<Control>();
-  assert(controlUnits->getComponents().size() > 0);
-  std::array<Control, CoreConstants::MAX_ENTITY_SIZE> res = controlUnits->getComponents();
+  assert(controlUnits->getComponents().size() > 0); 
   if (_me == 0)
   {
     size_t size = controlUnits->getSize();
@@ -61,7 +60,7 @@ void AISystem::update()
     _busy = true;
     _facade->aiCall(_me);
   }
-  else
+  else if (_me == 0 && !_busy)
   {
     GamePayload e = {};
     e.turn        = !_state;
