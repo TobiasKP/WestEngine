@@ -1,11 +1,11 @@
 #pragma once
 
-#include <functional>
-#include <thread>
 #include <array>
-#include <string>
-#include <vector>
 #include <atomic>
+#include <functional>
+#include <string>
+#include <thread>
+#include <vector>
 #include <WestLogger.h>
 
 class AssetPathScreener
@@ -25,7 +25,7 @@ public:
 
 private:
   void notifyOnNew();
-  void scanDir(); 
+  void scanDir();
 
   std::function<void(const std::string& path)> _callback;
   std::array<std::string, 1> _allowList = {".obj"};

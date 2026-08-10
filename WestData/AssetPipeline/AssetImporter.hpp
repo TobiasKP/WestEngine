@@ -28,6 +28,7 @@ private:
   std::vector<Vertex> processVertices(aiMesh* mesh);
   std::vector<std::uint32_t> processIndices(aiMesh* mesh);
   std::vector<Texture> processTextures(aiMesh* mesh, const aiScene* scene);
+  Material processMaterial(aiMesh* mesh, const aiScene* scene);
   std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
   Texture textureFromFile(const std::string& path, const std::string& typeName);
 

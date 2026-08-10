@@ -32,7 +32,7 @@ void WestRendererFacade::clearColor()
 void WestRendererFacade::renderEntity(
   std::string guid, std::uint32_t entityId, GLuint programId, EntityUniformParams* params, bool debug)
 {
-  std::unordered_map<std::string, GLuint> uniforms = _entityToUniforms[entityId];
+  std::unordered_map<std::string, GLuint>& uniforms = _entityToUniforms[entityId];
   _cycle->renderEntity(guid, programId, uniforms, params, debug);
 };
 

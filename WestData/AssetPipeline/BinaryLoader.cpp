@@ -119,6 +119,24 @@ std::optional<Model> BinaryLoader::convertToModel(std::ifstream& is, const std::
     is.read(reinterpret_cast<char*>(indices.data()), indiceSize * sizeof(std::uint32_t));
 
 #ifdef DEBUG
+    buffer = new char[MagicNumbers::MATERIAL.size()];
+    is.read(buffer, MagicNumbers::MATERIAL.size());
+    assert(std::memcmp(buffer, MagicNumbers::MATERIAL.data(), MagicNumbers::MATERIAL.size()) == 0);
+    delete[] buffer;
+#else
+    is.seekg(MagicNumbers::MATERIAL.size(), std::ios::cur);
+#endif
+
+    Material material;
+    is.seekg(MagicNumbers::KD.size(), std::ios::cur);
+    is.read(reinterpret_cast<char*>(&material.diffuseColor), sizeof(glm::vec3));
+    is.seekg(MagicNumbers::KE.size(), std::ios::cur);
+    is.read(reinterpret_cast<char*>(&material.emissiveColor), sizeof(glm::vec3));
+    is.seekg(MagicNumbers::KS.size(), std::ios::cur);
+    is.read(reinterpret_cast<char*>(&material.specularColor), sizeof(glm::vec3));
+    is.seekg(MagicNumbers::DELIMITER.size(), std::ios::cur);
+
+#ifdef DEBUG
     buffer = new char[MagicNumbers::TEXTURE.size()];
     is.read(buffer, MagicNumbers::TEXTURE.size());
     assert(std::memcmp(buffer, MagicNumbers::TEXTURE.data(), MagicNumbers::TEXTURE.size()) == 0);
@@ -172,7 +190,8 @@ std::optional<Model> BinaryLoader::convertToModel(std::ifstream& is, const std::
       }
     }
 
-    m.addMesh(Mesh(std::format("{}_{}", guid, count), vertices, indices, textures, AABB(aabbMin, aabbMax)));
+    m.addMesh(
+      Mesh(std::format("{}_{}", guid, count), vertices, indices, textures, AABB(aabbMin, aabbMax), material));
     if (is.peek() == EOF)
     {
       break;

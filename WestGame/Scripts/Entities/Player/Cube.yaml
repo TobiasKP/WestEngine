@@ -1,5 +1,5 @@
 name: "cube"
-model: "Cube.obj"
+model: "firstBlend.obj"
 shader: { v: "Vertex.vs", f: "Fragment.fs" }
 playercontrol: true
 activeUnit: true

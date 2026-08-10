@@ -22,17 +22,18 @@ public:
        std::vector<Vertex>& vertices,
        std::vector<std::uint32_t>& indices,
        std::vector<Texture>& textures,
-       AABB aabb)
+       AABB aabb,
+       Material mat = Material{})
   {
     this->_guid    = guid;
     this->vertices = vertices;
     this->indices  = indices;
     this->textures = textures;
     this->aabb     = aabb;
-    this->material = Material{};
+    this->material = mat;
   };
 
-  const std::string& getGuid()
+  const std::string& getGuid() const
   {
     return _guid;
   };

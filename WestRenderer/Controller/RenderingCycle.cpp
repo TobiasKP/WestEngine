@@ -7,7 +7,7 @@
 
 void RenderingCycle::renderEntity(std::string guid,
                                   GLuint programId,
-                                  std::unordered_map<std::string, GLuint> uniforms,
+                                  std::unordered_map<std::string, GLuint>& uniforms,
                                   EntityUniformParams* params,
                                   bool debug)
 {
@@ -38,53 +38,60 @@ void RenderingCycle::renderEntity(std::string guid,
     registerModel(model, guid);
   }
 
-  if (uniforms.contains(UniformConstants::COLOR))
+  const std::vector<std::pair<std::string, std::uint32_t>>& vaos = _uuidToVAO.at(guid);
+  for (std::uint32_t vao = 0; vao < vaos.size(); vao++)
   {
-    _utils->setUniform(uniforms[UniformConstants::COLOR], params->diffuseColor);
-  }
+    const std::string& meshGuid = std::get<0>(vaos[vao]);
+    const std::uint32_t v      = std::get<1>(vaos[vao]);
+    if (uniforms.contains(UniformConstants::COLOR))
+    {
+      _utils->setUniform(uniforms[UniformConstants::COLOR], params->diffuseColor[meshGuid]);
+    }
 
 #ifdef DEBUG
-  if (debug && uniforms.contains(UniformConstants::DCOLOR))
-  {
-    _utils->setUniform(uniforms[UniformConstants::DCOLOR], params->diffuseColor);
-  }
+    if (debug && uniforms.contains(UniformConstants::DCOLOR))
+    {
+      _utils->setUniform(uniforms[UniformConstants::DCOLOR], params->diffuseColor[meshGuid]);
+    }
 #endif
 
-  if (uniforms.contains(UniformConstants::ECOLOR))
-  {
-    _utils->setUniform(uniforms[UniformConstants::ECOLOR], params->emissiveColor);
-  }
+    if (uniforms.contains(UniformConstants::ECOLOR))
+    {
+      _utils->setUniform(uniforms[UniformConstants::ECOLOR], params->emissiveColor[meshGuid]);
+    }
 
-  if (uniforms.contains(UniformConstants::TEXTURE_SAMPLER))
-  {
-    _utils->setUniform(uniforms[UniformConstants::TEXTURE_SAMPLER], _uuidToTexture[guid]);
-  }
+    if (uniforms.contains(UniformConstants::TEXTURE_SAMPLER))
+    {
+      _utils->setUniform(uniforms[UniformConstants::TEXTURE_SAMPLER], _uuidToTexture[guid]);
+    }
 
-  if (uniforms.contains(UniformConstants::TRANSFORMATION_MATRIX))
-  {
-    _utils->setUniform(uniforms[UniformConstants::TRANSFORMATION_MATRIX], params->transform);
-  }
- 
+    if (uniforms.contains(UniformConstants::TRANSFORMATION_MATRIX))
+    {
+      _utils->setUniform(uniforms[UniformConstants::TRANSFORMATION_MATRIX], params->transform);
+    }
+
 #ifdef DEBUG
-  _logger->log(Level::Cycle, std::format("|><| guid {} has {} vao", guid, _uuidToVAO[guid]));
+    _logger->log(Level::Cycle, std::format("|><| guid {} has {} vaos", guid, _uuidToVAO[guid].size()));
 #endif
 
-  glBindVertexArray(_vaos[_uuidToVAO[guid]]);
+
+    glBindVertexArray(_vaos.at(v));
 
 #ifdef DEBUG
-  if (debug)
-  {
-    glDisable(GL_DEPTH_TEST);
-    glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, 0);
-    glEnable(GL_DEPTH_TEST);
-  }
-  else
-  {
-    glDrawElements(GL_TRIANGLES, _uuidToVertexCount[guid], GL_UNSIGNED_INT, 0);
-  }
+    if (debug)
+    {
+      glDisable(GL_DEPTH_TEST);
+      glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, 0);
+      glEnable(GL_DEPTH_TEST);
+    }
+    else
+    {
+      glDrawElements(GL_TRIANGLES, _uuidToVertexCount.at(guid)[vao], GL_UNSIGNED_INT, 0);
+    }
 #else
-  glDrawElements(GL_TRIANGLES, _uuidToVertexCount[guid], GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, _uuidToVertexCount[guid][vao], GL_UNSIGNED_INT, 0);
 #endif
+  }
 };
 
 void RenderingCycle::renderWorld(std::unordered_map<std::string, GLuint> uniforms,
@@ -112,11 +119,6 @@ void RenderingCycle::renderWorld(std::unordered_map<std::string, GLuint> uniform
     registerModel(model, modelGuid);
   }
 
-  if (uniforms.contains(UniformConstants::DCOLOR))
-  {
-    _utils->setUniform(uniforms[UniformConstants::DCOLOR], model->getMeshes().front().material.diffuseColor);
-  }
-
   if (dirty)
   {
     _utils->setUniform(uniforms[UniformConstants::WORLD_TILEARRAY], params->flags);
@@ -124,9 +126,16 @@ void RenderingCycle::renderWorld(std::unordered_map<std::string, GLuint> uniform
     _utils->setUniform(uniforms[UniformConstants::WORLD_GRID_ORIGIN], params->worldOrigin);
   }
 
-
-  glBindVertexArray(_vaos[_uuidToVAO[modelGuid]]);
-  glDrawElements(GL_TRIANGLES, _uuidToVertexCount[modelGuid], GL_UNSIGNED_INT, 0);
+  for (std::uint32_t i = 0; i < _uuidToVAO[modelGuid].size(); i++)
+  {
+    if (uniforms.contains(UniformConstants::DCOLOR))
+    {
+      _utils->setUniform(uniforms[UniformConstants::DCOLOR], model->getMeshes().front().material.diffuseColor);
+    }
+    std::uint32_t idx = std::get<1>(_uuidToVAO[modelGuid][i]);
+    glBindVertexArray(_vaos[idx]);
+    glDrawElements(GL_TRIANGLES, _uuidToVertexCount[modelGuid][i], GL_UNSIGNED_INT, 0);
+  }
   glUseProgram(_lastUsedShader);
 };
 
@@ -230,13 +239,14 @@ void RenderingCycle::renderInterfaces()
 
 void RenderingCycle::registerModel(const Model* model, std::string modelGuid)
 {
-  createVAO();
-  _uuidToVAO[modelGuid] = _vaos.size() - 1;
-  size_t vboStart        = _vbos.size();
-  for (const Mesh& m : model->getMeshes())
+  size_t vboStart = _vbos.size();
+  for (size_t i = 0; i < model->getMeshes().size(); i++)
   {
+    const Mesh& m = model->getMeshes()[i];
+    createVAO();
+    _uuidToVAO[modelGuid].push_back({m.getGuid(), _vaos.size() - 1});
     storeIndicesBuffer(m.indices.data(), m.indices.size());
-    _uuidToVertexCount[modelGuid] = m.indices.size();
+    _uuidToVertexCount[modelGuid].push_back(m.indices.size());
     std::vector<float> positions;
     positions.reserve(m.vertices.size() * 3);
     std::vector<float> texCoords;
@@ -264,8 +274,13 @@ void RenderingCycle::cleanupModel(const std::string& modelGuid)
     return;
   }
 
-  GLuint vao = _vaos[vaoIt->second];
-  glDeleteVertexArrays(1, &vao);
+  for (std::uint32_t i = 0; i < vaoIt->second.size(); i++)
+  {
+    std::uint32_t idx = std::get<1>(vaoIt->second[i]);
+    GLuint vao        = _vaos[idx];
+    glDeleteVertexArrays(1, &vao);
+  }
+
 
   auto vboIt = _uuidToVBOs.find(modelGuid);
   if (vboIt != _uuidToVBOs.end())

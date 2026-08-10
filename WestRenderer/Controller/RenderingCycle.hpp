@@ -16,7 +16,7 @@ public:
 
   void renderEntity(std::string guid,
                     GLuint programId,
-                    std::unordered_map<std::string, GLuint> uniforms,
+                    std::unordered_map<std::string, GLuint>& uniforms,
                     EntityUniformParams* params,
                     bool debug);
   void renderWorld(std::unordered_map<std::string, GLuint> uniforms,
@@ -37,8 +37,8 @@ private:
   WestLogger* _logger;
   WestData::WestAssetFacade* _dataFacade;
   GLuint _lastUsedShader = 0;
-  std::unordered_map<std::string, std::uint32_t> _uuidToVAO;
-  std::unordered_map<std::string, std::uint32_t> _uuidToVertexCount;
+  std::unordered_map<std::string, std::vector<std::pair<std::string, std::uint32_t>>> _uuidToVAO;
+  std::unordered_map<std::string, std::vector<std::uint32_t>> _uuidToVertexCount;
   std::unordered_map<std::string, GLint> _uuidToTexture;
   std::unordered_map<std::string, std::vector<GLuint>> _uuidToVBOs;
   std::vector<GLuint> _vaos;

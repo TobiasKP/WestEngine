@@ -123,14 +123,16 @@ void RenderManager::update()
     params.transform           = PositionCalculation::createTransformationMatrix(p->position, p->rotation, p->scale);
     if (model)
     {
-      params.diffuseColor  = model->getMeshes().front().material.diffuseColor;
-      params.emissiveColor = model->getMeshes().front().material.emissiveColor;
-      if (appearance)
+      for (Mesh m : model->getMeshes())
       {
-        params.diffuseColor  += appearance->diffuseOverride;
-        params.emissiveColor += appearance->emissiveOverride;
+        params.diffuseColor[m.getGuid()]  = m.material.diffuseColor;
+        params.emissiveColor[m.getGuid()] = m.material.emissiveColor;
+        if (appearance)
+        {
+          params.diffuseColor[m.getGuid()]  += appearance->diffuseOverride;
+          params.emissiveColor[m.getGuid()] += appearance->emissiveOverride;
+        }
       }
-
       _facade->renderEntity(entity.getModelGuid(), entity.getId(), entity.getShaderId(), &params, false);
     }
   }
@@ -158,9 +160,9 @@ bool RenderManager::AABBcheck(const Entity& e, const Frustum& f, ComponentRegist
   Position* p = reg->getComponent<Position>(e.getId());
   for (const Mesh& m : model->getMeshes())
   {
-    const AABB aabb = m.aabb; 
-    glm::vec3 min = aabb.min * p->scale + p->position;
-    glm::vec3 max = aabb.max * p->scale + p->position;
+    const AABB aabb = m.aabb;
+    glm::vec3 min   = aabb.min * p->scale + p->position;
+    glm::vec3 max   = aabb.max * p->scale + p->position;
 
     bool res =
       f.near.getSignedDistance(glm::vec3(
@@ -201,8 +203,8 @@ void RenderManager::renderDebugEntities()
   std::vector<std::tuple<std::string, std::uint32_t, GLuint, EntityUniformParams>> debugData;
   for (const Entity& entity : _scene->getDebugEntities())
   {
-    EntityUniformParams params = {};
-    params.diffuseColor        = glm::vec3(1.0f, 0.0f, 0.0f);
+    EntityUniformParams params                 = {};
+    params.diffuseColor[entity.getModelGuid()] = glm::vec3(1.0f, 0.0f, 0.0f);
     debugData.emplace_back(entity.getModelGuid(), entity.getId(), entity.getShaderId(), params);
   }
   _facade->renderDebugEntities(debugData);

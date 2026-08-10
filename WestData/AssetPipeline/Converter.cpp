@@ -79,6 +79,16 @@ void Converter::bake(Model& m)
 #ifdef DEBUG
     _logger->log(Level::Cycle, std::format("|*| writing textures for {}\n", m.getGuid()));
 #endif
+
+    file.write(MagicNumbers::MATERIAL.data(), MagicNumbers::MATERIAL.size());
+    file.write(MagicNumbers::KD.data(), MagicNumbers::KD.size());
+    write(file, me.material.diffuseColor);
+    file.write(MagicNumbers::KE.data(), MagicNumbers::KE.size());
+    write(file, me.material.emissiveColor);
+    file.write(MagicNumbers::KS.data(), MagicNumbers::KS.size());
+    write(file, me.material.specularColor);
+    file.write(MagicNumbers::DELIMITER.data(), MagicNumbers::DELIMITER.size());
+
     file.write(MagicNumbers::TEXTURE.data(), MagicNumbers::TEXTURE.size());
     write(file, me.textures.size());
     file.write(MagicNumbers::DELIMITER.data(), MagicNumbers::DELIMITER.size());

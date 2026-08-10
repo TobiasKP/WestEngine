@@ -3,8 +3,9 @@
 
 #include <cstdint>
 #include <glm/glm.hpp>
+#include <string>
+#include <unordered_map>
 #include <vector>
-
 
 struct UniformParams
 {
@@ -19,7 +20,7 @@ struct WorldUniformParams : UniformParams
 
 struct EntityUniformParams : UniformParams
 {
-  glm::vec3 diffuseColor, emissiveColor;
+  std::unordered_map<std::string, glm::vec3> diffuseColor, emissiveColor;
   std::int32_t texture;
   glm::mat4 transform;
 };

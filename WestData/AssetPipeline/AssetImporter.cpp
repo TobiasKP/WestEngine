@@ -8,9 +8,9 @@
 
 #include <assimp/postprocess.h>
 #include <filesystem>
+#include <format>
 #include <PathUtils.h>
 #include <stb_image.h>
-#include <format>
 
 
 AssetImporter::AssetImporter(WestLogger* l)
@@ -80,12 +80,38 @@ void AssetImporter::processNode(aiNode* node, const aiScene* scene, const std::s
   }
 }
 
+Material AssetImporter::processMaterial(aiMesh* mesh, const aiScene* scene)
+{
+  Material m;
+  if (mesh->mMaterialIndex >= 0)
+  {
+    aiMaterial* mat = scene->mMaterials[mesh->mMaterialIndex];
+    aiColor4D diffuse, specular, emissive;
+    if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
+    {
+      m.diffuseColor = glm::vec3(diffuse.r, diffuse.g, diffuse.b);
+    }
+
+    if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_COLOR_EMISSIVE, &emissive))
+    {
+      m.emissiveColor = glm::vec3(emissive.r, emissive.g, emissive.b);
+    }
+
+    if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_COLOR_SPECULAR, &specular))
+    {
+      m.specularColor = glm::vec3(specular.r, specular.g, specular.b);
+    }
+  }
+  return m;
+}
+
 Mesh AssetImporter::processMesh(aiMesh* mesh, const aiScene* scene, const std::string& guid, std::uint32_t count)
 {
   std::vector<Vertex> vertices       = processVertices(mesh);
   std::vector<std::uint32_t> indices = processIndices(mesh);
   std::vector<Texture> textures      = processTextures(mesh, scene);
-  return Mesh(std::format("{}_{}", guid, count), vertices, indices, textures, AABB());
+  Material mat                       = processMaterial(mesh, scene);
+  return Mesh(std::format("{}_{}", guid, count), vertices, indices, textures, AABB(), std::move(mat));
 }
 
 std::vector<Vertex> AssetImporter::processVertices(aiMesh* mesh)
