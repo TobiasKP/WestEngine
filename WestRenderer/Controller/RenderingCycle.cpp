@@ -71,7 +71,7 @@ void RenderingCycle::renderEntity(std::string guid,
     }
 
 #ifdef DEBUG
-    _logger->log(Level::Cycle, std::format("|><| guid {} has {} vaos", guid, _uuidToVAO[guid].size()));
+    _logger->log(Level::Cycle, std::format("|><| guid {} has {} vaos\n", guid, _uuidToVAO[guid].size()));
 #endif
 
 
