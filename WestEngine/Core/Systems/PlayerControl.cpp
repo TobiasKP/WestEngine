@@ -143,11 +143,8 @@ void PlayerControl::updateDebuggingInfo() {}
 
 void PlayerControl::passAttackInformation(std::uint32_t id)
 {
-  AttackPayload a = {};
-  a.target        = id;
-  a.attacker      = _me;
-  _busy           = true;
-  _dispatcher->dispatchEvent(EventIdentifiers::ATTACK_EVENT, a);
+  _busy = true;
+  _dispatcher->dispatchEvent(EventIdentifiers::ATTACK_EVENT, AttackPayload{.attacker = _me, .target = id});
 }
 
 void PlayerControl::passDestinationPosition(glm::vec3 dest, std::uint32_t id)

@@ -63,22 +63,21 @@ void ProjectileSystem::travel(std::uint32_t id, Position* posComp, Projectile* p
   {
     if (p->hit)
     {
-      Health* health      = _reg->getComponent<Health>(p->destination);
-      health->current    -= p->damage;
-      InterfacePayload i  = {};
-      i.event             = 0x10;
-      i.entityId          = p->destination;
-      i.newValue          = std::to_string(health->current);
-      _dispatcher->dispatchEvent(EventIdentifiers::INTERFACE_UPDATE, i);
-      i.event = 0x08;
-      _dispatcher->dispatchEvent(EventIdentifiers::INTERFACE_UPDATE, i);
+      Health* health   = _reg->getComponent<Health>(p->destination);
+      health->current -= p->damage;
+
+      std::string newHealth = std::to_string(health->current);
+      _dispatcher->dispatchEvent(EventIdentifiers::INTERFACE_UPDATE,
+                                 InterfacePayload{.event = 0x10, .entityId = p->destination, .newValue = newHealth});
+      _dispatcher->dispatchEvent(EventIdentifiers::INTERFACE_UPDATE,
+                                 InterfacePayload{.event = 0x08, .entityId = p->destination, .newValue = newHealth});
       if (health->current <= 0)
       {
         _toRemove.push_back(p->destination);
       }
     }
     _toRemove.push_back(id);
-    _dispatcher->dispatchEvent(EventIdentifiers::ACTION_FINISHED, ActionFinishedPayload{p->owner});
+    _dispatcher->dispatchEvent(EventIdentifiers::ACTION_FINISHED, ActionFinishedPayload{.entityId = p->owner});
   }
   else
   {

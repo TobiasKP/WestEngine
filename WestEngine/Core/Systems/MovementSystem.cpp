@@ -60,7 +60,7 @@ void MovementSystem::moveToDestination(std::uint32_t id, Position* posComp, Move
                                getName(),
                                (std::int32_t)LuaFacade::LuaStates::IDLE));
     } 
-    _dispatcher->dispatchEvent(EventIdentifiers::ACTION_FINISHED, ActionFinishedPayload{id});
+    _dispatcher->dispatchEvent(EventIdentifiers::ACTION_FINISHED, ActionFinishedPayload{.entityId = id});
     movComp->destination.reset();
 #ifdef DEBUG
     movComp->debugInfoDisplayed = false;

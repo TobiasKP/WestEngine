@@ -62,9 +62,7 @@ void AISystem::update()
   }
   else if (_me == 0 && !_busy)
   {
-    GamePayload e = {};
-    e.turn        = !_state;
-    _dispatcher->dispatchEvent(EventIdentifiers::GAME_EVENT, std::move(e));
+    _dispatcher->dispatchEvent(EventIdentifiers::GAME_EVENT, GamePayload{.turn = !_state});
   }
 }
 
@@ -162,11 +160,8 @@ int AISystem::aiAttackCommand(lua_State* L)
   std::int32_t enemyIdx = lua_tointeger(L, 2);
   std::uint32_t enemyId = me->_world->getEntityByIdx(enemyIdx);
   assert(id > 0 && enemyId > 0);
-  AttackPayload a = {};
-  a.target        = enemyId;
-  a.attacker      = id;
-  me->_busy       = true;
-  me->_dispatcher->dispatchEvent(EventIdentifiers::ATTACK_EVENT, a);
+  me->_busy = true;
+  me->_dispatcher->dispatchEvent(EventIdentifiers::ATTACK_EVENT, AttackPayload{.attacker = id, .target = enemyId});
   return 0;
 }
 
