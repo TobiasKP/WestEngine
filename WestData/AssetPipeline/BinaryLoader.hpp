@@ -7,7 +7,7 @@
 class BinaryLoader
 {
 public:
-  BinaryLoader(WestLogger* l);
+  BinaryLoader(WestLogger* l, std::shared_ptr<AssetImporter> importer);
   ~BinaryLoader();
 
   void init();

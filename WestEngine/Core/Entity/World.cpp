@@ -8,6 +8,7 @@ World::World()
   std::lock_guard<std::mutex> lock(_mutex);
   _lastIdx = -1;
   _dirty   = true;
+  _skybox  = "";
 }
 
 World::~World()

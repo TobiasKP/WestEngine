@@ -1,9 +1,9 @@
 #include "ModelBuilder.hpp"
 
-ModelBuilder::ModelBuilder(WestLogger* l)
+ModelBuilder::ModelBuilder(WestLogger* l, std::shared_ptr<AssetImporter> importer)
 {
   _logger = l;
-  _loader = std::make_unique<BinaryLoader>(l);
+  _loader = std::make_unique<BinaryLoader>(l, importer);
 }
 
 ModelBuilder::~ModelBuilder() {}

@@ -16,6 +16,7 @@ public:
   const bool deleteModelFromScene(const std::string& uuid);
   const std::string addModelToScene(const std::string& path);
   const std::string addModelToScene(Model& m);
+  const Texture loadTexture(const std::string& path);
 
 private:
   WestAssetFacade();

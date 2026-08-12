@@ -41,6 +41,12 @@ const std::string WestAssetFacade::addModelToScene(const std::string& path)
   return _controller->addModel(path);
 };
 
-const std::string WestAssetFacade::addModelToScene(Model& m) {
+const std::string WestAssetFacade::addModelToScene(Model& m)
+{
   return _controller->addModel(m);
+}
+
+const Texture WestAssetFacade::loadTexture(const std::string& path)
+{
+  return _controller->loadTexture(path);
 }

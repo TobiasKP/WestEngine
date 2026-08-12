@@ -17,7 +17,7 @@ ShaderManager::ShaderManager() : IManager(nullptr)
 {
   setName(CoreConstants::SHADER_MANAGER);
   _facade = nullptr;
-    _scene  = nullptr;
+  _scene  = nullptr;
 }
 
 ShaderManager::ShaderManager(WestLogger* logger, const std::shared_ptr<Scene>& s) : IManager(logger)
@@ -133,6 +133,7 @@ void ShaderManager::initWorldShader()
 
 
   world->setShaderId(_rendererFacade->registerShader("/shader/worldshader.vs", "/shader/worldshader.fs"));
+  world->setSkyboxShader(_rendererFacade->registerShader("/shader/skyboxshader.vs", "/shader/skyboxshader.fs"));
   world->initialize();
 #ifdef DEBUG
   logDebug(std::format("{} ### World shader initialized. ProgramID: {}.\n", getName(), world->getShaderId()));
@@ -143,6 +144,7 @@ void ShaderManager::initWorldShader()
   _rendererFacade->createUniform(UniformConstants::WORLD_TILEARRAY, world->getShaderId(), world->getId());
   _rendererFacade->createUniform(UniformConstants::WORLD_GRIDSIZE, world->getShaderId(), world->getId());
   _rendererFacade->createUniform(UniformConstants::WORLD_GRID_ORIGIN, world->getShaderId(), world->getId());
+  _rendererFacade->createUniform(UniformConstants::SKYBOX_CUBE_TEX, world->getSkyboxShader(), world->getId());
 }
 
 

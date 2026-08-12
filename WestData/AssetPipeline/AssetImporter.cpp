@@ -5,6 +5,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "../Data/Model.hpp"
+#include "../Constants/TextureTypes.hpp"
 
 #include <assimp/postprocess.h>
 #include <filesystem>
@@ -166,9 +167,9 @@ std::vector<Texture> AssetImporter::processTextures(aiMesh* mesh, const aiScene*
   if (mesh->mMaterialIndex >= 0)
   {
     aiMaterial* mat                  = scene->mMaterials[mesh->mMaterialIndex];
-    std::vector<Texture> diffuseMaps = loadMaterialTextures(mat, aiTextureType_DIFFUSE, "texture_diffuse");
+    std::vector<Texture> diffuseMaps = loadMaterialTextures(mat, aiTextureType_DIFFUSE, TextureTypes::DIFFUSE.data());
     result.insert(result.end(), diffuseMaps.begin(), diffuseMaps.end());
-    std::vector<Texture> specularMaps = loadMaterialTextures(mat, aiTextureType_SPECULAR, "texture_specular");
+    std::vector<Texture> specularMaps = loadMaterialTextures(mat, aiTextureType_SPECULAR, TextureTypes::SPECULAR.data());
     result.insert(result.end(), specularMaps.begin(), specularMaps.end());
   }
 

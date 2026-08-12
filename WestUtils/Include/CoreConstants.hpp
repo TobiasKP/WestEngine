@@ -16,6 +16,7 @@ inline constexpr char DEBUG_F_SHADER[]             = "/shader/Debug/DebugFShader
 inline constexpr std::string_view LUA_INIT_FILE    = "/lua/Core/Main.lua";
 inline constexpr std::string_view LUA_API_FILE     = "/lua/Core/WestAPI.lua";
 inline constexpr std::string_view ASSET_PATH       = "/assets/Models/";
+inline constexpr std::string_view SKYBOX_PATH      = "/assets/Skybox/";
 
 inline constexpr std::uint8_t MAX_Q_SIZE         = 7;
 inline constexpr std::uint16_t MAX_ENTITY_SIZE   = 1024;
