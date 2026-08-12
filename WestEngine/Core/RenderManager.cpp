@@ -62,15 +62,10 @@ void RenderManager::update()
 #ifdef DEBUG
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
-  std::shared_ptr<Camera> cam       = _scene->getCamera();
-  std::shared_ptr<World> world      = _scene->getWorld();
-  WorldUniformParams params         = {world->getFlagData(),
-                                       world->getGridSize(),
-                                       world->getOrigin(),
-                                       world->getSkybox(),
-                                       cam->getViewMatrix(),
-                                       cam->getProjectionMatrix(),
-                                       world->getSkyboxShader()};
+  std::shared_ptr<Camera> cam  = _scene->getCamera();
+  std::shared_ptr<World> world = _scene->getWorld();
+  WorldUniformParams params    = {
+    world->getFlagData(), world->getGridSize(), world->getOrigin(), world->getSkybox(), world->getSkyboxShader()};
   std::atomic<std::int32_t> skipped = 0;
   if (!Config::PAUSE)
   {
