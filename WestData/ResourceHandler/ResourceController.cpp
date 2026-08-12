@@ -1,13 +1,16 @@
 #include "ResourceController.hpp"
 
+#include "../Constants/TextureTypes.hpp"
 #include "../Utils/AssetUtils.hpp"
+
 #include <format>
 
 ResourceController::ResourceController(WestLogger* l)
 {
-  _logger  = l;
-  _builder = std::make_unique<ModelBuilder>(l);
-  _pool    = std::make_unique<DataPool>(l);
+  _logger   = l;
+  _importer = std::make_shared<AssetImporter>(l);
+  _builder  = std::make_unique<ModelBuilder>(l, _importer);
+  _pool     = std::make_unique<DataPool>(l);
 }
 
 ResourceController::~ResourceController() {}
@@ -28,6 +31,11 @@ const std::array<Model, Limit::cachesize>& ResourceController::getSceneModels() 
 {
   return _pool->getSceneModels();
 };
+
+const Texture ResourceController::loadTexture(const std::string& path)
+{
+  return _importer->textureFromFile(path, TextureTypes::SKYBOX.data());
+}
 
 std::string ResourceController::addModel(const std::string& path)
 {
@@ -62,7 +70,7 @@ std::string ResourceController::addModel(Model& m)
   ss << &m;
   std::string guid = AssetUtils::generateGUID(ss.str());
   m.setGuid(guid);
-  bool res         = _pool->addModelToScene(std::move(m));
+  bool res = _pool->addModelToScene(std::move(m));
   if (!res)
   {
     _logger->log(Level::Error, std::format("|*| Error adding Model to Scene: Artificially created...\n"));
@@ -77,7 +85,7 @@ const Model* ResourceController::getModel(const std::string& guid)
   if (m != nullptr)
   {
     return m;
-  } 
+  }
   _logger->log(Level::Error, std::format("|*| Error getting Model: {}, something went wrong.\n", guid));
   // TODO: Error handling;
   return {};

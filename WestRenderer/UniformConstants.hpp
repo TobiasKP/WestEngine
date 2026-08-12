@@ -16,4 +16,5 @@ inline constexpr const char* ORTHO_UNIFORM         = "orthoMatrix";
 inline constexpr const char* WORLD_GRIDSIZE    = "gridSize";
 inline constexpr const char* WORLD_TILEARRAY   = "tileFlags";
 inline constexpr const char* WORLD_GRID_ORIGIN = "gridOrigin";
-}
+inline constexpr const char* SKYBOX_CUBE_TEX   = "skybox";
+}  // namespace UniformConstants

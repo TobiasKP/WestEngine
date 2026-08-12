@@ -7,7 +7,7 @@
 class Converter
 {
 public:
-  Converter(WestLogger* l);
+  Converter(WestLogger* l, std::shared_ptr<AssetImporter> importer);
   ~Converter();
 
   void init();
@@ -24,6 +24,6 @@ private:
     file.write(reinterpret_cast<const char*>(&value), sizeof(T));
   };
 
-  std::unique_ptr<AssetImporter> _importer;
+  std::shared_ptr<AssetImporter> _importer;
   WestLogger* _logger;
 };

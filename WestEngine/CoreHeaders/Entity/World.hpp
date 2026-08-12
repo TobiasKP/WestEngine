@@ -23,28 +23,53 @@ public:
   std::uint32_t getEntityByIdx(std::int32_t idx);
   void clearFlag(std::uint32_t flag);
   void setFlag(std::uint32_t flag, std::int32_t idx);
-  void resetDirty()
+
+  inline void resetDirty()
   {
     _dirty.store(false);
+  }
+
+  inline void setSkybox(const std::string& guid)
+  {
+    _skybox = guid;
+  }
+
+  inline void setSkyboxShader(std::uint32_t shaderId)
+  {
+    _skyboxShaderId = shaderId;
+  }
+
+  inline std::string& getSkybox()
+  {
+    return _skybox;
   }
 
   inline std::int32_t getGridSize()
   {
     return _dimension;
   }
+
   inline bool isDirty()
   {
     return _dirty;
   }
+
   inline glm::vec2& getOrigin()
   {
     return _origin;
   }
+
+  inline std::uint32_t getSkyboxShader()
+  {
+    return _skyboxShaderId;
+  }
+
   std::vector<std::uint32_t>& getFlagData()
   {
     std::lock_guard<std::mutex> lock(_mutex);
     return _vflags;
   }
+
   void setCreationInformation(std::uint32_t d, std::uint32_t s, glm::vec2 o)
   {
     _dimension = d;
@@ -58,11 +83,12 @@ private:
   std::vector<std::int32_t> getTilesByAlgorithm(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a);
 
   std::mutex _mutex;
-  std::uint32_t _dimension, _tileSize;
+  std::uint32_t _dimension, _tileSize, _skyboxShaderId;
   std::int32_t _lastIdx;
   glm::vec2 _origin;
   std::vector<std::uint32_t> _vflags;
   std::unordered_map<std::int32_t, std::uint32_t> _idxToEntityId;
   std::unordered_map<std::uint32_t, std::int32_t> _entityIdToIdx;
   std::atomic<bool> _dirty;
+  std::string _skybox;
 };
