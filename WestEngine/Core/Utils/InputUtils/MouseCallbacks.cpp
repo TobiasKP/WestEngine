@@ -12,7 +12,7 @@ void MouseCallbacks::mouseCallback(GLFWwindow* window, double x, double y)
     return;
   }
   assert(_dispatcher != nullptr);
-  _dispatcher->dispatchEvent(EventIdentifiers::MOUSE_MOVE, MousePayload(x, y));
+  _dispatcher->dispatchEvent(EventIdentifiers::MOUSE_MOVE, MousePayload{.x = x, .y = y});
 }
 
 void MouseCallbacks::enterCallback(GLFWwindow* window, std::int32_t entered)
@@ -43,5 +43,5 @@ void MouseCallbacks::mouseButtonCallback(GLFWwindow* window,
 
 void MouseCallbacks::scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
 {
-  _dispatcher->dispatchEvent(EventIdentifiers::MOUSE_WHEEL, MousePayload{0, 0, yOffset * -5});
+  _dispatcher->dispatchEvent(EventIdentifiers::MOUSE_WHEEL, MousePayload{.scroll = yOffset * -5});
 }

@@ -53,8 +53,6 @@ int EventDispatcher::event(lua_State* L)
 {
   EventDispatcher* me = (EventDispatcher*)lua_touserdata(L, lua_upvalueindex(1));
   std::int32_t state  = lua_tointeger(L, 1);
-  GamePayload e       = {};
-  e.turn              = state;
-  me->dispatchEvent(EventIdentifiers::GAME_EVENT, std::move(e));
+  me->dispatchEvent(EventIdentifiers::GAME_EVENT, GamePayload{.turn = state});
   return 0;
 }
