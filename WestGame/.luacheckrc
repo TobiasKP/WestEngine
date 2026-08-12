@@ -36,11 +36,11 @@ end
 local lua_entry_points, engine_bindings = parse_lua_api(repo_root .. "/WestEngine/Constants/LuaAPI.hpp")
 
 -- Entry points called from C++ but not declared in LuaAPI.hpp.
--- SceneManager.cpp:95/105 and LuaFacade.cpp:288 use string literals.
+-- SceneManager.cpp:95/105 and LuaFacade.cpp:169 use string literals.
 table.insert(lua_entry_points, "Init")
 table.insert(lua_entry_points, "LoadScene")
 
--- Injected by LuaFacade::initState via luaL_dostring (LuaFacade.cpp:42/44).
+-- Injected by LuaFacade::startup via luaL_dostring (LuaFacade.cpp:52/54).
 table.insert(engine_bindings, "DEBUG")
 
 std = "lua54"

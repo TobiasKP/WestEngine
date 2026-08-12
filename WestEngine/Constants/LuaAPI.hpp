@@ -5,22 +5,16 @@
 
 namespace LuaAPI
 {
-// C->Lua calls
-constexpr std::string_view WORLD_POS_LCLICK  = "Worldpos_lclick";
-constexpr std::string_view WORLD_POS_RCLICK  = "Worldpos_rclick";
-constexpr std::string_view ENTITY_REGISTER   = "RegisterEntity";
-constexpr std::string_view ENTITY_REMOVE     = "RemoveEntity";
-constexpr std::string_view ENTITY_ATTACK     = "Entity_attack";
-constexpr std::string_view ENTITY_RCLICK     = "Entity_rclick";
-constexpr std::string_view STATE_CHANGE      = "EntityStateChange";
+// C->Lua notifications, every event goes through this single entry point and is
+// routed by the handler table in WestAPI.lua
+constexpr std::string_view ON_EVENT = "OnEvent";
+
+// C->Lua queries, these return a value and stay explicit
 constexpr std::string_view GET_ACTION_POINTS = "GetActionPoints";
-constexpr std::string_view UI_REFRESH        = "RefreshInterfaces";
-constexpr std::string_view UI_DELETE         = "DestroyInterface";
 constexpr std::string_view GET_STATE         = "GetState";
-constexpr std::string_view INTERNAL          = "InterfaceInternalFunctionCall";
-constexpr std::string_view ENTITY_QUEUE      = "EntityQueue";
-constexpr std::string_view AI_THINK          = "AIThink";
-constexpr std::string_view LEVEL_END         = "LevelEnd";
+
+// Table of EventIdentifiers the lua handlers key on, exported on startup
+constexpr std::string_view C_EVENTS = "Events";
 
 // Entity Creation
 constexpr std::string_view C_CREATE_ENTITY = "createEntity";

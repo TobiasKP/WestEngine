@@ -43,15 +43,10 @@ std::int32_t InputManager::startup()
   std::int32_t fd;
   _inputConfig       = PathUtils::openFile(CoreConstants::INPUT_CONFIG_FILE_NAME, true);
   _availableCommands = PathUtils::openFile(CoreConstants::AVAILABLE_INPUTS_FILE_NAME, true);
-  _dispatcher->registerNewEvent(EventIdentifiers::MOUSE_LCLICK);
-  _dispatcher->registerNewEvent(EventIdentifiers::MOUSE_RCLICK);
-  _dispatcher->registerNewEvent(EventIdentifiers::MOUSE_WHEEL);
-  _dispatcher->registerNewEvent(EventIdentifiers::MOUSE_MOVE);
-  _dispatcher->registerNewEvent(EventIdentifiers::KEY);
-  _dispatcher->registerNewEvent(EventIdentifiers::GAME_EVENT);
-  _dispatcher->registerNewEvent(EventIdentifiers::INTERFACE_UPDATE);
-  _dispatcher->registerNewEvent(EventIdentifiers::ATTACK_EVENT);
-  _dispatcher->registerNewEvent(EventIdentifiers::ACTION_FINISHED);
+  for (std::size_t i = 0; i < EVENT_COUNT; i++)
+  {
+    _dispatcher->registerNewEvent(static_cast<EventIdentifiers>(i));
+  }
   assert(_inputConfig != NULL && _availableCommands != NULL);
 
 
