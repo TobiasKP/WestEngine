@@ -10,6 +10,14 @@
 #include <PathUtils.h>
 
 
+static int appendTraceback(lua_State* L)
+{
+  const char* message = lua_tostring(L, -1);
+  luaL_traceback(L, L, message != nullptr ? message : "unknown lua error", 1);
+  return 1;
+}
+
+
 LuaFacade& LuaFacade::getLuaFacadeInstance()
 {
   static LuaFacade instance;
@@ -43,6 +51,7 @@ void LuaFacade::startup(WestLogger* logger)
 #else
   luaL_dostring(L, "DEBUG = false");
 #endif
+  exportEventIdentifiers();
   if (loadAPI() != 0)
   {
     _logger->log(Level::Error, std::format("Lua State error ::: Lua API file"));
@@ -67,172 +76,33 @@ bool LuaFacade::registerCFunction(int (*f)(lua_State*), std::string name, void* 
 }
 
 
-bool LuaFacade::onTileClicked(std::int32_t entityId, MouseAction m)
+bool LuaFacade::emit(const EventIdentifiers event, const EventPayload& payload)
 {
-  assert(entityId > -1);
-  if (m == LMOUSE_CLICK)
-  {
-    lua_getglobal(L, LuaAPI::WORLD_POS_LCLICK.data());
-  }
-  else if (m == RMOUSE_CLICK)
-  {
-    lua_getglobal(L, LuaAPI::WORLD_POS_RCLICK.data());
-  }
+  const std::int32_t base = lua_gettop(L);
+  lua_pushcfunction(L, appendTraceback);
+  lua_getglobal(L, LuaAPI::ON_EVENT.data());
   if (!lua_isfunction(L, -1))
   {
-    _logger->log(Level::Info,
-                 std::format("Lua State ::: function for called action: {} is not defined.\n",
-                             m == LMOUSE_CLICK ? LuaAPI::WORLD_POS_LCLICK : LuaAPI::WORLD_POS_RCLICK));
-    lua_pop(L, 1);
+    _logger->log(Level::Error,
+                 std::format("Lua State ::: {} is not defined, event {} can not be delivered.\n",
+                             LuaAPI::ON_EVENT,
+                             eventName(event)));
+    lua_settop(L, base);
     return 1;
   }
-  lua_pushinteger(L, entityId);
-  std::int32_t status = lua_pcall(L, 1, 0, 0);
-  if (status != 0)
+  lua_pushinteger(L, static_cast<lua_Integer>(event));
+  std::visit([this](const auto& p) { p.push(L); }, payload);
+  if (lua_pcall(L, 2, 0, base + 1) != LUA_OK)
   {
-    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
-    lua_pop(L, 1);
+    _logger->log(Level::Error,
+                 std::format("Lua State ::: Error handling event {}: {}\n", eventName(event), lua_tostring(L, -1)));
+    lua_settop(L, base);
     return 1;
   }
+  lua_settop(L, base);
   return 0;
 }
 
-bool LuaFacade::onEntityDestroy(std::int32_t entityId)
-{
-  lua_getglobal(L, LuaAPI::ENTITY_REMOVE.data());
-  lua_pushinteger(L, entityId);
-  std::int32_t status = lua_pcall(L, 1, 0, 0);
-  if (status != 0)
-  {
-    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
-    lua_pop(L, 1);
-    return 1;
-  }
-  return 0;
-}
-
-bool LuaFacade::onEntityClicked(std::int32_t entityId, MouseAction m)
-{
-  assert(entityId >= 0);
-  if (m == LMOUSE_CLICK)
-  {
-    return 0;
-  }
-  else if (m == RMOUSE_CLICK)
-  {
-    lua_getglobal(L, LuaAPI::ENTITY_RCLICK.data());
-  }
-  if (!lua_isfunction(L, -1))
-  {
-    _logger->log(Level::Info,
-                 std::format("Lua State ::: function for called action is not defined.\n", LuaAPI::ENTITY_RCLICK));
-    lua_pop(L, 1);
-    return 1;
-  }
-
-  lua_pushinteger(L, entityId);
-  std::int32_t status = lua_pcall(L, 1, 0, 0);
-  if (status != 0)
-  {
-    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
-    lua_pop(L, 1);
-    return 1;
-  }
-
-  return 0;
-}
-
-bool LuaFacade::onEntityCreation(std::int32_t entityId, bool playable, std::int32_t health)
-{
-  lua_getglobal(L, LuaAPI::ENTITY_REGISTER.data());
-  lua_pushinteger(L, entityId);
-  lua_pushboolean(L, playable);
-  lua_pushinteger(L, health);
-  std::int32_t status = lua_pcall(L, 3, 0, 0);
-  if (status != 0)
-  {
-    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
-    lua_pop(L, 1);
-    return 1;
-  }
-  return 0;
-}
-
-bool LuaFacade::entityQueue()
-{
-  lua_getglobal(L, LuaAPI::ENTITY_QUEUE.data());
-  std::int32_t status = lua_pcall(L, 0, 0, 0);
-  if (status != 0)
-  {
-    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
-    lua_pop(L, 1);
-    return 1;
-  }
-  return 0;
-};
-
-bool LuaFacade::levelEnd()
-{
-  lua_getglobal(L, LuaAPI::LEVEL_END.data());
-  std::int32_t status = lua_pcall(L, 0, 0, 0);
-  if (status != 0)
-  {
-    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
-    lua_pop(L, 1);
-    return 1;
-  }
-  return 0;
-}
-
-bool LuaFacade::onStateChange(std::int32_t entityId, std::int32_t oldState, std::int32_t newState)
-{
-  lua_getglobal(L, LuaAPI::STATE_CHANGE.data());
-  lua_pushinteger(L, entityId);
-  lua_pushinteger(L, oldState);
-  lua_pushinteger(L, newState);
-  std::int32_t status = lua_pcall(L, 3, 0, 0);
-  if (status != 0)
-  {
-    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}", lua_tostring(L, -1)));
-    lua_pop(L, 1);
-    return 1;
-  }
-  return 0;
-}
-
-bool LuaFacade::onUIRefresh()
-{
-  lua_getglobal(L, LuaAPI::UI_REFRESH.data());
-  std::int32_t status = lua_pcall(L, 0, 0, 0);
-  if (status != 0)
-  {
-    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}", lua_tostring(L, -1)));
-    lua_pop(L, 1);
-    return 1;
-  }
-
-  return 0;
-}
-
-bool LuaFacade::onUIDelete(std::int32_t uiId)
-{
-  return 0;
-}
-
-bool LuaFacade::internalCall(const std::string& toCall, std::int32_t callingId)
-{
-  lua_getglobal(L, LuaAPI::INTERNAL.data());
-  lua_pushstring(L, toCall.data());
-  lua_pushinteger(L, callingId);
-  std::int32_t status = lua_pcall(L, 2, 0, 0);
-  if (status != 0)
-  {
-    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
-    lua_pop(L, 1);
-    return IDLE;
-  }
-  return 0;
-}
 
 LuaFacade::LuaStates LuaFacade::getState(std::int32_t id)
 {
@@ -248,20 +118,6 @@ LuaFacade::LuaStates LuaFacade::getState(std::int32_t id)
   std::int32_t result = lua_tointeger(L, -1);
   lua_remove(L, -1);
   return static_cast<LuaFacade::LuaStates>(result);
-}
-
-bool LuaFacade::aiCall(std::int32_t id)
-{
-  lua_getglobal(L, LuaAPI::AI_THINK.data());
-  lua_pushinteger(L, id);
-  std::int32_t status = lua_pcall(L, 1, 1, 0);
-  if (status != 0)
-  {
-    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
-    lua_pop(L, 1);
-    return 1;
-  }
-  return 0;
 }
 
 
@@ -282,37 +138,16 @@ std::int32_t LuaFacade::getActionPoints(std::int32_t id)
   return result;
 }
 
-bool LuaFacade::onAttack(std::uint32_t attackerId,
-                         std::uint32_t bulletType,
-                         std::uint32_t wRange,
-                         std::uint32_t distanceToTarget,
-                         std::uint32_t wDamage,
-                         float wAccuracy,
-                         std::uint32_t targetId,
-                         float spawnX,
-                         float spawnY)
+void LuaFacade::exportEventIdentifiers()
 {
-  lua_getglobal(L, LuaAPI::ENTITY_ATTACK.data());
-  lua_pushinteger(L, attackerId);
-  lua_pushinteger(L, bulletType);
-  lua_pushinteger(L, wRange);
-  lua_pushinteger(L, distanceToTarget);
-  lua_pushinteger(L, wDamage);
-  lua_pushnumber(L, wAccuracy);
-  lua_pushinteger(L, targetId);
-  lua_pushnumber(L, spawnX);
-  lua_pushnumber(L, spawnY);
-  std::int32_t status = lua_pcall(L, 9, 0, 0);
-  if (status != 0)
+  lua_createtable(L, 0, static_cast<std::int32_t>(EVENT_COUNT));
+  for (std::size_t i = 0; i < EVENT_COUNT; i++)
   {
-    _logger->log(Level::Error, std::format("Lua State ::: Error executing function: {}\n", lua_tostring(L, -1)));
-    lua_pop(L, 1);
-    return IDLE;
+    lua_pushinteger(L, static_cast<lua_Integer>(i));
+    lua_setfield(L, -2, eventName(static_cast<EventIdentifiers>(i)).data());
   }
-
-
-  return 0;
-};
+  lua_setglobal(L, LuaAPI::C_EVENTS.data());
+}
 
 bool LuaFacade::loadAPI()
 {

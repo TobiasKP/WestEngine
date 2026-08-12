@@ -118,8 +118,8 @@ std::int32_t SceneManager::init()
 
 void SceneManager::update()
 {
-  bool result = _facade->levelEnd();
-  result      = _facade->entityQueue();
+  bool result  = _facade->emit(EventIdentifiers::LEVEL_END, EmptyPayload{});
+  result      |= _facade->emit(EventIdentifiers::ENTITY_QUEUE, EmptyPayload{});
   if (result == 1)
   {
     logFailure(std::format("{} ### failure calling lua frame game updates.\n", getName()));
@@ -163,7 +163,8 @@ void SceneManager::removeEntityFromScene(const Entity& entity)
       WestRenderer::WestRendererFacade::getRendererFacade().cleanupModel(guid);
       _dataFacade->deleteModelFromScene(guid);
     }
-    LuaFacade::getLuaFacadeInstance().onEntityDestroy(entity.getId());
+    LuaFacade::getLuaFacadeInstance().emit(EventIdentifiers::ENTITY_DESTROYED,
+                                           EntityPayload{.entityId = entity.getId()});
   }
   _registry->removeAllComponents(entity.getId());
   _scene->removeEntity(entity);

@@ -341,7 +341,11 @@ std::vector<ElementProxy*> InterfaceManager::fillInfo(lua_State* L, std::uint32_
     if (!lua_isnil(L, -1))
     {
       const std::string call  = lua_tostring(L, -1);
-      e->eventHandler         = [call, id]() { LuaFacade::getLuaFacadeInstance().internalCall(call, id); };
+      e->eventHandler         = [call, id]()
+      {
+        LuaFacade::getLuaFacadeInstance().emit(EventIdentifiers::UI_INTERNAL_CALL,
+                                               InternalCallPayload{.functionName = call, .elementId = id});
+      };
       e->givenFlags          |= 0x0040;
     }
     lua_pop(L, 1);
@@ -402,7 +406,7 @@ int InterfaceManager::destroyInterface(lua_State* L)
 
 void InterfaceManager::refreshGameInterfaces()
 {
-  LuaFacade::getLuaFacadeInstance().onUIRefresh();
+  LuaFacade::getLuaFacadeInstance().emit(EventIdentifiers::UI_REFRESH, EmptyPayload{});
 }
 
 

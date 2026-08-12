@@ -50,7 +50,9 @@ int EntityBuilder::buildEntity(lua_State* L)
   if (c != nullptr)
   {
     assert(h != nullptr);
-    bool result = LuaFacade::getLuaFacadeInstance().onEntityCreation(me->_e.getId(), playable, h->current);
+    bool result = LuaFacade::getLuaFacadeInstance().emit(
+      EventIdentifiers::ENTITY_CREATED,
+      EntityCreatedPayload{.entityId = me->_e.getId(), .playable = playable, .health = h->current});
     if (result != 0)
     {
       WestLogger::getLoggerInstance().log(

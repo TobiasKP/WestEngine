@@ -127,15 +127,16 @@ void ProjectileSystem::handleEvent(std::tuple<EventIdentifiers, EventPayload> ev
       std::int32_t dimension = _world->getGridSize();
       std::int32_t dx        = std::abs(aTile % dimension - tTile % dimension);
       std::int32_t dz        = std::abs(aTile / dimension - tTile / dimension);
-      LuaFacade::getLuaFacadeInstance().onAttack(a->attacker,
-                                                 active->bulletType,
-                                                 active->range,
-                                                 std::max(dx, dz),
-                                                 active->dmg,
-                                                 active->accuracy,
-                                                 a->target,
-                                                 aPosComp->position.x,
-                                                 aPosComp->position.z);
+      const EntityAttackPayload attack{.attacker   = a->attacker,
+                                       .target     = a->target,
+                                       .bulletType = active->bulletType,
+                                       .range      = active->range,
+                                       .distance   = static_cast<std::uint32_t>(std::max(dx, dz)),
+                                       .damage     = active->dmg,
+                                       .accuracy   = active->accuracy,
+                                       .spawnX     = aPosComp->position.x,
+                                       .spawnY     = aPosComp->position.z};
+      LuaFacade::getLuaFacadeInstance().emit(EventIdentifiers::ENTITY_ATTACK, attack);
       break;
     }
     default:

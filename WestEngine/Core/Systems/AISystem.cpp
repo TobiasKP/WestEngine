@@ -58,7 +58,7 @@ void AISystem::update()
   if (!_busy && _me != 0)
   {
     _busy = true;
-    _facade->aiCall(_me);
+    _facade->emit(EventIdentifiers::AI_THINK, EntityPayload{.entityId = _me});
   }
   else if (_me == 0 && !_busy)
   {
