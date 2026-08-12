@@ -10,8 +10,6 @@
 #include <PathUtils.h>
 
 
-// Message handler for pcall, turns the plain error message into a message with
-// a lua traceback attached so a failing handler can be located.
 static int appendTraceback(lua_State* L)
 {
   const char* message = lua_tostring(L, -1);
@@ -53,7 +51,6 @@ void LuaFacade::startup(WestLogger* logger)
 #else
   luaL_dostring(L, "DEBUG = false");
 #endif
-  // has to happen before the api file is loaded, its handler table keys on it
   exportEventIdentifiers();
   if (loadAPI() != 0)
   {

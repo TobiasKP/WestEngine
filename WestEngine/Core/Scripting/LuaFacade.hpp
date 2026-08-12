@@ -19,11 +19,8 @@ public:
   void startup(WestLogger* logger);
   bool registerCFunction(int (*f)(lua_State*), std::string name, void* me);
 
-  // Notifications, fire and forget. Everything C++ tells lua about goes through
-  // here, lua picks the handler by event identifier.
   bool emit(const EventIdentifiers event, const EventPayload& payload);
 
-  // Queries, these read state that lives in lua and need an answer right away
   LuaStates getState(std::int32_t calleeId);
   std::int32_t getActionPoints(std::int32_t id);
 

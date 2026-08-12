@@ -3,9 +3,6 @@
 #include <cstddef>
 #include <string_view>
 
-// Single source of truth for every event travelling through the engine.
-// Adding an event means adding one line here: the enum entry, the name used for
-// logging and the constant exposed to lua are all generated from this list.
 #define WEST_EVENT_LIST(X)                                                                                             \
   X(GAME_EVENT)                                                                                                        \
   X(ATTACK_EVENT)                                                                                                      \
