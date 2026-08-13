@@ -62,17 +62,19 @@ void RenderManager::update()
 #ifdef DEBUG
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
-  std::shared_ptr<World> world      = _scene->getWorld();
-  WorldUniformParams params         = {world->getFlagData(), world->getGridSize(), world->getOrigin()};
+  std::shared_ptr<Camera> cam  = _scene->getCamera();
+  std::shared_ptr<World> world = _scene->getWorld();
+  WorldUniformParams params    = {
+    world->getFlagData(), world->getGridSize(), world->getOrigin(), world->getSkybox(), world->getSkyboxShader()};
   std::atomic<std::int32_t> skipped = 0;
   if (!Config::PAUSE)
   {
-    _scene->getCamera()->update();
+    cam->update();
   }
   _facade->clearColor();
   _facade->renderWorld(world->getModelGuid(), world->getId(), world->getShaderId(), world->isDirty(), &params);
   _entitiesToRender.assign(_scene->getEntities().size(), 0);
-  const Frustum& frustum      = _scene->getCamera()->getFrustum();
+  const Frustum& frustum      = cam->getFrustum();
   ComponentRegistry* registry = _scene->getRegistry().get();
   std::vector<std::future<void>> futures;
 

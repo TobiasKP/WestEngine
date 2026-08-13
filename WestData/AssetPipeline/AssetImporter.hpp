@@ -19,6 +19,7 @@ public:
   void shutdown();
   std::vector<Model> getMeshQueue();
   void addOnRequest(const std::string& path);
+  Texture textureFromFile(const std::string& path, const std::string& typeName);
 
 private:
   void handlePath(const std::string& path);
@@ -30,7 +31,6 @@ private:
   std::vector<Texture> processTextures(aiMesh* mesh, const aiScene* scene);
   Material processMaterial(aiMesh* mesh, const aiScene* scene);
   std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
-  Texture textureFromFile(const std::string& path, const std::string& typeName);
 
   Model _model;
   WestLogger* _logger;

@@ -90,7 +90,7 @@ void PlayerControl::handleEvent(std::tuple<EventIdentifiers, EventPayload> event
       std::uint32_t id = _world->getEntityByIdx(_tileIdx);
       if (id > 0)
       {
-        LuaFacade::getLuaFacadeInstance().onEntityClicked(id, LuaFacade::MouseAction::RMOUSE_CLICK);
+        LuaFacade::getLuaFacadeInstance().emit(EventIdentifiers::ENTITY_RCLICK, EntityPayload{.entityId = id});
       }
       break;
     }
@@ -143,11 +143,8 @@ void PlayerControl::updateDebuggingInfo() {}
 
 void PlayerControl::passAttackInformation(std::uint32_t id)
 {
-  AttackPayload a = {};
-  a.target        = id;
-  a.attacker      = _me;
-  _busy           = true;
-  _dispatcher->dispatchEvent(EventIdentifiers::ATTACK_EVENT, a);
+  _busy = true;
+  _dispatcher->dispatchEvent(EventIdentifiers::ATTACK_EVENT, AttackPayload{.attacker = _me, .target = id});
 }
 
 void PlayerControl::passDestinationPosition(glm::vec3 dest, std::uint32_t id)
@@ -160,13 +157,13 @@ void PlayerControl::passDestinationPosition(glm::vec3 dest, std::uint32_t id)
     std::find(movComp->reachableTiles.begin(), movComp->reachableTiles.end(), tile) != movComp->reachableTiles.end();
   if (inRange && !movComp->destination.has_value())
   {
-    bool result = LuaFacade::getLuaFacadeInstance().onTileClicked(id, LuaFacade::MouseAction::LMOUSE_CLICK);
+    bool result =
+      LuaFacade::getLuaFacadeInstance().emit(EventIdentifiers::TILE_LCLICK, EntityPayload{.entityId = id});
     if (result)
     {
-      _logger->log(Level::Error,
-                   std::format("{} *** Error calling lua function: {}\n",
-                               getName(),
-                               (std::int32_t)LuaFacade::MouseAction::LMOUSE_CLICK));
+      _logger->log(
+        Level::Error,
+        std::format("{} *** Error emitting event: {}\n", getName(), eventName(EventIdentifiers::TILE_LCLICK)));
     }
     _busy                = true;
     movComp->destination = dest;

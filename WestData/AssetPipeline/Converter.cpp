@@ -6,10 +6,10 @@
 #include <iostream>
 #include <PathUtils.h>
 
-Converter::Converter(WestLogger* l)
+Converter::Converter(WestLogger* l, std::shared_ptr<AssetImporter> importer)
 {
   _logger   = l;
-  _importer = std::make_unique<AssetImporter>(l);
+  _importer = importer;
 }
 
 Converter::~Converter()

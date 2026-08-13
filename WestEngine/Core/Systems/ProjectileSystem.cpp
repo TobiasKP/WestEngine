@@ -63,22 +63,21 @@ void ProjectileSystem::travel(std::uint32_t id, Position* posComp, Projectile* p
   {
     if (p->hit)
     {
-      Health* health      = _reg->getComponent<Health>(p->destination);
-      health->current    -= p->damage;
-      InterfacePayload i  = {};
-      i.event             = 0x10;
-      i.entityId          = p->destination;
-      i.newValue          = std::to_string(health->current);
-      _dispatcher->dispatchEvent(EventIdentifiers::INTERFACE_UPDATE, i);
-      i.event = 0x08;
-      _dispatcher->dispatchEvent(EventIdentifiers::INTERFACE_UPDATE, i);
+      Health* health   = _reg->getComponent<Health>(p->destination);
+      health->current -= p->damage;
+
+      std::string newHealth = std::to_string(health->current);
+      _dispatcher->dispatchEvent(EventIdentifiers::INTERFACE_UPDATE,
+                                 InterfacePayload{.event = 0x10, .entityId = p->destination, .newValue = newHealth});
+      _dispatcher->dispatchEvent(EventIdentifiers::INTERFACE_UPDATE,
+                                 InterfacePayload{.event = 0x08, .entityId = p->destination, .newValue = newHealth});
       if (health->current <= 0)
       {
         _toRemove.push_back(p->destination);
       }
     }
     _toRemove.push_back(id);
-    _dispatcher->dispatchEvent(EventIdentifiers::ACTION_FINISHED, ActionFinishedPayload{p->owner});
+    _dispatcher->dispatchEvent(EventIdentifiers::ACTION_FINISHED, ActionFinishedPayload{.entityId = p->owner});
   }
   else
   {
@@ -128,15 +127,16 @@ void ProjectileSystem::handleEvent(std::tuple<EventIdentifiers, EventPayload> ev
       std::int32_t dimension = _world->getGridSize();
       std::int32_t dx        = std::abs(aTile % dimension - tTile % dimension);
       std::int32_t dz        = std::abs(aTile / dimension - tTile / dimension);
-      LuaFacade::getLuaFacadeInstance().onAttack(a->attacker,
-                                                 active->bulletType,
-                                                 active->range,
-                                                 std::max(dx, dz),
-                                                 active->dmg,
-                                                 active->accuracy,
-                                                 a->target,
-                                                 aPosComp->position.x,
-                                                 aPosComp->position.z);
+      const EntityAttackPayload attack{.attacker   = a->attacker,
+                                       .target     = a->target,
+                                       .bulletType = active->bulletType,
+                                       .range      = active->range,
+                                       .distance   = static_cast<std::uint32_t>(std::max(dx, dz)),
+                                       .damage     = active->dmg,
+                                       .accuracy   = active->accuracy,
+                                       .spawnX     = aPosComp->position.x,
+                                       .spawnY     = aPosComp->position.z};
+      LuaFacade::getLuaFacadeInstance().emit(EventIdentifiers::ENTITY_ATTACK, attack);
       break;
     }
     default:

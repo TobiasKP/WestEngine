@@ -6,10 +6,10 @@
 #include <filesystem>
 #include <PathUtils.h>
 
-BinaryLoader::BinaryLoader(WestLogger* l)
+BinaryLoader::BinaryLoader(WestLogger* l, std::shared_ptr<AssetImporter> importer)
 {
   _logger    = l;
-  _converter = std::make_unique<Converter>(l);
+  _converter = std::make_unique<Converter>(l, importer);
 }
 
 BinaryLoader::~BinaryLoader() {}
@@ -190,8 +190,7 @@ std::optional<Model> BinaryLoader::convertToModel(std::ifstream& is, const std::
       }
     }
 
-    m.addMesh(
-      Mesh(std::format("{}_{}", guid, count), vertices, indices, textures, AABB(aabbMin, aabbMax), material));
+    m.addMesh(Mesh(std::format("{}_{}", guid, count), vertices, indices, textures, AABB(aabbMin, aabbMax), material));
     if (is.peek() == EOF)
     {
       break;

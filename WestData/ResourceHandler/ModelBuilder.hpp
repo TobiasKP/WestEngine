@@ -6,7 +6,7 @@
 class ModelBuilder
 {
 public:
-  ModelBuilder(WestLogger* l);
+  ModelBuilder(WestLogger* l, std::shared_ptr<AssetImporter> importer);
   ~ModelBuilder();
 
   std::optional<Model> createModel(const std::string& path);

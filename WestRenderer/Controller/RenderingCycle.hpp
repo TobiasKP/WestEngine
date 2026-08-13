@@ -32,6 +32,8 @@ private:
   void createVAO();
   void storeIndicesBuffer(const std::uint32_t* data, size_t dataLength);
   void storeDataInAttribList(std::int32_t attribNo, std::int32_t vertexCount, const float* data, size_t dataLength);
+  void loadCubemap(std::string& guid, std::vector<Texture> faces);
+  void renderSkybox(const std::unordered_map<std::string, GLuint>& uniforms, WorldUniformParams* params);
 
   std::shared_ptr<UniformUtils> _utils;
   WestLogger* _logger;

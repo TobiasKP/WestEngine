@@ -51,16 +51,17 @@ void MovementSystem::moveToDestination(std::uint32_t id, Position* posComp, Move
   }
   else
   {
-    bool result =
-      LuaFacade::getLuaFacadeInstance().onStateChange(id, LuaFacade::LuaStates::MOVING, LuaFacade::LuaStates::IDLE);
+    bool result = LuaFacade::getLuaFacadeInstance().emit(
+      EventIdentifiers::ENTITY_STATE_CHANGE,
+      StateChangePayload{.entityId = id, .oldState = LuaFacade::MOVING, .newState = LuaFacade::IDLE});
     if (result)
     {
       _logger->log(Level::Error,
-                   std::format("{} *** Error calling lua function state change with state: {}\n",
+                   std::format("{} *** Error emitting state change to state: {}\n",
                                getName(),
                                (std::int32_t)LuaFacade::LuaStates::IDLE));
-    } 
-    _dispatcher->dispatchEvent(EventIdentifiers::ACTION_FINISHED, ActionFinishedPayload{id});
+    }
+    _dispatcher->dispatchEvent(EventIdentifiers::ACTION_FINISHED, ActionFinishedPayload{.entityId = id});
     movComp->destination.reset();
 #ifdef DEBUG
     movComp->debugInfoDisplayed = false;

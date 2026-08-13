@@ -20,9 +20,11 @@ public:
   std::string addModel(Model& m);
   const Model* getModel(const std::string& guid);
   bool deleteModel(const std::string& guid);
+  const Texture loadTexture(const std::string& path);
 
 private:
   WestLogger* _logger;
   std::unique_ptr<ModelBuilder> _builder;
   std::unique_ptr<DataPool> _pool;
+  std::shared_ptr<AssetImporter> _importer;
 };

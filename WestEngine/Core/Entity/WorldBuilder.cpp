@@ -35,6 +35,7 @@ void WorldBuilder::createWorld(World& w, lua_State* L)
 #endif
   std::int32_t sqmap;
   std::vector<std::uint8_t> map;
+  std::string path = "";
   lua_pushnil(L);
   if (!lua_istable(L, -2))
   {
@@ -48,11 +49,18 @@ void WorldBuilder::createWorld(World& w, lua_State* L)
     lua_pushnil(L);
     while (lua_next(L, -2) > 0)
     {
-      lua_pushnil(L);
-      while (lua_next(L, -2) > 0)
+      if (lua_isstring(L, -1))
       {
-        map.push_back(lua_tonumber(L, -1));
-        lua_pop(L, 1);
+        path = lua_tostring(L, -1);
+      }
+      else
+      {
+        lua_pushnil(L);
+        while (lua_next(L, -2) > 0)
+        {
+          map.push_back(lua_tonumber(L, -1));
+          lua_pop(L, 1);
+        }
       }
       lua_pop(L, 1);
     }
@@ -62,14 +70,63 @@ void WorldBuilder::createWorld(World& w, lua_State* L)
   sqmap = sqrt(map.size());
   w.setCreationInformation(sqmap, 1, glm::vec2(-sqmap / 2.0f, -sqmap / 2.0f));
 
+#ifdef DEBUG
+  WestLogger::getLoggerInstance().log(Level::Info, std::format("World comes with {} skybox\n", path));
+#endif
+
+
+  if (path.size() > 0)
+  {
+    Model* s                      = buildSkybox(CoreConstants::SKYBOX_PATH.data() + path);
+    const std::string& guidSkybox = WestData::WestAssetFacade::getAssetFacade().addModelToScene(*s);
+    w.setSkybox(guidSkybox);
+  }
   Model* m                = buildWorldMesh(map, sqmap);
   const std::string& guid = WestData::WestAssetFacade::getAssetFacade().addModelToScene(*m);
   w.setModelGuid(guid);
 }
 
+Model* WorldBuilder::buildSkybox(const std::string& texturePath)
+{
+  Model* m = new Model();
+  m->setGuid("skybox");
+  std::vector<std::uint32_t> idx;
+  std::vector<Texture> tex;
+  std::vector<Vertex> vert;
+
+  for (std::int32_t side = 0; side < 6; ++side)
+  {
+    tex.push_back(WestData::WestAssetFacade::getAssetFacade().loadTexture(texturePath + faces[side]));
+    std::int32_t base   = static_cast<std::int32_t>(vert.size());
+    const glm::vec3& n  = faceBasis[side][0];
+    const glm::vec3& tu = faceBasis[side][1];
+    const glm::vec3& tv = faceBasis[side][2];
+
+    for (std::int32_t v = 0; v < 4; ++v)
+    {
+      const float u = baseQuad[v * 2] * 2.0f - 1.0f;
+      const float w = baseQuad[v * 2 + 1] * 2.0f - 1.0f;
+      vert.push_back(Vertex(n + tu * u + tv * w, -n, glm::vec2(baseQuad[v * 2], baseQuad[v * 2 + 1])));
+    }
+
+    for (std::int32_t i = 0; i < 6; ++i)
+    {
+      idx.push_back(base + static_cast<std::int32_t>(indices[i]));
+    }
+
+    Mesh mesh = Mesh(std::format("skybox_{}", side), vert, idx, tex, AABB());
+    m->addMesh(std::move(mesh));
+    idx.clear();
+    tex.clear();
+    vert.clear();
+  }
+
+
+  return m;
+};
+
 Model* WorldBuilder::buildWorldMesh(const std::vector<std::uint8_t>& map, std::int32_t sqmap)
 {
-  std::vector<float> texCoords;
   std::vector<std::uint32_t> idx;
   std::vector<Texture> tex;
   std::vector<Vertex> vert;
@@ -83,7 +140,7 @@ Model* WorldBuilder::buildWorldMesh(const std::vector<std::uint8_t>& map, std::i
       std::int32_t base = static_cast<std::int32_t>(vert.size());
       float height      = static_cast<float>(map[row * sqmap + col]);
 
-      for (int v = 0; v < 4; ++v)
+      for (std::int32_t v = 0; v < 4; ++v)
       {
         vert.push_back(Vertex(glm::vec3((baseQuad[v * 2] + static_cast<float>(col)) - (sqmap >> 1),
                                         height,
@@ -92,7 +149,7 @@ Model* WorldBuilder::buildWorldMesh(const std::vector<std::uint8_t>& map, std::i
                               glm::vec2(baseQuad[v * 2], baseQuad[v * 2 + 1])));
       }
 
-      for (int i = 0; i < 6; ++i)
+      for (std::int32_t i = 0; i < 6; ++i)
       {
         idx.push_back(base + static_cast<std::int32_t>(indices[i]));
       }

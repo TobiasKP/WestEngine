@@ -150,6 +150,23 @@ void RenderingCycle::renderWorld(std::unordered_map<std::string, GLuint> uniform
   {
     registerModel(model, modelGuid);
   }
+  if (!_uuidToVAO.contains(params->skyboxGuid))
+  {
+    const Model* skybox = WestData::WestAssetFacade::getAssetFacade().requestModelFromScene(params->skyboxGuid);
+    if (skybox == nullptr)
+    {
+      _logger->log(Level::Error, std::format("|><| Can not retrieve World model for guid: {}\n", modelGuid));
+      glUseProgram(0);
+      return;
+    }
+    registerModel(skybox, params->skyboxGuid);
+    std::vector<Texture> textures;
+    for (const Mesh m : skybox->getMeshes())
+    {
+      textures.insert(textures.end(), m.textures.begin(), m.textures.end());
+    }
+    loadCubemap(params->skyboxGuid, textures);
+  }
 
   if (dirty)
   {
@@ -168,7 +185,40 @@ void RenderingCycle::renderWorld(std::unordered_map<std::string, GLuint> uniform
     glBindVertexArray(_vaos[idx]);
     glDrawElements(GL_TRIANGLES, _uuidToVertexCount[modelGuid][i], GL_UNSIGNED_INT, 0);
   }
+
+  renderSkybox(uniforms, params);
   glUseProgram(_lastUsedShader);
+};
+
+void RenderingCycle::renderSkybox(const std::unordered_map<std::string, GLuint>& uniforms, WorldUniformParams* params)
+{
+  if (!_uuidToVAO.contains(params->skyboxGuid) || !_uuidToTexture.contains(params->skyboxGuid))
+  {
+    return;
+  }
+ 
+  glUseProgram(params->skyboxShaderId);
+  glDepthFunc(GL_LEQUAL);
+  glDepthMask(GL_FALSE);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_CUBE_MAP, _uuidToTexture.at(params->skyboxGuid));
+  if (uniforms.contains(UniformConstants::SKYBOX_CUBE_TEX))
+  {
+    _utils->setUniform(uniforms.at(UniformConstants::SKYBOX_CUBE_TEX), 0);
+  }
+
+  const std::vector<std::pair<std::string, std::uint32_t>>& vaos = _uuidToVAO.at(params->skyboxGuid);
+  const std::vector<std::uint32_t>& counts                       = _uuidToVertexCount.at(params->skyboxGuid);
+  for (std::uint32_t i = 0; i < vaos.size(); i++)
+  {
+    glBindVertexArray(_vaos[std::get<1>(vaos[i])]);
+    glDrawElements(GL_TRIANGLES, counts[i], GL_UNSIGNED_INT, 0);
+  }
+
+  glBindVertexArray(0);
+  glDepthMask(GL_TRUE);
+  glDepthFunc(GL_LESS);
 };
 
 void RenderingCycle::renderInterfaces()
@@ -359,3 +409,39 @@ void RenderingCycle::storeDataInAttribList(std::int32_t attribNo,
   glEnableVertexAttribArray(attribNo);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
+
+void RenderingCycle::loadCubemap(std::string& guid, std::vector<Texture> faces)
+{
+  if (faces.size() != 6)
+  {
+    _logger->log(Level::Error,
+                 std::format("|><| Cubemap for guid {} needs 6 faces, got {}. Skybox will sample black.\n",
+                             guid,
+                             faces.size()));
+  }
+
+  GLuint textureId;
+  glGenTextures(1, &textureId);
+  glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
+  std::uint32_t i = 0;
+  for (Texture& t : faces)
+  {
+    const GLenum format = t.numComponents == 4 ? GL_RGBA : GL_RGB;
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                 0,
+                 format,
+                 t.width,
+                 t.height,
+                 0,
+                 format,
+                 GL_UNSIGNED_BYTE,
+                 t.imageData.data());
+    i++;
+  }
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+  _uuidToTexture[guid] = textureId;
+};
