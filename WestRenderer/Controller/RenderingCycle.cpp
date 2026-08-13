@@ -3,6 +3,7 @@
 #include "../UniformConstants.hpp"
 
 #include <glm/ext/matrix_clip_space.hpp>
+#include <TimeUtils.hpp>
 #include <WestInterfaceFacade.h>
 
 void RenderingCycle::renderEntity(std::string guid,
@@ -11,6 +12,9 @@ void RenderingCycle::renderEntity(std::string guid,
                                   EntityUniformParams* params,
                                   bool debug)
 {
+#ifdef DEBUG
+  double start = TimeUtils::getCurrentTimeAsTime();
+#endif
   if (programId != _lastUsedShader)
   {
     glUseProgram(programId);
@@ -21,6 +25,9 @@ void RenderingCycle::renderEntity(std::string guid,
   GLint linked;
   glGetProgramiv(programId, GL_LINK_STATUS, &linked);
   assert(linked == GL_TRUE);
+  double step = TimeUtils::getCurrentTimeAsTime();
+  double res  = TimeUtils::getDuration(start, step);
+  _logger->log(Level::Cycle, std::format("|><| Switching shader and asserting linkage: {} ms.\n", res));
 #endif
 
 
@@ -32,17 +39,30 @@ void RenderingCycle::renderEntity(std::string guid,
     return;
   }
 
+#ifdef DEBUG
+  step = TimeUtils::getCurrentTimeAsTime();
+  res  = TimeUtils::getDuration(start, step);
+  _logger->log(Level::Cycle, std::format("|><| Requesting Model for rendering: {} ms.\n", res));
+#endif
 
   if (!_uuidToVAO.contains(guid))
   {
     registerModel(model, guid);
   }
 
+#ifdef DEBUG
+  step = TimeUtils::getCurrentTimeAsTime();
+  res  = TimeUtils::getDuration(start, step);
+  _logger->log(Level::Cycle, std::format("|><| Registering Model for OpenGL: {} ms.\n", res));
+#endif
   const std::vector<std::pair<std::string, std::uint32_t>>& vaos = _uuidToVAO.at(guid);
   for (std::uint32_t vao = 0; vao < vaos.size(); vao++)
   {
+#ifdef DEBUG
+    double singleEntity = TimeUtils::getCurrentTimeAsTime();
+#endif
     const std::string& meshGuid = std::get<0>(vaos[vao]);
-    const std::uint32_t v      = std::get<1>(vaos[vao]);
+    const std::uint32_t v       = std::get<1>(vaos[vao]);
     if (uniforms.contains(UniformConstants::COLOR))
     {
       _utils->setUniform(uniforms[UniformConstants::COLOR], params->diffuseColor[meshGuid]);
@@ -71,9 +91,11 @@ void RenderingCycle::renderEntity(std::string guid,
     }
 
 #ifdef DEBUG
+    step = TimeUtils::getCurrentTimeAsTime();
+    res  = TimeUtils::getDuration(singleEntity, step);
+    _logger->log(Level::Cycle, std::format("|><| Setting Uniforms for: {} in: {} ms.\n", guid, res));
     _logger->log(Level::Cycle, std::format("|><| guid {} has {} vaos\n", guid, _uuidToVAO[guid].size()));
 #endif
-
 
     glBindVertexArray(_vaos.at(v));
 
@@ -88,10 +110,20 @@ void RenderingCycle::renderEntity(std::string guid,
     {
       glDrawElements(GL_TRIANGLES, _uuidToVertexCount.at(guid)[vao], GL_UNSIGNED_INT, 0);
     }
+
+    step = TimeUtils::getCurrentTimeAsTime();
+    res  = TimeUtils::getDuration(singleEntity, step);
+    _logger->log(Level::Cycle, std::format("|><| Rendering for: {} took: {} ms.\n", guid, res));
 #else
-    glDrawElements(GL_TRIANGLES, _uuidToVertexCount[guid][vao], GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, _uuidToVertexCount.at(guid)[vao], GL_UNSIGNED_INT, 0);
 #endif
   }
+
+#ifdef DEBUG
+  double end = TimeUtils::getCurrentTimeAsTime();
+  res        = TimeUtils::getDuration(start, end);
+  _logger->log(Level::Cycle, std::format("|><| Render cycle complete time: {} ms.\n", res));
+#endif
 };
 
 void RenderingCycle::renderWorld(std::unordered_map<std::string, GLuint> uniforms,
