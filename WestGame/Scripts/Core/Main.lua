@@ -1,5 +1,6 @@
 local intro
 local logic
+local logger
 
 function LoadScene(name)
   if name == nil then
@@ -16,4 +17,6 @@ end
 function Init()
   intro = require("Scenes.IntroScene")
   logic = require("Interface.InterfaceLogic")
+  logger = require("Utils.LuaLogger")
+  logger.Init();
 end
