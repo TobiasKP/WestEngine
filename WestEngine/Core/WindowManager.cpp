@@ -19,7 +19,8 @@ WindowManager::WindowManager() : IManager(nullptr)
   _height = 0;
 }
 
-WindowManager::WindowManager(WestLogger* logger) : IManager(logger)
+WindowManager::WindowManager(WestLogger* logger, const std::shared_ptr<EventDispatcher>& d)
+  : IManager(logger), _dispatcher(d)
 {
   setName(CoreConstants::WINDOW_MANAGER);
   _width  = 0;
@@ -136,6 +137,10 @@ std::int32_t WindowManager::init()
   glfwSetMouseButtonCallback(_window, MouseCallbacks::mouseButtonCallback);
   glfwSetScrollCallback(_window, MouseCallbacks::scrollCallback);
   LuaFacade::getLuaFacadeInstance().registerCFunction(getResolution, LuaAPI::C_GET_RESOLUTION.data(), this);
+  _dispatcher->subscribe(EventIdentifiers::WINDOW_CLOSE,
+                         [this](EventIdentifiers event, EventPayload payload)
+                         { glfwSetWindowShouldClose(_window, GLFW_TRUE); });
+  _frameStartTime = TimeUtils::getNanoseconds();
 
 #ifdef DEBUG
   logDebug(std::format("{}: initialized with \n\t\tWidth: {}\n\t\tHeight: {}\n", getName(), getWidth(), getHeight()));
@@ -158,6 +163,30 @@ void WindowManager::update()
   logCycle(std::format("SwapBuffers: {} ms \n", e - s));
 #endif
   glfwPollEvents();
+  if (glfwWindowShouldClose(_window))
+  {
+    _dispatcher->dispatchEvent(EventIdentifiers::WINDOW_CLOSE, EmptyPayload{});
+  }
+
+  _frames++;
+  double now = TimeUtils::getNanoseconds();
+  if (now - _frameStartTime >= 1000000000)
+  {
+    setWindowTitle(std::format("{} : {}", CoreConstants::TITLE, _frames));
+    _frames         = 0;
+    _frameStartTime = now;
+  }
+
+  if (Config::requestedWidth > 0 && Config::requestedHeight > 0)
+  {
+#ifdef DEBUG
+    logDebug(std::format(
+      "{} ### Requested window change: {} x {}.\n", getName(), Config::requestedWidth, Config::requestedHeight));
+#endif
+    resizeWindow(Config::requestedWidth, Config::requestedHeight);
+    Config::requestedWidth  = -1;
+    Config::requestedHeight = -1;
+  }
 }
 
 void WindowManager::errorCallback(std::int32_t error, const char* message)

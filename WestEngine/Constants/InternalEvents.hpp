@@ -24,7 +24,8 @@
   X(UI_REFRESH)                                                                                                        \
   X(UI_INTERNAL_CALL)                                                                                                  \
   X(AI_THINK)                                                                                                          \
-  X(LEVEL_END)
+  X(LEVEL_END)                                                                                                         \
+  X(WINDOW_CLOSE)
 
 enum class EventIdentifiers {
 #define WEST_EVENT_ENUM_ENTRY(name) name,

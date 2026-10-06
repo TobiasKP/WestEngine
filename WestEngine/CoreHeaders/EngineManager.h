@@ -3,7 +3,6 @@
 #include "../Core/Events/EventDispatcher.hpp"
 #include "Entity/Scene.h"
 #include "Interfaces/IManager.h"
-#include "WindowManager.h"
 
 #include <array>
 #include <Config.h>
@@ -20,10 +19,6 @@ public:
   {
     return _exitEngine;
   }
-  inline std::int32_t getFps()
-  {
-    return _fps;
-  }
 
   // Overrides
   std::int32_t startup() override;
@@ -31,19 +26,11 @@ public:
   void update() override;
   std::int32_t init() override;
 
-protected:
-  inline void setFps(std::int32_t fps)
-  {
-    _fps = fps;
-  }
-
 private:
   enum CYCLE { STARTUP, INIT, UPDATE, LOAD, PAUSE };
 
   bool _exitEngine;
-  std::int32_t _fps;
   std::array<IManager*, CoreConstants::MAX_Q_SIZE> _manager;
-  WindowManager* _windowManager;
   float _FRAMERATE;
   float _FRAMETIME;
   const long _NANOSECOND = 1000000000;
