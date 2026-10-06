@@ -60,8 +60,7 @@ public:
     0.0f, 0.0f, 1.0f * SIZE_E, 0.0f, 1.0f * SIZE_E, 1.0f * SIZE_E, 0.0f, 1.0f * SIZE_E};
   static constexpr float baseTex[] = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f};
 
-  GLuint _interfaceVBO, _interfaceVAO, _interfaceEBO, _interfaceCOL, _interfaceOFFSET, _interfaceFLAGS, _interfaceTEX,
-    _interfaceFONT_TEXTURE_ID, _interfaceUV;
+  GLuint _interfaceVBO, _interfaceVAO, _interfaceEBO, _interfaceINSTANCE, _interfaceTEX, _interfaceFONT_TEXTURE_ID;
 
   friend class UIRenderManager;
 
@@ -86,6 +85,5 @@ private:
   WestLogger& _logger             = WestLogger::getLoggerInstance();
 
   ContainerElement* findInterfaceById(std::uint8_t id);
-  void setupInstancedAttribute(GLuint buffer, GLuint index, GLint size, bool withDivisor);
 };
 };  // namespace WestInterface

@@ -53,15 +53,12 @@ std::int32_t WestInterfaceFacade::init()
 {
   glGenVertexArrays(1, &_interfaceVAO);
 
-  GLuint buffers[7] = {0};
-  glGenBuffers(7, buffers);
-  _interfaceVBO    = buffers[0];
-  _interfaceEBO    = buffers[1];
-  _interfaceCOL    = buffers[2];
-  _interfaceOFFSET = buffers[3];
-  _interfaceFLAGS  = buffers[4];
-  _interfaceTEX    = buffers[5];
-  _interfaceUV     = buffers[6];
+  GLuint buffers[4] = {0};
+  glGenBuffers(4, buffers);
+  _interfaceVBO      = buffers[0];
+  _interfaceEBO      = buffers[1];
+  _interfaceINSTANCE = buffers[2];
+  _interfaceTEX      = buffers[3];
   for (GLuint i : buffers)
   {
     if (i == -1)
@@ -84,22 +81,26 @@ std::int32_t WestInterfaceFacade::init()
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(0);
 
-  setupInstancedAttribute(_interfaceCOL, 1, 4, true);
-  setupInstancedAttribute(_interfaceOFFSET, 2, 4, true);
-
   glBindBuffer(GL_ARRAY_BUFFER, _interfaceTEX);
   glBufferData(GL_ARRAY_BUFFER, sizeof(baseTex), baseTex, GL_STATIC_DRAW);
 
   glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(3);
 
-  setupInstancedAttribute(_interfaceUV, 4, 4, true);
-
-  glBindBuffer(GL_ARRAY_BUFFER, _interfaceFLAGS);
-  glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
-  glVertexAttribIPointer(5, 1, GL_UNSIGNED_INT, sizeof(std::uint32_t), (void*)0);
-  glVertexAttribDivisor(5, 1);
-  glEnableVertexAttribArray(5);
+  glBindBuffer(GL_ARRAY_BUFFER, _interfaceINSTANCE);
+  glVertexAttribPointer(
+    1, 4, GL_FLOAT, GL_FALSE, sizeof(InterfaceInstanceData), (void*)offsetof(InterfaceInstanceData, color));
+  glVertexAttribPointer(
+    2, 4, GL_FLOAT, GL_FALSE, sizeof(InterfaceInstanceData), (void*)offsetof(InterfaceInstanceData, offset));
+  glVertexAttribPointer(
+    4, 4, GL_FLOAT, GL_FALSE, sizeof(InterfaceInstanceData), (void*)offsetof(InterfaceInstanceData, uv));
+  glVertexAttribIPointer(
+    5, 1, GL_UNSIGNED_INT, sizeof(InterfaceInstanceData), (void*)offsetof(InterfaceInstanceData, flags));
+  for (GLuint index : {1u, 2u, 4u, 5u})
+  {
+    glVertexAttribDivisor(index, 1);
+    glEnableVertexAttribArray(index);
+  }
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
@@ -132,18 +133,6 @@ std::int32_t WestInterfaceFacade::init()
 
   _renderManager->toggleDirty();
   return 0;
-}
-
-void WestInterfaceFacade::setupInstancedAttribute(GLuint buffer, GLuint index, GLint size, bool withDivisor)
-{
-  glBindBuffer(GL_ARRAY_BUFFER, buffer);
-  glBufferData(GL_ARRAY_BUFFER, NULL, NULL, GL_STATIC_DRAW);
-  glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, size * sizeof(float), (void*)0);
-  if (withDivisor)
-  {
-    glVertexAttribDivisor(index, 1);
-  }
-  glEnableVertexAttribArray(index);
 }
 
 ContainerElement* WestInterfaceFacade::findInterfaceById(std::uint8_t id)

@@ -231,37 +231,16 @@ void RenderingCycle::renderInterfaces()
     return;
   }
 
-  // TODO 4 vectors recreated per frame use GL_STREAM_DRAW or persistend mapped buffers
-  const size_t dataSize = renderData.size();
-  std::vector<float> instanceOffsets;
-  std::vector<float> colors;
-  std::vector<float> textCoords;
-  std::vector<std::uint32_t> flags;
-
-  instanceOffsets.reserve(dataSize * 4);
-  colors.reserve(dataSize * 4);
-  textCoords.reserve(dataSize * 4);
-  flags.reserve(dataSize);
+  std::vector<InterfaceInstanceData> instances;
+  instances.reserve(renderData.size());
 
   GLuint texture = 0;
   for (ComponentData* cd : renderData)
   {
-    instanceOffsets.emplace_back(cd->vertices[0]);
-    instanceOffsets.emplace_back(cd->vertices[1]);
-    instanceOffsets.emplace_back(cd->stretchX);
-    instanceOffsets.emplace_back(cd->stretchY);
-
-    colors.emplace_back(cd->colorR);
-    colors.emplace_back(cd->colorG);
-    colors.emplace_back(cd->colorB);
-    colors.emplace_back(cd->colorA);
-
-    flags.emplace_back(cd->flags);
-
-    textCoords.emplace_back(cd->textureCoords[0]);
-    textCoords.emplace_back(cd->textureCoords[1]);
-    textCoords.emplace_back(cd->textureCoords[2]);
-    textCoords.emplace_back(cd->textureCoords[3]);
+    instances.push_back({{cd->colorR, cd->colorG, cd->colorB, cd->colorA},
+                         {cd->vertices[0], cd->vertices[1], cd->stretchX, cd->stretchY},
+                         {cd->textureCoords[0], cd->textureCoords[1], cd->textureCoords[2], cd->textureCoords[3]},
+                         cd->flags});
 
     if (cd->texture > 0)
     {
@@ -269,7 +248,7 @@ void RenderingCycle::renderInterfaces()
     }
   }
 
-  if (instanceOffsets.size() <= 0)
+  if (instances.empty())
   {
     _logger->log(Level::Error, "|><| No instance data for interfaces gathered skipping rendering.\n");
     return;
@@ -289,18 +268,8 @@ void RenderingCycle::renderInterfaces()
   glDisable(GL_DEPTH_TEST);
   glBindVertexArray(facade->_interfaceVAO);
 
-  glBindBuffer(GL_ARRAY_BUFFER, facade->_interfaceCOL);
-  glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_DYNAMIC_DRAW);
-
-
-  glBindBuffer(GL_ARRAY_BUFFER, facade->_interfaceOFFSET);
-  glBufferData(GL_ARRAY_BUFFER, instanceOffsets.size() * sizeof(float), instanceOffsets.data(), GL_DYNAMIC_DRAW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, facade->_interfaceFLAGS);
-  glBufferData(GL_ARRAY_BUFFER, flags.size() * sizeof(std::uint32_t), flags.data(), GL_DYNAMIC_DRAW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, facade->_interfaceUV);
-  glBufferData(GL_ARRAY_BUFFER, textCoords.size() * sizeof(float), textCoords.data(), GL_DYNAMIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, facade->_interfaceINSTANCE);
+  glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(InterfaceInstanceData), instances.data(), GL_STREAM_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glActiveTexture(GL_TEXTURE0);

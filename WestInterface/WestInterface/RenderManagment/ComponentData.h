@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
+#include <type_traits>
 
 struct ComponentData
 {
@@ -28,6 +30,21 @@ struct ElementBounds
   std::int8_t zIndex;
   bool eventDriven = false, isContainer = false;
 };
+
+struct InterfaceInstanceData
+{
+  float color[4];
+  float offset[4];
+  float uv[4];
+  std::uint32_t flags;
+};
+
+static_assert(sizeof(InterfaceInstanceData) == 52);
+static_assert(offsetof(InterfaceInstanceData, color) == 0);
+static_assert(offsetof(InterfaceInstanceData, offset) == 16);
+static_assert(offsetof(InterfaceInstanceData, uv) == 32);
+static_assert(offsetof(InterfaceInstanceData, flags) == 48);
+static_assert(std::is_standard_layout_v<InterfaceInstanceData>);
 
 /**********************************************************************************
  * FLAG DESCRIPTION
