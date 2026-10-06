@@ -83,7 +83,7 @@ void PlayerControl::handleEvent(std::tuple<EventIdentifiers, EventPayload> event
     }
     case EventIdentifiers::MOUSE_RCLICK:
     {
-      if (!isPlayerturn())
+      if (!isPlayerturn() || !_world->isVisible(_tileIdx))
       {
         break;
       }
@@ -96,7 +96,7 @@ void PlayerControl::handleEvent(std::tuple<EventIdentifiers, EventPayload> event
     }
     case EventIdentifiers::MOUSE_LCLICK:
     {
-      if (!isPlayerturn() || _busy)
+      if (!isPlayerturn() || _busy || !_world->isVisible(_tileIdx))
       {
         break;
       }

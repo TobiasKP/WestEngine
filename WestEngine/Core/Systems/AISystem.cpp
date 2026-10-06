@@ -3,6 +3,7 @@
 #include "../../Constants/LuaAPI.hpp"
 #include "../Scripting/LuaFacade.hpp"
 
+#include <format>
 #include <iostream>
 
 AISystem::AISystem(std::shared_ptr<EventDispatcher> d, WestLogger* l, std::shared_ptr<ComponentRegistry> r)
@@ -117,7 +118,20 @@ int AISystem::gatherWorldInformation(lua_State* L)
   std::int32_t row                = tileIdx / dimension;
   std::vector<std::int32_t> tiles = me->_world->getReachableTiles(row, column, movComp->range, movComp->a, me);
   tiles.erase(std::remove(tiles.begin(), tiles.end(), tileIdx), tiles.end());
-  std::vector<std::int32_t> entities = me->_world->getEntitiesInRange(row, column, active->range, movComp->a, me->_me);
+  std::vector<std::int32_t> entities;
+  if (active)
+  {
+    std::int32_t sight = getLineOfSightRange(me->_reg->getComponent<LineOfSight>(me->_me), movComp).value();
+    std::int32_t range = std::min(static_cast<std::int32_t>(active->range), sight);
+    entities           = me->_world->getEntitiesInRange(row, column, range, movComp->a, me->_me);
+  }
+  else
+  {
+    me->_logger->log(Level::Error,
+                     std::format("AISystem ### entity {} has no active weapon (equipment slot {})\n",
+                                 me->_me,
+                                 eqComp->active));
+  }
   lua_createtable(L, 0, 2);
   lua_createtable(L, tiles.size(), 0);
   for (std::int32_t i = 0; i < tiles.size(); i++)

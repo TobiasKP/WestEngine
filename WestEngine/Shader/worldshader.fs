@@ -70,4 +70,8 @@ void main() {
     } else {
         fragColor = vec4(ddColor, 1.0);
     }
+    if ((tileFlags[index] & 0x0004u) == 0u) {
+        float lum = dot(fragColor.rgb, vec3(0.299, 0.587, 0.114));
+        fragColor.rgb = mix(fragColor.rgb, vec3(lum), 0.8) * 0.6;
+    }
 }
