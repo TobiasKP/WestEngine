@@ -341,7 +341,6 @@ std::vector<ElementProxy*> InterfaceManager::fillInfo(lua_State* L, std::uint32_
     }
     lua_pop(L, 1);
 
-    // element is rebuilt (e.g. resolution refresh): keep its runtime values instead of the creation values
     auto text = me->_elementValues.extract({oldId, 0x08});
     if (!text.empty())
     {
