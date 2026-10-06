@@ -6,7 +6,7 @@ local builder = require("Interface.InterfaceBuilder")
 function DestroyInterface(id)
   local result = destroyInterface(id)
   if result == false then
-    print("Error deleting UI with id " .. id)
+    westLog(LogLevel.Error, "Error destroying UI with id " .. tostring(id))
     return
   end
   uimanager.unregister(id)
@@ -20,7 +20,7 @@ function RefreshInterfaces()
   for id, uis in pairs(registeredUis) do
     local result = destroyInterface(id);
     if result == false then
-      print("Error deleting UI with id " .. id)
+      westLog(LogLevel.Error, "Error destroying UI with id " .. tostring(id) .. " during refresh")
     end
     local func, stretchX, stretchY, alpha, rows, columns, hidden = table.unpack(additionalData[id])
     local parent = additionalData[id].parent
@@ -74,15 +74,17 @@ end
 function SetActionPoints(id, points)
   local uiId = uimanager.getByParent("actionpoints_" .. id);
   if not uiId or not uiId[1] then
-    print("GGG - Ation UI not found")
+    westLog(LogLevel.Error, "Action points UI not found for entity " .. tostring(id))
     return
   end
   local res = uimanager.getElement(uiId[1], "actionpoints")
   if res == -1 or res == nil then
-    print("GGG - Action UI does not contain element actionpoints")
+    westLog(LogLevel.Error,
+      "Action points UI for entity " .. tostring(id) .. " does not contain element 'actionpoints'")
     return
   end
-  print("GGG - Updating Action UI")
+  westLog(LogLevel.Cycle,
+    "Updating action points UI for entity " .. tostring(id) .. " to " .. tostring(points) .. " points")
   updateInterfaceValue(res, 0x10, tostring(math.ceil((points / 3) * 100)))
 end
 
@@ -130,7 +132,7 @@ function EndTurnButton()
 end
 
 function LevelEndScreen(won)
-  print("GGG - Level ended")
+  westLog(LogLevel.Info, "Level ended, player " .. (won == true and "won" or "lost"))
   if won == true then
     builder.Panel("end")
         :anchor("center", 0, 0)

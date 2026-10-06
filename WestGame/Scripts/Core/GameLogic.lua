@@ -34,7 +34,8 @@ function Attack(attackerId, bulletType, wRange, distanceToTarget, wDmg, wAccurac
     entity.FillProjectileInfo(attackerId, 4.0, target, wDmg, hit, spawnX, spawnY)
     entity.QueueEntity("../Entities/Misc/MediumProjectile")
   else
-    print("Error defining projectile, dismissed call...")
+    westLog(LogLevel.Error,
+      "Unknown projectile bullet type " .. tostring(bulletType) .. ", dismissed projectile creation")
   end
 end
 
@@ -42,7 +43,8 @@ function Internal(toCall, id)
   if switch[toCall] then
     switch[toCall](id)
   else
-    print("Error calling " .. toCall .. " not supported")
+    westLog(LogLevel.Error,
+      "Internal UI call '" .. tostring(toCall) .. "' is not supported (element id: " .. tostring(id) .. ")")
   end
 end
 

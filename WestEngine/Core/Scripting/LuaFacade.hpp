@@ -37,6 +37,9 @@ private:
 
   bool loadAPI();
   void exportEventIdentifiers();
+  void exportLogLevels();
+
+  static int westLog(lua_State* L);
 
   WestLogger* _logger;
   lua_State* L;

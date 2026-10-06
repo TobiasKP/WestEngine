@@ -54,7 +54,7 @@ local Handlers = {
   end,
 
   [Events.TILE_RCLICK] = function(payload)
-    print(payload.entityId)
+    westLog(LogLevel.Info, "Tile right-clicked, entityId: " .. tostring(payload.entityId))
   end,
 
   [Events.UI_REFRESH] = function()
@@ -78,7 +78,7 @@ function OnEvent(event, payload)
   local handler = Handlers[event]
   if handler == nil then
     if DEBUG then
-      print("GGG - No handler registered for event: " .. tostring(event))
+      westLog(LogLevel.Error, "No handler registered for event: " .. tostring(event))
     end
     return
   end

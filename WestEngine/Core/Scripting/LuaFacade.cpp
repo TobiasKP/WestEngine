@@ -52,6 +52,9 @@ void LuaFacade::startup(WestLogger* logger)
   luaL_dostring(L, "DEBUG = false");
 #endif
   exportEventIdentifiers();
+  // logging has to be available before loadAPI, Init may already log
+  exportLogLevels();
+  registerCFunction(westLog, LuaAPI::C_WEST_LOG.data(), this);
   if (loadAPI() != 0)
   {
     _logger->log(Level::Error, std::format("Lua State error ::: Lua API file"));
@@ -147,6 +150,32 @@ void LuaFacade::exportEventIdentifiers()
     lua_setfield(L, -2, eventName(static_cast<EventIdentifiers>(i)).data());
   }
   lua_setglobal(L, LuaAPI::C_EVENTS.data());
+}
+
+void LuaFacade::exportLogLevels()
+{
+  lua_createtable(L, 0, 3);
+  lua_pushinteger(L, static_cast<lua_Integer>(Level::Info));
+  lua_setfield(L, -2, "Info");
+  lua_pushinteger(L, static_cast<lua_Integer>(Level::Error));
+  lua_setfield(L, -2, "Error");
+  lua_pushinteger(L, static_cast<lua_Integer>(Level::Cycle));
+  lua_setfield(L, -2, "Cycle");
+  lua_setglobal(L, LuaAPI::C_LOG_LEVELS.data());
+}
+
+int LuaFacade::westLog(lua_State* L)
+{
+  LuaFacade* me           = (LuaFacade*)lua_touserdata(L, lua_upvalueindex(1));
+  assert(me != nullptr);
+  const lua_Integer level = luaL_checkinteger(L, 1);
+  const char* message     = luaL_checkstring(L, 2);
+  if (level < static_cast<lua_Integer>(Level::Info) || level > static_cast<lua_Integer>(Level::Cycle))
+  {
+    return luaL_argerror(L, 1, "invalid log level, use a LogLevel value");
+  }
+  me->_logger->log(static_cast<Level>(level), std::format("{}\n", message));
+  return 0;
 }
 
 bool LuaFacade::loadAPI()
