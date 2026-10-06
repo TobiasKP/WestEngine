@@ -10,7 +10,7 @@ local entityQueue = {};
 local function interpreteData(data, qPos)
   local height, width = getScreenResolution();
   if DEBUG then
-    print("found resolution: " .. width .. " : " .. height)
+    westLog(LogLevel.Cycle, "Screen resolution for entity creation: " .. tostring(width) .. " x " .. tostring(height))
   end
   createEntity(data.name);
 
@@ -44,7 +44,7 @@ local function interpreteData(data, qPos)
   end
 
   if DEBUG then
-    print("Creating Entity " .. data.name);
+    westLog(LogLevel.Info, "Creating entity: " .. tostring(data.name))
   end
 
   buildEntity()
@@ -54,7 +54,7 @@ function loadFile(name)
   local file = io.open(root .. name .. ".yaml")
 
   if file == nil then
-    print("Error opening file")
+    westLog(LogLevel.Error, "Error opening entity file: " .. tostring(root) .. tostring(name) .. ".yaml")
     return nil
   end
 

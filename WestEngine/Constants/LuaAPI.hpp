@@ -16,6 +16,10 @@ constexpr std::string_view GET_STATE         = "GetState";
 // Table of EventIdentifiers the lua handlers key on, exported on startup
 constexpr std::string_view C_EVENTS = "Events";
 
+// Logging, westLog(level, message) forwards to the WestLogger, level is a LogLevel value
+constexpr std::string_view C_WEST_LOG   = "westLog";
+constexpr std::string_view C_LOG_LEVELS = "LogLevel";
+
 // Entity Creation
 constexpr std::string_view C_CREATE_ENTITY = "createEntity";
 constexpr std::string_view C_ADD_COMPONENT = "addComponent";

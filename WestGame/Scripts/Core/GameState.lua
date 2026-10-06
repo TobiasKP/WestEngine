@@ -21,7 +21,7 @@ local NpcEntitiesActionPoints = {}
 function ToggleGameState()
   if GameState == GameStates.PLAYER_TURN then
     GameState = GameStates.AI_TURN
-    print("GGG - Starting AI Turn")
+    westLog(LogLevel.Info, "Player turn ended, starting AI turn")
     for i, _ in pairs(PlayerEntitiesActionPoints) do
       PlayerEntitiesActionPoints[i] = 3
       interface.SetActionPoints(i, 3)
@@ -33,7 +33,7 @@ function ToggleGameState()
       interface.EndTurnButton()
     end
   else
-    print("GGG - Invalid Game State")
+    westLog(LogLevel.Error, "Cannot toggle game state, invalid game state: " .. tostring(GameState))
   end
   dispatchEvent(GameState)
 end
@@ -48,12 +48,13 @@ function GetEntityState(id)
   elseif NpcEntitiesState[id] ~= nil then
     return NpcEntitiesState[id]
   else
-    print("GGG - Invalid State for Entity, no entry found for: " .. id)
+    westLog(LogLevel.Error, "GetEntityState: no state entry found for entity " .. tostring(id))
   end
 end
 
 function SetPlayerEntityState(id, current, state)
-  print("GGG - Setting state from: " .. current .. " to: " .. state)
+  westLog(LogLevel.Info,
+    "Player entity " .. tostring(id) .. " state transition from " .. tostring(current) .. " to " .. tostring(state))
   if state == EntityStates.IDLE then
     PlayerEntitiesState[id] = EntityStates.IDLE
     return
@@ -61,35 +62,41 @@ function SetPlayerEntityState(id, current, state)
 
   local points = PlayerEntitiesActionPoints[id]
   if points == 0 or points == nil then
-    print("GGG - No more action points for entity " .. id)
+    westLog(LogLevel.Info,
+      "Player entity " .. tostring(id) .. " has no action points left, ignoring transition to state " ..
+      tostring(state))
     return
   end
   if state == EntityStates.MOVING then
     if current ~= EntityStates.IDLE then
-      print("GGG - Already Moving")
+      westLog(LogLevel.Info,
+        "Player entity " .. tostring(id) .. " cannot start moving, not idle (current state " .. tostring(current) ..
+        ")")
       return
     end
-    print("GGG - Moving")
+    westLog(LogLevel.Info, "Player entity " .. tostring(id) .. " starts moving")
     PlayerEntitiesState[id] = EntityStates.MOVING
     PlayerEntitiesActionPoints[id] = points - 1
   elseif state == EntityStates.IN_ACTION then
     if current ~= EntityStates.IDLE then
-      print("GGG - Already in some engagement, not idle.")
+      westLog(LogLevel.Info,
+        "Player entity " .. tostring(id) .. " cannot start action, not idle (current state " .. tostring(current) ..
+        ")")
       return
     end
-    print("GGG - starting Action.")
+    westLog(LogLevel.Info, "Player entity " .. tostring(id) .. " starts action")
     PlayerEntitiesActionPoints[id] = points - 1
     PlayerEntitiesState[id] = EntityStates.IN_ACTION
   elseif state == EntityStates.INSPECTING then
-    print("GGG - starting Inspection")
+    westLog(LogLevel.Info, "Player entity " .. tostring(id) .. " starts inspection")
     PlayerEntitiesActionPoints[id] = points - 1
     PlayerEntitiesState[id] = EntityStates.INSPECTING
   elseif state == EntityStates.ATTACKING then
-    print("GGG - Attacking")
+    westLog(LogLevel.Info, "Player entity " .. tostring(id) .. " starts attacking")
     PlayerEntitiesActionPoints[id] = points - 1
     PlayerEntitiesState[id] = EntityStates.ATTACKING
   end
-  print("GGG - reducing action points")
+  westLog(LogLevel.Info, "Player entity " .. tostring(id) .. " action points reduced to " .. tostring(points - 1))
   interface.SetActionPoints(id, points - 1)
 end
 
@@ -108,7 +115,7 @@ function EntityHasActionPointsLeft(id)
   elseif NpcEntitiesActionPoints[id] then
     return NpcEntitiesActionPoints[id]
   else
-    print("GGG - Not found " .. id);
+    westLog(LogLevel.Error, "EntityHasActionPointsLeft: entity " .. tostring(id) .. " not found")
     return -1
   end
 end
@@ -121,20 +128,23 @@ function SetNpcState(id, current, state)
 
   local points = NpcEntitiesActionPoints[id]
   if points == 0 or points == nil then
-    print("GGG - No more action points for entity " .. id)
+    westLog(LogLevel.Info,
+      "NPC entity " .. tostring(id) .. " has no action points left, ignoring transition to state " .. tostring(state))
     return
   end
 
   if state == EntityStates.MOVING then
     if current ~= EntityStates.IDLE then
-      print("GGG - Already Moving")
+      westLog(LogLevel.Info,
+        "NPC entity " .. tostring(id) .. " cannot start moving, not idle (current state " .. tostring(current) .. ")")
       return
     end
     NpcEntitiesState[id] = EntityStates.MOVING
     NpcEntitiesActionPoints[id] = points - 1
   elseif state == EntityStates.IN_ACTION then
     if current ~= EntityStates.IDLE then
-      print("GGG - Already in Action")
+      westLog(LogLevel.Info,
+        "NPC entity " .. tostring(id) .. " cannot start action, not idle (current state " .. tostring(current) .. ")")
       return
     end
     NpcEntitiesState[id] = EntityStates.IN_ACTION
@@ -154,12 +164,14 @@ function TransitionEntityState(id, current, newState)
   elseif NpcEntitiesState[id] ~= nil and GameState == GameStates.AI_TURN then
     SetNpcState(id, current, newState)
   else
-    print("GGG - Invalid State for Entity, no entry found for: " .. id)
+    westLog(LogLevel.Error,
+      "TransitionEntityState: no state entry found for entity " .. tostring(id) .. " in game state " ..
+      tostring(GameState))
   end
 end
 
 function RegisterEntity(id, playable, health)
-  print("GGG - Registering entity " .. id)
+  westLog(LogLevel.Info, "Registering entity " .. tostring(id) .. (playable and " (player)" or " (NPC)"))
   if playable then
     PlayerEntitiesState[id] = EntityStates.IDLE
     PlayerEntitiesActionPoints[id] = 3;
@@ -172,7 +184,7 @@ function RegisterEntity(id, playable, health)
 end
 
 function RemoveEntity(id)
-  print("GGG - Removing entity " .. id)
+  westLog(LogLevel.Info, "Removing entity " .. tostring(id))
   PlayerEntitiesState[id] = nil
   PlayerEntitiesActionPoints[id] = nil
   NpcEntitiesState[id] = nil

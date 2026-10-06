@@ -175,3 +175,92 @@ TEST_F(DataPoolTest, MultipleAddDeleteCycles)
     EXPECT_EQ(pool.getModelByGuid("guid-" + std::to_string(i)), nullptr);
   }
 }
+
+// ─── Edge cases ───────────────────────────────────────────────
+
+static std::size_t countModelsWithGuid(DataPool& pool, const std::string& guid)
+{
+  std::size_t n = 0;
+  for (const Model& m : pool.getSceneModels())
+  {
+    if (m.getGuid() == guid)
+    {
+      n++;
+    }
+  }
+  return n;
+}
+
+TEST_F(DataPoolTest, DeleteLastKeepsEarlierModels)
+{
+  pool.addModelToScene(makeTestModel("A", "guid-a"));
+  pool.addModelToScene(makeTestModel("B", "guid-b"));
+
+  EXPECT_TRUE(pool.deleteModelFromScene("guid-b"));
+
+  EXPECT_EQ(pool.getModelByGuid("guid-b"), nullptr);
+  EXPECT_EQ(pool.getModelByName("B"), nullptr);
+  const Model* a = pool.getModelByGuid("guid-a");
+  ASSERT_NE(a, nullptr);
+  EXPECT_EQ(a->getName(), "A");
+}
+
+// BUG: WestData/MiscDataHandler/DataPool.cpp:80-83 deleting the element at the tail swaps it with itself, clears it, then re-indexes the now empty model, leaving a stale "" key in _guidToIndex that resolves to an empty slot.
+TEST_F(DataPoolTest, DISABLED_DeleteLastElementLeavesNoStaleEmptyGuid)
+{
+  pool.addModelToScene(makeTestModel("A", "guid-a"));
+  pool.addModelToScene(makeTestModel("B", "guid-b"));
+
+  ASSERT_TRUE(pool.deleteModelFromScene("guid-b"));
+
+  EXPECT_EQ(pool.getModelByGuid(""), nullptr) << "no model was ever added with an empty guid";
+  EXPECT_FALSE(pool.deleteModelFromScene("")) << "an empty guid must not be deletable";
+}
+
+// BUG: WestData/MiscDataHandler/DataPool.cpp:59 addModelToScene does not check for an existing guid; the second add takes a new slot and repoints the index, so the first copy is orphaned and survives every later delete.
+TEST_F(DataPoolTest, DISABLED_DuplicateGuidLeavesNoOrphanAfterDelete)
+{
+  pool.addModelToScene(makeTestModel("First", "guid-dup"));
+  pool.addModelToScene(makeTestModel("Second", "guid-dup"));
+
+  // Either policy is fine (reject the duplicate or replace the model), but once
+  // the guid is deleted nothing may remain under it.
+  ASSERT_TRUE(pool.deleteModelFromScene("guid-dup"));
+  EXPECT_EQ(pool.getModelByGuid("guid-dup"), nullptr);
+  EXPECT_EQ(countModelsWithGuid(pool, "guid-dup"), 0u) << "an unreachable copy is still stored in the pool";
+}
+
+TEST_F(DataPoolTest, DuplicateGuidLookupReturnsAModelWithThatGuid)
+{
+  pool.addModelToScene(makeTestModel("First", "guid-dup"));
+  pool.addModelToScene(makeTestModel("Second", "guid-dup"));
+
+  const Model* m = pool.getModelByGuid("guid-dup");
+  ASSERT_NE(m, nullptr);
+  EXPECT_EQ(m->getGuid(), "guid-dup");
+}
+
+TEST_F(DataPoolTest, AddFailsOnceThePoolIsFull)
+{
+  bool sawFailure = false;
+  for (std::uint32_t i = 0; i <= Limit::cachesize; i++)
+  {
+    if (!pool.addModelToScene(makeTestModel("M" + std::to_string(i), "guid-" + std::to_string(i))))
+    {
+      sawFailure = true;
+    }
+  }
+  EXPECT_TRUE(sawFailure) << "adding cachesize + 1 models must be rejected at some point";
+}
+
+// BUG: WestData/MiscDataHandler/DataPool.cpp:54 the full check `max_size() - 1 == _currentIdx` rejects the add when one slot is still free, so the pool only ever holds cachesize - 1 models.
+TEST_F(DataPoolTest, DISABLED_PoolHoldsExactlyCachesizeModels)
+{
+  for (std::uint32_t i = 0; i < Limit::cachesize; i++)
+  {
+    ASSERT_TRUE(pool.addModelToScene(makeTestModel("M" + std::to_string(i), "guid-" + std::to_string(i))))
+      << "add #" << i << " of " << Limit::cachesize << " rejected";
+  }
+  EXPECT_FALSE(pool.addModelToScene(makeTestModel("Overflow", "guid-overflow")));
+  EXPECT_NE(pool.getModelByGuid("guid-" + std::to_string(Limit::cachesize - 1)), nullptr);
+}

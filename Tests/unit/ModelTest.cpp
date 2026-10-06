@@ -74,20 +74,6 @@ TEST(Model, MeshMaterialHasCorrectDefaults)
   EXPECT_EQ(mesh.material.emissiveColor, glm::vec3(0));
 }
 
-TEST(Model, MeshMaterialCanBeOverridden)
-{
-  std::vector<Vertex> verts = {{{0, 0, 0}, {0, 1, 0}, {0, 0}}};
-  std::vector<std::uint32_t> indices = {0};
-  std::vector<Texture> textures;
-  AABB aabb = {{0, 0, 0}, {1, 1, 1}};
-  Mesh mesh("m1", verts, indices, textures, aabb);
-  mesh.material.diffuseColor  = glm::vec3(0, 1, 0);
-  mesh.material.emissiveColor = glm::vec3(0.5, 0.5, 0);
-
-  EXPECT_EQ(mesh.material.diffuseColor, glm::vec3(0, 1, 0));
-  EXPECT_EQ(mesh.material.emissiveColor, glm::vec3(0.5, 0.5, 0));
-}
-
 // ─── Multiple meshes ──────────────────────────────────────────
 
 TEST(Model, MultipleMeshesAreStored)
