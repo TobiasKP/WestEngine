@@ -111,7 +111,7 @@ void PlayerControl::handleEvent(std::tuple<EventIdentifiers, EventPayload> event
           passDestinationPosition(destination.value(), _me);
         }
       }
-      else if (id != 0)
+      else if (id != 0 && id != _me)
       {
         passAttackInformation(id);
       }
