@@ -11,6 +11,7 @@ inline constexpr std::string_view MODEL           = "model";
 inline constexpr std::string_view MATERIAL        = "material";
 inline constexpr std::string_view POSITION        = "position";
 inline constexpr std::string_view MOVEMENT        = "movement";
+inline constexpr std::string_view LINE_OF_SIGHT   = "lineofsight";
 inline constexpr std::string_view AABB            = "aabb";
 inline constexpr std::string_view CONTROL         = "playercontrol";
 inline constexpr std::string_view AI_CONTROL      = "aicontrol";

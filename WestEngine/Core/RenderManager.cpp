@@ -119,6 +119,11 @@ void RenderManager::update()
     }
     const Entity& entity   = _scene->getEntities().at(i);
     Position* p            = _scene->getRegistry()->getComponent<Position>(entity.getId());
+    Control* control       = _scene->getRegistry()->getComponent<Control>(entity.getId());
+    if (control && control->aiControl && !world->isVisible(world->calculateIndex(p->position.x, p->position.z)))
+    {
+      continue;
+    }
     Appearance* appearance = _scene->getRegistry()->getComponent<Appearance>(entity.getId());
     const Model* model     = WestData::WestAssetFacade::getAssetFacade().requestModelFromScene(entity.getModelGuid());
     EntityUniformParams params = {};

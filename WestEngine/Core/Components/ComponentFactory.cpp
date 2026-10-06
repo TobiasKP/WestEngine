@@ -25,6 +25,10 @@ void ComponentFactory::createComponent(lua_State* L, std::string& name, Entity& 
   {
     addMovement(L, e);
   }
+  else if (Components::LINE_OF_SIGHT.compare(name) == 0)
+  {
+    addLineOfSight(L, e);
+  }
   else if (Components::SHADER.compare(name) == 0)
   {
     addShader(L, e);
@@ -181,6 +185,15 @@ void ComponentFactory::addMovement(lua_State* L, Entity& e)
   m.a = (algorithm)lua_tointeger(L, -1);
   lua_pop(L, 1);
   _registry->addComponent<Movement>(e.getId(), std::move(m));
+};
+
+void ComponentFactory::addLineOfSight(lua_State* L, Entity& e)
+{
+  LineOfSight l = {};
+  lua_getfield(L, 2, "r");
+  l.range = lua_tointeger(L, -1);
+  lua_pop(L, 1);
+  _registry->addComponent<LineOfSight>(e.getId(), std::move(l));
 };
 
 

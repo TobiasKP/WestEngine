@@ -6,5 +6,6 @@ activeUnit: true
 components: 
   - { name: "position", x: -1.5, y: 0, z: -1.5 }
   - { name: "movement", r: 2, a: 0 }
+  - { name: "lineofsight", r: 3 }
   - { name: "health", m: 100, c: 80 }
   - { name: "equipment", secondary: { id: 1, bulletType: 1, dmg: 50, range: 3, accuracy: 95 } }

@@ -23,6 +23,8 @@ public:
   std::uint32_t getEntityByIdx(std::int32_t idx);
   void clearFlag(std::uint32_t flag);
   void setFlag(std::uint32_t flag, std::int32_t idx);
+  void updateVisibility(const std::vector<std::pair<std::int32_t, std::int32_t>>& origins);
+  bool isVisible(std::int32_t idx) const;
 
   inline void resetDirty()
   {

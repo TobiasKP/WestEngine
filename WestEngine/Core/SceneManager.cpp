@@ -74,6 +74,7 @@ std::int32_t SceneManager::init()
   double start = TimeUtils::getCurrentTimeAsTime();
 #endif
   _registry->registerComponent<Movement>();
+  _registry->registerComponent<LineOfSight>();
   _registry->registerComponent<Position>();
   _registry->registerComponent<AABB>();
   _registry->registerComponent<Control>();

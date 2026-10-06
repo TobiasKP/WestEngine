@@ -1,6 +1,7 @@
 #include "Appearance.h"
 #include "Control.hpp"
 #include "Health.hpp"
+#include "LineOfSight.hpp"
 #include "Movement.hpp"
 #include "Position.h"
 #include "Projectile.hpp"

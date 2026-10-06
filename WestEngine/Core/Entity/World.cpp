@@ -77,6 +77,33 @@ void World::setFlag(std::uint32_t flag, std::int32_t idx)
   _dirty.store(true, std::memory_order_relaxed);
 }
 
+void World::updateVisibility(const std::vector<std::pair<std::int32_t, std::int32_t>>& origins)
+{
+  clearFlag(0x0004u);
+  for (const auto& [tile, range] : origins)
+  {
+    if (tile < 0)
+    {
+      continue;
+    }
+    std::int32_t row = tile / _dimension;
+    std::int32_t col = tile % _dimension;
+    for (std::int32_t idx : getTilesByAlgorithm(row, col, range, algorithm::MANHATTAN))
+    {
+      setFlag(0x0004u, idx);
+    }
+  }
+}
+
+bool World::isVisible(std::int32_t idx) const
+{
+  if (idx < 0 || idx >= static_cast<std::int32_t>(_vflags.size()))
+  {
+    return false;
+  }
+  return (_vflags[idx] & 0x0004u) != 0;
+}
+
 void World::addEntityIdToIdx(float x, float y, std::uint32_t id)
 {
   std::int32_t tile = calculateIndex(x, y);

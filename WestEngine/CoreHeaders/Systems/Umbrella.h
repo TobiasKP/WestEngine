@@ -4,3 +4,4 @@
 #include "PlayerControl.h"
 #include "PositionalSystem.hpp"
 #include "ProjectileSystem.hpp"
+#include "VisibilitySystem.hpp"

@@ -17,6 +17,7 @@ private:
   void addModel(lua_State* L, Entity& e);
   void addPosition(lua_State* L, Entity& e);
   void addMovement(lua_State* L, Entity& e);
+  void addLineOfSight(lua_State* L, Entity& e);
   void addShader(lua_State* L, Entity& e);
   void addHealth(lua_State* L, Entity& e);
   void addPlayerControl(Entity& e);

@@ -49,6 +49,7 @@ set(TEST_SOURCES
     unit/PathUtilsTest.cpp
     unit/WorldTest.cpp
     unit/WorldFlagTest.cpp
+    unit/WorldVisibilityTest.cpp
     unit/EntitySemanticsTest.cpp
     unit/ComponentArrayTest.cpp
     unit/ThreadSafeQueueTest.cpp
