@@ -3,6 +3,7 @@
 #include <array>
 #include <atomic>
 #include <functional>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
@@ -30,6 +31,7 @@ private:
   std::function<void(const std::string& path)> _callback;
   std::array<std::string, 1> _allowList = {".obj"};
   std::atomic_bool _stop;
+  std::mutex _scanMutex;
   std::thread _t;
   std::vector<std::string> _files;
 

@@ -25,11 +25,6 @@ Interfaces GeneralInterfaces = {-1, -1, -1, -1};
 
 std::uint32_t incEntityId()
 {
-  std::optional<std::uint32_t> r = freedEntityIds.tryPop();
-  if (r.has_value())
-  {
-    return r.value();
-  }
   assert(std::atomic<std::uint32_t>::is_always_lock_free);
   return INTERNAL_ENTITY_ID.fetch_add(1, std::memory_order_relaxed);
 }
@@ -45,7 +40,6 @@ std::uint32_t incUiId()
   return INTERNAL_UI_ID.fetch_add(1, std::memory_order_relaxed);
 }
 
-tQueue<std::uint32_t> freedEntityIds;
 tQueue<std::uint32_t> freedUiIds;
 
 }  // namespace Config
