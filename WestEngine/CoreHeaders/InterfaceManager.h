@@ -46,6 +46,7 @@ private:
   std::vector<ElementBounds*> _elements;
   std::shared_ptr<EventDispatcher> _dispatcher;
   std::map<std::pair<std::uint32_t, std::int32_t>, std::uint32_t> _attachedEntities;
+  std::map<std::pair<std::uint32_t, std::int32_t>, std::string> _elementValues;
   WestInterface::WestInterfaceFacade* _facade;
   WindowManager* _windowManager;
 

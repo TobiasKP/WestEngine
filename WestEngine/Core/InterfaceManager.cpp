@@ -102,7 +102,7 @@ void InterfaceManager::update()
                     std::format("Culled Entities: {}", Config::GeneralInfo.CULLED_ENTITIES));
     _currentCE = Config::GeneralInfo.CULLED_ENTITIES;
   }
-  if (_currentX != Config::GeneralConfig.WIDTH && _currentY != Config::GeneralConfig.HEIGHT)
+  if (_currentX != Config::GeneralConfig.WIDTH || _currentY != Config::GeneralConfig.HEIGHT)
   {
 #ifdef DEBUG
     refreshTechDemoFooter();
@@ -198,6 +198,7 @@ void InterfaceManager::pollEvents()
                                i->newValue));
 #endif
           _facade->notify(_attachedEntities[{i->entityId, i->event}], i->event, i->newValue);
+          _elementValues[{_attachedEntities[{i->entityId, i->event}], i->event}] = i->newValue;
         }
         break;
       }
@@ -264,6 +265,9 @@ std::vector<ElementProxy*> InterfaceManager::fillInfo(lua_State* L, std::uint32_
     lua_getfield(L, -1, "type");
     e->type      = (ElementType)lua_tointeger(L, -1);
     e->elementId = Config::incUiId();
+    lua_pop(L, 1);
+    lua_getfield(L, -1, "id");
+    std::uint32_t oldId = lua_tointeger(L, -1);
     lua_pop(L, 1);
     lua_pushinteger(L, e->elementId);
     lua_setfield(L, -2, "id");
@@ -337,6 +341,23 @@ std::vector<ElementProxy*> InterfaceManager::fillInfo(lua_State* L, std::uint32_
     }
     lua_pop(L, 1);
 
+    // element is rebuilt (e.g. resolution refresh): keep its runtime values instead of the creation values
+    auto text = me->_elementValues.extract({oldId, 0x08});
+    if (!text.empty())
+    {
+      e->text        = text.mapped();
+      e->givenFlags |= 0x0008;
+      text.key()     = {e->elementId, 0x08};
+      me->_elementValues.insert(std::move(text));
+    }
+    auto progress = me->_elementValues.extract({oldId, 0x10});
+    if (!progress.empty())
+    {
+      e->progress    = std::max(0, std::stoi(progress.mapped()));
+      progress.key() = {e->elementId, 0x10};
+      me->_elementValues.insert(std::move(progress));
+    }
+
     lua_getfield(L, -1, "handler");
     if (!lua_isnil(L, -1))
     {
@@ -392,6 +413,7 @@ int InterfaceManager::updateInterfaceValue(lua_State* L)
   std::uint8_t event   = lua_tointeger(L, 2);
   std::string value    = lua_tostring(L, 3);
   me->_facade->notify(id, event, value);
+  me->_elementValues[{id, event}] = value;
   return 0;
 };
 
