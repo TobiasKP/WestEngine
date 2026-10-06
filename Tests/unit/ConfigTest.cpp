@@ -1,27 +1,16 @@
-#include <gtest/gtest.h>
-#include <Config.h>
+#include "support/ConfigQueueFixture.hpp"
 
-TEST(Config, IncEntityIdReturnsSequentialValues)
+#include <algorithm>
+#include <thread>
+#include <vector>
+
+class ConfigCounter : public ConfigQueueFixture
 {
-  std::uint32_t first  = Config::incEntityId();
-  std::uint32_t second = Config::incEntityId();
-  std::uint32_t third  = Config::incEntityId();
+};
 
-  EXPECT_EQ(second, first + 1);
-  EXPECT_EQ(third, second + 1);
-}
-
-TEST(Config, IncUiIdReturnsSequentialValues)
-{
-  std::uint32_t first  = Config::incUiId();
-  std::uint32_t second = Config::incUiId();
-  std::uint32_t third  = Config::incUiId();
-
-  EXPECT_EQ(second, first + 1);
-  EXPECT_EQ(third, second + 1);
-}
-
-TEST(Config, ConcurrentIncEntityIdProducesUniqueValues)
+// The sequential counter cases live in ConfigIdReuseTest. This one is the only
+// test that hammers the atomic counter itself (no freed ids involved).
+TEST_F(ConfigCounter, ConcurrentIncEntityIdProducesUniqueValues)
 {
   constexpr int COUNT = 1000;
   std::vector<std::uint32_t> results(COUNT * 2);

@@ -10,6 +10,7 @@
 #include <cstring>
 #include <format>
 #include <PathUtils.h>
+#include <ranges>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -89,7 +90,8 @@ void EngineManager::shutdown()
 #ifdef DEBUG
   logDebug(std::format("{} ### Shutting down {}...\n", getName(), getName()));
 #endif
-  for (auto* item : _manager)
+  // reverse startup order, the window owns the GL context and must outlive every manager using it
+  for (auto* item : _manager | std::views::reverse)
   {
     if (item)
     {

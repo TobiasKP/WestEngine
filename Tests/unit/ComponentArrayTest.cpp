@@ -39,10 +39,10 @@ TEST_F(ComponentArrayTest, RemoveMiddlePreservesOthers)
 
   registry.removeComponent<TestComp>(20);
 
-  EXPECT_NE(registry.getComponent<TestComp>(10), nullptr);
+  ASSERT_NE(registry.getComponent<TestComp>(10), nullptr);
   EXPECT_EQ(registry.getComponent<TestComp>(10)->value, 100);
 
-  EXPECT_NE(registry.getComponent<TestComp>(30), nullptr);
+  ASSERT_NE(registry.getComponent<TestComp>(30), nullptr);
   EXPECT_EQ(registry.getComponent<TestComp>(30)->value, 300);
 
   EXPECT_EQ(registry.getComponent<TestComp>(20), nullptr);
@@ -197,4 +197,21 @@ TEST_F(ComponentArrayTest, RemoveAndReAddSameId)
   addComp(1, 200);
   EXPECT_NE(registry.getComponent<TestComp>(1), nullptr);
   EXPECT_EQ(registry.getComponent<TestComp>(1)->value, 200);
+}
+
+// ─── Lookups and removals for ids that were never added ──────
+
+TEST_F(ComponentArrayTest, GetComponentReturnsNullForNeverAddedId)
+{
+  addComp(1, 10);
+  EXPECT_EQ(registry.getComponent<TestComp>(42), nullptr);
+}
+
+TEST_F(ComponentArrayTest, RemoveNeverAddedIdReturnsFalseAndKeepsOthers)
+{
+  addComp(1, 10);
+  EXPECT_FALSE(registry.removeComponent<TestComp>(999));
+  EXPECT_EQ(getArray()->getSize(), 1u);
+  ASSERT_NE(registry.getComponent<TestComp>(1), nullptr);
+  EXPECT_EQ(registry.getComponent<TestComp>(1)->value, 10);
 }

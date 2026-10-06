@@ -10,6 +10,10 @@
 #include <PathUtils.h>
 
 
+// Prepended to every lua log line so they are easy to find in the log files
+static constexpr std::string_view LOG_PREFIX = "GGG";
+
+
 static int appendTraceback(lua_State* L)
 {
   const char* message = lua_tostring(L, -1);
@@ -51,9 +55,7 @@ void LuaFacade::startup(WestLogger* logger)
 #else
   luaL_dostring(L, "DEBUG = false");
 #endif
-  exportEventIdentifiers();
-  // logging has to be available before loadAPI, Init may already log
-  exportLogLevels();
+  exportGlobalTables();
   registerCFunction(westLog, LuaAPI::C_WEST_LOG.data(), this);
   if (loadAPI() != 0)
   {
@@ -141,8 +143,9 @@ std::int32_t LuaFacade::getActionPoints(std::int32_t id)
   return result;
 }
 
-void LuaFacade::exportEventIdentifiers()
+void LuaFacade::exportGlobalTables()
 {
+  // Events, EventIdentifiers the lua handlers key on
   lua_createtable(L, 0, static_cast<std::int32_t>(EVENT_COUNT));
   for (std::size_t i = 0; i < EVENT_COUNT; i++)
   {
@@ -150,10 +153,8 @@ void LuaFacade::exportEventIdentifiers()
     lua_setfield(L, -2, eventName(static_cast<EventIdentifiers>(i)).data());
   }
   lua_setglobal(L, LuaAPI::C_EVENTS.data());
-}
 
-void LuaFacade::exportLogLevels()
-{
+  // LogLevel, values passed to westLog
   lua_createtable(L, 0, 3);
   lua_pushinteger(L, static_cast<lua_Integer>(Level::Info));
   lua_setfield(L, -2, "Info");
@@ -166,15 +167,18 @@ void LuaFacade::exportLogLevels()
 
 int LuaFacade::westLog(lua_State* L)
 {
-  LuaFacade* me           = (LuaFacade*)lua_touserdata(L, lua_upvalueindex(1));
+  LuaFacade* me = (LuaFacade*)lua_touserdata(L, lua_upvalueindex(1));
   assert(me != nullptr);
   const lua_Integer level = luaL_checkinteger(L, 1);
   const char* message     = luaL_checkstring(L, 2);
   if (level < static_cast<lua_Integer>(Level::Info) || level > static_cast<lua_Integer>(Level::Cycle))
   {
-    return luaL_argerror(L, 1, "invalid log level, use a LogLevel value");
+    me->_logger->log(
+      Level::Error,
+      std::format("{} - invalid log level {}, use a LogLevel value\n", LOG_PREFIX, level));
+    return 0;
   }
-  me->_logger->log(static_cast<Level>(level), std::format("{}\n", message));
+  me->_logger->log(static_cast<Level>(level), std::format("{} - {}\n", LOG_PREFIX, message));
   return 0;
 }
 

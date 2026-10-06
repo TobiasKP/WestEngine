@@ -36,8 +36,7 @@ private:
   ~LuaFacade();
 
   bool loadAPI();
-  void exportEventIdentifiers();
-  void exportLogLevels();
+  void exportGlobalTables();
 
   static int westLog(lua_State* L);
 

@@ -1,12 +1,15 @@
-#include <gtest/gtest.h>
-#include <Config.h>
+#include "support/ConfigQueueFixture.hpp"
 
 #include <set>
 #include <thread>
 
+class ConfigIdReuse : public ConfigQueueFixture
+{
+};
+
 // ─── ID reuse via freed queue ─────────────────────────────────
 
-TEST(ConfigIdReuse, FreedEntityIdIsReused)
+TEST_F(ConfigIdReuse, FreedEntityIdIsReused)
 {
   std::uint32_t original = Config::incEntityId();
   Config::freedEntityIds.push(original);
@@ -15,7 +18,7 @@ TEST(ConfigIdReuse, FreedEntityIdIsReused)
   EXPECT_EQ(reused, original);
 }
 
-TEST(ConfigIdReuse, FreedUiIdIsReused)
+TEST_F(ConfigIdReuse, FreedUiIdIsReused)
 {
   std::uint32_t original = Config::incUiId();
   Config::freedUiIds.push(original);
@@ -24,7 +27,7 @@ TEST(ConfigIdReuse, FreedUiIdIsReused)
   EXPECT_EQ(reused, original);
 }
 
-TEST(ConfigIdReuse, FreedIdsAreExhaustedBeforeCounter)
+TEST_F(ConfigIdReuse, FreedIdsAreExhaustedBeforeCounter)
 {
   std::uint32_t a = Config::incEntityId();
   std::uint32_t b = Config::incEntityId();
@@ -45,11 +48,9 @@ TEST(ConfigIdReuse, FreedIdsAreExhaustedBeforeCounter)
   EXPECT_FALSE(freed.contains(fresh));
 }
 
-TEST(ConfigIdReuse, EmptyFreedQueueFallsThrough)
+TEST_F(ConfigIdReuse, EmptyFreedQueueFallsThrough)
 {
-  // Drain any leftover freed IDs
-  while (Config::freedEntityIds.tryPop().has_value()) {}
-
+  // The fixture drained the freed queues, so ids come straight from the counter
   std::uint32_t id1 = Config::incEntityId();
   std::uint32_t id2 = Config::incEntityId();
   EXPECT_EQ(id2, id1 + 1);
@@ -57,7 +58,7 @@ TEST(ConfigIdReuse, EmptyFreedQueueFallsThrough)
 
 // ─── Concurrent free + allocate ──────────────────────────────
 
-TEST(ConfigIdReuse, ConcurrentFreeAndAllocateProducesNoLostIds)
+TEST_F(ConfigIdReuse, ConcurrentFreeAndAllocateProducesNoLostIds)
 {
   constexpr int COUNT = 500;
 
@@ -90,4 +91,11 @@ TEST(ConfigIdReuse, ConcurrentFreeAndAllocateProducesNoLostIds)
   // All returned IDs must be unique
   std::set<std::uint32_t> unique(results.begin(), results.end());
   EXPECT_EQ(unique.size(), results.size()) << "Duplicate IDs under concurrent free+alloc";
+}
+
+TEST_F(ConfigIdReuse, EmptyUiFreedQueueFallsThrough)
+{
+  std::uint32_t id1 = Config::incUiId();
+  std::uint32_t id2 = Config::incUiId();
+  EXPECT_EQ(id2, id1 + 1);
 }

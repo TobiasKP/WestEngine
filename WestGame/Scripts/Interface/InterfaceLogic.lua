@@ -6,7 +6,7 @@ local builder = require("Interface.InterfaceBuilder")
 function DestroyInterface(id)
   local result = destroyInterface(id)
   if result == false then
-    westLog(LogLevel.Error, "Error destroying UI with id " .. tostring(id))
+    westLog(LogLevel.Info, "Error destroying UI with id " .. tostring(id))
     return
   end
   uimanager.unregister(id)
@@ -20,7 +20,7 @@ function RefreshInterfaces()
   for id, uis in pairs(registeredUis) do
     local result = destroyInterface(id);
     if result == false then
-      westLog(LogLevel.Error, "Error destroying UI with id " .. tostring(id) .. " during refresh")
+      westLog(LogLevel.Info, "Error destroying UI with id " .. tostring(id) .. " during refresh")
     end
     local func, stretchX, stretchY, alpha, rows, columns, hidden = table.unpack(additionalData[id])
     local parent = additionalData[id].parent

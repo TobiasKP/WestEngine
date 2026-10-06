@@ -69,8 +69,7 @@ void WestLogger::joinThreads()
 void WestLogger::log(const Level level, const std::string message)
 {
   std::unique_lock<std::mutex> lock(_mutex);
-  Message* m = new Message(level, message);
-  _q.push(*m);
+  _q.push(Message{level, message});
   lock.unlock();
   _cv.notify_one();
 }
