@@ -4,7 +4,6 @@
 #include "../Constants/InternalEvents.hpp"
 #include "../Core/Events/EventDispatcher.hpp"
 #include "Interfaces/IManager.h"
-#include "WindowManager.h"
 
 #include <map>
 #include <WestInterfaceFacade.h>
@@ -13,7 +12,7 @@ class InterfaceManager : public IManager
 {
 public:
   InterfaceManager();
-  InterfaceManager(WestLogger* logger, WindowManager* manager, const std::shared_ptr<EventDispatcher>& d);
+  InterfaceManager(WestLogger* logger, const std::shared_ptr<EventDispatcher>& d);
   ~InterfaceManager() override;
 
   std::int32_t startup() override;
@@ -48,7 +47,6 @@ private:
   std::map<std::pair<std::uint32_t, std::int32_t>, std::uint32_t> _attachedEntities;
   std::map<std::pair<std::uint32_t, std::int32_t>, std::string> _elementValues;
   WestInterface::WestInterfaceFacade* _facade;
-  WindowManager* _windowManager;
 
 #ifdef DEBUG
   std::uint8_t _demoId;

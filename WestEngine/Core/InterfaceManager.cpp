@@ -21,15 +21,11 @@ InterfaceManager::InterfaceManager() : IManager(nullptr)
 #endif
 };
 
-InterfaceManager::InterfaceManager(WestLogger* logger,
-                                   WindowManager* manager,
-                                   const std::shared_ptr<EventDispatcher>& d)
-  : IManager(logger)
+InterfaceManager::InterfaceManager(WestLogger* logger, const std::shared_ptr<EventDispatcher>& d) : IManager(logger)
 {
   setName(CoreConstants::INTERFACE_MANAGER);
   _facade           = nullptr;
   _cachedInterfaces = 0;
-  _windowManager    = manager;
   _dispatcher       = d;
   _currentPos       = glm::vec2(0);
   _currentHover     = std::make_tuple(-1, false);
@@ -166,7 +162,7 @@ void InterfaceManager::pollEvents()
         {
           break;
         }
-        std::string action = InputManager::getInputMap()[k->key];
+        const std::string& action = InputManager::getInputMap().at(k->key);
         if (action.compare("OpenMenu") == 0)
         {
           _facade->notify(Config::GeneralInterfaces.SETTING_ID.load(), 0x04, -1, -1);
@@ -475,11 +471,7 @@ std::uint8_t InterfaceManager::buildTechDemoFooter()
   quitButton->columnElements = 4;
   quitButton->givenFlags     = 0x0040;
   quitButton->text           = "Quit";
-  quitButton->eventHandler   = [this]()
-  {
-    assert(_windowManager != nullptr);
-    _windowManager->setWindowShouldClose();
-  };
+  quitButton->eventHandler   = [this]() { _dispatcher->dispatchEvent(EventIdentifiers::WINDOW_CLOSE, EmptyPayload{}); };
 
   elements.push_back(quitButton);
 

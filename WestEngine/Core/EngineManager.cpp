@@ -6,6 +6,7 @@
 #include "../CoreHeaders/SceneManager.h"
 #include "../CoreHeaders/ShaderManager.h"
 #include "../CoreHeaders/SystemManager.h"
+#include "../CoreHeaders/WindowManager.h"
 
 #include <cstring>
 #include <format>
@@ -24,24 +25,22 @@
 EngineManager::EngineManager() : IManager(nullptr)
 {
   setName(CoreConstants::ENGINE_MANAGER);
-  _exitEngine    = true;
-  _windowManager = nullptr;
+  _exitEngine = true;
 }
 
 EngineManager::EngineManager(WestLogger* logger) : IManager(logger)
 {
   setName(CoreConstants::ENGINE_MANAGER);
-  _exitEngine    = false;
-  _windowManager = new WindowManager(logger);
-  _FRAMERATE     = Config::GeneralConfig.FPS;
-  _FRAMETIME     = 1.0f / _FRAMERATE;
-  _dispatcher    = std::make_shared<EventDispatcher>();
-  _scene         = std::make_shared<Scene>();
+  _exitEngine = false;
+  _FRAMERATE  = Config::GeneralConfig.FPS;
+  _FRAMETIME  = 1.0f / _FRAMERATE;
+  _dispatcher = std::make_shared<EventDispatcher>();
+  _scene      = std::make_shared<Scene>();
 
   _manager[0] = new InputManager(logger, _dispatcher);
-  _manager[1] = _windowManager;
+  _manager[1] = new WindowManager(logger, _dispatcher);
   _manager[2] = new ShaderManager(logger, _scene);
-  _manager[3] = new InterfaceManager(logger, _windowManager, _dispatcher);
+  _manager[3] = new InterfaceManager(logger, _dispatcher);
   _manager[4] = new RenderManager(logger, _scene);
   _manager[5] = new SceneManager(logger, _dispatcher, _scene);
   _manager[6] = new SystemManager(logger, _dispatcher, _scene);
@@ -53,12 +52,8 @@ EngineManager::~EngineManager()
 {
   for (auto* manager : _manager)
   {
-    if (manager && manager != _windowManager)
-    {
-      delete manager;
-    }
+    delete manager;
   }
-  delete _windowManager;
 }
 
 std::int32_t EngineManager::startup()
@@ -103,10 +98,9 @@ void EngineManager::shutdown()
 
 void EngineManager::update()
 {
-  std::int32_t frames = 0, success = 0;
-  double frameCounter = 0;
-  double lastTime     = TimeUtils::getNanoseconds();
-  double delta        = 0;
+  std::int32_t success = 0;
+  double lastTime      = TimeUtils::getNanoseconds();
+  double delta         = 0;
 
 #ifdef DEBUG
   logDebug(std::format("{} ### STARTING MAIN GAME LOOP.\n", getName()));
@@ -117,7 +111,6 @@ void EngineManager::update()
     while (Config::PAUSE)
     {
       iterateQ(CYCLE::PAUSE);
-      _windowManager->setWindowTitle("paused ...");
     }
 
     bool render       = false;
@@ -127,27 +120,11 @@ void EngineManager::update()
 
     delta                       += passedTime / (double)_NANOSECOND;
     Config::GeneralConfig.DELTA  = delta;
-    frameCounter                += passedTime;
 
     while (delta > _FRAMETIME)
     {
       render  = true;
       delta  -= _FRAMETIME;
-
-      if (_windowManager->windowShouldClose())
-      {
-        _exitEngine = true;
-        break;
-      }
-
-      if (frameCounter >= _NANOSECOND)
-      {
-        setFps(frames);
-        _windowManager->setWindowTitle(std::format("{} : {}", CoreConstants::TITLE, getFps()));
-
-        frames       = 0;
-        frameCounter = 0;
-      }
     }
 
     if (render)
@@ -156,22 +133,10 @@ void EngineManager::update()
       double start = TimeUtils::getCurrentTimeAsTime();
 #endif
       success = iterateQ(CYCLE::UPDATE);
-      frames++;
 #ifdef DEBUG
       double end = TimeUtils::getCurrentTimeAsTime();
       logCycle(std::format("Full Cycle: {} ms \n", end - start));
 #endif
-    }
-
-    if (Config::requestedWidth > 0 && Config::requestedHeight > 0)
-    {
-#ifdef DEBUG
-      logDebug(std::format(
-        "{} ### Requested window change: {} x {}.\n", getName(), Config::requestedWidth, Config::requestedHeight));
-#endif
-      _windowManager->resizeWindow(Config::requestedWidth, Config::requestedHeight);
-      Config::requestedWidth  = -1;
-      Config::requestedHeight = -1;
     }
   }
 }
@@ -183,6 +148,8 @@ std::int32_t EngineManager::init()
 #endif
 
   std::int32_t success = iterateQ(CYCLE::INIT);
+  _dispatcher->subscribe(EventIdentifiers::WINDOW_CLOSE,
+                         [this](EventIdentifiers event, EventPayload payload) { _exitEngine = true; });
 
 #ifdef DEBUG
   double end = TimeUtils::getCurrentTimeAsTime();

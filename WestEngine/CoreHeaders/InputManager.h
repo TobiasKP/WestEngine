@@ -24,7 +24,7 @@ public:
 
   // Functions
   void setKey(std::int32_t key, std::string command);
-  static std::map<std::int32_t, std::string> getInputMap()
+  static const std::map<std::int32_t, std::string>& getInputMap()
   {
     return _inputMap;
   }

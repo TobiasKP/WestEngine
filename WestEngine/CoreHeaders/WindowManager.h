@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Core/Events/EventDispatcher.hpp"
 #include "Interfaces/IManager.h"
 
 #include <cstdint>
@@ -11,7 +12,7 @@ class WindowManager : public IManager
 {
 public:
   WindowManager();
-  WindowManager(WestLogger* logger);
+  WindowManager(WestLogger* logger, const std::shared_ptr<EventDispatcher>& d);
   ~WindowManager() override;
 
   // Getter
@@ -35,14 +36,6 @@ public:
   std::int32_t init() override;
 
   // Functions
-  inline bool windowShouldClose()
-  {
-    return glfwWindowShouldClose(_window);
-  }
-  inline void setWindowShouldClose()
-  {
-    glfwSetWindowShouldClose(_window, GLFW_TRUE);
-  }
   void resizeWindow(GLint width, GLint height);
   void setWindowTitle(const std::string& title);
   void setClearColor(float r, float g, float b, float a)
@@ -58,4 +51,7 @@ public:
 private:
   GLint _width, _height;
   GLFWwindow* _window = nullptr;
+  std::shared_ptr<EventDispatcher> _dispatcher;
+  std::int32_t _frames   = 0;
+  double _frameStartTime = 0;
 };

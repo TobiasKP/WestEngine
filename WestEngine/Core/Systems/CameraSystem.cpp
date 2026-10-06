@@ -58,7 +58,7 @@ void CameraSystem::handleEvent(std::tuple<EventIdentifiers, EventPayload> event)
       {
         break;
       }
-      std::string action = InputManager::getInputMap()[k->key];
+      const std::string& action = InputManager::getInputMap().at(k->key);
       float sign         = (k->action == GLFW_PRESS || k->action == GLFW_REPEAT) ? 1.0f : 0.0f;
       if (action.compare("CameraUp") == 0)
       {
