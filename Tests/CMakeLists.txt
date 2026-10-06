@@ -55,6 +55,7 @@ set(TEST_SOURCES
     unit/ECSStressTest.cpp
     unit/DataPoolTest.cpp
     unit/ModelTest.cpp
+    unit/AssetImporterConcurrencyTest.cpp
     unit/EventDispatcherTest.cpp
     unit/EventPayloadLuaTest.cpp
     unit/ComponentDataPoolTest.cpp

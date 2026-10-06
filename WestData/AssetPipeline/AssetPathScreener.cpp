@@ -61,6 +61,7 @@ void AssetPathScreener::notifyOnNew()
     _logger->log(Level::Cycle, "Scanning for new assets ... \n");
 #endif
 
+    std::lock_guard lock(_scanMutex);
     scanDir();
     if (_files.size() == 0)
     {
@@ -120,6 +121,7 @@ void AssetPathScreener::scanDir()
 
 void AssetPathScreener::addOnRequest(const std::string& file)
 {
+  std::lock_guard lock(_scanMutex);
   _logger->log(Level::Cycle, std::format("|*| Reading: {} for import\n", file));
   std::string path     = std::format("{}{}", PathUtils::getExecutableDir(), CoreConstants::ASSET_PATH);
   std::string fullfile = std::format("{}{}{}", PathUtils::getExecutableDir(), CoreConstants::ASSET_PATH, "_" + file);

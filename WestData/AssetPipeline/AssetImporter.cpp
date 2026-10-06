@@ -56,28 +56,29 @@ std::vector<Model> AssetImporter::getMeshQueue()
 
 void AssetImporter::handleFile(const std::string& path, const std::string& guid)
 {
-  _model = {};
-  _model.setGuid(guid);
-  _model.setName(std::filesystem::path(path).stem().string());
+  std::lock_guard lock(_importMutex);
+  Model model;
+  model.setGuid(guid);
+  model.setName(std::filesystem::path(path).stem().string());
   const aiScene* scene = _importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
   {
     _logger->log(Level::Error, std::format("|*| Error importing file: {}", _importer.GetErrorString()));
     return;
   }
-  processNode(scene->mRootNode, scene, guid);
-  _queue.push(std::move(_model));
+  processNode(scene->mRootNode, scene, guid, model);
+  _queue.push(std::move(model));
 };
-void AssetImporter::processNode(aiNode* node, const aiScene* scene, const std::string& guid)
+void AssetImporter::processNode(aiNode* node, const aiScene* scene, const std::string& guid, Model& model)
 {
   for (std::uint32_t i = 0; i < node->mNumMeshes; i++)
   {
     aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-    _model.addMesh(processMesh(mesh, scene, guid, i));
+    model.addMesh(processMesh(mesh, scene, guid, i));
   }
   for (std::uint32_t i = 0; i < node->mNumChildren; i++)
   {
-    processNode(node->mChildren[i], scene, guid);
+    processNode(node->mChildren[i], scene, guid, model);
   }
 }
 

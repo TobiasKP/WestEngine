@@ -6,6 +6,7 @@
 
 #include <assimp/scene.h>
 #include <memory>
+#include <mutex>
 #include <ThreadSafeQueue.hpp>
 #include <WestLogger.h>
 
@@ -23,7 +24,7 @@ public:
 
 private:
   void handlePath(const std::string& path);
-  void processNode(aiNode* node, const aiScene* scene, const std::string& guid);
+  void processNode(aiNode* node, const aiScene* scene, const std::string& guid, Model& model);
   Mesh processMesh(aiMesh* mesh, const aiScene* scene, const std::string& guid, std::uint32_t count);
   void handleFile(const std::string& path, const std::string& guid);
   std::vector<Vertex> processVertices(aiMesh* mesh);
@@ -32,9 +33,9 @@ private:
   Material processMaterial(aiMesh* mesh, const aiScene* scene);
   std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
 
-  Model _model;
   WestLogger* _logger;
   tQueue<Model> _queue;
   Assimp::Importer _importer;
+  std::mutex _importMutex;
   std::unique_ptr<AssetPathScreener> _screener;
 };
