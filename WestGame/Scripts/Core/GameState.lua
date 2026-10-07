@@ -120,6 +120,12 @@ function EntityHasActionPointsLeft(id)
   end
 end
 
+function SetNpcActionPoints(id, points)
+  if NpcEntitiesActionPoints[id] then
+    NpcEntitiesActionPoints[id] = points
+  end
+end
+
 function SetNpcState(id, current, state)
   if state == EntityStates.IDLE then
     NpcEntitiesState[id] = EntityStates.IDLE
@@ -212,6 +218,7 @@ StateMachine.TransitionEntityState = TransitionEntityState
 StateMachine.RegisterEntity = RegisterEntity
 StateMachine.RemoveEntity = RemoveEntity
 StateMachine.EntityHasActionPointsLeft = EntityHasActionPointsLeft
+StateMachine.SetNpcActionPoints = SetNpcActionPoints
 StateMachine.AIFinished = AIFinished
 StateMachine.LevelEnd = LevelEnd
 

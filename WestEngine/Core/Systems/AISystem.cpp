@@ -170,11 +170,7 @@ int AISystem::aiMoveCommand(lua_State* L)
   if (path.empty())
   {
     me->_logger->log(
-      Level::Error,
-      std::format("AISystem ### entity {} has no path from tile {} to {}, ending its action\n", id, start, target));
-    me->_handled.push_back(me->_me);
-    me->_me   = 0;
-    me->_busy = false;
+      Level::Error, std::format("AISystem ### entity {} has no path from tile {} to {}\n", id, start, target));
     lua_pushboolean(L, false);
     return 1;
   }
