@@ -1,8 +1,8 @@
 -- Stand-ins for everything the engine injects into the Lua state (LuaFacade.cpp
 -- and the systems' registerCFunction calls), plus spy modules for package.preload.
 --
--- Events and LogLevel are parsed from the C++ headers so the tests key on the
--- same values the engine exports at startup.
+-- Events, LogLevel and the C function names are parsed from the C++ headers so
+-- the tests key on the same values the engine exports at startup.
 
 local S = {}
 
@@ -41,14 +41,20 @@ end
 S.Events = parse_events()
 S.LogLevel = parse_log_levels()
 
--- C functions the engine registers as globals (LuaAPI.hpp C_* names)
-local ENGINE_FUNCTIONS = {
-  "westLog", "dispatchEvent", "createEntity", "addComponent", "buildEntity", "loadWorld", "setTileBlocked",
-  "tileToWorldPos",
-  "getHealth", "getPosition", "gatherWorldInformation", "aiMoveCommand", "aiAttackCommand",
-  "aiEndAction", "getScreenResolution", "createInterface", "updateInterfaceValue",
-  "destroyInterface", "getMousePosition",
-}
+-- C functions the engine registers as globals: the LuaAPI.hpp C_* names, minus the exported tables
+local GLOBAL_TABLES = { C_EVENTS = true, C_LOG_LEVELS = true }
+
+local function parse_engine_functions()
+  local header = read_file(WEST_REPO_ROOT .. "/WestEngine/Constants/LuaAPI.hpp")
+  local names = {}
+  for const, name in header:gmatch('constexpr%s+std::string_view%s+(C_[%w_]+)%s*=%s*"([%w_]+)"') do
+    if not GLOBAL_TABLES[const] then names[#names + 1] = name end
+  end
+  assert(#names > 0, "stubs: no C functions parsed from LuaAPI.hpp")
+  return names
+end
+
+local ENGINE_FUNCTIONS = parse_engine_functions()
 
 -- Default behaviour for C functions whose results the scripts use, an S.returns entry wins.
 -- loadWorld keeps the grid dimension so tileToWorldPos mirrors World::tileToWorldPos.
