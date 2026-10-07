@@ -12,6 +12,7 @@ WorldBuilder::WorldBuilder(lua_State* l, std::shared_ptr<ComponentRegistry> r, s
 {
   LuaFacade::getLuaFacadeInstance().registerCFunction(loadWorld, LuaAPI::C_LOAD_WORLD.data(), this);
   LuaFacade::getLuaFacadeInstance().registerCFunction(setTileBlocked, LuaAPI::C_SET_TILE_BLOCKED.data(), this);
+  LuaFacade::getLuaFacadeInstance().registerCFunction(tileToWorldPos, LuaAPI::C_TILE_TO_WORLD_POS.data(), this);
 };
 
 WorldBuilder::~WorldBuilder() {}
@@ -44,6 +45,26 @@ int WorldBuilder::setTileBlocked(lua_State* L)
   }
   w->setFlag(0x0008u, static_cast<std::int32_t>(y * dimension + x));
   return 0;
+}
+
+int WorldBuilder::tileToWorldPos(lua_State* L)
+{
+  WorldBuilder* me         = (WorldBuilder*)lua_touserdata(L, lua_upvalueindex(1));
+  std::shared_ptr<World> w = me->_scene->getWorld();
+  lua_Integer x            = luaL_checkinteger(L, 1);
+  lua_Integer y            = luaL_checkinteger(L, 2);
+  std::int32_t dimension   = w ? w->getGridSize() : 0;
+  if (x < 0 || y < 0 || x >= dimension || y >= dimension)
+  {
+    WestLogger::getLoggerInstance().log(Level::Error,
+                                        std::format("tileToWorldPos: tile {}, {} is off the grid\n", x, y));
+    lua_pushnil(L);
+    return 1;
+  }
+  glm::vec3 pos = w->tileToWorldPos(static_cast<std::int32_t>(y * dimension + x)).value();
+  lua_pushnumber(L, pos.x);
+  lua_pushnumber(L, pos.z);
+  return 2;
 }
 
 void WorldBuilder::createWorld(World& w, lua_State* L)

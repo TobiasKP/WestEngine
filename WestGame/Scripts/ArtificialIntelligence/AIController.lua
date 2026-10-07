@@ -3,18 +3,27 @@ local utils = require("Utils.Utils")
 
 local AIController = {}
 
+local function EndActions(entityId)
+  westLog(LogLevel.Info, "AI entity " .. tostring(entityId) .. " has no action points left, ending its actions")
+  if state.AIFinished() == true then
+    westLog(LogLevel.Info, "All AI entities finished, ending AI turn")
+    aiEndAction(true)
+    state.ToggleGameState();
+  else
+    aiEndAction(false)
+  end
+end
+
+local function Forfeit(entityId)
+  state.SetNpcActionPoints(entityId, 0)
+  EndActions(entityId)
+end
+
 function Execute(entityId)
   state.TransitionEntityState(entityId, StateMachine.GetEntityState(entityId), StateMachine.EntityStates.IDLE)
   local points = state.EntityHasActionPointsLeft(entityId)
   if points == 0 then
-    westLog(LogLevel.Info, "AI entity " .. tostring(entityId) .. " has no action points left, ending its actions")
-    if state.AIFinished() == true then
-      westLog(LogLevel.Info, "All AI entities finished, ending AI turn")
-      aiEndAction(true)
-      state.ToggleGameState();
-    else
-      aiEndAction(false)
-    end
+    EndActions(entityId)
     return;
   end
 
@@ -24,13 +33,15 @@ function Execute(entityId)
   local info = gatherWorldInformation(entityId)
   local tiles = info.TilesInRange
   local enemies = info.EnemiesInRange
-  if points > 1 or utils.TableLength(enemies) == 0 then
+  if (points > 1 and utils.TableLength(tiles) > 0) or utils.TableLength(enemies) == 0 then
     if utils.TableLength(tiles) == 0 then
       westLog(LogLevel.Error, "No tiles in range for AI entity " .. tostring(entityId) .. ", cannot move")
+      Forfeit(entityId)
       return
     end
     westLog(LogLevel.Info, "AI entity " .. tostring(entityId) .. " moving to tile " .. tostring(tiles[1]))
     if aiMoveCommand(entityId, tiles[1]) == false then
+      Forfeit(entityId)
       return
     end
     state.TransitionEntityState(entityId, StateMachine.GetEntityState(entityId), StateMachine.EntityStates.MOVING)

@@ -20,6 +20,7 @@ public:
                                               algorithm a,
                                               void* callee,
                                               const std::function<bool(std::uint32_t)>& isEnemy = {});
+  void followPath(Movement* movComp, const std::vector<std::int32_t>& path);
   std::vector<std::int32_t> getPath(std::int32_t from,
                                     std::int32_t to,
                                     std::int32_t range,

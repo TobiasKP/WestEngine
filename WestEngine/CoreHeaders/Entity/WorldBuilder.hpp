@@ -15,6 +15,7 @@ public:
 
   static int loadWorld(lua_State*);
   static int setTileBlocked(lua_State*);
+  static int tileToWorldPos(lua_State*);
 
 private:
   void createWorld(World& w, lua_State* L);

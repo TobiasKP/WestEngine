@@ -1,6 +1,7 @@
 #include "../../CoreHeaders/Systems/AISystem.hpp"
 
 #include "../../Constants/LuaAPI.hpp"
+#include "../../CoreHeaders/Components/Faction.hpp"
 #include "../Scripting/LuaFacade.hpp"
 
 #include <format>
@@ -103,21 +104,13 @@ int AISystem::gatherWorldInformation(lua_State* L)
   assert(posComp != nullptr);
   assert(movComp != nullptr);
   assert(eqComp != nullptr);
-  Weapon* active = nullptr;
-  if (eqComp->active == 1)
-  {
-    active = &eqComp->primary;
-  }
-  else if (eqComp->active == 2)
-  {
-    active = &eqComp->secondary;
-  }
+  Weapon* active                  = eqComp->activeWeapon();
   std::int32_t tileIdx            = me->_world->calculateIndex(posComp->position.x, posComp->position.z);
   std::int32_t dimension          = me->_world->getGridSize();
   std::int32_t column             = tileIdx % dimension;
   std::int32_t row                = tileIdx / dimension;
   std::vector<std::int32_t> tiles = me->_world->getReachableTiles(
-    row, column, movComp->range, movComp->a, me, std::bind_front(&AISystem::isEnemy, me));
+    row, column, movComp->range, movComp->a, me, std::bind_front(isHostile, std::ref(*me->_reg), me->_me));
   tiles.erase(std::remove(tiles.begin(), tiles.end(), tileIdx), tiles.end());
   std::vector<std::int32_t> entities;
   if (active)
@@ -166,33 +159,18 @@ int AISystem::aiMoveCommand(lua_State* L)
   std::int32_t start             = me->_world->calculateIndex(posComp->position.x, posComp->position.z);
   std::int32_t target            = lua_tointeger(L, 2);
   std::vector<std::int32_t> path = me->_world->getPath(
-    start, target, movComp->range, std::bind_front(&AISystem::isEnemy, me));
+    start, target, movComp->range, std::bind_front(isHostile, std::ref(*me->_reg), id));
   if (path.empty())
   {
     me->_logger->log(
-      Level::Error,
-      std::format("AISystem ### entity {} has no path from tile {} to {}, ending its action\n", id, start, target));
-    me->_handled.push_back(me->_me);
-    me->_me   = 0;
-    me->_busy = false;
+      Level::Error, std::format("AISystem ### entity {} has no path from tile {} to {}\n", id, start, target));
     lua_pushboolean(L, false);
     return 1;
   }
   me->_busy = true;
-  for (std::int32_t idx : path)
-  {
-    movComp->path.push_back(me->_world->tileToWorldPos(idx).value());
-  }
-  movComp->destination = movComp->path.front();
-  movComp->path.pop_front();
+  me->_world->followPath(movComp, path);
   lua_pushboolean(L, true);
   return 1;
-}
-
-bool AISystem::isEnemy(std::uint32_t id)
-{
-  Control* c = _reg->getComponent<Control>(id);
-  return c != nullptr && !c->aiControl;
 }
 
 int AISystem::aiAttackCommand(lua_State* L)

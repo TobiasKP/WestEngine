@@ -53,6 +53,7 @@ void MovementSystem::moveToDestination(std::uint32_t id, Position* posComp, Move
   {
     movComp->destination = movComp->path.front();
     movComp->path.pop_front();
+    updatePosition(*movComp->destination, posComp, id);
   }
   else
   {
