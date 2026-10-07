@@ -86,7 +86,8 @@ local function spawnMisc(data)
     local onGrid = type(x) == "number" and type(y) == "number" and x % 1 == 0 and y % 1 == 0
       and x >= 0 and y >= 0 and x < dim and y < dim
     local tile = onGrid and y * dim + x + 1 or nil
-    if tile == nil or type(kind) ~= "string" or kind == "" or seen[tile] then
+    local badWalkable = misc.walkable ~= nil and type(misc.walkable) ~= "boolean"
+    if tile == nil or type(kind) ~= "string" or kind == "" or seen[tile] or badWalkable then
       westLog(LogLevel.Error, "Skipping misc object " .. tostring(kind) .. " at " .. tostring(x) .. ", " .. tostring(y))
     else
       seen[tile] = true
@@ -95,6 +96,9 @@ local function spawnMisc(data)
       addComponent("shader", { v = "Vertex.vs", f = "Fragment.fs" })
       addComponent("position", { name = "position", x = x + 0.5 - dim / 2, y = grid[tile], z = y + 0.5 - dim / 2 })
       buildEntity()
+      if misc.walkable == false then
+        setTileBlocked(x, y)
+      end
     end
   end
 end

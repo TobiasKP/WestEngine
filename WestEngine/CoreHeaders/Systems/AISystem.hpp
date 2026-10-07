@@ -22,6 +22,7 @@ private:
   {
     return _state == 1;
   }
+  bool isEnemy(std::uint32_t id);
 
   std::int32_t _state;
   std::uint32_t _me;

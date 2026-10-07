@@ -3,6 +3,8 @@
 #include "../../Constants/Systems.hpp"
 #include "../../CoreHeaders/Interfaces/ISystem.h"
 
+#include <deque>
+
 World::World()
 {
   std::lock_guard<std::mutex> lock(_mutex);
@@ -145,10 +147,18 @@ void World::removeEntityFromGrid(std::uint32_t id)
 
 
 std::vector<std::int32_t>
-World::getReachableTiles(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a, void* callee)
+World::getReachableTiles(std::int32_t row,
+                         std::int32_t col,
+                         std::int32_t range,
+                         algorithm a,
+                         void* callee,
+                         const std::function<bool(std::uint32_t)>& isEnemy)
 {
-  std::vector<std::int32_t> result = getTilesByAlgorithm(row, col, range, a);
-  ISystem* c                       = (ISystem*)callee;
+  std::int32_t start                = row * _dimension + col;
+  std::vector<std::int32_t> parents = floodFill(start, range, isEnemy);
+  std::vector<std::int32_t> result  = getTilesByAlgorithm(row, col, range, a);
+  std::erase_if(result, [&](std::int32_t idx) { return !canEndOn(parents, start, idx); });
+  ISystem* c = (ISystem*)callee;
   if (c->getName() != Systems::PLAYER_CONTROL)
   {
     return result;
@@ -158,6 +168,72 @@ World::getReachableTiles(std::int32_t row, std::int32_t col, std::int32_t range,
     setFlag(0x0002u, idx);
   }
   return result;
+}
+
+std::vector<std::int32_t>
+World::getPath(std::int32_t from, std::int32_t to, std::int32_t range, const std::function<bool(std::uint32_t)>& isEnemy)
+{
+  std::vector<std::int32_t> path;
+  std::vector<std::int32_t> parents = floodFill(from, range, isEnemy);
+  if (to == from || !canEndOn(parents, from, to))
+  {
+    return path;
+  }
+  for (std::int32_t idx = to; idx != from; idx = parents[idx])
+  {
+    path.push_back(idx);
+  }
+  std::reverse(path.begin(), path.end());
+  return path;
+}
+
+std::vector<std::int32_t>
+World::floodFill(std::int32_t start, std::int32_t range, const std::function<bool(std::uint32_t)>& isEnemy)
+{
+  std::int32_t dimension = static_cast<std::int32_t>(_dimension);
+  std::vector<std::int32_t> parents(_vflags.size(), -1);
+  if (start < 0 || start >= static_cast<std::int32_t>(_vflags.size()))
+  {
+    return parents;
+  }
+  std::vector<std::int32_t> depth(_vflags.size(), 0);
+  std::deque<std::int32_t> open{start};
+  parents[start] = start;
+  while (!open.empty())
+  {
+    std::int32_t idx = open.front();
+    open.pop_front();
+    if (depth[idx] >= range)
+    {
+      continue;
+    }
+    std::int32_t row = idx / dimension;
+    std::int32_t col = idx % dimension;
+    for (auto [dr, dc] : {std::pair{-1, 0}, std::pair{0, -1}, std::pair{0, 1}, std::pair{1, 0}})
+    {
+      std::int32_t r = row + dr;
+      std::int32_t c = col + dc;
+      if (r < 0 || r >= dimension || c < 0 || c >= dimension)
+      {
+        continue;
+      }
+      std::int32_t next      = r * dimension + c;
+      std::uint32_t occupant = getEntityByIdx(next);
+      if (parents[next] != -1 || (_vflags[next] & 0x0008u) != 0 || (occupant != 0 && isEnemy && isEnemy(occupant)))
+      {
+        continue;
+      }
+      parents[next] = idx;
+      depth[next]   = depth[idx] + 1;
+      open.push_back(next);
+    }
+  }
+  return parents;
+}
+
+bool World::canEndOn(const std::vector<std::int32_t>& parents, std::int32_t start, std::int32_t idx)
+{
+  return parents[idx] != -1 && (idx == start || getEntityByIdx(idx) == 0);
 }
 
 std::vector<std::int32_t>

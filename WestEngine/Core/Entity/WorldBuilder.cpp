@@ -11,6 +11,7 @@ WorldBuilder::WorldBuilder(lua_State* l, std::shared_ptr<ComponentRegistry> r, s
   : _registry(r), _scene(s)
 {
   LuaFacade::getLuaFacadeInstance().registerCFunction(loadWorld, LuaAPI::C_LOAD_WORLD.data(), this);
+  LuaFacade::getLuaFacadeInstance().registerCFunction(setTileBlocked, LuaAPI::C_SET_TILE_BLOCKED.data(), this);
 };
 
 WorldBuilder::~WorldBuilder() {}
@@ -27,6 +28,23 @@ int WorldBuilder::loadWorld(lua_State* L)
   me->_scene->addWorld(w);
   return 0;
 };
+
+int WorldBuilder::setTileBlocked(lua_State* L)
+{
+  WorldBuilder* me         = (WorldBuilder*)lua_touserdata(L, lua_upvalueindex(1));
+  std::shared_ptr<World> w = me->_scene->getWorld();
+  lua_Integer x            = luaL_checkinteger(L, 1);
+  lua_Integer y            = luaL_checkinteger(L, 2);
+  std::int32_t dimension   = w ? w->getGridSize() : 0;
+  if (x < 0 || y < 0 || x >= dimension || y >= dimension)
+  {
+    WestLogger::getLoggerInstance().log(Level::Error,
+                                        std::format("setTileBlocked: tile {}, {} is off the grid\n", x, y));
+    return 0;
+  }
+  w->setFlag(0x0008u, static_cast<std::int32_t>(y * dimension + x));
+  return 0;
+}
 
 void WorldBuilder::createWorld(World& w, lua_State* L)
 {

@@ -32,6 +32,7 @@ private:
   bool isPlayerturn() const {
     return _state == 0;
   }
+  bool isEnemy(std::uint32_t id);
 
   std::shared_ptr<World> _world;
   std::shared_ptr<Camera> _cam;

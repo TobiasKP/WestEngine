@@ -49,6 +49,11 @@ void MovementSystem::moveToDestination(std::uint32_t id, Position* posComp, Move
   {
     updatePosition(*movComp->destination, posComp, id);
   }
+  else if (!movComp->path.empty())
+  {
+    movComp->destination = movComp->path.front();
+    movComp->path.pop_front();
+  }
   else
   {
     bool result = LuaFacade::getLuaFacadeInstance().emit(
@@ -80,7 +85,11 @@ void MovementSystem::updatePosition(glm::vec3 local, Position* posComp, std::uin
 {
   assert(posComp != nullptr);
   PositionCalculation::updatePosition(local, posComp);
-  _world->updateEntityIdToIdx(posComp->position.x, posComp->position.z, id);
+  std::uint32_t occupant = _world->getEntityByIdx(_world->calculateIndex(posComp->position.x, posComp->position.z));
+  if (occupant == 0 || occupant == id)
+  {
+    _world->updateEntityIdToIdx(posComp->position.x, posComp->position.z, id);
+  }
 }
 
 void MovementSystem::updateDebuggingInfo() {}

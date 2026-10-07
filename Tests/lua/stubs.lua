@@ -43,7 +43,7 @@ S.LogLevel = parse_log_levels()
 
 -- C functions the engine registers as globals (LuaAPI.hpp C_* names)
 local ENGINE_FUNCTIONS = {
-  "westLog", "dispatchEvent", "createEntity", "addComponent", "buildEntity", "loadWorld",
+  "westLog", "dispatchEvent", "createEntity", "addComponent", "buildEntity", "loadWorld", "setTileBlocked",
   "getHealth", "getPosition", "gatherWorldInformation", "aiMoveCommand", "aiAttackCommand",
   "aiEndAction", "getScreenResolution", "createInterface", "updateInterfaceValue",
   "destroyInterface", "getMousePosition",

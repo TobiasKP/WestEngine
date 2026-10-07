@@ -30,7 +30,9 @@ function Execute(entityId)
       return
     end
     westLog(LogLevel.Info, "AI entity " .. tostring(entityId) .. " moving to tile " .. tostring(tiles[1]))
-    aiMoveCommand(entityId, tiles[1])
+    if aiMoveCommand(entityId, tiles[1]) == false then
+      return
+    end
     state.TransitionEntityState(entityId, StateMachine.GetEntityState(entityId), StateMachine.EntityStates.MOVING)
   else
     westLog(LogLevel.Info, "AI entity " .. tostring(entityId) .. " attacking entity " .. tostring(enemies[1]))
