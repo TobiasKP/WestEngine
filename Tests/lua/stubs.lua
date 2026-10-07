@@ -44,9 +44,25 @@ S.LogLevel = parse_log_levels()
 -- C functions the engine registers as globals (LuaAPI.hpp C_* names)
 local ENGINE_FUNCTIONS = {
   "westLog", "dispatchEvent", "createEntity", "addComponent", "buildEntity", "loadWorld", "setTileBlocked",
+  "tileToWorldPos",
   "getHealth", "getPosition", "gatherWorldInformation", "aiMoveCommand", "aiAttackCommand",
   "aiEndAction", "getScreenResolution", "createInterface", "updateInterfaceValue",
   "destroyInterface", "getMousePosition",
+}
+
+-- Default behaviour for C functions whose results the scripts use, an S.returns entry wins.
+-- loadWorld keeps the grid dimension so tileToWorldPos mirrors World::tileToWorldPos.
+local world_dim = 0
+local DEFAULTS = {
+  loadWorld = function(w)
+    for _, entry in ipairs(w or {}) do
+      if entry.grid then world_dim = math.floor(math.sqrt(#entry.grid)) end
+    end
+  end,
+  tileToWorldPos = function(x, y)
+    if x < 0 or y < 0 or x >= world_dim or y >= world_dim then return nil end
+    return x + 0.5 - world_dim / 2, y + 0.5 - world_dim / 2
+  end,
 }
 
 S.calls = {}
@@ -100,10 +116,11 @@ function S.reset()
 
   S.calls = {}
   S.returns = {}
+  world_dim = 0
   for _, name in ipairs(ENGINE_FUNCTIONS) do
     _G[name] = function(...)
       record(name, ...)
-      local r = S.returns[name]
+      local r = S.returns[name] or DEFAULTS[name]
       if r then return r(...) end
     end
   end

@@ -80,7 +80,7 @@ local function spawnMisc(data)
   for _, entry in ipairs(data.world or {}) do
     grid = entry.grid or grid
   end
-  local dim, seen = math.sqrt(#grid), {}
+  local dim, seen = math.floor(math.sqrt(#grid)), {}
   for _, misc in ipairs(data.miscPositions or {}) do
     local x, y, kind = misc.x, misc.y, misc.type
     local onGrid = type(x) == "number" and type(y) == "number" and x % 1 == 0 and y % 1 == 0
@@ -94,7 +94,8 @@ local function spawnMisc(data)
       createEntity(kind)
       addComponent("object", kind .. ".obj")
       addComponent("shader", { v = "Vertex.vs", f = "Fragment.fs" })
-      addComponent("position", { name = "position", x = x + 0.5 - dim / 2, y = grid[tile], z = y + 0.5 - dim / 2 })
+      local wx, wz = tileToWorldPos(x, y)
+      addComponent("position", { name = "position", x = wx, y = grid[tile], z = wz })
       buildEntity()
       if misc.walkable == false then
         setTileBlocked(x, y)

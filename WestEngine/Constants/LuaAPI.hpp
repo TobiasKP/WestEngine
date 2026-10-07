@@ -21,11 +21,12 @@ constexpr std::string_view C_WEST_LOG   = "westLog";
 constexpr std::string_view C_LOG_LEVELS = "LogLevel";
 
 // Entity Creation
-constexpr std::string_view C_CREATE_ENTITY    = "createEntity";
-constexpr std::string_view C_ADD_COMPONENT    = "addComponent";
-constexpr std::string_view C_BUILD_ENTITY     = "buildEntity";
-constexpr std::string_view C_LOAD_WORLD       = "loadWorld";
-constexpr std::string_view C_SET_TILE_BLOCKED = "setTileBlocked";
+constexpr std::string_view C_CREATE_ENTITY     = "createEntity";
+constexpr std::string_view C_ADD_COMPONENT     = "addComponent";
+constexpr std::string_view C_BUILD_ENTITY      = "buildEntity";
+constexpr std::string_view C_LOAD_WORLD        = "loadWorld";
+constexpr std::string_view C_SET_TILE_BLOCKED  = "setTileBlocked";
+constexpr std::string_view C_TILE_TO_WORLD_POS = "tileToWorldPos";
 
 // Entity Information
 constexpr std::string_view C_EVENT       = "dispatchEvent";
