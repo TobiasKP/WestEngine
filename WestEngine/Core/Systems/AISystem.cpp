@@ -104,15 +104,7 @@ int AISystem::gatherWorldInformation(lua_State* L)
   assert(posComp != nullptr);
   assert(movComp != nullptr);
   assert(eqComp != nullptr);
-  Weapon* active = nullptr;
-  if (eqComp->active == 1)
-  {
-    active = &eqComp->primary;
-  }
-  else if (eqComp->active == 2)
-  {
-    active = &eqComp->secondary;
-  }
+  Weapon* active                  = eqComp->activeWeapon();
   std::int32_t tileIdx            = me->_world->calculateIndex(posComp->position.x, posComp->position.z);
   std::int32_t dimension          = me->_world->getGridSize();
   std::int32_t column             = tileIdx % dimension;

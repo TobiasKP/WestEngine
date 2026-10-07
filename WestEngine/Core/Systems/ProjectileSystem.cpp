@@ -104,15 +104,7 @@ void ProjectileSystem::handleEvent(std::tuple<EventIdentifiers, EventPayload> ev
       assert(a != nullptr);
       Equipment* e = _reg->getComponent<Equipment>(a->attacker);
       assert(e != nullptr);
-      Weapon* active = nullptr;
-      if (e->active == 1)
-      {
-        active = &e->primary;
-      }
-      else if (e->active == 2)
-      {
-        active = &e->secondary;
-      }
+      Weapon* active = e->activeWeapon();
       if (!active)
       {
         _logger->log(Level::Error,

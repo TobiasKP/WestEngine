@@ -16,4 +16,17 @@ struct Equipment
   Weapon primary;
   Weapon secondary;
   std::uint8_t active = 2;
+
+  Weapon* activeWeapon()
+  {
+    if (active == 1)
+    {
+      return &primary;
+    }
+    if (active == 2)
+    {
+      return &secondary;
+    }
+    return nullptr;
+  }
 };
