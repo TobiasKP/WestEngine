@@ -3,6 +3,7 @@
 #include "../Components/Movement.hpp"
 #include "Entity.h"
 
+#include <functional>
 #include <optional>
 class World : public Entity
 {
@@ -13,8 +14,16 @@ public:
   std::int32_t worldPosToTile(double x, double y);
   std::optional<glm::vec3> tileToWorldPos(std::int32_t idx);
   std::int32_t calculateIndex(double x, double y);
-  std::vector<std::int32_t>
-  getReachableTiles(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a, void* callee);
+  std::vector<std::int32_t> getReachableTiles(std::int32_t row,
+                                              std::int32_t col,
+                                              std::int32_t range,
+                                              algorithm a,
+                                              void* callee,
+                                              const std::function<bool(std::uint32_t)>& isEnemy = {});
+  std::vector<std::int32_t> getPath(std::int32_t from,
+                                    std::int32_t to,
+                                    std::int32_t range,
+                                    const std::function<bool(std::uint32_t)>& isEnemy = {});
   std::vector<std::int32_t>
   getEntitiesInRange(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a, std::int32_t me);
   void addEntityIdToIdx(float x, float y, std::uint32_t id);
@@ -83,6 +92,9 @@ public:
 
 private:
   std::vector<std::int32_t> getTilesByAlgorithm(std::int32_t row, std::int32_t col, std::int32_t range, algorithm a);
+  std::vector<std::int32_t>
+  floodFill(std::int32_t start, std::int32_t range, const std::function<bool(std::uint32_t)>& isEnemy);
+  bool canEndOn(const std::vector<std::int32_t>& parents, std::int32_t start, std::int32_t idx);
 
   std::mutex _mutex;
   std::uint32_t _dimension, _tileSize, _skyboxShaderId;

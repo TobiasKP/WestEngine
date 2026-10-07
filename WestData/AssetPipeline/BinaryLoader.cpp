@@ -27,7 +27,8 @@ void BinaryLoader::shutdown()
 
 bool BinaryLoader::exists(const std::string& modelname)
 {
-  std::string filename = std::format("{}/{}.west", PathUtils::getExecutableDir() + "/bin", "_" + modelname);
+  std::string filename = std::format(
+    "{}/{}.west", PathUtils::getExecutableDir() + "/bin", "_" + std::filesystem::path(modelname).stem().string());
   return std::filesystem::exists(filename);
 }
 
@@ -52,7 +53,11 @@ std::optional<Model> BinaryLoader::loadFromDisk(const std::string& modelname)
     "{}/{}.west", PathUtils::getExecutableDir() + "/bin", "_" + std::filesystem::path(modelname).stem().string());
   std::string guid = AssetUtils::generateGUID(filename);
   _logger->log(Level::Info, std::format("|*| Loading binary model {} from disk\n ", filename));
-  assert(std::filesystem::exists(filename));
+  if (!std::filesystem::exists(filename))
+  {
+    _logger->log(Level::Error, std::format("|*| Binary model {} not found on disk\n", filename));
+    return {};
+  }
   std::ifstream file(filename, std::ios::binary);
   if (!file)
   {

@@ -165,6 +165,111 @@ TEST_F(WorldTest, GetReachableTilesFromOtherSystemsLeavesFlagsUntouched)
   EXPECT_FALSE(world.isDirty());
 }
 
+// ─── getReachableTiles flood fill / getPath ────────────────
+
+static bool isAdjacent(std::int32_t a, std::int32_t b)
+{
+  return std::abs(a / 10 - b / 10) + std::abs(a % 10 - b % 10) == 1;
+}
+
+TEST_F(WorldTest, FloodFillWithoutObstaclesMatchesDiamond)
+{
+  MockSystem sys;
+  for (std::int32_t r = 0; r <= 4; r++)
+  {
+    auto tiles = world.getReachableTiles(5, 5, r, algorithm::MANHATTAN, &sys);
+    EXPECT_EQ(tiles.size(), static_cast<size_t>(2 * r * r + 2 * r + 1)) << "range " << r;
+  }
+  EXPECT_EQ(world.getReachableTiles(0, 0, 3, algorithm::MANHATTAN, &sys).size(), 10u);
+}
+
+TEST_F(WorldTest, BlockedTileInFrontHidesTileBehind)
+{
+  MockSystem sys;
+  world.setFlag(0x0008u, 56);
+  auto tiles = asSet(world.getReachableTiles(5, 5, 2, algorithm::MANHATTAN, &sys));
+  EXPECT_FALSE(tiles.contains(56));
+  EXPECT_FALSE(tiles.contains(57));
+  EXPECT_TRUE(tiles.contains(46));
+  EXPECT_TRUE(tiles.contains(66));
+}
+
+TEST_F(WorldTest, DetourAroundBlockedTileWithinRangeIsReachable)
+{
+  MockSystem sys;
+  world.setFlag(0x0008u, 56);
+  auto tiles = asSet(world.getReachableTiles(5, 5, 4, algorithm::MANHATTAN, &sys));
+  EXPECT_TRUE(tiles.contains(57));
+  EXPECT_FALSE(tiles.contains(56));
+}
+
+TEST_F(WorldTest, EnclosedStartReachesOnlyItself)
+{
+  MockSystem sys;
+  for (std::int32_t idx : {45, 54, 56, 65})
+  {
+    world.setFlag(0x0008u, idx);
+  }
+  EXPECT_EQ(asSet(world.getReachableTiles(5, 5, 3, algorithm::MANHATTAN, &sys)), (std::set<std::int32_t>{55}));
+}
+
+TEST_F(WorldTest, EnemyUnitBlocksPassage)
+{
+  MockSystem sys;
+  world.addEntityIdToIdx(6.5f, 5.5f, 2);
+  auto isEnemy = [](std::uint32_t id) { return id == 2; };
+  auto tiles   = asSet(world.getReachableTiles(5, 5, 2, algorithm::MANHATTAN, &sys, isEnemy));
+  EXPECT_FALSE(tiles.contains(56));
+  EXPECT_FALSE(tiles.contains(57));
+  EXPECT_TRUE(tiles.contains(46));
+}
+
+TEST_F(WorldTest, AlliedUnitCanBePassedButNotEndedOn)
+{
+  MockSystem sys;
+  world.addEntityIdToIdx(5.5f, 5.5f, 1);
+  world.addEntityIdToIdx(6.5f, 5.5f, 3);
+  auto isEnemy = [](std::uint32_t id) { return id == 2; };
+  auto tiles   = asSet(world.getReachableTiles(5, 5, 2, algorithm::MANHATTAN, &sys, isEnemy));
+  EXPECT_TRUE(tiles.contains(55));
+  EXPECT_FALSE(tiles.contains(56));
+  EXPECT_TRUE(tiles.contains(57));
+  EXPECT_EQ(tiles.size(), 12u);
+}
+
+TEST_F(WorldTest, GetPathFollowsShortestDetour)
+{
+  world.setFlag(0x0008u, 56);
+  world.addEntityIdToIdx(5.5f, 4.5f, 2);
+  auto isEnemy = [](std::uint32_t id) { return id == 2; };
+  auto path    = world.getPath(55, 57, 4, isEnemy);
+  ASSERT_EQ(path.size(), 4u);
+  EXPECT_EQ(path.back(), 57);
+  std::int32_t prev = 55;
+  for (std::int32_t idx : path)
+  {
+    EXPECT_TRUE(isAdjacent(prev, idx)) << prev << " -> " << idx;
+    EXPECT_EQ(world.getFlagData()[idx] & 0x0008u, 0u);
+    EXPECT_NE(world.getEntityByIdx(idx), 2u);
+    prev = idx;
+  }
+}
+
+TEST_F(WorldTest, GetPathPassesThroughAlly)
+{
+  world.addEntityIdToIdx(6.5f, 5.5f, 3);
+  EXPECT_EQ(world.getPath(55, 57, 2), (std::vector<std::int32_t>{56, 57}));
+  EXPECT_TRUE(world.getPath(55, 56, 2).empty());
+}
+
+TEST_F(WorldTest, GetPathToUnreachableTargetIsEmpty)
+{
+  world.setFlag(0x0008u, 56);
+  EXPECT_TRUE(world.getPath(55, 57, 2).empty());
+  EXPECT_TRUE(world.getPath(55, 56, 4).empty());
+  EXPECT_TRUE(world.getPath(55, 55, 4).empty());
+}
+
 // ─── worldPosToTile (hover flag) ───────────────────────────
 
 TEST_F(WorldTest, WorldPosToTileReturnsIndexAndSetsHoverFlag)

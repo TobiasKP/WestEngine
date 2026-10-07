@@ -103,7 +103,7 @@ void RenderingCycle::renderEntity(std::string guid,
     if (debug)
     {
       glDisable(GL_DEPTH_TEST);
-      glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, 0);
+      glDrawElements(GL_LINES, _uuidToVertexCount.at(guid)[vao], GL_UNSIGNED_INT, 0);
       glEnable(GL_DEPTH_TEST);
     }
     else

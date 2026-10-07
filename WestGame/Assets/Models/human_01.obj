@@ -1,6 +1,6 @@
 # Blender 5.2.0 LTS
 # www.blender.org
-mtllib firstBlend.mtl
+mtllib human_01.mtl
 o Cube
 v -0.000000 1.066532 0.085319
 v -0.000000 1.329900 0.136203

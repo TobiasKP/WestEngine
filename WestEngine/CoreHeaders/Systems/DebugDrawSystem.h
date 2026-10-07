@@ -7,6 +7,7 @@
 
 #include <WestAssetFacade.hpp>
 #include <WestRendererFacade.hpp>
+#include <vector>
 
 class DebugDrawSystem
 {
@@ -17,7 +18,7 @@ public:
   void update();
 
 private:
-  std::uint32_t createDebugLine(glm::vec3 start, glm::vec3 end);
+  std::uint32_t createDebugLine(const std::vector<glm::vec3>& points);
   void removeDebugEntity(std::uint32_t entityId);
 
   std::shared_ptr<Scene> _scene;

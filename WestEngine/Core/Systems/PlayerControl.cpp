@@ -61,8 +61,9 @@ void PlayerControl::update()
     std::int32_t dimension        = _world->getGridSize();
     std::int32_t column           = tileIdx % dimension;
     std::int32_t row              = tileIdx / dimension;
-    std::vector<std::int32_t> res = _world->getReachableTiles(row, column, movComp->range, movComp->a, this);
-    movComp->reachableTiles       = res;
+    std::vector<std::int32_t> res = _world->getReachableTiles(
+      row, column, movComp->range, movComp->a, this, std::bind_front(&PlayerControl::isEnemy, this));
+    movComp->reachableTiles = res;
   }
   else
   {
@@ -152,10 +153,16 @@ void PlayerControl::passDestinationPosition(glm::vec3 dest, std::uint32_t id)
   Movement* movComp = _reg->getComponent<Movement>(id);
   assert(movComp != nullptr);
 
+  Position* posComp = _reg->getComponent<Position>(id);
+  assert(posComp != nullptr);
   std::int32_t tile = _world->calculateIndex(dest.x, dest.z);
   bool inRange =
     std::find(movComp->reachableTiles.begin(), movComp->reachableTiles.end(), tile) != movComp->reachableTiles.end();
-  if (inRange && !movComp->destination.has_value())
+  std::vector<std::int32_t> path = _world->getPath(_world->calculateIndex(posComp->position.x, posComp->position.z),
+                                                   tile,
+                                                   movComp->range,
+                                                   std::bind_front(&PlayerControl::isEnemy, this));
+  if (inRange && !path.empty() && !movComp->destination.has_value())
   {
     bool result =
       LuaFacade::getLuaFacadeInstance().emit(EventIdentifiers::TILE_LCLICK, EntityPayload{.entityId = id});
@@ -165,7 +172,18 @@ void PlayerControl::passDestinationPosition(glm::vec3 dest, std::uint32_t id)
         Level::Error,
         std::format("{} *** Error emitting event: {}\n", getName(), eventName(EventIdentifiers::TILE_LCLICK)));
     }
-    _busy                = true;
-    movComp->destination = dest;
+    _busy = true;
+    for (std::int32_t idx : path)
+    {
+      movComp->path.push_back(_world->tileToWorldPos(idx).value());
+    }
+    movComp->destination = movComp->path.front();
+    movComp->path.pop_front();
   }
+}
+
+bool PlayerControl::isEnemy(std::uint32_t id)
+{
+  Control* c = _reg->getComponent<Control>(id);
+  return c != nullptr && c->aiControl;
 }

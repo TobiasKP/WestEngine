@@ -116,7 +116,8 @@ int AISystem::gatherWorldInformation(lua_State* L)
   std::int32_t dimension          = me->_world->getGridSize();
   std::int32_t column             = tileIdx % dimension;
   std::int32_t row                = tileIdx / dimension;
-  std::vector<std::int32_t> tiles = me->_world->getReachableTiles(row, column, movComp->range, movComp->a, me);
+  std::vector<std::int32_t> tiles = me->_world->getReachableTiles(
+    row, column, movComp->range, movComp->a, me, std::bind_front(&AISystem::isEnemy, me));
   tiles.erase(std::remove(tiles.begin(), tiles.end(), tileIdx), tiles.end());
   std::vector<std::int32_t> entities;
   if (active)
@@ -159,12 +160,39 @@ int AISystem::aiMoveCommand(lua_State* L)
   AISystem* me      = (AISystem*)lua_touserdata(L, lua_upvalueindex(1));
   std::int32_t id   = lua_tointeger(L, 1);
   Movement* movComp = me->_reg->getComponent<Movement>(id);
+  Position* posComp = me->_reg->getComponent<Position>(id);
   assert(movComp != nullptr);
-  me->_busy                     = true;
-  std::optional<glm::vec3> dest = me->_world->tileToWorldPos(lua_tointeger(L, 2));
-  assert(dest.has_value());
-  movComp->destination = dest.value();
-  return 0;
+  assert(posComp != nullptr);
+  std::int32_t start             = me->_world->calculateIndex(posComp->position.x, posComp->position.z);
+  std::int32_t target            = lua_tointeger(L, 2);
+  std::vector<std::int32_t> path = me->_world->getPath(
+    start, target, movComp->range, std::bind_front(&AISystem::isEnemy, me));
+  if (path.empty())
+  {
+    me->_logger->log(
+      Level::Error,
+      std::format("AISystem ### entity {} has no path from tile {} to {}, ending its action\n", id, start, target));
+    me->_handled.push_back(me->_me);
+    me->_me   = 0;
+    me->_busy = false;
+    lua_pushboolean(L, false);
+    return 1;
+  }
+  me->_busy = true;
+  for (std::int32_t idx : path)
+  {
+    movComp->path.push_back(me->_world->tileToWorldPos(idx).value());
+  }
+  movComp->destination = movComp->path.front();
+  movComp->path.pop_front();
+  lua_pushboolean(L, true);
+  return 1;
+}
+
+bool AISystem::isEnemy(std::uint32_t id)
+{
+  Control* c = _reg->getComponent<Control>(id);
+  return c != nullptr && !c->aiControl;
 }
 
 int AISystem::aiAttackCommand(lua_State* L)

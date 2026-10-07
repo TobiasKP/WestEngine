@@ -103,6 +103,35 @@ TEST_F(WorldVisibilityTest, IsVisibleOutOfRangeIsFalse)
   EXPECT_TRUE(world.isVisible(99));
 }
 
+TEST_F(WorldVisibilityTest, BlockedTileIsNotReachable)
+{
+  VisibilityMockSystem sys;
+  world.setFlag(0x0008u, 56);
+  std::vector<std::int32_t> reachable = world.getReachableTiles(5, 5, 1, algorithm::MANHATTAN, &sys);
+  EXPECT_EQ(std::set<std::int32_t>(reachable.begin(), reachable.end()), (std::set<std::int32_t>{45, 54, 55, 65}));
+}
+
+TEST_F(WorldVisibilityTest, BlockedTileKeepsOtherBitsAndIsNotFlaggedReachable)
+{
+  VisibilityMockSystem player;
+  player.setName("PlayerControl");
+  world.setFlag(0x0001u, 56);
+  world.setFlag(0x0004u, 56);
+  world.setFlag(0x0008u, 56);
+  world.getReachableTiles(5, 5, 1, algorithm::MANHATTAN, &player);
+  auto& flags = world.getFlagData();
+  EXPECT_EQ(flags[56], 0x000Du);
+  EXPECT_EQ(flags[54], 0x0002u);
+}
+
+TEST_F(WorldVisibilityTest, UpdateVisibilityKeepsBlockedBit)
+{
+  world.setFlag(0x0008u, 56);
+  world.updateVisibility({{55, 1}});
+  world.updateVisibility({});
+  EXPECT_EQ(world.getFlagData()[56], 0x0008u);
+}
+
 TEST(LineOfSightRange, PrefersLineOfSightComponent)
 {
   LineOfSight los{.range = 3};

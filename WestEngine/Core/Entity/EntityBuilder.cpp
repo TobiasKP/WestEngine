@@ -43,6 +43,14 @@ int EntityBuilder::addComponent(lua_State* L)
 int EntityBuilder::buildEntity(lua_State* L)
 {
   EntityBuilder* me = EntityBuilder::retrieveMeFromStack(L);
+  if (me->_e.getModelGuid().empty())
+  {
+    WestLogger::getLoggerInstance().log(
+      Level::Error, std::format("Error creating Entity: {}, model failed to load, skipping.\n", me->_e.getName()));
+    me->_registry->removeAllComponents(me->_e.getId());
+    me->_e = {};
+    return 0;
+  }
   Position* p       = me->_registry->getComponent<Position>(me->_e.getId());
   Control* c        = me->_registry->getComponent<Control>(me->_e.getId());
   Health* h         = me->_registry->getComponent<Health>(me->_e.getId());

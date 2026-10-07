@@ -35,8 +35,10 @@ void DebugDrawSystem::update()
     }
     else if (!mov->debugInfoDisplayed && mov->destination.has_value())
     {
-      Position* pos           = reg->getComponent<Position>(id);
-      mov->debugEntity        = createDebugLine(pos->position, *mov->destination);
+      Position* pos = reg->getComponent<Position>(id);
+      std::vector<glm::vec3> points{pos->position, *mov->destination};
+      points.insert(points.end(), mov->path.begin(), mov->path.end());
+      mov->debugEntity        = createDebugLine(points);
       mov->debugInfoDisplayed = true;
     }
   }
@@ -58,23 +60,29 @@ void DebugDrawSystem::update()
     Position* targetPos = reg->getComponent<Position>(proj->destination);
     if (projPos && targetPos)
     {
-      _projectileDebugEntities.push_back(createDebugLine(projPos->position, targetPos->position));
+      _projectileDebugEntities.push_back(createDebugLine({projPos->position, targetPos->position}));
     }
   }
 }
 
-std::uint32_t DebugDrawSystem::createDebugLine(glm::vec3 start, glm::vec3 end)
+std::uint32_t DebugDrawSystem::createDebugLine(const std::vector<glm::vec3>& points)
 {
   std::uint32_t entityId = Config::incEntityId();
   std::string guid       = "debug-line-" + std::to_string(entityId);
 
-  std::vector<Vertex> verts = {
-    {start, {0, 1, 0}, {0, 0}},
-    {end,   {0, 1, 0}, {0, 0}},
-  };
-  std::vector<std::uint32_t> indices = {0, 1};
+  std::vector<Vertex> verts;
+  std::vector<std::uint32_t> indices;
+  AABB aabb = {points.front(), points.front()};
+  for (std::uint32_t i = 0; i < points.size(); i++)
+  {
+    verts.push_back({points[i], {0, 1, 0}, {0, 0}});
+    aabb = {glm::min(aabb.min, points[i]), glm::max(aabb.max, points[i])};
+    if (i > 0)
+    {
+      indices.insert(indices.end(), {i - 1, i});
+    }
+  }
   std::vector<Texture> textures;
-  AABB aabb = {glm::min(start, end), glm::max(start, end)};
   Mesh mesh(guid, verts, indices, textures, aabb);
   mesh.material.diffuseColor = glm::vec3(1.0f, 0.0f, 0.0f);
 
