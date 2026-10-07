@@ -1,6 +1,7 @@
 #include "../../CoreHeaders/Systems/PlayerControl.h"
 
 #include "../../Constants/Systems.hpp"
+#include "../../CoreHeaders/Components/Faction.hpp"
 #include "../Core/Scripting/LuaFacade.hpp"
 #include "../CoreHeaders/Utils/Math/PositionCalculation.h"
 
@@ -62,7 +63,7 @@ void PlayerControl::update()
     std::int32_t column           = tileIdx % dimension;
     std::int32_t row              = tileIdx / dimension;
     std::vector<std::int32_t> res = _world->getReachableTiles(
-      row, column, movComp->range, movComp->a, this, std::bind_front(&PlayerControl::isEnemy, this));
+      row, column, movComp->range, movComp->a, this, std::bind_front(isHostile, std::ref(*_reg), _me));
     movComp->reachableTiles = res;
   }
   else
@@ -112,7 +113,7 @@ void PlayerControl::handleEvent(std::tuple<EventIdentifiers, EventPayload> event
           passDestinationPosition(destination.value(), _me);
         }
       }
-      else if (isEnemy(id))
+      else if (isHostile(*_reg, _me, id))
       {
         passAttackInformation(id);
       }
@@ -161,7 +162,7 @@ void PlayerControl::passDestinationPosition(glm::vec3 dest, std::uint32_t id)
   std::vector<std::int32_t> path = _world->getPath(_world->calculateIndex(posComp->position.x, posComp->position.z),
                                                    tile,
                                                    movComp->range,
-                                                   std::bind_front(&PlayerControl::isEnemy, this));
+                                                   std::bind_front(isHostile, std::ref(*_reg), id));
   if (inRange && !path.empty() && !movComp->destination.has_value())
   {
     bool result =
@@ -173,17 +174,6 @@ void PlayerControl::passDestinationPosition(glm::vec3 dest, std::uint32_t id)
         std::format("{} *** Error emitting event: {}\n", getName(), eventName(EventIdentifiers::TILE_LCLICK)));
     }
     _busy = true;
-    for (std::int32_t idx : path)
-    {
-      movComp->path.push_back(_world->tileToWorldPos(idx).value());
-    }
-    movComp->destination = movComp->path.front();
-    movComp->path.pop_front();
+    _world->followPath(movComp, path);
   }
-}
-
-bool PlayerControl::isEnemy(std::uint32_t id)
-{
-  Control* c = _reg->getComponent<Control>(id);
-  return c != nullptr && c->aiControl;
 }

@@ -187,6 +187,16 @@ World::getPath(std::int32_t from, std::int32_t to, std::int32_t range, const std
   return path;
 }
 
+void World::followPath(Movement* movComp, const std::vector<std::int32_t>& path)
+{
+  for (std::int32_t idx : path)
+  {
+    movComp->path.push_back(tileToWorldPos(idx).value());
+  }
+  movComp->destination = movComp->path.front();
+  movComp->path.pop_front();
+}
+
 std::vector<std::int32_t>
 World::floodFill(std::int32_t start, std::int32_t range, const std::function<bool(std::uint32_t)>& isEnemy)
 {

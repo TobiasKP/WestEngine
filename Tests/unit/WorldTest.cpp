@@ -255,6 +255,17 @@ TEST_F(WorldTest, GetPathFollowsShortestDetour)
   }
 }
 
+TEST_F(WorldTest, FollowPathSetsFirstWaypointAsDestination)
+{
+  Movement m;
+  world.followPath(&m, {56, 57, 47});
+  ASSERT_TRUE(m.destination.has_value());
+  EXPECT_EQ(*m.destination, glm::vec3(6.5f, 0, 5.5f));
+  ASSERT_EQ(m.path.size(), 2u);
+  EXPECT_EQ(m.path.front(), glm::vec3(7.5f, 0, 5.5f));
+  EXPECT_EQ(m.path.back(), glm::vec3(7.5f, 0, 4.5f));
+}
+
 TEST_F(WorldTest, GetPathPassesThroughAlly)
 {
   world.addEntityIdToIdx(6.5f, 5.5f, 3);
