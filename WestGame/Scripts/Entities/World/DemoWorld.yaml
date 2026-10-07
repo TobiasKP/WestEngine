@@ -2,3 +2,7 @@ world:
   - skybox: "skybox"
   - grid:
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+miscPositions:
+  - { x: 1, y: 2, type: "broadleaf_01" }
+  - { x: 2, y: 1, type: "broadleaf_01" }

@@ -53,6 +53,7 @@ std::string ResourceController::addModel(const std::string& path)
                  std::format("|*| Error creating Model for: {} look at trace for more information.\n", path));
     return "";
   }
+  m.value().setName(path);
   std::string guid = m.value().getGuid();
   bool res         = _pool->addModelToScene(std::move(m.value()));
   if (!res)

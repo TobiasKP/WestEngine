@@ -75,6 +75,30 @@ function LoadEntity(entity, qPos)
   interpreteData(data, qPos)
 end
 
+local function spawnMisc(data)
+  local grid = {}
+  for _, entry in ipairs(data.world or {}) do
+    grid = entry.grid or grid
+  end
+  local dim, seen = math.sqrt(#grid), {}
+  for _, misc in ipairs(data.miscPositions or {}) do
+    local x, y, kind = misc.x, misc.y, misc.type
+    local onGrid = type(x) == "number" and type(y) == "number" and x % 1 == 0 and y % 1 == 0
+      and x >= 0 and y >= 0 and x < dim and y < dim
+    local tile = onGrid and y * dim + x + 1 or nil
+    if tile == nil or type(kind) ~= "string" or kind == "" or seen[tile] then
+      westLog(LogLevel.Error, "Skipping misc object " .. tostring(kind) .. " at " .. tostring(x) .. ", " .. tostring(y))
+    else
+      seen[tile] = true
+      createEntity(kind)
+      addComponent("object", kind .. ".obj")
+      addComponent("shader", { v = "Vertex.vs", f = "Fragment.fs" })
+      addComponent("position", { name = "position", x = x + 0.5 - dim / 2, y = grid[tile], z = y + 0.5 - dim / 2 })
+      buildEntity()
+    end
+  end
+end
+
 function world(name)
   assert(name ~= nil)
   local data = loadFile(name)
@@ -82,6 +106,7 @@ function world(name)
     return 1
   end
   loadWorld(data.world);
+  spawnMisc(data)
 end
 
 function FillProjectileInfo(attacker, speed, target, dmg, hit, x, z)
@@ -109,5 +134,6 @@ Utils.FillProjectileInfo = FillProjectileInfo
 Utils.QueueEntity = QueueEntity
 Utils.DrainQueue = DrainQueue
 Utils.World = world;
+Utils.SpawnMisc = spawnMisc
 
 return Utils
